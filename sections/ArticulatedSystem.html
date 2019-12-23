@@ -36,7 +36,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Single-Body Objects" href="SingleBodyObjects.html" />
-    <link rel="prev" title="RaiSim World" href="WorldSystem.html" /> 
+    <link rel="prev" title="Objects" href="Object.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -89,12 +89,18 @@
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ConventionsAndNotations.html">Conventions and Notations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="WorldSystem.html">RaiSim World</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Articulated Systems</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#state-representation">State Representation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#types-of-indicies">Types of Indicies</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="Object.html">Objects</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Articulated Systems</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#state-representation">State Representation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#types-of-indicies">Types of Indicies</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#conversions-between-indicies">Conversions Between Indicies</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
@@ -144,14 +150,14 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
+          <li><a href="Object.html">Objects</a> &raquo;</li>
+        
       <li>Articulated Systems</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/sections/ArticulatedSystem.rst.txt" rel="nofollow"> View page source</a>
-          
         
       </li>
     
@@ -172,8 +178,17 @@
 <h2>Types of Indicies<a class="headerlink" href="#types-of-indicies" title="Permalink to this headline">¶</a></h2>
 <p>ArticulatedSystem class contains multiple types of indicies. To query a specific quantity, you have to provide an index of the right type. Here are the types of indicies in Articulated Systems</p>
 <ul class="simple">
-<li><p>Body Index: All fixed bodies are combined to a single movable body.</p></li>
+<li><p>Body/Joint Index: All fixed bodies are combined to a single movable body. Each movable body has a unique body index. Because there is a movable joint associated with a movable body, there is a 1-to-1 mapping between the joints and the bodies and they share the same index. For a fixed-base system, the first body rigidly fixed to the world is body-0. For a floating-base system, the floating base is body-0.</p></li>
+<li><p>Generalized Velocity (DOF) Index: All joints are mapped to a specific set of generalized velocity indicies.</p></li>
+<li><p>Generalized Coordinate Index:</p></li>
 </ul>
+<div class="section" id="conversions-between-indicies">
+<h3>Conversions Between Indicies<a class="headerlink" href="#conversions-between-indicies" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>A body index to a generalized velocity index: <code class="code docutils literal notranslate"><span class="pre">ArticulatedSystem::getMappingFromBodyIndexToGeneralizedVelocityIndex()</span></code></p></li>
+<li><p>A body index to a generalized coordinate index: <code class="code docutils literal notranslate"><span class="pre">ArticulatedSystem::getMappingFromBodyIndexToGeneralizedCoordinateIndex()</span></code></p></li>
+</ul>
+</div>
 </div>
 </div>
 
@@ -188,7 +203,7 @@
         <a href="SingleBodyObjects.html" class="btn btn-neutral float-right" title="Single-Body Objects" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="WorldSystem.html" class="btn btn-neutral float-left" title="RaiSim World" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="Object.html" class="btn btn-neutral float-left" title="Objects" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
