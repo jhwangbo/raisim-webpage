@@ -2,7 +2,7 @@
 Introduction
 #############################
 
-RaiSim is a physics engine developed by the researchers at Robotic Systems Lab, ETH Zurich.
+RaiSim is a physics engine developed by `Jemin Hwangbo <https://scholar.google.com/citations?user=Uam1ZB8AAAAJ&hl=en&oi=ao>`_, `Dongho Kang <https://donghok.me/>`_ and other researchers at Robotic Systems Lab, ETH Zurich.
 It was designed to provide both the accuracy and speed for simulating robotic systems. 
 However, it is a generic rigid-body simulator and can simulate any rigid body efficiently.
 
@@ -10,7 +10,7 @@ Here is a list of advantages of using RaiSim:
 
 * The speed is benchmarked against other popular physics engine. (`[1] <https://github.com/leggedrobotics/SimBenchmark>`_)
 * The accuracy of RaiSim has been demonstrated through a number of papers (`[2] <https://robotics.sciencemag.org/content/4/26/eaau5872/tab-article-info>`_, `[3] <https://arxiv.org/pdf/1901.07517.pdf>`_)
-* Easiest C++ simulation library to learn/use (see)
+* Easiest C++ simulation library to learn/use
 * A minimum number of dependencies (only on STL, Eigen)
 
 System Requirements
@@ -20,4 +20,37 @@ RaiSim is supported only on the following systems
 * Linux only. support ubuntu 16.04 and 18.04 but might work on other distributions
 * g++, gcc > 6 (how to install?)
 * cmake > 3.10 (how to install?)
-* The binaries contain avx2 instructions. If your CPU is 6-year-old or older (before Haswell), it is likely that raisimLib does not work on your machine.
+* The binaries contain avx2 instructions. If your CPU is 7-year-old or older (before Haswell), it is likely that raisimLib does not work on your machine.
+
+Example code
+===================
+Here is an example of an RaiSim application code.
+
+.. code-block:: c
+
+  #include “raisim/World.hpp”
+
+  int main() {
+    raisim::World world;
+    auto anymal = world.addArticulatedSystem(PATH_TO_URDF);
+    auto ball = world.addSphere(1, 1);
+    auto ground = world.addGround();
+    world.setTimeStep(0.002);
+    world.integrate();
+  }
+
+Here is a cmake file to compile above application code.
+
+.. code-block:: cmake
+
+  cmake_minimum_required(VERSION 3.5)
+  project(raisim_examples LANGUAGES CXX)
+
+  find_package(raisim CONFIG REQUIRED)
+  find_package(Eigen3 REQUIRED HINTS ${Eigen3_HINT})
+  
+  include_directories (${EIGEN3_INCLUDE_DIRS})
+  add_executable(APP_NAME ${file_name})
+
+  target_link_libraries(APP_NAME PUBLIC raisim::raisim)
+  target_include_directories(APP_NAME PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
