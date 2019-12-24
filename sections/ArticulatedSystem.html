@@ -177,11 +177,13 @@
   <div class="section" id="articulated-systems">
 <h1>Articulated Systems<a class="headerlink" href="#articulated-systems" title="Permalink to this headline">¶</a></h1>
 <p>Articulated Systems are a system of multiple bodies connected by joints.
-Each body has a set of collision bodies and visual objects.
 There are two types of articulated systems: <em>Kinematic trees</em> and <em>closed-loop systems</em>.
 Kinematic trees do not contain a loop (a body always has a single joint).
 Consequently, the number of joints is equal to the number of bodies (for floating systems, we assign a floating joint on the root body).
-<strong>RaiSim can only simulate kinematic trees</strong>.</p>
+RaiSim can only simulate <strong>kinematic trees</strong>.</p>
+<p>Each body has a set of collision bodies and visual objects.
+Collision bodies contain a collision object
+Visual objects just store specifications for visualization and the actual visualzation happens in a visualizer (e.g., <a class="reference external" href="https://github.com/leggedrobotics/raisimOgre">raisimOgre</a>)</p>
 <div class="section" id="state-representation">
 <h2>State Representation<a class="headerlink" href="#state-representation" title="Permalink to this headline">¶</a></h2>
 <p>The state of an articulated system can be represented by a <strong>generalized state</strong> <span class="math notranslate nohighlight">\(\boldsymbol{S}\)</span>, which is composed of a <strong>generalized coordinate</strong> <span class="math notranslate nohighlight">\(\boldsymbol{q}\)</span> and a <strong>generalized velocity</strong> <span class="math notranslate nohighlight">\(\boldsymbol{u}\)</span>.
@@ -190,9 +192,7 @@ Since we are not constraining their parameterization, in general,</p>
 \[\begin{equation}
   u\neq\dot{q}.
 \end{equation}\]</div>
-<p>A generalized coordinate fully represents the configuration of the articulated system and a generalized velocity fully represents the velocity state of the articulated system.
-Motions of an articulated system is caused by a <strong>generalized force</strong> <span class="math notranslate nohighlight">\(\boldsymbol{\tau}\)</span>.
-Just like in a Cartesian coordiate (i.e., x, y, z axes), the power exerted by an articulated system is computed as a dot product of generalized force and generalized velocity (i.e., <span class="math notranslate nohighlight">\(\boldsymbol{u}\cdot\boldsymbol{\tau}\)</span>).</p>
+<p>A generalized coordinate fully represents the configuration of the articulated system and a generalized velocity fully represents the velocity state of the articulated system.</p>
 </div>
 <div class="section" id="joints">
 <h2>Joints<a class="headerlink" href="#joints" title="Permalink to this headline">¶</a></h2>
@@ -265,6 +265,21 @@ Just like in a Cartesian coordiate (i.e., x, y, z axes), the power exerted by an
 </div>
 <div class="section" id="dynamics">
 <h2>Dynamics<a class="headerlink" href="#dynamics" title="Permalink to this headline">¶</a></h2>
+<p>All force and torque acting on the system can be represented as a single vector in the generalized velocity space.
+This representation is called <strong>generalized force</strong> <span class="math notranslate nohighlight">\(\boldsymbol{\tau}\)</span>.
+Just like in a Cartesian coordiate (i.e., x, y, z axes), the power exerted by an articulated system is computed as a dot product of generalized force and generalized velocity (i.e., <span class="math notranslate nohighlight">\(\boldsymbol{u}\cdot\boldsymbol{\tau}\)</span>).</p>
+<p>We can also combine the mass and inertia of the whole articulated system and represent them in a single matrix.
+This matrix is called <strong>mass matrix</strong> or <strong>inertia matrix</strong> and denoted as <span class="math notranslate nohighlight">\(\boldsymbol{M}\)</span>.
+A mass matrix represents how much the articulated system resists change in generalized velocities.
+Naively speaking, a large mass matrix means that the articulated system gets low velocity change for a given generalized force.</p>
+<p>The total kinetic energy of the system is computed as <span class="math notranslate nohighlight">\(\frac{1}{2}\boldsymbol{u}^TM\boldsymbol{u}\)</span>.</p>
+<p>The equation of motion of an articulated system is shown below:</p>
+<div class="math notranslate nohighlight">
+\[\begin{equation}
+   \boldsymbol{\tau} = \boldsymbol{M}(\boldsymbol{q})\dot{\boldsymbol{u}} + \boldsymbol{h}(\boldsymbol{q}, \boldsymbol{u}).
+\end{equation}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(\boldsymbol{h}\)</span> is called a non-linear term.
+There are two sources of force that contributes to the non-linear: gravity and</p>
 </div>
 <div class="section" id="contact-dynamics">
 <h2>Contact Dynamics<a class="headerlink" href="#contact-dynamics" title="Permalink to this headline">¶</a></h2>
