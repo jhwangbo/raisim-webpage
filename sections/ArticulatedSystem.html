@@ -94,6 +94,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Articulated Systems</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#state-representation">State Representation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#joints">Joints</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#urdf-convention">URDF convention</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#kinematics">Kinematics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#dynamics">Dynamics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#contact-dynamics">Contact Dynamics</a></li>
@@ -106,7 +107,7 @@
 <li class="toctree-l2"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RelatedSoftware.html">Related Software</a></li>
@@ -178,24 +179,32 @@
 <h1>Articulated Systems<a class="headerlink" href="#articulated-systems" title="Permalink to this headline">¶</a></h1>
 <p>Articulated Systems are a system of multiple bodies connected by joints.
 There are two types of articulated systems: <em>Kinematic trees</em> and <em>closed-loop systems</em>.
-Kinematic trees do not contain a loop (a body always has a single joint).
+Kinematic trees do not contain a loop (a body always has only one joint).
 Consequently, the number of joints is equal to the number of bodies (for floating systems, we assign a floating joint on the root body).
 RaiSim can only simulate <strong>kinematic trees</strong>.</p>
-<p>Each body has a set of collision bodies and visual objects.
-Collision bodies contain a collision object
-Visual objects just store specifications for visualization and the actual visualzation happens in a visualizer (e.g., <a class="reference external" href="https://github.com/leggedrobotics/raisimOgre">raisimOgre</a>)</p>
 <div class="section" id="state-representation">
 <h2>State Representation<a class="headerlink" href="#state-representation" title="Permalink to this headline">¶</a></h2>
 <p>The state of an articulated system can be represented by a <strong>generalized state</strong> <span class="math notranslate nohighlight">\(\boldsymbol{S}\)</span>, which is composed of a <strong>generalized coordinate</strong> <span class="math notranslate nohighlight">\(\boldsymbol{q}\)</span> and a <strong>generalized velocity</strong> <span class="math notranslate nohighlight">\(\boldsymbol{u}\)</span>.
 Since we are not constraining their parameterization, in general,</p>
 <div class="math notranslate nohighlight">
 \[\begin{equation}
-  u\neq\dot{q}.
+  \boldsymbol{u}\neq\dot{\boldsymbol{q}}.
 \end{equation}\]</div>
 <p>A generalized coordinate fully represents the configuration of the articulated system and a generalized velocity fully represents the velocity state of the articulated system.</p>
+<p>Both Generalized coordinate and velocity are defined by what joints link the bodies together.
+Each joint has a generalized coordinate and a generalized velocity.
+Stack of all joint generalized coordinates and velocities are the generalized coordinates and velocities of the articulated system, respectively.
+The order of stacking is called <strong>joint order</strong>.
+The joint order is the order the joint appears in the URDF unless otherwise it is explicitly given at the construction time.
+It starts with a <strong>root body</strong> which is the first body of the articulated system.
+For floating-base systems, a root body is the floating base.
+For fixed-base systems, a root body is the one rigidly attached to the wolrd (and thus cannot move).
+The following example illustrates how the generalized coordinates and velocities are defined.</p>
+<p><strong>image here</strong></p>
 </div>
 <div class="section" id="joints">
 <h2>Joints<a class="headerlink" href="#joints" title="Permalink to this headline">¶</a></h2>
+<p>Here are the available joints in RaiSim.</p>
 <table class="colwidths-given docutils align-default" id="id1">
 <caption><span class="caption-text">Joint Properties (<span class="math notranslate nohighlight">\(|\cdot|\)</span> is a symbol for dimension size (i.e., cardinality))</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
 <colgroup>
@@ -253,12 +262,27 @@ Since we are not constraining their parameterization, in general,</p>
 </tr>
 </tbody>
 </table>
-<p>here is <span class="math notranslate nohighlight">\(^j_k\boldsymbol{q}=mc^2 \in \mathbb{R}\)</span></p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{eqnarray}
-   y    &amp; = &amp; ax^2 + bx + c \\
-   f(x) &amp; = &amp; x^2 + 2xy + y^2
-\end{eqnarray}\end{split}\]</div>
+<p>The generalized coordinates/velocities of a joint are expressed in the <strong>joint frame</strong> and with respect to the <strong>parent body</strong>.
+Joint frame is the frame attached to every joint and fixed to the parent body.
+Parent body is the one closer to the root body among the two bodies connected via the joint.
+Note that the angular velocity of a floating base is also expressed in a parent frame (which is the <strong>world frame</strong>).
+Other libraries (e.g., RBLD) might have a different convention and a special care has to be taken in conversions.</p>
+</div>
+<div class="section" id="urdf-convention">
+<h2>URDF convention<a class="headerlink" href="#urdf-convention" title="Permalink to this headline">¶</a></h2>
+<p>RaiSim uses a modified URDF protocol to define an articulated system.
+URDF files following the original convention can be read in RaiSim.
+However, since RaiSim offers more functionalities, a RaiSim URDF might not be read by other libraries following the original URDF convention.</p>
+<p>The modifications are as follows:</p>
+<ul class="simple">
+<li><p>Capsule geom is available for both collision objects and visual objects (with the keyword “capsule”). The geom is defined by “height” and “radius” keyword. The height represents the distance between the two center points of the spheres.</p></li>
+<li><p>A &lt;joint&gt;/&lt;dynamics&gt; tag can have three more attributes: <em>rotor inertia</em>, <em>spring_mount</em> and <em>stiffness</em>.</p></li>
+</ul>
+<p><strong>Rotor inertia</strong> in Raisim approximately simulates the rotor inertia of the motor (but missing the resulting gyroscopic effect, which is often neglegible).
+It is common way to include the inertial effect of the rotor.</p>
+<p>In RaiSim, each body of an articulated system has a set of collision bodies and visual objects.
+Collision bodies contain a collision object of one of the following shapes: mesh, sphere, box, cylinder, capsule.</p>
+<p>Visual objects just store specifications for visualization and the actual visualzation happens in a visualizer (e.g., <a class="reference external" href="https://github.com/leggedrobotics/raisimOgre">raisimOgre</a>)</p>
 </div>
 <div class="section" id="kinematics">
 <h2>Kinematics<a class="headerlink" href="#kinematics" title="Permalink to this headline">¶</a></h2>
