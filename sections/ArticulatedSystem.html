@@ -283,14 +283,35 @@ However, since RaiSim offers more functionalities, a RaiSim URDF might not be re
 <p><strong>Rotor inertia</strong> in Raisim approximately simulates the rotor inertia of the motor (but missing the resulting gyroscopic effect, which is often neglegible).
 It is common way to include the inertial effect of the rotor.
 You can also override it in C++ using <code class="code docutils literal notranslate"><span class="pre">setRotorInertia()</span></code>.</p>
-<p>In RaiSim, each body of an articulated system has a set of collision bodies and visual objects.
-Collision bodies contain a collision object of one of the following shapes: mesh, sphere, box, cylinder, capsule.</p>
+<p>In RaiSim, each body of an articulated system has a set of collision bodies and visual objects.</p>
+<p>Collision bodies contain a collision object of one of the following shapes: <em>mesh</em>, <em>sphere</em>, <em>box</em>, <em>cylinder</em>, <em>capsule</em>.</p>
 <p>Visual objects just store specifications for visualization and the actual visualzation happens in a visualizer (e.g., <a class="reference external" href="https://github.com/leggedrobotics/raisimOgre">raisimOgre</a>)</p>
+<p>For details, check the <a class="reference external" href="http://wiki.ros.org/urdf/XML">URDF protocol</a>.</p>
 </div>
 <div class="section" id="kinematics">
 <h2>Kinematics<a class="headerlink" href="#kinematics" title="Permalink to this headline">¶</a></h2>
 <p>A position and velocity of a specific point on a body of an articulated system can be obtained by attaching a <strong>frame</strong>.
-<strong>Frame</strong></p>
+<strong>Frame</strong> of an articulated system in RaiSim is rigidly attached to a body of the system and has a constant position and orientation (w.r.t. parent frame).
+It is the most recommended way to get kinematics information of a point of an articulated system in RaiSim.</p>
+<p>All joint frames have a frame attached and their names are the same as the joint name.
+To create a custom frame, a fixed frame can be defined at the point of the interest.
+A dummy link with zero inertia and zero mass can be added on one side of the fixed joint to complete the kinematic tree.</p>
+<p>A frame can be locally stored as an index in the user code. For e.g.,</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">“raisim/World.hpp”</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">raisim</span><span class="o">::</span><span class="n">World</span> <span class="n">world</span><span class="p">;</span>
+  <span class="k">auto</span> <span class="n">anymal</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">addArticulatedSystem</span><span class="p">(</span><span class="n">PATH_TO_URDF</span><span class="p">);</span>
+  <span class="k">auto</span> <span class="n">footFrameIndex</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">getFrameIdxByName</span><span class="p">(</span><span class="s">&quot;foot_joint&quot;</span><span class="p">);</span> <span class="c1">// the URDF has a joint named &quot;foot_joint&quot;</span>
+  <span class="n">raisim</span><span class="o">::</span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;</span> <span class="n">footPosition</span><span class="p">,</span> <span class="n">footVelocity</span><span class="p">,</span> <span class="n">footAngularVelocity</span><span class="p">;</span>
+  <span class="n">raisim</span><span class="o">::</span><span class="n">Mat</span><span class="o">&lt;</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="o">&gt;</span> <span class="n">footOrientation</span><span class="p">;</span>
+  <span class="n">world</span><span class="p">.</span><span class="n">getFramePosition</span><span class="p">(</span><span class="n">footFrameIndex</span><span class="p">,</span> <span class="n">footPosition</span><span class="p">);</span>
+  <span class="n">world</span><span class="p">.</span><span class="n">getFrameOrientation</span><span class="p">(</span><span class="n">footFrameIndex</span><span class="p">,</span> <span class="n">footOrientation</span><span class="p">);</span>
+  <span class="n">world</span><span class="p">.</span><span class="n">getFrameVelocity</span><span class="p">(</span><span class="n">footFrameIndex</span><span class="p">,</span> <span class="n">footVelocity</span><span class="p">);</span>
+  <span class="n">world</span><span class="p">.</span><span class="n">getFrameAngularVelocity</span><span class="p">(</span><span class="n">footFrameIndex</span><span class="p">,</span> <span class="n">footAngularVelocity</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="dynamics">
 <h2>Dynamics<a class="headerlink" href="#dynamics" title="Permalink to this headline">¶</a></h2>
