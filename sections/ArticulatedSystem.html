@@ -98,6 +98,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#kinematics">Kinematics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#dynamics">Dynamics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#contact-dynamics">Contact Dynamics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pd-controller">PD Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#integration-steps">Integration Steps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#types-of-indicies">Types of Indicies</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#conversions-between-indicies">Conversions Between Indicies</a></li>
 </ul>
@@ -280,13 +282,15 @@ However, since RaiSim offers more functionalities, a RaiSim URDF might not be re
 </ul>
 <p><strong>Rotor inertia</strong> in Raisim approximately simulates the rotor inertia of the motor (but missing the resulting gyroscopic effect, which is often neglegible).
 It is common way to include the inertial effect of the rotor.
-You can also override it in C++.</p>
+You can also override it in C++ using <code class="code docutils literal notranslate"><span class="pre">setRotorInertia()</span></code>.</p>
 <p>In RaiSim, each body of an articulated system has a set of collision bodies and visual objects.
 Collision bodies contain a collision object of one of the following shapes: mesh, sphere, box, cylinder, capsule.</p>
 <p>Visual objects just store specifications for visualization and the actual visualzation happens in a visualizer (e.g., <a class="reference external" href="https://github.com/leggedrobotics/raisimOgre">raisimOgre</a>)</p>
 </div>
 <div class="section" id="kinematics">
 <h2>Kinematics<a class="headerlink" href="#kinematics" title="Permalink to this headline">¶</a></h2>
+<p>A position and velocity of a specific point on a body of an articulated system can be obtained by attaching a <strong>frame</strong>.
+<strong>Frame</strong></p>
 </div>
 <div class="section" id="dynamics">
 <h2>Dynamics<a class="headerlink" href="#dynamics" title="Permalink to this headline">¶</a></h2>
@@ -304,10 +308,16 @@ Naively speaking, a large mass matrix means that the articulated system gets low
    \boldsymbol{\tau} = \boldsymbol{M}(\boldsymbol{q})\dot{\boldsymbol{u}} + \boldsymbol{h}(\boldsymbol{q}, \boldsymbol{u}).
 \end{equation}\]</div>
 <p>Here <span class="math notranslate nohighlight">\(\boldsymbol{h}\)</span> is called a non-linear term.
-There are two sources of force that contributes to the non-linear: gravity and</p>
+There are three sources of force that contributes to the non-linear: gravity, coriolis, and centrifugal force.</p>
 </div>
 <div class="section" id="contact-dynamics">
 <h2>Contact Dynamics<a class="headerlink" href="#contact-dynamics" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="pd-controller">
+<h2>PD Controller<a class="headerlink" href="#pd-controller" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="integration-steps">
+<h2>Integration Steps<a class="headerlink" href="#integration-steps" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="types-of-indicies">
 <h2>Types of Indicies<a class="headerlink" href="#types-of-indicies" title="Permalink to this headline">¶</a></h2>
