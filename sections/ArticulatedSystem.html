@@ -183,9 +183,9 @@
             
   <div class="section" id="articulated-systems">
 <h1>Articulated Systems<a class="headerlink" href="#articulated-systems" title="Permalink to this headline">¶</a></h1>
-<p>Articulated Systems are a system of multiple bodies connected by joints.
+<p>Articulated Systems are a system of multiple bodies connected through joints.
 There are two types of articulated systems: <em>Kinematic trees</em> and <em>closed-loop systems</em>.
-Kinematic trees do not contain a loop (a body always has only one joint).
+Kinematic trees do not contain a loop (a body always has only one parent joint).
 Consequently, the number of joints is equal to the number of bodies (for floating systems, we assign a floating joint on the root body).
 RaiSim can only simulate <strong>kinematic trees</strong>.</p>
 <div class="section" id="creating-an-instance">
@@ -375,6 +375,9 @@ If a rotational Jacobian is used, the right-hand side changes to a rotational ve
 <li><p><code class="code docutils literal notranslate"><span class="pre">getSparseRotationalJacobian</span></code></p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">getDenseRotationalJacobian</span></code> – this method only fills non-zero values. The matrix should be initialized to a zero matrix of an appropriate size.</p></li>
 </ul>
+<p>The main Jacobian class in RaiSim is <code class="code docutils literal notranslate"><span class="pre">raisim::SparseJacobian</span></code>.
+It has a member <code class="code docutils literal notranslate"><span class="pre">idx</span></code> which stores the indicies of columns whose values are non-zero.
+Note that only the joints between the child body and the root body affect the motion of the point.</p>
 </div>
 </div>
 <div class="section" id="dynamics">

@@ -1,9 +1,9 @@
 #############################
 Articulated Systems
 #############################
-Articulated Systems are a system of multiple bodies connected by joints. 
+Articulated Systems are a system of multiple bodies connected through joints. 
 There are two types of articulated systems: *Kinematic trees* and *closed-loop systems*. 
-Kinematic trees do not contain a loop (a body always has only one joint).
+Kinematic trees do not contain a loop (a body always has only one parent joint).
 Consequently, the number of joints is equal to the number of bodies (for floating systems, we assign a floating joint on the root body).
 RaiSim can only simulate **kinematic trees**.
 
@@ -203,6 +203,9 @@ To get the rotational Jacobians, the following methods are used
 * :code:`getSparseRotationalJacobian`
 * :code:`getDenseRotationalJacobian` -- this method only fills non-zero values. The matrix should be initialized to a zero matrix of an appropriate size.
 
+The main Jacobian class in RaiSim is :code:`raisim::SparseJacobian`. 
+It has a member :code:`idx` which stores the indicies of columns whose values are non-zero.
+Note that only the joints between the child body and the root body affect the motion of the point.
 
 Dynamics
 =============================
