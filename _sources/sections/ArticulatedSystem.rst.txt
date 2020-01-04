@@ -209,6 +209,20 @@ Next, the desirable joint gains have to be set.
 
 Note that **the dimension of the pGain vector is the same as that of the generalized velocity NOT that of the coordinate**.
 
+Finally, the target position and the velocity can set as below
+
+.. code-block:: c
+
+  Eigen::VectorXd pTarget(robot->getGeneralizedCoordinateDim()), vTarget(robot->getDOF());
+  pTarget<< ...; // set your position target
+  vTarget<< ...; // set your velocity target
+  robot->setPdTarget(pTarget, vTarget);
+
+Here, **the dimension of the pTarget vector is the same as that of the generalized coordinate NOT that of the velocity**.
+This is confusing and might seem inconsistent.
+However, this is a valid convention.
+The only reason that the two dimensions differ is a quaternion.
+The quaternion target is represented by a quaternion whereas the virtual spring stiffness between the two orientations can be represented by 3D vector, where each dimension represents the motions in each angular velocity components.
 
 Integration Steps
 =============================

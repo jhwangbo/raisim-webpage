@@ -365,6 +365,18 @@ However, it is often desirable to have a stable PD controller when a user wants 
 </pre></div>
 </div>
 <p>Note that <strong>the dimension of the pGain vector is the same as that of the generalized velocity NOT that of the coordinate</strong>.</p>
+<p>Finally, the target position and the velocity can set as below</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span> <span class="n">pTarget</span><span class="p">(</span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getGeneralizedCoordinateDim</span><span class="p">()),</span> <span class="n">vTarget</span><span class="p">(</span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getDOF</span><span class="p">());</span>
+<span class="n">pTarget</span><span class="o">&lt;&lt;</span> <span class="p">...;</span> <span class="c1">// set your position target</span>
+<span class="n">vTarget</span><span class="o">&lt;&lt;</span> <span class="p">...;</span> <span class="c1">// set your velocity target</span>
+<span class="n">robot</span><span class="o">-&gt;</span><span class="n">setPdTarget</span><span class="p">(</span><span class="n">pTarget</span><span class="p">,</span> <span class="n">vTarget</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Here, <strong>the dimension of the pTarget vector is the same as that of the generalized coordinate NOT that of the velocity</strong>.
+This is confusing and might seem inconsistent.
+However, this is a valid convention.
+The only reason that the two dimensions differ is a quaternion.
+The quaternion target is represented by a quaternion whereas the virtual spring stiffness between the two orientations can be represented by 3D vector, where each dimension represents the motions in each angular velocity components.</p>
 </div>
 <div class="section" id="integration-steps">
 <h2>Integration Steps<a class="headerlink" href="#integration-steps" title="Permalink to this headline">¶</a></h2>
