@@ -97,7 +97,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#urdf-convention">URDF convention</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#kinematics">Kinematics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#dynamics">Dynamics</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#contact-dynamics">Contact Dynamics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pd-controller">PD Controller</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#integration-steps">Integration Steps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#types-of-indicies">Types of Indicies</a><ul>
@@ -324,7 +323,7 @@ Frames are instantiated during initialization of the articulated system instance
 This representation is called <strong>generalized force</strong> <span class="math notranslate nohighlight">\(\boldsymbol{\tau}\)</span>.
 Just like in a Cartesian coordiate (i.e., x, y, z axes), the power exerted by an articulated system is computed as a dot product of generalized force and generalized velocity (i.e., <span class="math notranslate nohighlight">\(\boldsymbol{u}\cdot\boldsymbol{\tau}\)</span>).</p>
 <p>We can also combine the mass and inertia of the whole articulated system and represent them in a single matrix.
-This matrix is called <strong>mass matrix</strong> or <strong>inertia matrix</strong> and denoted as <span class="math notranslate nohighlight">\(\boldsymbol{M}\)</span>.
+This matrix is called <strong>mass matrix</strong> or <strong>inertia matrix</strong> and denoted by <span class="math notranslate nohighlight">\(\boldsymbol{M}\)</span>.
 A mass matrix represents how much the articulated system resists change in generalized velocities.
 Naively speaking, a large mass matrix means that the articulated system gets low velocity change for a given generalized force.</p>
 <p>The total kinetic energy of the system is computed as <span class="math notranslate nohighlight">\(\frac{1}{2}\boldsymbol{u}^T\boldsymbol{M}\boldsymbol{u}\)</span>.</p>
@@ -333,14 +332,39 @@ Naively speaking, a large mass matrix means that the articulated system gets low
 \[\begin{equation}
    \boldsymbol{\tau} = \boldsymbol{M}(\boldsymbol{q})\dot{\boldsymbol{u}} + \boldsymbol{h}(\boldsymbol{q}, \boldsymbol{u}).
 \end{equation}\]</div>
-<p>Here <span class="math notranslate nohighlight">\(\boldsymbol{h}\)</span> is called a non-linear term.
-There are three sources of force that contributes to the non-linear: gravity, coriolis, and centrifugal force.</p>
-</div>
-<div class="section" id="contact-dynamics">
-<h2>Contact Dynamics<a class="headerlink" href="#contact-dynamics" title="Permalink to this headline">¶</a></h2>
+<p>Here <span class="math notranslate nohighlight">\(\boldsymbol{h}\)</span> is called a <strong>non-linear term</strong>.
+There are three sources of force that contributes to the non-linear term: gravity, coriolis, and centrifugal force.</p>
+<p>The following methods are used to obtain dynamic quantities</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">getMassMatrix()</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">getNonlinearities()</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">getInverseMassMatrix()</span></code></p></li>
+</ul>
+<p>It is rarely useful to compute the gravity contribution to the nonlinear term alone.
+However, if it is needed, the easiest way is to make the same robot in another world with zero velocity.
+If the generalized velocity is zero, the coriolis and centrifugal contributions are zero.</p>
 </div>
 <div class="section" id="pd-controller">
 <h2>PD Controller<a class="headerlink" href="#pd-controller" title="Permalink to this headline">¶</a></h2>
+<p>When naively implemented, a PD controller can often make a robot unstable.
+For simulating a discrete control system (e.g., robot), this instability is also present in the real system.
+However, it is often desirable to have a stable PD controller when a user wants to keep the time step small.</p>
+<p>To use the PD controller, the control mode has to be set to the “PD_PLUS_FEEDFORWARD_TORQUE” mode as following</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">setControlMode</span><span class="p">(</span><span class="n">ControlMode</span><span class="o">::</span><span class="n">Type</span><span class="o">::</span><span class="n">PD_PLUS_FEEDFORWARD_TORQUE</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The current control mode can be retrived as folloing</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">controlMode</span> <span class="o">=</span> <span class="n">robot</span><span class="o">-&gt;</span><span class="n">getControlMode</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>Next, the desirable joint gains have to be set.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span> <span class="n">pGain</span><span class="p">(</span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getDOF</span><span class="p">()),</span> <span class="n">dGain</span><span class="p">(</span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getDOF</span><span class="p">());</span>
+<span class="n">pGain</span><span class="o">&lt;&lt;</span> <span class="p">...;</span> <span class="c1">// set your proportional gain values here</span>
+<span class="n">dGain</span><span class="o">&lt;&lt;</span> <span class="p">...;</span> <span class="c1">// set your differential gain values here</span>
+<span class="n">robot</span><span class="o">-&gt;</span><span class="n">setPdGains</span><span class="p">(</span><span class="n">pGain</span><span class="p">,</span> <span class="n">dGain</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Note that <strong>the dimension of the pGain vector is the same as that of the generalized velocity NOT that of the coordinate</strong>.</p>
 </div>
 <div class="section" id="integration-steps">
 <h2>Integration Steps<a class="headerlink" href="#integration-steps" title="Permalink to this headline">¶</a></h2>

@@ -153,7 +153,7 @@ This representation is called **generalized force** :math:`\boldsymbol{\tau}`.
 Just like in a Cartesian coordiate (i.e., x, y, z axes), the power exerted by an articulated system is computed as a dot product of generalized force and generalized velocity (i.e., :math:`\boldsymbol{u}\cdot\boldsymbol{\tau}`).
 
 We can also combine the mass and inertia of the whole articulated system and represent them in a single matrix.
-This matrix is called **mass matrix** or **inertia matrix** and denoted as :math:`\boldsymbol{M}`. 
+This matrix is called **mass matrix** or **inertia matrix** and denoted by :math:`\boldsymbol{M}`. 
 A mass matrix represents how much the articulated system resists change in generalized velocities.
 Naively speaking, a large mass matrix means that the articulated system gets low velocity change for a given generalized force.
 
@@ -167,15 +167,48 @@ The equation of motion of an articulated system is shown below:
      \boldsymbol{\tau} = \boldsymbol{M}(\boldsymbol{q})\dot{\boldsymbol{u}} + \boldsymbol{h}(\boldsymbol{q}, \boldsymbol{u}).
   \end{equation}
 
-Here :math:`\boldsymbol{h}` is called a non-linear term. 
-There are three sources of force that contributes to the non-linear: gravity, coriolis, and centrifugal force.
+Here :math:`\boldsymbol{h}` is called a **non-linear term**. 
+There are three sources of force that contributes to the non-linear term: gravity, coriolis, and centrifugal force.
 
+The following methods are used to obtain dynamic quantities
 
-Contact Dynamics
-=============================
+* :code:`getMassMatrix()`
+* :code:`getNonlinearities()`
+* :code:`getInverseMassMatrix()`
+
+It is rarely useful to compute the gravity contribution to the nonlinear term alone.
+However, if it is needed, the easiest way is to make the same robot in another world with zero velocity.
+If the generalized velocity is zero, the coriolis and centrifugal contributions are zero.
 
 PD Controller
 =============================
+When naively implemented, a PD controller can often make a robot unstable.
+For simulating a discrete control system (e.g., robot), this instability is also present in the real system.
+However, it is often desirable to have a stable PD controller when a user wants to keep the time step small.
+
+To use the PD controller, the control mode has to be set to the "PD_PLUS_FEEDFORWARD_TORQUE" mode as following
+
+.. code-block:: c
+
+  robot->setControlMode(ControlMode::Type::PD_PLUS_FEEDFORWARD_TORQUE);
+
+The current control mode can be retrived as folloing
+
+.. code-block:: c
+
+  auto controlMode = robot->getControlMode();
+
+Next, the desirable joint gains have to be set.
+
+.. code-block:: c
+
+  Eigen::VectorXd pGain(robot->getDOF()), dGain(robot->getDOF());
+  pGain<< ...; // set your proportional gain values here
+  dGain<< ...; // set your differential gain values here
+  robot->setPdGains(pGain, dGain);
+
+Note that **the dimension of the pGain vector is the same as that of the generalized velocity NOT that of the coordinate**.
+
 
 Integration Steps
 =============================
