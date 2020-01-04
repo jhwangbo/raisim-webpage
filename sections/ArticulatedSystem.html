@@ -92,6 +92,7 @@
 <li class="toctree-l1"><a class="reference internal" href="WorldSystem.html">RaiSim World</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="Object.html">Objects</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Articulated Systems</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#creating-an-instance">Creating an instance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#state-representation">State Representation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#joints">Joints</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#urdf-convention">URDF convention</a></li>
@@ -183,6 +184,16 @@ There are two types of articulated systems: <em>Kinematic trees</em> and <em>clo
 Kinematic trees do not contain a loop (a body always has only one joint).
 Consequently, the number of joints is equal to the number of bodies (for floating systems, we assign a floating joint on the root body).
 RaiSim can only simulate <strong>kinematic trees</strong>.</p>
+<div class="section" id="creating-an-instance">
+<h2>Creating an instance<a class="headerlink" href="#creating-an-instance" title="Permalink to this headline">¶</a></h2>
+<p>Just like any other object, an articulated system is also created by the world instance using <code class="code docutils literal notranslate"><span class="pre">addArticulatedSystem</span></code> method.
+There are tree ways to specify the system.</p>
+<ol class="arabic simple">
+<li><p>by providing the path to the URDF file (the most recommneded way)</p></li>
+<li><p>by providing <code class="code docutils literal notranslate"><span class="pre">std::string</span></code> of the URDF text (can be useful when working with Xacro)</p></li>
+<li><p>by providing a <code class="code docutils literal notranslate"><span class="pre">raisim::Child</span></code> instance. It is an advanced method and not recommnded to beginners.</p></li>
+</ol>
+</div>
 <div class="section" id="state-representation">
 <h2>State Representation<a class="headerlink" href="#state-representation" title="Permalink to this headline">¶</a></h2>
 <p>The state of an articulated system can be represented by a <strong>generalized state</strong> <span class="math notranslate nohighlight">\(\boldsymbol{S}\)</span>, which is composed of a <strong>generalized coordinate</strong> <span class="math notranslate nohighlight">\(\boldsymbol{q}\)</span> and a <strong>generalized velocity</strong> <span class="math notranslate nohighlight">\(\boldsymbol{u}\)</span>.
@@ -197,7 +208,11 @@ Each joint has a generalized coordinate and a generalized velocity.
 Stack of all joint generalized coordinates and velocities are the generalized coordinates and velocities of the articulated system, respectively.
 The order of stacking is called <strong>joint order</strong>.
 The joint order is the order the joint appears in the URDF unless otherwise it is explicitly given at the construction time.
-It starts with a <strong>root body</strong> which is the first body of the articulated system.
+The joint order can be accessed through <code class="code docutils literal notranslate"><span class="pre">getMovableJointNames()</span></code>.
+Note the keyword “movable”.
+The fixed joints contribute to neither the generalized coordinate nor the generalized velocity.
+Only movable the joints do.
+The joint order starts with a <strong>root body</strong> which is the first body of the articulated system.
 For floating-base systems, a root body is the floating base.
 For fixed-base systems, a root body is the one rigidly attached to the wolrd (and thus cannot move).
 The following example illustrates how the generalized coordinates and velocities are defined.</p>
@@ -341,7 +356,11 @@ Just like in a Cartesian coordiate (i.e., x, y, z axes), the power exerted by an
 This matrix is called <strong>mass matrix</strong> or <strong>inertia matrix</strong> and denoted by <span class="math notranslate nohighlight">\(\boldsymbol{M}\)</span>.
 A mass matrix represents how much the articulated system resists change in generalized velocities.
 Naively speaking, a large mass matrix means that the articulated system gets low velocity change for a given generalized force.</p>
-<p>The total kinetic energy of the system is computed as <span class="math notranslate nohighlight">\(\frac{1}{2}\boldsymbol{u}^T\boldsymbol{M}\boldsymbol{u}\)</span>.</p>
+<p>The total kinetic energy of the system is computed as <span class="math notranslate nohighlight">\(\frac{1}{2}\boldsymbol{u}^T\boldsymbol{M}\boldsymbol{u}\)</span>.
+This quantity can be obtained by <code class="code docutils literal notranslate"><span class="pre">getKineticEnergy()</span></code>.</p>
+<p>The total potential energy due to the gravity is a sum of <span class="math notranslate nohighlight">\(mgh\)</span> for all bodies.
+This quantity can be obtained by <code class="code docutils literal notranslate"><span class="pre">getEnergy()</span></code>.
+Note that the gravity has to be specified since only the world has the gravity vector.</p>
 <p>The equation of motion of an articulated system is shown below:</p>
 <div class="math notranslate nohighlight">
 \[\begin{equation}
@@ -392,6 +411,9 @@ This is confusing and might seem inconsistent.
 However, this is a valid convention.
 The only reason that the two dimensions differ is a quaternion.
 The quaternion target is represented by a quaternion whereas the virtual spring stiffness between the two orientations can be represented by a 3D vector, which is composed of motions in each angular velocity components.</p>
+<p>A feedforward force term can be added by <code class="code docutils literal notranslate"><span class="pre">setGeneralizedForce()</span></code>.
+Note that this value stored at the instance and does not change unless the user specifies it to.
+If this feedforward force should be applied for a single time step, it should be set to zero in the subsequent control loop (after <code class="code docutils literal notranslate"><span class="pre">integrate()</span></code> call of the world).</p>
 <p>The theory of the implemented PD controller can be found in chapter 1.2 of this <a class="reference external" href="https://www.overleaf.com/read/dbqbgcnhzykq">article</a>.
 This document is only for advanced users and it is not necessary to use RaiSim.</p>
 </div>
