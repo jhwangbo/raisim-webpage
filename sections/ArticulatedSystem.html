@@ -397,6 +397,21 @@ This document is only for advanced users and it is not necessary to use RaiSim.<
 </div>
 <div class="section" id="integration-steps">
 <h2>Integration Steps<a class="headerlink" href="#integration-steps" title="Permalink to this headline">¶</a></h2>
+<p>Integration of an articulated systems is performed as following</p>
+<ol class="arabic simple">
+<li><p>If the time step changed, update the damping of the mass matrix (which reflects effective inertial increase due to springs, dampers and PD gains)</p></li>
+<li><p>Update positions of the collision bodies</p></li>
+<li><p>Detect collisions (called by the world instance)</p></li>
+<li><p>The world assigns contacts on each object and computes the contact normal</p></li>
+<li><p>Compute the mass matrix, nonlinear term and inverse inertia matrix</p></li>
+<li><p>Compute jacobians of contacts</p></li>
+<li><p>Compute contact Properties</p></li>
+<li><p>Compute PD controller (if used), add it to the feedforward force and bound it by the limits</p></li>
+<li><p>Compute generalized forces due to springs and external forces/torques</p></li>
+<li><p>Contact solver (called by the world instance)</p></li>
+<li><p>Integrate the velocity</p></li>
+<li><p>Integrate the position (in a semi-implicit way)</p></li>
+</ol>
 </div>
 <div class="section" id="types-of-indicies">
 <h2>Types of Indicies<a class="headerlink" href="#types-of-indicies" title="Permalink to this headline">¶</a></h2>
