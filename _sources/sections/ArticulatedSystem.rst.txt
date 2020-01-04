@@ -144,6 +144,10 @@ For details, check the `URDF protocol <http://wiki.ros.org/urdf/XML>`_.
 
 Kinematics
 =============================
+
+Frames
+****************************
+
 A position and velocity of a specific point on a body of an articulated system can be obtained by attaching a **frame**.
 **Frame** of an articulated system in RaiSim is rigidly attached to a body of the system and has a constant position and orientation (w.r.t. parent frame).
 It is the most recommended way to get kinematics information of a point of an articulated system in RaiSim.
@@ -175,6 +179,29 @@ For e.g., you can replace :code:`getFrameIdxByName` by :code:`getFrameByName` in
 In this way, you can access the internal variables and even modify them.
 Modifying the frames do not affect the joints.
 Frames are instantiated during initialization of the articulated system instance and affect neither kinematics nor dynamics of the system.
+
+Jacobians
+****************************
+Jacobians of a point in RaiSim satisfy the following equation:
+
+.. math::
+
+  \begin{equation}
+    \boldsymbol{J}\boldsymbol{u} = \boldsymbol{v}
+  \end{equation}
+
+where :math:`\boldsymbol{v}` represents the linear velocity of the associated point.
+If a rotational Jacobian is used, the right-hand side changes to a rotational velocity expressed in the world frame.
+
+To get the Jacobians associated with the linear velocity, the following methods are used
+
+* :code:`getSparseJacobian`
+* :code:`getDenseJacobian` -- this method only fills non-zero values. The matrix should be initialized to a zero matrix of an appropriate size.
+
+To get the rotational Jacobians, the following methods are used
+
+* :code:`getSparseRotationalJacobian`
+* :code:`getDenseRotationalJacobian` -- this method only fills non-zero values. The matrix should be initialized to a zero matrix of an appropriate size.
 
 
 Dynamics
