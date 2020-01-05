@@ -422,8 +422,9 @@ If the generalized velocity is zero, the coriolis and centrifugal contributions 
 <div class="section" id="pd-controller">
 <h2>PD Controller<a class="headerlink" href="#pd-controller" title="Permalink to this headline">¶</a></h2>
 <p>When naively implemented, a PD controller can often make a robot unstable.
-For simulating a discrete control system (e.g., robot), this instability is also present in the real system.
-However, it is often desirable to have a stable PD controller when a user wants to keep the time step small.</p>
+However, this is often not so bad for robotics since this instability might be also present in the real system (discrete-time control system).</p>
+<p>For other applications like animation and graphics, it is often desirable to have a stable PD controller when a user wants to keep the time step small.
+This provided PD controller uses a more stable integration scheme and can have much smaller time step than a naive implementation.</p>
 <p>To use the PD controller, the control mode has to be set to the “PD_PLUS_FEEDFORWARD_TORQUE” mode as following</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">setControlMode</span><span class="p">(</span><span class="n">ControlMode</span><span class="o">::</span><span class="n">Type</span><span class="o">::</span><span class="n">PD_PLUS_FEEDFORWARD_TORQUE</span><span class="p">);</span>
 </pre></div>
@@ -450,7 +451,7 @@ However, it is often desirable to have a stable PD controller when a user wants 
 <p>Here, <strong>the dimension of the pTarget vector is the same as that of the generalized coordinate NOT that of the velocity</strong>.
 This is confusing and might seem inconsistent.
 However, this is a valid convention.
-The only reason that the two dimensions differ is a quaternion.
+The only reason that the two dimensions differ is quaternions.
 The quaternion target is represented by a quaternion whereas the virtual spring stiffness between the two orientations can be represented by a 3D vector, which is composed of motions in each angular velocity components.</p>
 <p>A feedforward force term can be added by <code class="code docutils literal notranslate"><span class="pre">setGeneralizedForce()</span></code>.
 Note that this value stored at the instance and does not change unless the user specifies it to.
