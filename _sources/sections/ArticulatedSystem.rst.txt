@@ -333,34 +333,48 @@ In such cases, simulation cannot be performed reliably and it is advised to care
 
 Here is a list of modifiable kinematic/dynamic parameters.
 
-* Joint Position (relative to the parent joint) Expressed in the Parent Frame
+* **Joint Position (relative to the parent joint) Expressed in the Parent Frame**
 
 :code:`getJointPos_P` method returns (a non-const reference to) a :code:`std::vector` of position vectors from the parent joint to the child joint expressed in the respective parent joint frames.
 This should be changed with care since it can result in unrealistic collision geometry.
 **This method does not change the position of the end-effector with respect to its parent** as it is defined by the collision body position, not by the joint position.
 The elements are ordered by the joint indicies.
 
-* Joint Axis in the Parent Frame
+* **Joint Axis in the Parent Frame**
 
 :code:`getJointAxis_P` method returns (a non-const reference to) a :code:`std::vector` of joint axes expressed in the respective parent joint frame.
 This method should also be changed with care.
 The elements are ordered by the joint indicies.
 
-* Mass of the Links
+* **Mass of the Links**
 
 :code:`getMass` method returns (a non-const reference to) a :code:`std::vector` of link masses.
 **IMPORTANT! You must call :code:`updateMassInfo`** after changing mass values.
 The elements are ordered by the body indicies (which is the same as the joint indicies in RaiSim).
 
-* Center of Mass Position
+* **Center of Mass Position**
 
 :code:`getLinkCOM` method returns (a non-const reference to) a :code:`std::vector` of the COM of the links.
 The elements are ordered by the body indicies.
 
-* Link Inertia
+* **Link Inertia**
 
 :code:`getInertia` method returns (a non-const reference to) a :code:`std::vector` of link inertia.
 The elements are ordered by the body indicies.
+
+* **Collision Bodies**
+
+:code:`getCollisionBodies` method returns (a non-const reference to) a :code:`std::vector` of the collision bodies.
+This vector contains all collision bodies associated with the articulated system.
+
+:code:`getCollisionBody` method returns a specific collision body instead.
+All collision bodies are named "LINK_NAME" + "/INDEX". 
+For example, the 2nd collision body of a link named "FOOT" is named "FOOT/1" (1 because the index starts from 0).
+
+The collision bodies is a class that contains position/orientation offset from the parent joint frame, name, parent body index, and ODE collision pointer (:code:`dGeomID`, retrieved using :code:`getCollisionObject`).
+The collision geom can be modified using ODE methods (`ODE manual <http://ode.org/wiki/index.php?title=Manual>`_).
+Users can also modify the material of the collision body.
+This material affects the contact dynamics.
 
 Types of Indicies
 =============================

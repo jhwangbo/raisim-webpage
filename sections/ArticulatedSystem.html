@@ -486,34 +486,46 @@ For example, joints can be locked by collision bodies.
 In such cases, simulation cannot be performed reliably and it is advised to carefully check randomly generated robot models.</p>
 <p>Here is a list of modifiable kinematic/dynamic parameters.</p>
 <ul class="simple">
-<li><p>Joint Position (relative to the parent joint) Expressed in the Parent Frame</p></li>
+<li><p><strong>Joint Position (relative to the parent joint) Expressed in the Parent Frame</strong></p></li>
 </ul>
 <p><code class="code docutils literal notranslate"><span class="pre">getJointPos_P</span></code> method returns (a non-const reference to) a <code class="code docutils literal notranslate"><span class="pre">std::vector</span></code> of position vectors from the parent joint to the child joint expressed in the respective parent joint frames.
 This should be changed with care since it can result in unrealistic collision geometry.
 <strong>This method does not change the position of the end-effector with respect to its parent</strong> as it is defined by the collision body position, not by the joint position.
 The elements are ordered by the joint indicies.</p>
 <ul class="simple">
-<li><p>Joint Axis in the Parent Frame</p></li>
+<li><p><strong>Joint Axis in the Parent Frame</strong></p></li>
 </ul>
 <p><code class="code docutils literal notranslate"><span class="pre">getJointAxis_P</span></code> method returns (a non-const reference to) a <code class="code docutils literal notranslate"><span class="pre">std::vector</span></code> of joint axes expressed in the respective parent joint frame.
 This method should also be changed with care.
 The elements are ordered by the joint indicies.</p>
 <ul class="simple">
-<li><p>Mass of the Links</p></li>
+<li><p><strong>Mass of the Links</strong></p></li>
 </ul>
 <p><code class="code docutils literal notranslate"><span class="pre">getMass</span></code> method returns (a non-const reference to) a <code class="code docutils literal notranslate"><span class="pre">std::vector</span></code> of link masses.
 <strong>IMPORTANT! You must call :code:`updateMassInfo`</strong> after changing mass values.
 The elements are ordered by the body indicies (which is the same as the joint indicies in RaiSim).</p>
 <ul class="simple">
-<li><p>Center of Mass Position</p></li>
+<li><p><strong>Center of Mass Position</strong></p></li>
 </ul>
 <p><code class="code docutils literal notranslate"><span class="pre">getLinkCOM</span></code> method returns (a non-const reference to) a <code class="code docutils literal notranslate"><span class="pre">std::vector</span></code> of the COM of the links.
 The elements are ordered by the body indicies.</p>
 <ul class="simple">
-<li><p>Link Inertia</p></li>
+<li><p><strong>Link Inertia</strong></p></li>
 </ul>
 <p><code class="code docutils literal notranslate"><span class="pre">getInertia</span></code> method returns (a non-const reference to) a <code class="code docutils literal notranslate"><span class="pre">std::vector</span></code> of link inertia.
 The elements are ordered by the body indicies.</p>
+<ul class="simple">
+<li><p><strong>Collision Bodies</strong></p></li>
+</ul>
+<p><code class="code docutils literal notranslate"><span class="pre">getCollisionBodies</span></code> method returns (a non-const reference to) a <code class="code docutils literal notranslate"><span class="pre">std::vector</span></code> of the collision bodies.
+This vector contains all collision bodies associated with the articulated system.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">getCollisionBody</span></code> method returns a specific collision body instead.
+All collision bodies are named “LINK_NAME” + “/INDEX”.
+For example, the 2nd collision body of a link named “FOOT” is named “FOOT/1” (1 because the index starts from 0).</p>
+<p>The collision bodies is a class that contains position/orientation offset from the parent joint frame, name, parent body index, and ODE collision pointer (<code class="code docutils literal notranslate"><span class="pre">dGeomID</span></code>, retrieved using <code class="code docutils literal notranslate"><span class="pre">getCollisionObject</span></code>).
+The collision geom can be modified using ODE methods (<a class="reference external" href="http://ode.org/wiki/index.php?title=Manual">ODE manual</a>).
+Users can also modify the material of the collision body.
+This material affects the contact dynamics.</p>
 </div>
 <div class="section" id="types-of-indicies">
 <h2>Types of Indicies<a class="headerlink" href="#types-of-indicies" title="Permalink to this headline">¶</a></h2>
