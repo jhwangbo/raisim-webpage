@@ -331,7 +331,23 @@ Note that a random model might be kinematically and dynamically unrealistic.
 For example, joints can be locked by collision bodies.
 In such cases, simulation cannot be performed reliably and it is advised to carefully check randomly generated robot models.
 
+Here is a list of modifiable kinematic/dynamic parameters.
 
+Joint Position (relative to the parent joint) Expressed in the Parent Frame
+***********************************************************************************************
+:code:`getJointPos_P` method returns (a non-const reference to) a :code:`std::vector` of position vectors from the parent joint to the child joint expressed in the respective parent joint frames.
+This should be changed with care since it can result in unrealistic collision geometry.
+**This method does not change the position of the end-effector with respect to its parent** as it is defined by the collision body position, not by the joint position.
+
+Joint Axis in the Parent Frame
+*******************************
+:code:`getJointAxis_P` method returns (a non-const reference to) a :code:`std::vector` of joint axes expressed in the respective parent joint frame.
+This method should also be changed with care.
+
+Mass of the Links
+******************************
+:code:`getMass` method returns (a non-const reference to) a vector link masses.
+**IMPORTANT! You must call :code:`updateMassInfo`** after changing mass values.
 
 Types of Indicies
 =============================
