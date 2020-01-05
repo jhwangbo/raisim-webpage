@@ -333,25 +333,34 @@ In such cases, simulation cannot be performed reliably and it is advised to care
 
 Here is a list of modifiable kinematic/dynamic parameters.
 
-Joint Position (relative to the parent joint) Expressed in the Parent Frame
-****************************************************************************
+* Joint Position (relative to the parent joint) Expressed in the Parent Frame
+
 :code:`getJointPos_P` method returns (a non-const reference to) a :code:`std::vector` of position vectors from the parent joint to the child joint expressed in the respective parent joint frames.
 This should be changed with care since it can result in unrealistic collision geometry.
 **This method does not change the position of the end-effector with respect to its parent** as it is defined by the collision body position, not by the joint position.
+The elements are ordered by the joint indicies.
 
-Joint Axis in the Parent Frame
-*******************************
+* Joint Axis in the Parent Frame
+
 :code:`getJointAxis_P` method returns (a non-const reference to) a :code:`std::vector` of joint axes expressed in the respective parent joint frame.
 This method should also be changed with care.
+The elements are ordered by the joint indicies.
 
-Mass of the Links
-******************************
-:code:`getMass` method returns (a non-const reference to) a vector link masses.
+* Mass of the Links
+
+:code:`getMass` method returns (a non-const reference to) a :code:`std::vector` of link masses.
 **IMPORTANT! You must call :code:`updateMassInfo`** after changing mass values.
+The elements are ordered by the body indicies (which is the same as the joint indicies in RaiSim).
 
-Center of Mass Position
-*****************************
+* Center of Mass Position
 
+:code:`getLinkCOM` method returns (a non-const reference to) a :code:`std::vector` of the COM of the links.
+The elements are ordered by the body indicies.
+
+* Link Inertia
+
+:code:`getInertia` method returns (a non-const reference to) a :code:`std::vector` of link inertia.
+The elements are ordered by the body indicies.
 
 Types of Indicies
 =============================

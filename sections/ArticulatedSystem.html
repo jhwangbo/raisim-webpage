@@ -104,13 +104,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#dynamics">Dynamics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pd-controller">PD Controller</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#integration-steps">Integration Steps</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#get-and-modify-robot-description-in-code">Get and Modify Robot Description in code</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#joint-position-relative-to-the-parent-joint-expressed-in-the-parent-frame">Joint Position (relative to the parent joint) Expressed in the Parent Frame</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#joint-axis-in-the-parent-frame">Joint Axis in the Parent Frame</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#mass-of-the-links">Mass of the Links</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#center-of-mass-position">Center of Mass Position</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#get-and-modify-robot-description-in-code">Get and Modify Robot Description in code</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#types-of-indicies">Types of Indicies</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#conversions-between-indicies">Conversions Between Indicies</a></li>
 </ul>
@@ -491,25 +485,35 @@ Note that a random model might be kinematically and dynamically unrealistic.
 For example, joints can be locked by collision bodies.
 In such cases, simulation cannot be performed reliably and it is advised to carefully check randomly generated robot models.</p>
 <p>Here is a list of modifiable kinematic/dynamic parameters.</p>
-<div class="section" id="joint-position-relative-to-the-parent-joint-expressed-in-the-parent-frame">
-<h3>Joint Position (relative to the parent joint) Expressed in the Parent Frame<a class="headerlink" href="#joint-position-relative-to-the-parent-joint-expressed-in-the-parent-frame" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Joint Position (relative to the parent joint) Expressed in the Parent Frame</p></li>
+</ul>
 <p><code class="code docutils literal notranslate"><span class="pre">getJointPos_P</span></code> method returns (a non-const reference to) a <code class="code docutils literal notranslate"><span class="pre">std::vector</span></code> of position vectors from the parent joint to the child joint expressed in the respective parent joint frames.
 This should be changed with care since it can result in unrealistic collision geometry.
-<strong>This method does not change the position of the end-effector with respect to its parent</strong> as it is defined by the collision body position, not by the joint position.</p>
-</div>
-<div class="section" id="joint-axis-in-the-parent-frame">
-<h3>Joint Axis in the Parent Frame<a class="headerlink" href="#joint-axis-in-the-parent-frame" title="Permalink to this headline">¶</a></h3>
+<strong>This method does not change the position of the end-effector with respect to its parent</strong> as it is defined by the collision body position, not by the joint position.
+The elements are ordered by the joint indicies.</p>
+<ul class="simple">
+<li><p>Joint Axis in the Parent Frame</p></li>
+</ul>
 <p><code class="code docutils literal notranslate"><span class="pre">getJointAxis_P</span></code> method returns (a non-const reference to) a <code class="code docutils literal notranslate"><span class="pre">std::vector</span></code> of joint axes expressed in the respective parent joint frame.
-This method should also be changed with care.</p>
-</div>
-<div class="section" id="mass-of-the-links">
-<h3>Mass of the Links<a class="headerlink" href="#mass-of-the-links" title="Permalink to this headline">¶</a></h3>
-<p><code class="code docutils literal notranslate"><span class="pre">getMass</span></code> method returns (a non-const reference to) a vector link masses.
-<strong>IMPORTANT! You must call :code:`updateMassInfo`</strong> after changing mass values.</p>
-</div>
-<div class="section" id="center-of-mass-position">
-<h3>Center of Mass Position<a class="headerlink" href="#center-of-mass-position" title="Permalink to this headline">¶</a></h3>
-</div>
+This method should also be changed with care.
+The elements are ordered by the joint indicies.</p>
+<ul class="simple">
+<li><p>Mass of the Links</p></li>
+</ul>
+<p><code class="code docutils literal notranslate"><span class="pre">getMass</span></code> method returns (a non-const reference to) a <code class="code docutils literal notranslate"><span class="pre">std::vector</span></code> of link masses.
+<strong>IMPORTANT! You must call :code:`updateMassInfo`</strong> after changing mass values.
+The elements are ordered by the body indicies (which is the same as the joint indicies in RaiSim).</p>
+<ul class="simple">
+<li><p>Center of Mass Position</p></li>
+</ul>
+<p><code class="code docutils literal notranslate"><span class="pre">getLinkCOM</span></code> method returns (a non-const reference to) a <code class="code docutils literal notranslate"><span class="pre">std::vector</span></code> of the COM of the links.
+The elements are ordered by the body indicies.</p>
+<ul class="simple">
+<li><p>Link Inertia</p></li>
+</ul>
+<p><code class="code docutils literal notranslate"><span class="pre">getInertia</span></code> method returns (a non-const reference to) a <code class="code docutils literal notranslate"><span class="pre">std::vector</span></code> of link inertia.
+The elements are ordered by the body indicies.</p>
 </div>
 <div class="section" id="types-of-indicies">
 <h2>Types of Indicies<a class="headerlink" href="#types-of-indicies" title="Permalink to this headline">¶</a></h2>
