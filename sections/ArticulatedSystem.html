@@ -319,6 +319,7 @@ However, since RaiSim offers more functionalities, a RaiSim URDF might not be re
 <p><strong>Rotor inertia</strong> in Raisim approximately simulates the rotor inertia of the motor (but missing the resulting gyroscopic effect, which is often neglegible).
 It is added to the diagonal elements of the mass matrix.
 It is common way to include the inertial effect of the rotor.
+This means that it only
 You can also override it in C++ using <code class="code docutils literal notranslate"><span class="pre">setRotorInertia()</span></code>.</p>
 <p>In RaiSim, each body of an articulated system has a set of collision bodies and visual objects.</p>
 <p>Collision bodies contain a collision object of one of the following shapes: <em>mesh</em>, <em>sphere</em>, <em>box</em>, <em>cylinder</em>, <em>capsule</em>.</p>
@@ -453,13 +454,19 @@ This document is only for advanced users and it is not necessary to use RaiSim.<
 </div>
 <div class="section" id="integration-steps">
 <h2>Integration Steps<a class="headerlink" href="#integration-steps" title="Permalink to this headline">¶</a></h2>
-<p>Integration of an articulated systems is performed as following</p>
+<p>Integration of an articulated systems is performed in two stages: <code class="code docutils literal notranslate"><span class="pre">integrate1</span></code> and <code class="code docutils literal notranslate"><span class="pre">integrate2</span></code></p>
+<p>The following steps are performed in <code class="code docutils literal notranslate"><span class="pre">integrate1</span></code></p>
 <ol class="arabic simple">
 <li><p>If the time step changed, update the damping of the mass matrix (which reflects effective inertial increase due to springs, dampers and PD gains)</p></li>
 <li><p>Update positions of the collision bodies</p></li>
 <li><p>Detect collisions (called by the world instance)</p></li>
 <li><p>The world assigns contacts on each object and computes the contact normal</p></li>
 <li><p>Compute the mass matrix, nonlinear term and inverse inertia matrix</p></li>
+</ol>
+<p>After this step, all kinematic/dynamic proerpties are computed at this stage.
+Users can access them if they are necessary for the controller.
+Next, <code class="code docutils literal notranslate"><span class="pre">integrate2</span></code> computes the contact forces and integrate the velocities and positions.</p>
+<ol class="arabic simple" start="6">
 <li><p>Compute jacobians of contacts</p></li>
 <li><p>Compute contact Properties</p></li>
 <li><p>Compute PD controller (if used), add it to the feedforward force and bound it by the limits</p></li>

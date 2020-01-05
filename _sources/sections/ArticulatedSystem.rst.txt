@@ -133,6 +133,7 @@ The modifications are as follows:
 **Rotor inertia** in Raisim approximately simulates the rotor inertia of the motor (but missing the resulting gyroscopic effect, which is often neglegible). 
 It is added to the diagonal elements of the mass matrix.
 It is common way to include the inertial effect of the rotor.
+This means that it only
 You can also override it in C++ using :code:`setRotorInertia()`.
 
 In RaiSim, each body of an articulated system has a set of collision bodies and visual objects. 
@@ -300,13 +301,20 @@ This document is only for advanced users and it is not necessary to use RaiSim.
 
 Integration Steps
 =============================
-Integration of an articulated systems is performed as following
+Integration of an articulated systems is performed in two stages: :code:`integrate1` and :code:`integrate2`
+
+The following steps are performed in :code:`integrate1`
 
 1. If the time step changed, update the damping of the mass matrix (which reflects effective inertial increase due to springs, dampers and PD gains)
 2. Update positions of the collision bodies
 3. Detect collisions (called by the world instance)
 4. The world assigns contacts on each object and computes the contact normal
 5. Compute the mass matrix, nonlinear term and inverse inertia matrix
+
+After this step, all kinematic/dynamic proerpties are computed at this stage. 
+Users can access them if they are necessary for the controller.
+Next, :code:`integrate2` computes the contact forces and integrate the velocities and positions.
+
 6. Compute jacobians of contacts
 7. Compute contact Properties
 8. Compute PD controller (if used), add it to the feedforward force and bound it by the limits
