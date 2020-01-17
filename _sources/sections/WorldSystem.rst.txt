@@ -1,9 +1,59 @@
 #############################
 RaiSim World
 #############################
-
-raisim::World class creates/manages all resources. 
+:code:`raisim::World` class creates/manages all resources. 
 It is the only class that you have to create yourself, except a few math classes and materials.
-All objects defined in the same Wolrd class instance can collide each other unless their collision mask and group explicitly disables the collision. 
+All objects defined in the same Wolrd class instance can collide each other unless otherwise their collision mask and group explicitly disables the collision. 
 
-Currently, you can only dynamically generate the world. We are working on a method of generating a world from an XML script.
+Currently, you can only dynamically generate the world. A new constructor for generating a world from an XML script will be introduced soon (the existing one is not thoroughly tested and not recommended yet).
+
+The world class contains the following features:
+
+Adding New Objects
+============================
+To add a new object of a shape X, a method named :code:`addX` is used.
+For example, to add a sphere
+
+.. code-block:: c
+
+  raisim::World world;
+  auto sphere = world.addSphere(0.5, 1.0);
+
+Here :code:`sphere` is a pointer to the internal resource.
+It can be used to access or to modify the internal variables.
+
+There are three hidden arguments to all object creation methods: :code:`material`, :code:`collisionGroup` and :code:`collisionMask`.
+Descriptions of the collision varaibles are given in "Collision and Contact" chapter.
+:code:`material` argument specifies the material which governs contact dynamics.
+It is further explained in "Material System" chapter.
+
+The list of objects is given in "Object" chapter.
+
+Once an object is added, a name can be set as below
+
+.. code-block:: c
+
+  sphere.setName("ball");
+
+A pointer to an object with a specific name can be retrieved as below
+
+.. code-block:: c
+
+  auto ball = world.getObject("ball");
+
+Adding constraints
+===============================
+RaiSim Offers two types of constraints: hard wire constraint and soft wire constraint.
+Wire constraints are unilateral; they can only pull.
+Stiff wire is a hard constraint and solved using the contact solver.
+Soft wire is a soft constraint and computed
+
+Changing Simulation Parameters
+================================
+The following paramters can be changed using the world API
+
+* **Time step**
+
+RaiSim uses a fixed time step. The time step obtained and modified using :code:`getTimeStep` and :code:`setTimeStep` method.
+
+*
