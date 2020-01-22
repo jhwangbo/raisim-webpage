@@ -356,7 +356,7 @@ A dummy link with zero inertia and zero mass must be added on one side of the fi
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>You can also store Frame reference.
+<p>You can also store a Frame reference.
 For e.g., you can replace <code class="code docutils literal notranslate"><span class="pre">getFrameIdxByName</span></code> by <code class="code docutils literal notranslate"><span class="pre">getFrameByName</span></code> in the above example.
 In this way, you can access the internal variables and even modify them.
 Modifying the frames do not affect the joints.
@@ -382,10 +382,10 @@ If a rotational Jacobian is used, the right-hand side changes to a rotational ve
 <li><p><code class="code docutils literal notranslate"><span class="pre">getDenseRotationalJacobian</span></code> – this method only fills non-zero values. The matrix should be initialized to a zero matrix of an appropriate size.</p></li>
 </ul>
 <p>The main Jacobian class in RaiSim is <code class="code docutils literal notranslate"><span class="pre">raisim::SparseJacobian</span></code>.
-RaiSim uses only sparse Jacobians it is more cache-friendly.
+RaiSim uses only sparse Jacobians as it is more memory-friendly.
 Note that only the joints between the child body and the root body affect the motion of the point.</p>
 <p>The class <code class="code docutils literal notranslate"><span class="pre">raisim::SparseJacobian</span></code> has a member <code class="code docutils literal notranslate"><span class="pre">idx</span></code> which stores the indicies of columns whose values are non-zero.
-The member <code class="code docutils literal notranslate"><span class="pre">v</span></code> is compacted to store only the non-zero values.
+The member <code class="code docutils literal notranslate"><span class="pre">v</span></code> stores the Jacobian except the zero columns.
 In other words, ith column of <code class="code docutils literal notranslate"><span class="pre">v</span></code> corresponds to <code class="code docutils literal notranslate"><span class="pre">idx[i]</span></code> generalized velocity dimension.</p>
 </div>
 </div>
@@ -397,7 +397,7 @@ Just like in a Cartesian coordiate (i.e., x, y, z axes), the power exerted by an
 <p>We can also combine the mass and inertia of the whole articulated system and represent them in a single matrix.
 This matrix is called <strong>mass matrix</strong> or <strong>inertia matrix</strong> and denoted by <span class="math notranslate nohighlight">\(\boldsymbol{M}\)</span>.
 A mass matrix represents how much the articulated system resists change in generalized velocities.
-Naively speaking, a large mass matrix means that the articulated system gets low velocity change for a given generalized force.</p>
+Naively speaking, a large mass matrix means that the articulated system experiences a low velocity change for a given generalized force.</p>
 <p>The total kinetic energy of the system is computed as <span class="math notranslate nohighlight">\(\frac{1}{2}\boldsymbol{u}^T\boldsymbol{M}\boldsymbol{u}\)</span>.
 This quantity can be obtained by <code class="code docutils literal notranslate"><span class="pre">getKineticEnergy()</span></code>.</p>
 <p>The total potential energy due to the gravity is a sum of <span class="math notranslate nohighlight">\(mgh\)</span> for all bodies.

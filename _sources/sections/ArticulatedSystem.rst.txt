@@ -178,7 +178,7 @@ A frame can be locally stored as an index in the user code. For e.g.,
     anymal.getFrameAngularVelocity(footFrameIndex, footAngularVelocity);
   }
 
-You can also store Frame reference. 
+You can also store a Frame reference. 
 For e.g., you can replace :code:`getFrameIdxByName` by :code:`getFrameByName` in the above example.
 In this way, you can access the internal variables and even modify them.
 Modifying the frames do not affect the joints.
@@ -208,11 +208,11 @@ To get the rotational Jacobians, the following methods are used
 * :code:`getDenseRotationalJacobian` -- this method only fills non-zero values. The matrix should be initialized to a zero matrix of an appropriate size.
 
 The main Jacobian class in RaiSim is :code:`raisim::SparseJacobian`. 
-RaiSim uses only sparse Jacobians it is more cache-friendly.
+RaiSim uses only sparse Jacobians as it is more memory-friendly.
 Note that only the joints between the child body and the root body affect the motion of the point.
 
 The class :code:`raisim::SparseJacobian` has a member :code:`idx` which stores the indicies of columns whose values are non-zero.
-The member :code:`v` is compacted to store only the non-zero values.
+The member :code:`v` stores the Jacobian except the zero columns.
 In other words, ith column of :code:`v` corresponds to :code:`idx[i]` generalized velocity dimension.
 
 Dynamics
@@ -224,7 +224,7 @@ Just like in a Cartesian coordiate (i.e., x, y, z axes), the power exerted by an
 We can also combine the mass and inertia of the whole articulated system and represent them in a single matrix.
 This matrix is called **mass matrix** or **inertia matrix** and denoted by :math:`\boldsymbol{M}`. 
 A mass matrix represents how much the articulated system resists change in generalized velocities.
-Naively speaking, a large mass matrix means that the articulated system gets low velocity change for a given generalized force.
+Naively speaking, a large mass matrix means that the articulated system experiences a low velocity change for a given generalized force.
 
 The total kinetic energy of the system is computed as :math:`\frac{1}{2}\boldsymbol{u}^T\boldsymbol{M}\boldsymbol{u}`.
 This quantity can be obtained by :code:`getKineticEnergy()`.
