@@ -16,7 +16,8 @@ There are tree ways to specify the system.
 2. by providing :code:`std::string` of the URDF text (can be useful when working with Xacro)
 3. by providing a :code:`raisim::Child` instance. It is an advanced method and not recommnded to beginners.
 
-Note that option 1 and 2 use the same method. You can provide either the path string or the contents string and the class will identify which one is provided.
+Note that option 1 and 2 use the same method. 
+You can provide either the path string or the contents string and the class will identify which one is provided.
 
 State Representation
 =============================
@@ -31,15 +32,15 @@ Since we are not constraining their parameterization, in general,
 
 A generalized coordinate fully represents the configuration of the articulated system and a generalized velocity fully represents the velocity state of the articulated system.
 
-Both Generalized coordinate and velocity are defined by its joints.
+Both Generalized coordinate and velocity are defined by the joints.
 Each joint has a generalized coordinate and a generalized velocity.
-Stack of all joint generalized coordinates and velocities are the generalized coordinates and velocities of the articulated system, respectively.
+A concatenation of all joint generalized coordinates and velocities are the generalized coordinates and velocities of the articulated system, respectively.
 The order of stacking is called **joint order**.
 The joint order is determined by the order the joint appears in the URDF unless otherwise it is explicitly given at the construction time.
 The joint order can be accessed through :code:`getMovableJointNames()`.
 Note the keyword "movable".
 The fixed joints contribute to neither the generalized coordinate nor the generalized velocity.
-Only movable the joints do.
+Only movable joints do.
 
 The joint order starts with the **root body** which is the first body of the articulated system. 
 For floating-base systems, the root body is the floating base.
@@ -155,9 +156,9 @@ A position and velocity of a specific point on a body of an articulated system c
 **Frames** are rigidly attached to a body of the system and has a constant position and orientation (w.r.t. parent frame).
 It is the most recommended way to get kinematics information of a point of an articulated system in RaiSim.
 
-All joint frames have a frame attached and their names are the same as the joint name.
+All joints have a frame attached and their names are the same as the joint name.
 To create a custom frame, a fixed frame can be defined at the point of the interest.
-A dummy link with zero inertia and zero mass can be added on one side of the fixed joint to complete the kinematic tree.
+A dummy link with zero inertia and zero mass must be added on one side of the fixed joint to complete the kinematic tree.
 
 A frame can be locally stored as an index in the user code. For e.g.,
 
@@ -171,10 +172,10 @@ A frame can be locally stored as an index in the user code. For e.g.,
     auto footFrameIndex = world.getFrameIdxByName("foot_joint"); // the URDF has a joint named "foot_joint"
     raisim::Vec<3> footPosition, footVelocity, footAngularVelocity;
     raisim::Mat<3,3> footOrientation;
-    world.getFramePosition(footFrameIndex, footPosition);
-    world.getFrameOrientation(footFrameIndex, footOrientation);
-    world.getFrameVelocity(footFrameIndex, footVelocity);
-    world.getFrameAngularVelocity(footFrameIndex, footAngularVelocity);
+    anymal.getFramePosition(footFrameIndex, footPosition);
+    anymal.getFrameOrientation(footFrameIndex, footOrientation);
+    anymal.getFrameVelocity(footFrameIndex, footVelocity);
+    anymal.getFrameAngularVelocity(footFrameIndex, footAngularVelocity);
   }
 
 You can also store Frame reference. 
