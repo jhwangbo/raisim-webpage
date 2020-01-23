@@ -15,5 +15,24 @@ Contact class is header-only and can be found at :code:`include/raisim/contact/C
 Note that all vector quantities are expressed in the respective **Contact Frame**.
 A contact frame is defined such that its z-axis is aligned with the contact normal and its origin is at the contact point. 
 Its x- and y-axes are arbitrary chosen.
-Here is a 
+Here is an extensive example
+
+.. code-block:: c
+
+  /// Let's check all contact impulses acting on "LF_SHANK"
+  auto footIndex = anymal->getBodyIdx("LF_SHANK");
+
+  /// for all contacts on the robot, check ...
+  for(auto& contact: anymal->getContacts()) {
+    if ( footIndex == contact.getlocalBodyIndex() ) {
+      std::cout<<"Contact impulse in the contact frame: "<<contact.getImpulse()->e()<<std::endl;
+      std::cout<<"Contact frame: \n"<<contact.getContactFrame()->e()<<std::endl;
+      std::cout<<"Contact impulse in the world frame: "<<contact.getContactFrame()->e() * contact.getImpulse()->e()<<std::endl;
+      std::cout<<"Contact Normal in the world frame: "<<contact.getNormal().e().transpose()<<std::endl;
+      std::cout<<"Contact position in the world frame: "<<contact.getPosition().e().transpose()<<std::endl;
+      /// the following method available as of sept 29th 2019
+      std::cout<<"It collides with: "<<world.getObject(contact.getPairObjectIndex().getName())<<std::endl;
+      std::cout<<"please check Contact.hpp for the full list of the methods"<<std::endl; 
+    }
+  }
 
