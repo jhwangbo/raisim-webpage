@@ -256,7 +256,7 @@ The following methods are used to obtain dynamic quantities
 PD Controller
 =============================
 When naively implemented, a PD controller can often make a robot unstable.
-However, this is often not so bad for robotics since this instability might be also present in the real system (discrete-time control system).
+However, this is often not so bad for robotics since this instability is also present in the real system (discrete-time control system).
 
 For other applications like animation and graphics, it is often desirable to have a stable PD controller when a user wants to keep the time step small.
 This provided PD controller uses a more stable integration scheme and can have much smaller time step than a naive implementation.
@@ -318,12 +318,12 @@ The following steps are performed in :code:`integrate1`
 3. Detect collisions (called by the world instance)
 4. The world assigns contacts on each object and computes the contact normal
 5. Compute the mass matrix, nonlinear term and inverse inertia matrix
+6. Compute (Sparse) Jacobians of contacts
 
 After this step, all kinematic/dynamic proerpties are computed at this stage. 
 Users can access them if they are necessary for the controller.
 Next, :code:`integrate2` computes the rest of the simulation.
 
-6. Compute Jacobians of contacts
 7. Compute contact Properties
 8. Compute PD controller (if used), add it to the feedforward force and bound it by the limits
 9. Compute generalized forces due to springs and external forces/torques
@@ -345,7 +345,7 @@ Here is a list of modifiable kinematic/dynamic parameters.
 
 :code:`getJointPos_P` method returns (a non-const reference to) a :code:`std::vector` of position vectors from the parent joint to the child joint expressed in the respective parent joint frames.
 This should be changed with care since it can result in unrealistic collision geometry.
-**This method does not change the position of the end-effector with respect to its parent** as it is defined by the collision body position, not by the joint position.
+**This method does not change the position of the end-effector with respect to its parent** as the position of the last link is defined by the collision body position, not by the joint position.
 The elements are ordered by the joint indicies.
 
 * **Joint Axis in the Parent Frame**

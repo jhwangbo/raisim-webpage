@@ -423,7 +423,7 @@ If the generalized velocity is zero, the coriolis and centrifugal contributions 
 <div class="section" id="pd-controller">
 <h2>PD Controller<a class="headerlink" href="#pd-controller" title="Permalink to this headline">¶</a></h2>
 <p>When naively implemented, a PD controller can often make a robot unstable.
-However, this is often not so bad for robotics since this instability might be also present in the real system (discrete-time control system).</p>
+However, this is often not so bad for robotics since this instability is also present in the real system (discrete-time control system).</p>
 <p>For other applications like animation and graphics, it is often desirable to have a stable PD controller when a user wants to keep the time step small.
 This provided PD controller uses a more stable integration scheme and can have much smaller time step than a naive implementation.</p>
 <p>To use the PD controller, the control mode has to be set to the “PD_PLUS_FEEDFORWARD_TORQUE” mode as following</p>
@@ -471,12 +471,12 @@ This document is only for advanced users and it is not necessary to use RaiSim.<
 <li><p>Detect collisions (called by the world instance)</p></li>
 <li><p>The world assigns contacts on each object and computes the contact normal</p></li>
 <li><p>Compute the mass matrix, nonlinear term and inverse inertia matrix</p></li>
+<li><p>Compute (Sparse) Jacobians of contacts</p></li>
 </ol>
 <p>After this step, all kinematic/dynamic proerpties are computed at this stage.
 Users can access them if they are necessary for the controller.
 Next, <code class="code docutils literal notranslate"><span class="pre">integrate2</span></code> computes the rest of the simulation.</p>
-<ol class="arabic simple" start="6">
-<li><p>Compute Jacobians of contacts</p></li>
+<ol class="arabic simple" start="7">
 <li><p>Compute contact Properties</p></li>
 <li><p>Compute PD controller (if used), add it to the feedforward force and bound it by the limits</p></li>
 <li><p>Compute generalized forces due to springs and external forces/torques</p></li>
@@ -498,7 +498,7 @@ In such cases, simulation cannot be performed reliably and it is advised to care
 </ul>
 <p><code class="code docutils literal notranslate"><span class="pre">getJointPos_P</span></code> method returns (a non-const reference to) a <code class="code docutils literal notranslate"><span class="pre">std::vector</span></code> of position vectors from the parent joint to the child joint expressed in the respective parent joint frames.
 This should be changed with care since it can result in unrealistic collision geometry.
-<strong>This method does not change the position of the end-effector with respect to its parent</strong> as it is defined by the collision body position, not by the joint position.
+<strong>This method does not change the position of the end-effector with respect to its parent</strong> as the position of the last link is defined by the collision body position, not by the joint position.
 The elements are ordered by the joint indicies.</p>
 <ul class="simple">
 <li><p><strong>Joint Axis in the Parent Frame</strong></p></li>
