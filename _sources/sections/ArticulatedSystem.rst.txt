@@ -7,6 +7,9 @@ Kinematic trees do not contain a loop (a body always has only one parent joint).
 Consequently, the number of joints is equal to the number of bodies (for floating systems, we assign a floating joint on the root body).
 RaiSim can only simulate **kinematic trees**.
 
+**Since all bodies have one joints, a body index is always the same as its parent joint's index**. 
+Sometimes this index is also called a local index but this term will no longer be used in RaiSim.
+
 Creating an instance
 =============================
 Just like any other object, an articulated system is created by the world instance using :code:`addArticulatedSystem` method.
@@ -32,22 +35,25 @@ Since we are not constraining their parameterization, in general,
 
 A generalized coordinate fully represents the configuration of the articulated system and a generalized velocity fully represents the velocity state of the articulated system.
 
-Both Generalized coordinate and velocity are defined by the joints.
-Each joint has a generalized coordinate and a generalized velocity.
+Every joint has a corresponding generalized coordinate and generalized velocity.
 A concatenation of all joint generalized coordinates and velocities are the generalized coordinates and velocities of the articulated system, respectively.
-The order of stacking is called **joint order**.
-The joint order is determined by the order the joint appears in the URDF unless otherwise it is explicitly given at the construction time.
+The order of this concatenation is called **joint order**.
+The joint order is determined by the order the joint appears in the URDF unless otherwise it is explicitly given at the instance construction time.
 The joint order can be accessed through :code:`getMovableJointNames()`.
 Note the keyword "movable".
 The fixed joints contribute to neither the generalized coordinate nor the generalized velocity.
-Only movable joints do.
+Only movable joints do (with one exception metioned below). 
 
 The joint order starts with the **root body** which is the first body of the articulated system. 
 For floating-base systems, the root body is the floating base.
-For fixed-base systems, the root body is the one rigidly attached to the wolrd (and thus cannot move).
+For fixed-base systems, the root body is the one rigidly attached to the wolrd.
+Even though the fixed base cannot move physically, users can move them using :code:`setBaseOrientation` and :code:`setBasePosition`.
+So :code:`getMovableJointNames()` method will return the fixed base name and the fixed base joint is a part of the joint order.
+
 The following example illustrates how the generalized coordinates and velocities are defined.
 
-**image here**
+
+**two image here**
 
 To set the state of the system, the following methods can be used
 
@@ -131,8 +137,6 @@ The modifications are as follows:
 * Capsule geom is available for both collision objects and visual objects (with the keyword "capsule"). The geom is defined by "height" and "radius" keyword. The height represents the distance between the two center points of the spheres.
 
 * A <joint>/<dynamics> tag can have three more attributes: *rotor inertia*, *spring_mount* and *stiffness*. 
-
-* Supports spherical joint
 
 **Rotor inertia** in Raisim approximately simulates the rotor inertia of the motor (but missing the resulting gyroscopic effect, which is often neglegible). 
 It is added to the diagonal elements of the mass matrix.
