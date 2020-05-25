@@ -30,7 +30,7 @@ Sometimes this index is also called a local index but this term will no longer b
 Creating an instance
 =============================
 Just like any other object, an articulated system is created by the world instance using :code:`addArticulatedSystem` method.
-There are tree ways to specify the system.
+There are three ways to specify the system.
 
 1. by providing the path to the URDF file (the most recommneded way)
 2. by providing :code:`std::string` of the URDF text (can be useful when working with Xacro)
@@ -84,7 +84,9 @@ To obtain the state of the system, the following methods can be used
 The dimensions of each vector can be obtained respectively by
 
 * :code:`getGeneralizedCoordinateDim`
-* :code:`getDOF` or :code:`getGeneralizedVelocityDim`. These two methods are identical
+* :code:`getDOF` or :code:`getGeneralizedVelocityDim`. 
+
+These two methods are identical
 
 
 Joints
@@ -155,7 +157,6 @@ The modifications are as follows:
 **Rotor inertia** in Raisim approximately simulates the rotor inertia of the motor (but missing the resulting gyroscopic effect, which is often neglegible). 
 It is added to the diagonal elements of the mass matrix.
 It is common way to include the inertial effect of the rotor.
-This means that it only
 You can also override it in C++ using :code:`setRotorInertia()`.
 
 In RaiSim, each body of an articulated system has a set of collision bodies and visual objects. 
@@ -279,21 +280,9 @@ When naively implemented, a PD controller can often make a robot unstable.
 However, this is often not so bad for robotics since this instability is also present in the real system (discrete-time control system).
 
 For other applications like animation and graphics, it is often desirable to have a stable PD controller when a user wants to keep the time step small.
-This provided PD controller uses a more stable integration scheme and can have much smaller time step than a naive implementation.
+Therefore, this PD controller exploits a more stable integration scheme and can have much smaller time step than a naive implementation.
 
-To use the PD controller, the control mode has to be set to the "PD_PLUS_FEEDFORWARD_TORQUE" mode as following
-
-.. code-block:: c
-
-  robot->setControlMode(ControlMode::Type::PD_PLUS_FEEDFORWARD_TORQUE);
-
-The current control mode can be retrived as below
-
-.. code-block:: c
-
-  auto controlMode = robot->getControlMode();
-
-Next, the desirable joint gains have to be set.
+To use this PD controller, you have to set the desirable control gains first
 
 .. code-block:: c
 
@@ -321,7 +310,7 @@ The quaternion target is represented by a quaternion whereas the virtual spring 
 
 A feedforward force term can be added by :code:`setGeneralizedForce()` if desired.
 This term is set to zero by default.
-Note that this value stored in the class and does not change unless the user specifies it so.
+Note that this value is stored in the class instance and does not change unless the user specifies it so.
 If this feedforward force should be applied for a single time step, it should be set to zero in the subsequent control loop (after :code:`integrate()` call of the world).
 
 The theory of the implemented PD controller can be found in chapter 1.2 of this `article <https://www.overleaf.com/read/dbqbgcnhzykq>`_. 
@@ -333,7 +322,7 @@ Integration of an articulated systems is performed in two stages: :code:`integra
 
 The following steps are performed in :code:`integrate1`
 
-1. If the time step changed, update the damping of the mass matrix (which reflects effective inertial increase due to springs, dampers and PD gains)
+1. If the time step is changed, update the damping of the mass matrix (which reflects effective inertial increase due to springs, dampers and PD gains)
 2. Update positions of the collision bodies
 3. Detect collisions (called by the world instance)
 4. The world assigns contacts on each object and computes the contact normal

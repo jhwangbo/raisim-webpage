@@ -207,7 +207,7 @@ Sometimes this index is also called a local index but this term will no longer b
 <div class="section" id="creating-an-instance">
 <h2>Creating an instance<a class="headerlink" href="#creating-an-instance" title="Permalink to this headline">¶</a></h2>
 <p>Just like any other object, an articulated system is created by the world instance using <code class="code docutils literal notranslate"><span class="pre">addArticulatedSystem</span></code> method.
-There are tree ways to specify the system.</p>
+There are three ways to specify the system.</p>
 <ol class="arabic simple">
 <li>by providing the path to the URDF file (the most recommneded way)</li>
 <li>by providing <code class="code docutils literal notranslate"><span class="pre">std::string</span></code> of the URDF text (can be useful when working with Xacro)</li>
@@ -254,8 +254,9 @@ So <code class="code docutils literal notranslate"><span class="pre">getMovableJ
 <p>The dimensions of each vector can be obtained respectively by</p>
 <ul class="simple">
 <li><code class="code docutils literal notranslate"><span class="pre">getGeneralizedCoordinateDim</span></code></li>
-<li><code class="code docutils literal notranslate"><span class="pre">getDOF</span></code> or <code class="code docutils literal notranslate"><span class="pre">getGeneralizedVelocityDim</span></code>. These two methods are identical</li>
+<li><code class="code docutils literal notranslate"><span class="pre">getDOF</span></code> or <code class="code docutils literal notranslate"><span class="pre">getGeneralizedVelocityDim</span></code>.</li>
 </ul>
+<p>These two methods are identical</p>
 </div>
 <div class="section" id="joints">
 <h2>Joints<a class="headerlink" href="#joints" title="Permalink to this headline">¶</a></h2>
@@ -336,7 +337,6 @@ However, since RaiSim offers more functionalities, a RaiSim URDF might not be re
 <p><strong>Rotor inertia</strong> in Raisim approximately simulates the rotor inertia of the motor (but missing the resulting gyroscopic effect, which is often neglegible).
 It is added to the diagonal elements of the mass matrix.
 It is common way to include the inertial effect of the rotor.
-This means that it only
 You can also override it in C++ using <code class="code docutils literal notranslate"><span class="pre">setRotorInertia()</span></code>.</p>
 <p>In RaiSim, each body of an articulated system has a set of collision bodies and visual objects.</p>
 <p>Collision bodies contain a collision object of one of the following shapes: <em>mesh</em>, <em>sphere</em>, <em>box</em>, <em>cylinder</em>, <em>capsule</em>.</p>
@@ -438,16 +438,8 @@ If the generalized velocity is zero, the coriolis and centrifugal contributions 
 <p>When naively implemented, a PD controller can often make a robot unstable.
 However, this is often not so bad for robotics since this instability is also present in the real system (discrete-time control system).</p>
 <p>For other applications like animation and graphics, it is often desirable to have a stable PD controller when a user wants to keep the time step small.
-This provided PD controller uses a more stable integration scheme and can have much smaller time step than a naive implementation.</p>
-<p>To use the PD controller, the control mode has to be set to the “PD_PLUS_FEEDFORWARD_TORQUE” mode as following</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">setControlMode</span><span class="p">(</span><span class="n">ControlMode</span><span class="o">::</span><span class="n">Type</span><span class="o">::</span><span class="n">PD_PLUS_FEEDFORWARD_TORQUE</span><span class="p">);</span>
-</pre></div>
-</div>
-<p>The current control mode can be retrived as below</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">controlMode</span> <span class="o">=</span> <span class="n">robot</span><span class="o">-&gt;</span><span class="n">getControlMode</span><span class="p">();</span>
-</pre></div>
-</div>
-<p>Next, the desirable joint gains have to be set.</p>
+Therefore, this PD controller exploits a more stable integration scheme and can have much smaller time step than a naive implementation.</p>
+<p>To use this PD controller, you have to set the desirable control gains first</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span> <span class="n">pGain</span><span class="p">(</span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getDOF</span><span class="p">()),</span> <span class="n">dGain</span><span class="p">(</span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getDOF</span><span class="p">());</span>
 <span class="n">pGain</span><span class="o">&lt;&lt;</span> <span class="p">...;</span> <span class="c1">// set your proportional gain values here</span>
 <span class="n">dGain</span><span class="o">&lt;&lt;</span> <span class="p">...;</span> <span class="c1">// set your differential gain values here</span>
@@ -469,7 +461,7 @@ The only reason that the two dimensions differ is quaternions.
 The quaternion target is represented by a quaternion whereas the virtual spring stiffness between the two orientations can be represented by a 3D vector, which is composed of motions in each angular velocity components.</p>
 <p>A feedforward force term can be added by <code class="code docutils literal notranslate"><span class="pre">setGeneralizedForce()</span></code> if desired.
 This term is set to zero by default.
-Note that this value stored in the class and does not change unless the user specifies it so.
+Note that this value is stored in the class instance and does not change unless the user specifies it so.
 If this feedforward force should be applied for a single time step, it should be set to zero in the subsequent control loop (after <code class="code docutils literal notranslate"><span class="pre">integrate()</span></code> call of the world).</p>
 <p>The theory of the implemented PD controller can be found in chapter 1.2 of this <a class="reference external" href="https://www.overleaf.com/read/dbqbgcnhzykq">article</a>.
 This document is only for advanced users and it is not necessary to use RaiSim.</p>
@@ -479,7 +471,7 @@ This document is only for advanced users and it is not necessary to use RaiSim.<
 <p>Integration of an articulated systems is performed in two stages: <code class="code docutils literal notranslate"><span class="pre">integrate1</span></code> and <code class="code docutils literal notranslate"><span class="pre">integrate2</span></code></p>
 <p>The following steps are performed in <code class="code docutils literal notranslate"><span class="pre">integrate1</span></code></p>
 <ol class="arabic simple">
-<li>If the time step changed, update the damping of the mass matrix (which reflects effective inertial increase due to springs, dampers and PD gains)</li>
+<li>If the time step is changed, update the damping of the mass matrix (which reflects effective inertial increase due to springs, dampers and PD gains)</li>
 <li>Update positions of the collision bodies</li>
 <li>Detect collisions (called by the world instance)</li>
 <li>The world assigns contacts on each object and computes the contact normal</li>
