@@ -7,8 +7,8 @@ Setup
 
 Please install/save everything locally to prevent any conflicts with other libraries. We will assume that you have a single workspace where you save all repos related to raisim. Here we introduce two variables
 
-* WORKSPACE: workspace where you clone your git repos (e.g., ~/raisim_workspace)
-* LOCAL_BUILD: build directory where you install exported cmake libraries (e.g., ~/raisim_build)
+* ``WORKSPACE``: workspace where you clone your git repos (e.g., ~/raisim_workspace)
+* ``LOCAL_INSTALL``: build directory where you install exported cmake libraries (e.g., ~/raisim_build)
 
 Dependencies
 ============
@@ -16,28 +16,27 @@ Dependencies
 RaiSim depends on the following open-source libraries
 
 * *Eigen3* (:code:`sudo apt-get install libeigen3-dev`)
-
-RaiSim does not contain Eigen operations in the binaries. 
-All Eigen operations stay in the header files.
-Therefore, there is much less risk of version incompatibility (zero risk unless Eigen team removes a method that is used in the RaiSim header files).
+* cmake > 3.10 (Technically it is not a dependency but it makes the installation easier)
 
 RaiSim includes the following open-source libraries (You do not have to install them yourself): 
 *TinyXML*, *Open Dynamics Engine*
 
-RaiSim
-========
+RaiSim Install
+===============
 
-We provide the following two installation options
+RaiSim is installed using cmake. The following options are available
 
-Option 1
-***********
-Copy-paste the lib and the include directories to $LOCAL_BUILD.
+* ``RAISIM_EXAMPLE`` : Compile C++ RaiSim examples
+* ``RAISIM_MATLAB`` : Compile raisimMatlab (compiled binary is also provided). You need MATLAB for this option
+* ``RAISIM_PY`` : Compile raisimPy. The python version can be set as ``-DPYTHON_EXECUTABLE:FILEPATH=$LOCATION_OF_THE_PYTHON_EXECUTABLE``
+* ``RAISIM_DOC`` : This is for developers only. The documentation is available at raisim.com
 
-Option 2
-***********
-Assuming that you have cloned raisimLib repo,
+Example install in Linux
 
 .. code-block:: bash
 
   cd $WORKSPACE/raisimLib
-  mkdir build && cd build && cmake .. -DCMAKE_INSTALL_PREFIX=$LOCAL_BUILD && make install
+  mkdir build
+  cd build
+  cmake .. -DCMAKE_INSTALL_PREFIX=$LOCAL_INSTALL -DRAISIM_EXAMPLE=ON -DRAISIM_PY=ON
+  make install -j4
