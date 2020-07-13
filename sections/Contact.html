@@ -1,18 +1,15 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Contact and Collision &mdash; raisim 1.0.0 documentation</title>
+  <title>Contact and Collision &mdash; raisim 0.6.0 documentation</title>
   
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
 
   
   
@@ -20,21 +17,23 @@
   
 
   
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Material System" href="MaterialSystem.html" />
@@ -52,7 +51,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> raisim
+            <a href="../index.html" class="icon icon-home"> raisim
           
 
           
@@ -62,7 +61,7 @@
             
             
               <div class="version">
-                1.0.0
+                0.6.0
               </div>
             
           
@@ -79,7 +78,6 @@
           
         </div>
 
-        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -91,13 +89,9 @@
 <li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ConventionsAndNotations.html">Conventions and Notations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WorldSystem.html">RaiSim World</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Contact and Collision</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#collision-group-and-mask">Collision Group and Mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#contacts">Contacts</a></li>
-</ul>
-</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RelatedSoftware.html">Related Software</a></li>
@@ -106,7 +100,6 @@
             
           
         </div>
-        
       </div>
     </nav>
 
@@ -145,7 +138,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../index.html">Docs</a> &raquo;</li>
         
       <li>Contact and Collision</li>
     
@@ -153,8 +146,6 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/sections/Contact.rst.txt" rel="nofollow"> View page source</a>
-          
         
       </li>
     
@@ -168,28 +159,6 @@
             
   <div class="section" id="contact-and-collision">
 <h1>Contact and Collision<a class="headerlink" href="#contact-and-collision" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="collision-group-and-mask">
-<h2>Collision Group and Mask<a class="headerlink" href="#collision-group-and-mask" title="Permalink to this headline">¶</a></h2>
-<p>Collision group and mask in RaiSim uses bit operations as most other physics engines. The below example is self-explanatory</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span> <span class="n">world</span><span class="p">;</span>
-<span class="k">auto</span> <span class="n">sphere0</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">raisim</span><span class="o">::</span><span class="n">COLLISION</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">raisim</span><span class="o">::</span><span class="n">COLLISION</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="n">raisim</span><span class="o">::</span><span class="n">COLLISION</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
-<span class="k">auto</span> <span class="n">sphere1</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">raisim</span><span class="o">::</span><span class="n">COLLISION</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">raisim</span><span class="o">::</span><span class="n">COLLISION</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="n">raisim</span><span class="o">::</span><span class="n">COLLISION</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
-<span class="k">auto</span> <span class="n">sphere2</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">raisim</span><span class="o">::</span><span class="n">COLLISION</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">raisim</span><span class="o">::</span><span class="n">COLLISION</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
-<span class="k">auto</span> <span class="n">sphere3</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">raisim</span><span class="o">::</span><span class="n">COLLISION</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
-</pre></div>
-</div>
-<p>In the above example, <code class="docutils literal notranslate"><span class="pre">sphere0</span></code> is in collision group 0 and can collide with collision group 0 and 1.
-<code class="docutils literal notranslate"><span class="pre">sphere1</span></code> is in collision group 1 and can collide with collision group 0 and 1.
-<code class="docutils literal notranslate"><span class="pre">sphere2</span></code> is in collision group 2 and can collide with collision group 1.
-<code class="docutils literal notranslate"><span class="pre">sphere3</span></code> is in collision group 2 and can collide with any object (-1 means all groups).</p>
-<p><code class="docutils literal notranslate"><span class="pre">sphere0</span></code> can collide with <code class="docutils literal notranslate"><span class="pre">sphere1</span></code>.
-<code class="docutils literal notranslate"><span class="pre">sphere1</span></code> cannot collide with <code class="docutils literal notranslate"><span class="pre">spehre2</span></code> (both conditions must be satisfied).
-<code class="docutils literal notranslate"><span class="pre">sphere3</span></code> cannot collide with <code class="docutils literal notranslate"><span class="pre">spehre0</span></code> and <code class="docutils literal notranslate"><span class="pre">sphere1</span></code> but not with <code class="docutils literal notranslate"><span class="pre">sphere2</span></code>.</p>
-<p>By default, movable object are in collision group 1 and can collide with anything (collision mask = -1).
-All static objects (e.g., ground and height map) are in collision group 63 and can collide with anything.</p>
-</div>
-<div class="section" id="contacts">
-<h2>Contacts<a class="headerlink" href="#contacts" title="Permalink to this headline">¶</a></h2>
 <p><code class="code docutils literal notranslate"><span class="pre">raisim::Object</span></code> (and thus <code class="code docutils literal notranslate"><span class="pre">raisim::ArticulatedSystem</span></code> and <code class="code docutils literal notranslate"><span class="pre">raisim:SingleBodyObject</span></code>) have a method <code class="code docutils literal notranslate"><span class="pre">getContacts</span></code> which returns the list of contacts.
 For example,</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">&amp;</span> <span class="n">contactsOnAnymal</span> <span class="o">=</span> <span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getContacts</span><span class="p">();</span>
@@ -218,7 +187,6 @@ Here is an extensive example</p>
 </pre></div>
 </div>
 </div>
-</div>
 
 
            </div>
@@ -240,19 +208,11 @@ Here is an extensive example</p>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, RaiSim Tech Inc.
+        &copy; Copyright 2019, Jemin Hwangbo
 
     </p>
   </div>
-    
-    
-    
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -263,6 +223,7 @@ Here is an extensive example</p>
 
   </div>
   
+
 
   <script type="text/javascript">
       jQuery(function () {
