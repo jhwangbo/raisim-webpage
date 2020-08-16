@@ -2,6 +2,34 @@
 Contact and Collision
 #############################
 
+Collision Group and Mask
+=========================
+
+Collision group and mask in RaiSim uses bit operations as most other physics engines. The below example is self-explanatory
+
+.. code-block:: c
+
+  raisim::World world;
+  auto sphere0 = world.addSphere(1, 1, raisim::COLLISION(0), raisim::COLLISION(0) | raisim::COLLISION(1));
+  auto sphere1 = world.addSphere(1, 1, raisim::COLLISION(1), raisim::COLLISION(0) | raisim::COLLISION(1));
+  auto sphere2 = world.addSphere(1, 1, raisim::COLLISION(2), raisim::COLLISION(1));
+  auto sphere3 = world.addSphere(1, 1, raisim::COLLISION(3), -1);
+
+In the above example, ``sphere0`` is in collision group 0 and can collide with collision group 0 and 1.
+``sphere1`` is in collision group 1 and can collide with collision group 0 and 1.
+``sphere2`` is in collision group 2 and can collide with collision group 1.
+``sphere3`` is in collision group 2 and can collide with any object (-1 means all groups).
+
+``sphere0`` can collide with ``sphere1``.
+``sphere1`` cannot collide with ``spehre2`` (both conditions must be satisfied).
+``sphere3`` cannot collide with ``spehre0`` and ``sphere1`` but not with ``sphere2``.
+
+By default, movable object are in collision group 1 and can collide with anything (collision mask = -1).
+All static objects (e.g., ground and height map) are in collision group 63 and can collide with anything.
+
+Contacts
+=========================
+
 :code:`raisim::Object` (and thus :code:`raisim::ArticulatedSystem` and :code:`raisim:SingleBodyObject`) have a method :code:`getContacts` which returns the list of contacts.
 For example,
 
