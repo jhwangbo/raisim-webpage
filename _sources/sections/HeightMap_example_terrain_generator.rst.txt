@@ -2,6 +2,11 @@
 Height Map Using the Terrain Generator
 #########################################
 
+.. image:: ../image/heightMapUsingTerrainGenerator.gif
+
+XML Way
+-----------------------------
+
 Try it yourself with
 
 .. code-block:: bash
@@ -36,4 +41,25 @@ The xml file is constructed as following:
             </heightmap>
         </objects>
     </raisim>
+
+The perlin parameters are not very trivial to understand. Play with them to get the shape you want.
+
+
+C++ Way
+-----------------------------
+
+.. code-block:: C++
+
+  raisim::TerrainProperties terrainProperties;
+  terrainProperties.frequency = 0.2;
+  terrainProperties.zScale = 3.0;
+  terrainProperties.xSize = 20.0;
+  terrainProperties.ySize = 20.0;
+  terrainProperties.xSamples = 50;
+  terrainProperties.ySamples = 50;
+  terrainProperties.fractalOctaves = 3;
+  terrainProperties.fractalLacunarity = 2.0;
+  terrainProperties.fractalGain = 0.25;
+
+  auto hm = world.addHeightMap(0.0, 0.0, terrainProperties);
 
