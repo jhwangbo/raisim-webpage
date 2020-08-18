@@ -172,32 +172,27 @@
             
   <div class="section" id="material-system">
 <h1>Material System<a class="headerlink" href="#material-system" title="Permalink to this headline">¶</a></h1>
-<p><strong>In RaiSim, all material properties are associated with a pair.</strong>
-Most physics engines define material properties on each material and average the two material properties to get the contact properties.
-The RaiSim way is more accurate and users have more freedom to it but it might be combersome to define a set of material properties for all pairs.</p>
-<p>There are currently three material properties used in RaiSim.</p>
+<p><strong>In RaiSim, all material properties are associated with a material pair.</strong></p>
+<p>Currently, there are three material properties used in RaiSim.</p>
 <ul class="simple">
-<li><p>Coefficient of friction (<span class="math notranslate nohighlight">\(\mu\ge 0\)</span>): This defines how much friction is applied</p></li>
+<li><p>Coefficient of friction (<span class="math notranslate nohighlight">\(\mu\ge 0\)</span>): This defines how much friction is applied between the two materials</p></li>
 <li><p>Coefficient of restitution (<span class="math notranslate nohighlight">\(c_r\ge 0\)</span>): How bouncy the material pair is</p></li>
 <li><p>Restitution Threshold (<span class="math notranslate nohighlight">\(c_{th}\ge 0\)</span>): If the impact velocity is smaller than this number, objects do not bounce off</p></li>
 </ul>
-<p>The bounce velocity is computed as <span class="math notranslate nohighlight">\(=c_{th}(v_i-c_{th})\)</span>, where <span class="math notranslate nohighlight">\(v_i\)</span> is the impact velocity.</p>
+<p>The bounce velocity is computed as <span class="math notranslate nohighlight">\(c_{th}(v_i-c_{th})\)</span>, where <span class="math notranslate nohighlight">\(v_i\)</span> is the impact velocity.</p>
 <p>A material name is set when the material is created.
 For example,</p>
 <div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">ball</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&quot;steel&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>In order to simulate “steel”, its material pair has to be added.
-Note that material is defined on a collision body.
-If an object has multiple collision bodies, each collision body can have a different material.
-The above creation method assumes that all collision bodies have the same material.</p>
-<p>Unrecognized material pairs will get <strong>default material properties</strong>, which can be set as <code class="code docutils literal notranslate"><span class="pre">raisim::World::setDefaultMaterial</span></code>.
+<p>World owns a materials manager which holds all material pair properties.
+Unrecognized material pairs will get <strong>default material properties</strong>, which can be set as <code class="code docutils literal notranslate"><span class="pre">raisim::World::setDefaultMaterial</span></code>.
 If the default material pair properties are not set, they are {<span class="math notranslate nohighlight">\(\mu=0.8\)</span>, <span class="math notranslate nohighlight">\(c_r=0\)</span>, <span class="math notranslate nohighlight">\(c_{th}=0\)</span>}.</p>
 <p>Material properties over a pair can be defined as following</p>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">world</span><span class="p">.</span><span class="n">setMaterialPairProp</span><span class="p">(</span><span class="s">&quot;steel&quot;</span><span class="p">,</span> <span class="s">&quot;glass&quot;</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">);</span>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">world</span><span class="p">.</span><span class="n">setMaterialPairProp</span><span class="p">(</span><span class="s">&quot;steel&quot;</span><span class="p">,</span> <span class="s">&quot;glass&quot;</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>The first two arguments are the two materials and the following three are the coefficient of friction, coeffcient of restitution, and restitution threshold.
+<p>The first two arguments are the two material names and the following three are the coefficient of friction, coeffcient of restitution, and restitution threshold.
 The order of the material names does not matter.</p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>

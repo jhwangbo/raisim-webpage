@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>RaisimGymTorch &mdash; raisim 1.0.0 documentation</title>
+  <title>Height Map &mdash; raisim 1.0.0 documentation</title>
   
 
   
@@ -86,6 +86,7 @@
             
             
               <ul>
+<li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ConventionsAndNotations.html">Conventions and Notations</a></li>
@@ -141,13 +142,13 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>RaisimGymTorch</li>
+      <li>Height Map</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/sections/RaisimGymTorch.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/sections/HeightMap.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -160,34 +161,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="raisimgymtorch">
-<h1>RaisimGymTorch<a class="headerlink" href="#raisimgymtorch" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="how-does-it-work">
-<h2>How does it work?<a class="headerlink" href="#how-does-it-work" title="Permalink to this headline">¶</a></h2>
-<p>RaiSimGymTorch wraps a c++ environment (i.e., ENVIRONMENT.hpp) as a python library using Pybind11.
-When you call <code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">setup.py</span> <span class="pre">develop</span></code>, all environments under <code class="docutils literal notranslate"><span class="pre">raisimGymTorch/raisimGymTorch/env/envs</span></code> are compiled.
-The compiled libraries are stored in <code class="docutils literal notranslate"><span class="pre">raisimGymTorch/raisimGymTorch/env/bin</span></code>.
-Then you can import your environment to your python code.
-For example, the anymal locomotion example can be imported as <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">raisimGymTorch.env.bin</span> <span class="pre">import</span> <span class="pre">rsg_anymal</span></code></p>
-<p>All the rest happens in Python.
-Your launch file (e.g., <code class="docutils literal notranslate"><span class="pre">runner.py</span></code>) can be customized for your need.</p>
+  <div class="section" id="height-map">
+<h1>Height Map<a class="headerlink" href="#height-map" title="Permalink to this headline">¶</a></h1>
+<p>Height map is a grid of points which are triangulated to form a surface.
+Since it is axis-aligned, collision checking is very efficient and it is a recommended way to create a terrain.</p>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
 </div>
-<div class="section" id="how-to-add-a-custom-environment">
-<h2>How to add a custom environment?<a class="headerlink" href="#how-to-add-a-custom-environment" title="Permalink to this headline">¶</a></h2>
-<p>You can add your environment in <code class="docutils literal notranslate"><span class="pre">raisimGymTorch/raisimGymTorch/env/envs</span></code>.
-If you want to keep your source file somewhere else, then add a symlink to it in <code class="docutils literal notranslate"><span class="pre">raisimGymTorch/raisimGymTorch/env/envs</span></code>.</p>
-</div>
-<div class="section" id="code-structure">
-<h2>Code structure<a class="headerlink" href="#code-structure" title="Permalink to this headline">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">ENVIRONMENT</span></code> class is where you define the dynamics, reward, termination condition and so on.
-This class inherits from “RaisimGymEnv.hpp”, which add basic functionalities to the environment such as <code class="docutils literal notranslate"><span class="pre">setSimulationTimeStep</span></code>, <code class="docutils literal notranslate"><span class="pre">setControlTimeStep</span></code>, <code class="docutils literal notranslate"><span class="pre">getObDim</span></code> and so on.
-If <code class="docutils literal notranslate"><span class="pre">RaisimGymEnv</span></code> is not general enough for you, you can also make <code class="docutils literal notranslate"><span class="pre">ENVIRONMENT</span></code> independent from <code class="docutils literal notranslate"><span class="pre">RaisimGymEnv</span></code>.</p>
-<p><code class="docutils literal notranslate"><span class="pre">RaisimGymEnv</span></code> is wrapped by <code class="docutils literal notranslate"><span class="pre">VectorizedEnvironment</span></code>, which parallelizes the environment.
-You can consider it similar to <code class="docutils literal notranslate"><span class="pre">VectorEnv</span></code> in OpenAI Baselines.
-But RaisimGym parallelization happens in C++, which make it much faster.</p>
-<p>‘’raisim_gym.cpp`` is a Pybind11 wrapping of <code class="docutils literal notranslate"><span class="pre">VectorizedEnvironment</span></code>.
-It simply defines the interface functions.</p>
-<p>Finally, RaisimGymVecEnv is a python class that wraps a python library created from <code class="docutils literal notranslate"><span class="pre">raisim_gym.cpp</span></code>.</p>
 </div>
 </div>
 
