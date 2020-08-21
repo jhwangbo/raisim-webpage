@@ -37,7 +37,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Constraints" href="Constraints.html" />
+    <link rel="next" title="Height Map" href="HeightMap.html" />
     <link rel="prev" title="Contact and Collision" href="Contact.html" /> 
 </head>
 
@@ -96,13 +96,19 @@
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Material System</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#example">Example</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#example-single-bodies">Example - Single Bodies</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#xml-way">XML Way</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#c-way">C++ Way</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#example-articulated-systems">Example - Articulated Systems</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#urdf-way">URDF Way</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">C++ Way</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RelatedSoftware.html">Related Software</a></li>
 </ul>
@@ -194,8 +200,8 @@ If the default material pair properties are not set, they are {<span class="math
 </div>
 <p>The first two arguments are the two material names and the following three are the coefficient of friction, coeffcient of restitution, and restitution threshold.
 The order of the material names does not matter.</p>
-<div class="section" id="example">
-<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="example-single-bodies">
+<h2>Example - Single Bodies<a class="headerlink" href="#example-single-bodies" title="Permalink to this headline">¶</a></h2>
 <img alt="../_images/materials.gif" src="../_images/materials.gif" />
 <div class="section" id="xml-way">
 <h3>XML Way<a class="headerlink" href="#xml-way" title="Permalink to this headline">¶</a></h3>
@@ -270,6 +276,35 @@ The order of the material names does not matter.</p>
 </div>
 </div>
 </div>
+<div class="section" id="example-articulated-systems">
+<h2>Example - Articulated Systems<a class="headerlink" href="#example-articulated-systems" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="urdf-way">
+<h3>URDF Way<a class="headerlink" href="#urdf-way" title="Permalink to this headline">¶</a></h3>
+<p>The material can be specified in the URDF file as following</p>
+<div class="highlight-XML notranslate"><div class="highlight"><pre><span></span><span class="c">&lt;!-- Foot link --&gt;</span>
+<span class="nt">&lt;link</span> <span class="na">name=</span><span class="s">&quot;LF_FOOT&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;collision&gt;</span>
+        <span class="nt">&lt;origin</span> <span class="na">xyz=</span><span class="s">&quot;0 0 0.02325&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;geometry&gt;</span>
+            <span class="nt">&lt;sphere</span> <span class="na">radius=</span><span class="s">&quot;0.035&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;/geometry&gt;</span>
+        <span class="nt">&lt;material</span> <span class="na">name=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;contact</span> <span class="na">name=</span><span class="s">&quot;ice&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;/material&gt;</span>
+    <span class="nt">&lt;/collision&gt;</span>
+<span class="nt">&lt;/link&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id1">
+<h3>C++ Way<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Alternatively, you can specify the material dynamically as following</p>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getCollisionBody</span><span class="p">(</span><span class="s">&quot;LF_FOOT/0&quot;</span><span class="p">).</span><span class="n">setMaterial</span><span class="p">(</span><span class="s">&quot;ice&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>“LF_FOOT/0” means the first collision body of the link “LF_FOOT”.</p>
+</div>
+</div>
 </div>
 
 
@@ -280,7 +315,7 @@ The order of the material names does not matter.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="Constraints.html" class="btn btn-neutral float-right" title="Constraints" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="HeightMap.html" class="btn btn-neutral float-right" title="Height Map" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="Contact.html" class="btn btn-neutral float-left" title="Contact and Collision" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

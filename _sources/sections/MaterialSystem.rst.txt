@@ -32,7 +32,7 @@ Material properties over a pair can be defined as following
 The first two arguments are the two material names and the following three are the coefficient of friction, coeffcient of restitution, and restitution threshold.
 The order of the material names does not matter.
 
-Example
+Example - Single Bodies
 =============================
 
 .. image:: ../image/materials.gif
@@ -111,3 +111,37 @@ C++ Way
 
       server.killServer();
     }
+
+Example - Articulated Systems
+==============================
+
+URDF Way
+-----------------------------
+
+The material can be specified in the URDF file as following
+
+.. code-block:: XML
+
+    <!-- Foot link -->
+    <link name="LF_FOOT">
+        <collision>
+            <origin xyz="0 0 0.02325"/>
+            <geometry>
+                <sphere radius="0.035"/>
+            </geometry>
+            <material name="">
+                <contact name="ice"/>
+            </material>
+        </collision>
+    </link>
+
+C++ Way
+-----------------------------
+
+Alternatively, you can specify the material dynamically as following
+
+.. code-block:: C++
+
+    anymal->getCollisionBody("LF_FOOT/0").setMaterial("ice");
+
+"LF_FOOT/0" means the first collision body of the link "LF_FOOT".
