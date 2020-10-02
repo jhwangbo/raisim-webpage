@@ -176,7 +176,7 @@
 <p>Please install/save everything locally to prevent any conflicts with other libraries. We will assume that you have a single workspace where you save all repos related to raisim. Here we introduce two variables</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">WORKSPACE</span></code>: workspace where you clone your git repos (e.g., ~/raisim_workspace)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">LOCAL_INSTALL</span></code>: build directory where you install exported cmake libraries (e.g., ~/raisim_build)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LOCAL_INSTALL</span></code>: install directory where you install exported cmake libraries (e.g., ~/raisim_build)</p></li>
 </ul>
 </div>
 <div class="section" id="dependencies">
@@ -186,8 +186,7 @@
 <li><p><em>Eigen3</em> (<code class="code docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">libeigen3-dev</span></code>)</p></li>
 <li><p>cmake &gt; 3.10 (Technically it is not a dependency but it makes the installation easier)</p></li>
 </ul>
-<p>RaiSim includes the following open-source libraries (You do not have to install them yourself):
-<em>TinyXML</em>, <em>Open Dynamics Engine</em></p>
+<p>RaiSim includes many open-source libraries. See the COPYING file for the full list.</p>
 </div>
 <div class="section" id="raisim-install">
 <h2>RaiSim Install<a class="headerlink" href="#raisim-install" title="Permalink to this headline">¶</a></h2>
@@ -196,7 +195,6 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">RAISIM_EXAMPLE</span></code> : Compile C++ RaiSim examples</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">RAISIM_MATLAB</span></code> : Compile raisimMatlab (compiled binary is also provided). You need MATLAB for this option</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">RAISIM_PY</span></code> : Compile raisimPy. The python version can be set as <code class="docutils literal notranslate"><span class="pre">-DPYTHON_EXECUTABLE:FILEPATH=$LOCATION_OF_THE_PYTHON_EXECUTABLE</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">RAISIM_DOC</span></code> : This is for developers only. The documentation is available at raisim.com</p></li>
 </ul>
 <p>Example install in Linux</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> <span class="nv">$WORKSPACE</span>/raisimLib
@@ -206,10 +204,19 @@ cmake .. -DCMAKE_INSTALL_PREFIX<span class="o">=</span><span class="nv">$LOCAL_I
 make install -j4
 </pre></div>
 </div>
-<p>To use RaiSimUnity in Linux, you need to install <code class="docutils literal notranslate"><span class="pre">minizip</span></code>, <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> and <code class="docutils literal notranslate"><span class="pre">vulkan</span></code> (<code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt</span> <span class="pre">install</span> <span class="pre">minizip</span> <span class="pre">ffmpeg</span></code>).</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt install libvulkan1 mesa-vulkan-drivers vulkan-utils
-sudo apt install minizip ffmpeg
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To use RaiSimUnity in Linux, you need to install <code class="docutils literal notranslate"><span class="pre">minizip</span></code>, <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> and <code class="docutils literal notranslate"><span class="pre">vulkan</span></code>.
+To install vulkan, follow this link <a class="reference external" href="https://linuxconfig.org/install-and-test-vulkan-on-linux">https://linuxconfig.org/install-and-test-vulkan-on-linux</a></p>
+<p>To install <code class="docutils literal notranslate"><span class="pre">minizip</span></code> and <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code>,</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt install minizip ffmpeg
 </pre></div>
+</div>
+<p>To conveniently use raisim and raisimPy, add the following lines to your <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code> file</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$LD_LIBRARY_PATH</span>:~/&lt;WHERE-YOU-HAVE-INSTALLED-RAISIM&gt;/lib
+<span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:~/&lt;WHERE-YOU-HAVE-INSTALLED-RAISIM&gt;/lib
+</pre></div>
+</div>
 </div>
 </div>
 </div>
