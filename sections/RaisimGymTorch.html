@@ -36,7 +36,8 @@
 
     
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Related Software" href="RelatedSoftware.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -85,7 +86,7 @@
               
             
             
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
@@ -96,7 +97,18 @@
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RelatedSoftware.html">Related Software</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="RelatedSoftware.html">Related Software</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">RaisimGymTorch</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#what-is-raisimgymtorch">What is raisimGymTorch?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#why-raisimgymtorch">Why raisimGymTorch?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-run-the-example">How to run the example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#how-does-it-work">How does it work?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-add-a-custom-environment">How to add a custom environment?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#code-structure-if-you-are-curious">Code structure (if you are curious)</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
             
@@ -143,14 +155,14 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
+          <li><a href="RelatedSoftware.html">Related Software</a> &raquo;</li>
+        
       <li>RaisimGymTorch</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/sections/RaisimGymTorch.rst.txt" rel="nofollow"> View page source</a>
-          
         
       </li>
     
@@ -164,6 +176,34 @@
             
   <div class="section" id="raisimgymtorch">
 <h1>RaisimGymTorch<a class="headerlink" href="#raisimgymtorch" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-raisimgymtorch">
+<h2>What is raisimGymTorch?<a class="headerlink" href="#what-is-raisimgymtorch" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="../_images/raisimGymTorchOverview.png"><img alt="RaiSimPy demo (robots.py)" src="../_images/raisimGymTorchOverview.png" style="width: 600px;" /></a>
+<p>raisimGymTorch is a gym environment example with raisim.
+Instead of using raisimPy, pybind11 wraps a vectorized environment so that the parallelization happens in C++.
+This improves the speed tremendously.</p>
+</div>
+<div class="section" id="why-raisimgymtorch">
+<h2>Why raisimGymTorch?<a class="headerlink" href="#why-raisimgymtorch" title="Permalink to this headline">¶</a></h2>
+<p>raisimGymTorch is designed such that you can collect <strong>tens of billions of state transitions</strong> with a single desktop machine.
+Such a number of state transitions is necessary to train for very difficult tasks. An example of trained tasks are shown below</p>
+<img alt="trained policy 1" src="../_images/raisimGymTorch_trainedPolicy1.gif" />
+<img alt="trained policy 2" src="../_images/raisimGymTorch_trainedPolicy2.gif" />
+<p>About <strong>160 billion time steps</strong> were used to train the above controller.
+raisimGymTorch can process about 500k time steps per second in the above environment (with 3950x) with an actuator network (which is as heavy as the physics simulation).</p>
+</div>
+<div class="section" id="how-to-run-the-example">
+<h2>How to run the example<a class="headerlink" href="#how-to-run-the-example" title="Permalink to this headline">¶</a></h2>
+<p>We provide an ANYmal locomotion example.
+In raisimGymTorch directory,</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python setup.py develop
+python raisimGymTorch/env/envs/rsg_anymal/runner.py
+</pre></div>
+</div>
+<p>To visualize the policy, run raisimUnity as well.
+It will show/record the performance of the policy every 200 iterations.
+All recorded videos can be found in <code class="docutils literal notranslate"><span class="pre">raisimlib/raisimUnity/&lt;OS&gt;/screenshots</span></code></p>
+</div>
 <div class="section" id="how-does-it-work">
 <h2>How does it work?<a class="headerlink" href="#how-does-it-work" title="Permalink to this headline">¶</a></h2>
 <p>RaiSimGymTorch wraps a c++ environment (i.e., ENVIRONMENT.hpp) as a python library using Pybind11.
@@ -177,17 +217,18 @@ Your launch file (e.g., <code class="docutils literal notranslate"><span class="
 <div class="section" id="how-to-add-a-custom-environment">
 <h2>How to add a custom environment?<a class="headerlink" href="#how-to-add-a-custom-environment" title="Permalink to this headline">¶</a></h2>
 <p>You can add your environment in <code class="docutils literal notranslate"><span class="pre">raisimGymTorch/raisimGymTorch/env/envs</span></code>.
-If you want to keep your source file somewhere else, then add a symlink to it in <code class="docutils literal notranslate"><span class="pre">raisimGymTorch/raisimGymTorch/env/envs</span></code>.</p>
+If you want to keep your source file somewhere else, then add a symlink to it in <code class="docutils literal notranslate"><span class="pre">raisimGymTorch/raisimGymTorch/env/envs</span></code>.
+An example environment can be found <a class="reference external" href="https://github.com/raisimTech/raisimlib/tree/master/raisimGymTorch/raisimGymTorch/env/envs/rsg_anymal">here</a></p>
 </div>
-<div class="section" id="code-structure">
-<h2>Code structure<a class="headerlink" href="#code-structure" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="code-structure-if-you-are-curious">
+<h2>Code structure (if you are curious)<a class="headerlink" href="#code-structure-if-you-are-curious" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">ENVIRONMENT</span></code> class is where you define the dynamics, reward, termination condition and so on.
 This class inherits from “RaisimGymEnv.hpp”, which add basic functionalities to the environment such as <code class="docutils literal notranslate"><span class="pre">setSimulationTimeStep</span></code>, <code class="docutils literal notranslate"><span class="pre">setControlTimeStep</span></code>, <code class="docutils literal notranslate"><span class="pre">getObDim</span></code> and so on.
 If <code class="docutils literal notranslate"><span class="pre">RaisimGymEnv</span></code> is not general enough for you, you can also make <code class="docutils literal notranslate"><span class="pre">ENVIRONMENT</span></code> independent from <code class="docutils literal notranslate"><span class="pre">RaisimGymEnv</span></code>.</p>
 <p><code class="docutils literal notranslate"><span class="pre">RaisimGymEnv</span></code> is wrapped by <code class="docutils literal notranslate"><span class="pre">VectorizedEnvironment</span></code>, which parallelizes the environment.
 You can consider it similar to <code class="docutils literal notranslate"><span class="pre">VectorEnv</span></code> in OpenAI Baselines.
 But RaisimGym parallelization happens in C++, which make it much faster.</p>
-<p>‘’raisim_gym.cpp`` is a Pybind11 wrapping of <code class="docutils literal notranslate"><span class="pre">VectorizedEnvironment</span></code>.
+<p><code class="docutils literal notranslate"><span class="pre">raisim_gym.cpp</span></code> is a Pybind11 wrapping of <code class="docutils literal notranslate"><span class="pre">VectorizedEnvironment</span></code>.
 It simply defines the interface functions.</p>
 <p>Finally, RaisimGymVecEnv is a python class that wraps a python library created from <code class="docutils literal notranslate"><span class="pre">raisim_gym.cpp</span></code>.</p>
 </div>
@@ -198,6 +239,13 @@ It simply defines the interface functions.</p>
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="RelatedSoftware.html" class="btn btn-neutral float-left" title="Related Software" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
