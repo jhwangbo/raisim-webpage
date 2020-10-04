@@ -11,7 +11,8 @@ What is raisimGymTorch?
   :alt: RaiSimPy demo (robots.py)
 
 raisimGymTorch is a gym environment example with raisim.
-Instead of using raisimPy, pybind11 wraps a vectorized environment so that the parallelization happens in C++.
+A simple pytorch-based RL framework is provided as well but it should work well with any other RL frameworks.
+Instead of using raisimPy, pybind11 wraps a vectorized environment in C++ so that the parallelization happens in C++.
 This improves the speed tremendously.
 
 
@@ -19,7 +20,7 @@ Why raisimGymTorch?
 ============================
 
 raisimGymTorch is designed such that you can collect **tens of billions of state transitions** with a single desktop machine.
-Such a number of state transitions is necessary to train for very difficult tasks. An example of trained tasks are shown below
+Such a number of state transitions is necessary to train for very difficult tasks. An example of a trained policy is shown below
 
 .. image:: ../image/raisimGymTorch_trainedPolicy1.gif
   :alt: trained policy 1
@@ -33,6 +34,7 @@ raisimGymTorch can process about 500k time steps per second in the above environ
 
 How to run the example
 =============================
+
 We provide an ANYmal locomotion example.
 In the raisimGymTorch directory,
 
@@ -51,10 +53,10 @@ How does it work?
 RaiSimGymTorch wraps a c++ environment (i.e., ENVIRONMENT.hpp) as a python library using Pybind11.
 When you call ``python3 setup.py develop``, all environments under ``raisimGymTorch/raisimGymTorch/env/envs`` are compiled.
 The compiled libraries are stored in ``raisimGymTorch/raisimGymTorch/env/bin``.
-Then you can import your environment to your python code.
-For example, the anymal locomotion example can be imported as ``from raisimGymTorch.env.bin import rsg_anymal``
 
 All the rest happens in Python.
+You can import your environment from your python code.
+For example, the anymal locomotion example can be imported as ``from raisimGymTorch.env.bin import rsg_anymal``
 Your launch file (e.g., ``runner.py``) can be customized for your need.
 
 
@@ -68,16 +70,15 @@ An example environment can be found `here <https://github.com/raisimTech/raisiml
 Code structure (if you are curious)
 ======================================
 ``ENVIRONMENT`` class is where you define the dynamics, reward, termination condition and so on.
-This class inherits from "RaisimGymEnv.hpp", which add basic functionalities to the environment such as ``setSimulationTimeStep``, ``setControlTimeStep``, ``getObDim`` and so on.
+This class inherits from ``RaisimGymEnv``, which add basic functionalities to the environment such as ``setSimulationTimeStep``, ``setControlTimeStep``, ``getObDim`` and so on.
 If ``RaisimGymEnv`` is not general enough for you, you can also make ``ENVIRONMENT`` independent from ``RaisimGymEnv``.
 
-``RaisimGymEnv`` is wrapped by ``VectorizedEnvironment``, which parallelizes the environment.
-You can consider it similar to ``VectorEnv`` in OpenAI Baselines.
-But RaisimGym parallelization happens in C++, which make it much faster.
+``RaisimGymEnv`` is wrapped by ``VectorizedEnvironment``, which parallelizes the environment using openmp.
+You can consider it similar to ``VectorEnv`` in OpenAI Baselines but RaisimGym parallelization happens in C++, which makes it orders of magnitude faster.
 
 ``raisim_gym.cpp`` is a Pybind11 wrapping of ``VectorizedEnvironment``.
 It simply defines the interface functions.
 
-Finally, RaisimGymVecEnv is a python class that wraps a python library created from ``raisim_gym.cpp``.
+Finally, ``RaisimGymVecEnv`` is a python class that wraps a python library created from ``raisim_gym.cpp``.
 
 

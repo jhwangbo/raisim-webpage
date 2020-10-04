@@ -180,13 +180,14 @@
 <h2>What is raisimGymTorch?<a class="headerlink" href="#what-is-raisimgymtorch" title="Permalink to this headline">¶</a></h2>
 <a class="reference internal image-reference" href="../_images/raisimGymTorchOverview.png"><img alt="RaiSimPy demo (robots.py)" src="../_images/raisimGymTorchOverview.png" style="width: 600px;" /></a>
 <p>raisimGymTorch is a gym environment example with raisim.
-Instead of using raisimPy, pybind11 wraps a vectorized environment so that the parallelization happens in C++.
+A simple pytorch-based RL framework is provided as well but it should work well with any other RL frameworks.
+Instead of using raisimPy, pybind11 wraps a vectorized environment in C++ so that the parallelization happens in C++.
 This improves the speed tremendously.</p>
 </div>
 <div class="section" id="why-raisimgymtorch">
 <h2>Why raisimGymTorch?<a class="headerlink" href="#why-raisimgymtorch" title="Permalink to this headline">¶</a></h2>
 <p>raisimGymTorch is designed such that you can collect <strong>tens of billions of state transitions</strong> with a single desktop machine.
-Such a number of state transitions is necessary to train for very difficult tasks. An example of trained tasks are shown below</p>
+Such a number of state transitions is necessary to train for very difficult tasks. An example of a trained policy is shown below</p>
 <img alt="trained policy 1" src="../_images/raisimGymTorch_trainedPolicy1.gif" />
 <img alt="trained policy 2" src="../_images/raisimGymTorch_trainedPolicy2.gif" />
 <p>About <strong>160 billion time steps</strong> were used to train the above controller.
@@ -208,10 +209,10 @@ All recorded videos can be found in <code class="docutils literal notranslate"><
 <h2>How does it work?<a class="headerlink" href="#how-does-it-work" title="Permalink to this headline">¶</a></h2>
 <p>RaiSimGymTorch wraps a c++ environment (i.e., ENVIRONMENT.hpp) as a python library using Pybind11.
 When you call <code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">setup.py</span> <span class="pre">develop</span></code>, all environments under <code class="docutils literal notranslate"><span class="pre">raisimGymTorch/raisimGymTorch/env/envs</span></code> are compiled.
-The compiled libraries are stored in <code class="docutils literal notranslate"><span class="pre">raisimGymTorch/raisimGymTorch/env/bin</span></code>.
-Then you can import your environment to your python code.
-For example, the anymal locomotion example can be imported as <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">raisimGymTorch.env.bin</span> <span class="pre">import</span> <span class="pre">rsg_anymal</span></code></p>
+The compiled libraries are stored in <code class="docutils literal notranslate"><span class="pre">raisimGymTorch/raisimGymTorch/env/bin</span></code>.</p>
 <p>All the rest happens in Python.
+You can import your environment from your python code.
+For example, the anymal locomotion example can be imported as <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">raisimGymTorch.env.bin</span> <span class="pre">import</span> <span class="pre">rsg_anymal</span></code>
 Your launch file (e.g., <code class="docutils literal notranslate"><span class="pre">runner.py</span></code>) can be customized for your need.</p>
 </div>
 <div class="section" id="how-to-add-a-custom-environment">
@@ -223,14 +224,13 @@ An example environment can be found <a class="reference external" href="https://
 <div class="section" id="code-structure-if-you-are-curious">
 <h2>Code structure (if you are curious)<a class="headerlink" href="#code-structure-if-you-are-curious" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">ENVIRONMENT</span></code> class is where you define the dynamics, reward, termination condition and so on.
-This class inherits from “RaisimGymEnv.hpp”, which add basic functionalities to the environment such as <code class="docutils literal notranslate"><span class="pre">setSimulationTimeStep</span></code>, <code class="docutils literal notranslate"><span class="pre">setControlTimeStep</span></code>, <code class="docutils literal notranslate"><span class="pre">getObDim</span></code> and so on.
+This class inherits from <code class="docutils literal notranslate"><span class="pre">RaisimGymEnv</span></code>, which add basic functionalities to the environment such as <code class="docutils literal notranslate"><span class="pre">setSimulationTimeStep</span></code>, <code class="docutils literal notranslate"><span class="pre">setControlTimeStep</span></code>, <code class="docutils literal notranslate"><span class="pre">getObDim</span></code> and so on.
 If <code class="docutils literal notranslate"><span class="pre">RaisimGymEnv</span></code> is not general enough for you, you can also make <code class="docutils literal notranslate"><span class="pre">ENVIRONMENT</span></code> independent from <code class="docutils literal notranslate"><span class="pre">RaisimGymEnv</span></code>.</p>
-<p><code class="docutils literal notranslate"><span class="pre">RaisimGymEnv</span></code> is wrapped by <code class="docutils literal notranslate"><span class="pre">VectorizedEnvironment</span></code>, which parallelizes the environment.
-You can consider it similar to <code class="docutils literal notranslate"><span class="pre">VectorEnv</span></code> in OpenAI Baselines.
-But RaisimGym parallelization happens in C++, which make it much faster.</p>
+<p><code class="docutils literal notranslate"><span class="pre">RaisimGymEnv</span></code> is wrapped by <code class="docutils literal notranslate"><span class="pre">VectorizedEnvironment</span></code>, which parallelizes the environment using openmp.
+You can consider it similar to <code class="docutils literal notranslate"><span class="pre">VectorEnv</span></code> in OpenAI Baselines but RaisimGym parallelization happens in C++, which makes it orders of magnitude faster.</p>
 <p><code class="docutils literal notranslate"><span class="pre">raisim_gym.cpp</span></code> is a Pybind11 wrapping of <code class="docutils literal notranslate"><span class="pre">VectorizedEnvironment</span></code>.
 It simply defines the interface functions.</p>
-<p>Finally, RaisimGymVecEnv is a python class that wraps a python library created from <code class="docutils literal notranslate"><span class="pre">raisim_gym.cpp</span></code>.</p>
+<p>Finally, <code class="docutils literal notranslate"><span class="pre">RaisimGymVecEnv</span></code> is a python class that wraps a python library created from <code class="docutils literal notranslate"><span class="pre">raisim_gym.cpp</span></code>.</p>
 </div>
 </div>
 
