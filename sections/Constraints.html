@@ -37,7 +37,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Related Software" href="RelatedSoftware.html" />
+    <link rel="next" title="StiffLengthConstraint" href="StiffLengthConstraint.html" />
     <link rel="prev" title="Height Map Using a Text File" href="HeightMap_example_txt.html" /> 
 </head>
 
@@ -98,7 +98,8 @@
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Constraints</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#stifflengthconstraint">StiffLengthConstraint</a></li>
+<li class="toctree-l2"><a class="reference internal" href="StiffLengthConstraint.html">StiffLengthConstraint</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CompliantLengthConstraint.html">CompliantLengthConstraint</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="RelatedSoftware.html">Related Software</a></li>
@@ -167,39 +168,19 @@
             
   <div class="section" id="constraints">
 <h1>Constraints<a class="headerlink" href="#constraints" title="Permalink to this headline">¶</a></h1>
-<p>RaiSim currently has two types of constraints: <code class="docutils literal notranslate"><span class="pre">StiffLengthConstraint</span></code> and <code class="docutils literal notranslate"><span class="pre">CompliantLengthConstraint</span></code>.
-Both constraints offer three stretch types: <code class="docutils literal notranslate"><span class="pre">STRETCH_RESISTANT_ONLY</span></code>, <code class="docutils literal notranslate"><span class="pre">COMPRESSION_RESISTANT_ONLY</span></code>, <code class="docutils literal notranslate"><span class="pre">BOTH</span></code>.
-The former two are unilateral constraints (i.e., acting only in one direction) and <code class="docutils literal notranslate"><span class="pre">BOTH</span></code> is a bilateral constraint (i.e., acting in both directions).</p>
-<div class="section" id="stifflengthconstraint">
-<h2>StiffLengthConstraint<a class="headerlink" href="#stifflengthconstraint" title="Permalink to this headline">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">StiffLengthConstraint</span></code> is treated as a collision and solved using a contact solver.
-This ensures that the constraint is respected with a high accuracy but it is computationally costly (as if there is one more collision).</p>
-<p><code class="docutils literal notranslate"><span class="pre">StiffLengthConstraint</span></code> can be added between two objects as</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">pin1</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">);</span>
-<span class="n">pin1</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">);</span>
-<span class="n">pin1</span><span class="o">-&gt;</span><span class="n">setBodyType</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">BodyType</span><span class="o">::</span><span class="n">STATIC</span><span class="p">);</span>
-<span class="k">auto</span> <span class="n">ball1</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="s">&quot;steel&quot;</span><span class="p">);</span>
-<span class="n">ball1</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">);</span>
-<span class="k">auto</span> <span class="n">wire</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">addStiffWire</span><span class="p">(</span><span class="n">pin1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span> <span class="n">ball1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span> <span class="mf">2.0</span><span class="p">);</span>
-</pre></div>
+<p>RaiSim currently has two types of constraints:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="StiffLengthConstraint.html">StiffLengthConstraint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CompliantLengthConstraint.html">CompliantLengthConstraint</a></li>
+</ul>
 </div>
-<p>By default, this constraint is <code class="docutils literal notranslate"><span class="pre">STRETCH_RESISTANT_ONLY</span></code>, which means that it acts like a string (i.e., it cannot push).
-Above code will create dynamics shown below</p>
-<img alt="../_images/stiff_stretch_constraint.gif" src="../_images/stiff_stretch_constraint.gif" />
-<p>The type can be changed with the following command</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">wire</span><span class="o">-&gt;</span><span class="n">setStretchType</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">LengthConstraint</span><span class="o">::</span><span class="n">StretchType</span><span class="o">::</span><span class="n">COMPRESSION_RESISTANT_ONLY</span><span class="p">);</span>
-</pre></div>
-</div>
-<p>By appending the above code and moving the ball higher, the simulation changes to</p>
-<img alt="../_images/stiff_comp_constraint.gif" src="../_images/stiff_comp_constraint.gif" />
-<p>The following code</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">wire</span><span class="o">-&gt;</span><span class="n">setStretchType</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">LengthConstraint</span><span class="o">::</span><span class="n">StretchType</span><span class="o">::</span><span class="n">BOTH</span><span class="p">);</span>
-</pre></div>
-</div>
-<p>results in</p>
-<img alt="../_images/stiff_both_constraint.gif" src="../_images/stiff_both_constraint.gif" />
-<p>This option resists both compression and stretch.</p>
-</div>
+<p>Both constraints offer three stretch types: <code class="docutils literal notranslate"><span class="pre">STRETCH_RESISTANT_ONLY</span></code>, <code class="docutils literal notranslate"><span class="pre">COMPRESSION_RESISTANT_ONLY</span></code>, <code class="docutils literal notranslate"><span class="pre">BOTH</span></code>.
+The first two are unilateral constraints (i.e., acting only in one direction) and <code class="docutils literal notranslate"><span class="pre">BOTH</span></code> is a bilateral constraint (i.e., acting in both directions).
+The stretch types are explained in</p>
+<p>You can find a short example in <a class="reference external" href="https://github.com/raisimTech/raisimlib/blob/master/examples/src/server/newtonsCradle.cpp">examples/src/server/newtonsCradle.cpp</a>.
+This code simulated the following dynamics</p>
+<img alt="../_images/constraints.gif" src="../_images/constraints.gif" />
 </div>
 
 
@@ -210,7 +191,7 @@ Above code will create dynamics shown below</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="RelatedSoftware.html" class="btn btn-neutral float-right" title="Related Software" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="StiffLengthConstraint.html" class="btn btn-neutral float-right" title="StiffLengthConstraint" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="HeightMap_example_txt.html" class="btn btn-neutral float-left" title="Height Map Using a Text File" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
