@@ -337,9 +337,19 @@ However, since RaiSim offers more functionalities, a RaiSim URDF might not be re
 <p>The modifications are as follows:</p>
 <ul class="simple">
 <li><p>Capsule geom is available for both collision objects and visual objects (with the keyword “capsule”). The geom is defined by “height” and “radius” keyword. The height represents the distance between the two center points of the spheres.</p></li>
-<li><p>A &lt;joint&gt;/&lt;dynamics&gt; tag can have three more attributes: <em>rotor inertia</em>, <em>spring_mount</em> and <em>stiffness</em>.</p></li>
+<li><p>A &lt;joint&gt;/&lt;dynamics&gt; tag can have three more attributes: <em>rotor_inertia</em>, <em>spring_mount</em> and <em>stiffness</em>.</p></li>
 </ul>
-<p><strong>Rotor inertia</strong> in Raisim approximately simulates the rotor inertia of the motor (but missing the resulting gyroscopic effect, which is often neglegible).
+<p>Here is an example joint with the raisim tags</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;joint</span> <span class="na">name=</span><span class="s">&quot;link1Tolink2&quot;</span> <span class="na">type=</span><span class="s">&quot;spherical&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;parent</span> <span class="na">link=</span><span class="s">&quot;link1&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;child</span> <span class="na">link=</span><span class="s">&quot;link2&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;origin</span> <span class="na">xyz=</span><span class="s">&quot;0 0 -0.24&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;axis</span> <span class="na">xyz=</span><span class="s">&quot;0 1 0&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;dynamics</span> <span class="na">rotor_inertia=</span><span class="s">&quot;0.0001&quot;</span> <span class="na">spring_mount=</span><span class="s">&quot;0.70710678118 0 0.70710678118 0&quot;</span> <span class="na">stiffness=</span><span class="s">&quot;500.0&quot;</span> <span class="na">damping=</span><span class="s">&quot;3.&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/joint&gt;</span>
+</pre></div>
+</div>
+<p><strong>Rotor_inertia</strong> in Raisim approximately simulates the rotor inertia of the motor (but missing the resulting gyroscopic effect, which is often neglegible).
 It is added to the diagonal elements of the mass matrix.
 It is common way to include the inertial effect of the rotor.
 You can also override it in C++ using <code class="code docutils literal notranslate"><span class="pre">setRotorInertia()</span></code>.</p>
