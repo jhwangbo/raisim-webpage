@@ -177,6 +177,7 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">WORKSPACE</span></code>: workspace where you clone your git repos (e.g., ~/raisim_workspace)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">LOCAL_INSTALL</span></code>: install directory where you install exported cmake libraries (e.g., ~/raisim_build)</p></li>
 </ul>
+<p>You can add them to your environment variables or simply replace them by the path you want in the below instructions.</p>
 </div>
 <div class="section" id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
@@ -184,6 +185,7 @@
 <ul class="simple">
 <li><p><em>Eigen3</em> (<code class="code docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">libeigen3-dev</span></code>)</p></li>
 <li><p>cmake &gt; 3.10 (Technically it is not a dependency but it makes the installation easier)</p></li>
+<li><p>For windows users, visual studio 2019 (we only support 2019 but it will probably work with 2015 or above)</p></li>
 </ul>
 <p>RaiSim includes many open-source libraries. See the COPYING file for the full list.</p>
 </div>
@@ -203,7 +205,14 @@ cmake .. -DCMAKE_INSTALL_PREFIX<span class="o">=</span><span class="nv">$LOCAL_I
 make install -j4
 </pre></div>
 </div>
-<p>Then, to use RaiSim more conveniently, you have to let your linker know where you installed RaiSim</p>
+<p>In Windows, you can use CMake gui or just use powershell.
+CMake gui will open Visual Studio
+Instead of <cite>make install -j4</cite> command, you should use the following command in Windows</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake --build . --target install --config Release
+</pre></div>
+</div>
+<p>Because the build is done by Visual Studio, not by make.</p>
+<p>To use RaiSim more conveniently, you have to let your linker know where you installed RaiSim</p>
 <p>In <strong>Linux</strong>, you can do that by adding the following line to your <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code> file</p>
 <blockquote>
 <div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$LD_LIBRARY_PATH</span>:~/&lt;WHERE-YOU-HAVE-INSTALLED-RAISIM&gt;/lib
@@ -218,16 +227,19 @@ make install -j4
 </pre></div>
 </div>
 </div></blockquote>
-<p>In <strong>Windows</strong>, you can do that by adding the installation directory to your <cite>PATH</cite> environment variable.</p>
+<p>In <strong>Windows</strong>, you can do that by adding the installation directory to your <cite>Path</cite> environment variable.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>** For Linux users **
+<p><strong>For Linux users</strong>
 To use (vulkan version) RaiSimUnity in Linux, you need to install <code class="docutils literal notranslate"><span class="pre">minizip</span></code>, <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> and <code class="docutils literal notranslate"><span class="pre">vulkan</span></code>.
 To install vulkan, follow this link <a class="reference external" href="https://linuxconfig.org/install-and-test-vulkan-on-linux">https://linuxconfig.org/install-and-test-vulkan-on-linux</a></p>
 <p>To install <code class="docutils literal notranslate"><span class="pre">minizip</span></code> and <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code>,</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt install minizip ffmpeg
 </pre></div>
 </div>
+<p>If you still cannot raisimUnity, this probably means that your driver does not support vulkan so well.
+In that case, you should use raisimUnityOpengl.
+It only supports minimalistic graphics.</p>
 </div>
 </div>
 </div>
