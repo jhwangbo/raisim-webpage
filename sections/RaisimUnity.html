@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Ray Test &mdash; raisim 1.0.0 documentation</title>
+  <title>RaiSim Unity &mdash; raisim 1.0.0 documentation</title>
   
 
   
@@ -37,8 +37,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="RaisimMatlab Introduction" href="RaiSimMatlabIntroduction.html" />
-    <link rel="prev" title="CompliantLengthConstraint" href="CompliantLengthConstraint.html" /> 
+    <link rel="prev" title="RaisimGymTorch" href="RaisimGymTorch.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -87,7 +86,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
 </ul>
 <p class="caption"><span class="caption-text">RaiSim C++</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ConventionsAndNotations.html">Conventions and Notations</a></li>
@@ -97,10 +96,7 @@
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Ray Test</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
 </ul>
 <p class="caption"><span class="caption-text">RaiSimMatlab</span></p>
 <ul>
@@ -113,9 +109,12 @@
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPyExample.html">RaisimPy Example</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Related Software</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RaisimUnity.html">RaiSim Unity</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">RaiSim Unity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-use-raisimunity">How to use raisimUnity</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -162,7 +161,7 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Ray Test</li>
+      <li>RaiSim Unity</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -179,19 +178,45 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="ray-test">
-<h1>Ray Test<a class="headerlink" href="#ray-test" title="Permalink to this headline">¶</a></h1>
-<img alt="../_images/raytest.gif" src="../_images/raytest.gif" />
-<p>Ray test is a collision checker between the world and a ray.
-Users should specify the starting point, direction and length. It returns the colliding objects and the distance.</p>
-<div class="section" id="example">
-<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>An example is provided <a class="reference external" href="https://github.com/raisimTech/raisimLib/blob/master/examples/src/server/rayDemo.cpp">here</a>.
-Note that only the following line</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">&amp;</span> <span class="n">col</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">rayTest</span><span class="p">({</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">},</span> <span class="n">direction</span><span class="p">,</span> <span class="mf">50.</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>
+  <div class="section" id="raisim-unity">
+<h1>RaiSim Unity<a class="headerlink" href="#raisim-unity" title="Permalink to this headline">¶</a></h1>
+<p>raisimUnity is a visualizer for RaiSim.
+It communicates with RaiSim using a TCP/IP protocol.
+Pre-built executables are provided in <code class="docutils literal notranslate"><span class="pre">raisimUnity</span></code> directory.</p>
+<div class="section" id="how-to-use-raisimunity">
+<h2>How to use raisimUnity<a class="headerlink" href="#how-to-use-raisimunity" title="Permalink to this headline">¶</a></h2>
+<p>1. Write your simulated world in RaiSim, create a server and attach the world to the server.
+An example is provided below.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>/// launch raisim server
+raisim::RaisimServer server<span class="o">(</span><span class="p">&amp;</span>world<span class="o">)</span><span class="p">;</span>
+server.launchServer<span class="o">()</span><span class="p">;</span>
+
+<span class="k">while</span><span class="o">(</span><span class="m">1</span><span class="o">)</span> <span class="o">{</span>
+  raisim::MSLEEP<span class="o">(</span><span class="m">2</span><span class="o">)</span><span class="p">;</span>
+  server.integrateWorldThreadSafe<span class="o">()</span><span class="p">;</span>
+<span class="o">}</span>
+
+server.killServer<span class="o">()</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>performs the ray test. The rest of the code is for demo only.</p>
+<ol class="arabic simple" start="2">
+<li><p>Run RaiSimUnity executable (in the <code class="docutils literal notranslate"><span class="pre">raisimUnity</span></code> directory)</p></li>
+</ol>
+<img alt="../_images/raisimUnity1.png" src="../_images/raisimUnity1.png" />
+<img alt="../_images/raisimUnity2.png" src="../_images/raisimUnity2.png" />
+<ol class="arabic simple" start="3">
+<li><p>Run your simulation</p></li>
+</ol>
+<img alt="../_images/raisimUnity3.png" src="../_images/raisimUnity3.png" />
+<p>4. If the IP and port number matches, raisimUnity will try to connect automatically.
+You can disable auto-connection by unchecking the <code class="docutils literal notranslate"><span class="pre">auto-connect</span></code> checkbox.</p>
+<img alt="../_images/raisimUnity4.png" src="../_images/raisimUnity4.png" />
+<ol class="arabic simple" start="5">
+<li><p>A quick summary</p></li>
+</ol>
+<img alt="../_images/RSUinstruction1.png" src="../_images/RSUinstruction1.png" />
+<img alt="../_images/RSUinstruction2.png" src="../_images/RSUinstruction2.png" />
+<img alt="../_images/RSUinstruction3.png" src="../_images/RSUinstruction3.png" />
 </div>
 </div>
 
@@ -203,10 +228,8 @@ Note that only the following line</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="RaiSimMatlabIntroduction.html" class="btn btn-neutral float-right" title="RaisimMatlab Introduction" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-      
-        <a href="CompliantLengthConstraint.html" class="btn btn-neutral float-left" title="CompliantLengthConstraint" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="RaisimGymTorch.html" class="btn btn-neutral float-left" title="RaisimGymTorch" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
