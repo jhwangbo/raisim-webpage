@@ -83,14 +83,16 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Support.html">Support</a></li>
 </ul>
 <p class="caption"><span class="caption-text">RaiSim C++</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="LoggingSystem.html">Logging System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LoggingSystem.html">Logging System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Sever</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
@@ -178,7 +180,119 @@
   <div class="section" id="raisimpy">
 <h1>RaisimPy<a class="headerlink" href="#raisimpy" title="Permalink to this headline">¶</a></h1>
 <p>raisimPy was originally developed by Brian Delhaisse.
-It is nearly</p>
+RaiSim Tech Inc. is continuing th development now.</p>
+<p>The syntax of raisimPy is nearly identical to that of the C++ API.
+Therefore, we do not provide a separate documentation for the python API.
+An example application of raisimPy is shown below</p>
+<div class="twocol docutils container">
+<div class="leftside docutils container">
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;raisim/RaisimServer.hpp&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;raisim/World.hpp&quot;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+  <span class="k">auto</span> <span class="n">binaryPath</span> <span class="o">=</span> <span class="n">raisim</span><span class="o">::</span><span class="n">Path</span><span class="o">::</span><span class="n">setFromArgv</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+  <span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">::</span><span class="n">setActivationKey</span><span class="p">(</span><span class="n">binaryPath</span><span class="p">.</span><span class="n">getDirectory</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;</span><span class="se">\\</span><span class="s">rsc</span><span class="se">\\</span><span class="s">activation.raisim&quot;</span><span class="p">);</span>
+
+  <span class="c1">/// create raisim world</span>
+  <span class="n">raisim</span><span class="o">::</span><span class="n">World</span> <span class="n">world</span><span class="p">;</span>
+
+  <span class="c1">/// create objects</span>
+  <span class="n">raisim</span><span class="o">::</span><span class="n">TerrainProperties</span> <span class="n">terrainProperties</span><span class="p">;</span>
+  <span class="n">terrainProperties</span><span class="p">.</span><span class="n">frequency</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">;</span>
+  <span class="n">terrainProperties</span><span class="p">.</span><span class="n">zScale</span> <span class="o">=</span> <span class="mf">3.0</span><span class="p">;</span>
+  <span class="n">terrainProperties</span><span class="p">.</span><span class="n">xSize</span> <span class="o">=</span> <span class="mf">20.0</span><span class="p">;</span>
+  <span class="n">terrainProperties</span><span class="p">.</span><span class="n">ySize</span> <span class="o">=</span> <span class="mf">20.0</span><span class="p">;</span>
+  <span class="n">terrainProperties</span><span class="p">.</span><span class="n">xSamples</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span>
+  <span class="n">terrainProperties</span><span class="p">.</span><span class="n">ySamples</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span>
+  <span class="n">terrainProperties</span><span class="p">.</span><span class="n">fractalOctaves</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+  <span class="n">terrainProperties</span><span class="p">.</span><span class="n">fractalLacunarity</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">;</span>
+  <span class="n">terrainProperties</span><span class="p">.</span><span class="n">fractalGain</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">;</span>
+  <span class="n">raisim</span><span class="o">::</span><span class="n">HeightMap</span><span class="o">*</span> <span class="n">hm</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">addHeightMap</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">terrainProperties</span><span class="p">);</span>
+
+  <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">ArticulatedSystem</span><span class="o">*&gt;</span> <span class="n">anymals</span><span class="p">;</span>
+
+  <span class="c1">/// ANYmal joint PD controller</span>
+  <span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span> <span class="n">jointNominalConfig</span><span class="p">(</span><span class="mi">19</span><span class="p">),</span> <span class="n">jointVelocityTarget</span><span class="p">(</span><span class="mi">18</span><span class="p">);</span>
+  <span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span> <span class="n">jointState</span><span class="p">(</span><span class="mi">18</span><span class="p">),</span> <span class="n">jointForce</span><span class="p">(</span><span class="mi">18</span><span class="p">),</span> <span class="n">jointPgain</span><span class="p">(</span><span class="mi">18</span><span class="p">),</span> <span class="n">jointDgain</span><span class="p">(</span><span class="mi">18</span><span class="p">);</span>
+  <span class="n">jointPgain</span><span class="p">.</span><span class="n">setZero</span><span class="p">();</span>
+  <span class="n">jointDgain</span><span class="p">.</span><span class="n">setZero</span><span class="p">();</span>
+  <span class="n">jointVelocityTarget</span><span class="p">.</span><span class="n">setZero</span><span class="p">();</span>
+  <span class="n">jointPgain</span><span class="p">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">12</span><span class="p">).</span><span class="n">setConstant</span><span class="p">(</span><span class="mf">200.0</span><span class="p">);</span>
+  <span class="n">jointDgain</span><span class="p">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">12</span><span class="p">).</span><span class="n">setConstant</span><span class="p">(</span><span class="mf">10.0</span><span class="p">);</span>
+
+  <span class="k">const</span> <span class="kt">size_t</span> <span class="n">N</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+
+  <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">N</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">N</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">anymals</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">addArticulatedSystem</span><span class="p">(</span><span class="n">binaryPath</span><span class="p">.</span><span class="n">getDirectory</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;</span><span class="se">\\</span><span class="s">rsc</span><span class="se">\\</span><span class="s">anymal</span><span class="se">\\</span><span class="s">urdf</span><span class="se">\\</span><span class="s">anymal.urdf&quot;</span><span class="p">));</span>
+      <span class="n">anymals</span><span class="p">.</span><span class="n">back</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">setGeneralizedCoordinate</span><span class="p">({</span><span class="kt">double</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">i</span><span class="p">),</span> <span class="kt">double</span><span class="p">(</span><span class="n">j</span><span class="p">),</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">-0.8</span><span class="p">,</span> <span class="mf">-0.03</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">-0.8</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">-0.4</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">-0.03</span><span class="p">,</span> <span class="mf">-0.4</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">});</span>
+      <span class="n">anymals</span><span class="p">.</span><span class="n">back</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">setGeneralizedForce</span><span class="p">(</span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="o">::</span><span class="n">Zero</span><span class="p">(</span><span class="n">anymals</span><span class="p">.</span><span class="n">back</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getDOF</span><span class="p">()));</span>
+      <span class="n">anymals</span><span class="p">.</span><span class="n">back</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">setControlMode</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">ControlMode</span><span class="o">::</span><span class="n">PD_PLUS_FEEDFORWARD_TORQUE</span><span class="p">);</span>
+      <span class="n">anymals</span><span class="p">.</span><span class="n">back</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">setPdGains</span><span class="p">(</span><span class="n">jointPgain</span><span class="p">,</span> <span class="n">jointDgain</span><span class="p">);</span>
+      <span class="n">anymals</span><span class="p">.</span><span class="n">back</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">setName</span><span class="p">(</span><span class="s">&quot;anymal&quot;</span> <span class="o">+</span> <span class="n">std</span><span class="o">::</span><span class="n">to_string</span><span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="n">N</span><span class="p">));</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="c1">/// launch raisim servear</span>
+  <span class="n">raisim</span><span class="o">::</span><span class="n">RaisimServer</span> <span class="n">server</span><span class="p">(</span><span class="o">&amp;</span><span class="n">world</span><span class="p">);</span>
+  <span class="n">server</span><span class="p">.</span><span class="n">launchServer</span><span class="p">();</span>
+
+  <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">raisim</span><span class="o">::</span><span class="n">MSLEEP</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+    <span class="n">server</span><span class="p">.</span><span class="n">integrateWorldThreadSafe</span><span class="p">();</span>
+  <span class="p">}</span>
+  <span class="n">server</span><span class="p">.</span><span class="n">killServer</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="rightside docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">raisimpy</span> <span class="k">as</span> <span class="nn">raisim</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="n">raisim</span><span class="o">.</span><span class="n">World</span><span class="o">.</span><span class="n">setLicenseFile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;/../../rsc/activation.raisim&quot;</span><span class="p">)</span>
+<span class="n">world</span> <span class="o">=</span> <span class="n">raisim</span><span class="o">.</span><span class="n">World</span><span class="p">()</span>
+<span class="n">world</span><span class="o">.</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
+
+<span class="c1"># create objects</span>
+<span class="n">terrainProperties</span> <span class="o">=</span> <span class="n">raisim</span><span class="o">.</span><span class="n">TerrainProperties</span><span class="p">()</span>
+<span class="n">terrainProperties</span><span class="o">.</span><span class="n">frequency</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">terrainProperties</span><span class="o">.</span><span class="n">zScale</span> <span class="o">=</span> <span class="mf">3.0</span>
+<span class="n">terrainProperties</span><span class="o">.</span><span class="n">xSize</span> <span class="o">=</span> <span class="mf">20.0</span>
+<span class="n">terrainProperties</span><span class="o">.</span><span class="n">ySize</span> <span class="o">=</span> <span class="mf">20.0</span>
+<span class="n">terrainProperties</span><span class="o">.</span><span class="n">xSamples</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">terrainProperties</span><span class="o">.</span><span class="n">ySamples</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">terrainProperties</span><span class="o">.</span><span class="n">fractalOctaves</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">terrainProperties</span><span class="o">.</span><span class="n">fractalLacunarity</span> <span class="o">=</span> <span class="mf">2.0</span>
+<span class="n">terrainProperties</span><span class="o">.</span><span class="n">fractalGain</span> <span class="o">=</span> <span class="mf">0.25</span>
+<span class="n">hm</span> <span class="o">=</span> <span class="n">world</span><span class="o">.</span><span class="n">addHeightMap</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">terrainProperties</span><span class="p">)</span>
+
+<span class="c1"># robot</span>
+<span class="n">anymal_urdf_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;/../../rsc/anymal/urdf/anymal.urdf&quot;</span>
+<span class="n">anymal</span> <span class="o">=</span> <span class="n">world</span><span class="o">.</span><span class="n">addArticulatedSystem</span><span class="p">(</span><span class="n">anymal_urdf_file</span><span class="p">)</span>
+
+<span class="c1"># ANYmal joint PD controller</span>
+<span class="n">anymal_nominal_joint_config</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.54</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.8</span><span class="p">,</span>
+                                        <span class="o">-</span><span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.03</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">])</span>
+<span class="n">anymal</span><span class="o">.</span><span class="n">setGeneralizedCoordinate</span><span class="p">(</span><span class="n">anymal_nominal_joint_config</span><span class="p">)</span>
+<span class="n">anymal</span><span class="o">.</span><span class="n">setPdGains</span><span class="p">(</span><span class="mi">200</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">([</span><span class="mi">18</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">([</span><span class="mi">18</span><span class="p">]))</span>
+<span class="n">anymal</span><span class="o">.</span><span class="n">setPdTarget</span><span class="p">(</span><span class="n">anymal_nominal_joint_config</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">18</span><span class="p">]))</span>
+
+<span class="c1"># launch raisim servear</span>
+<span class="n">server</span> <span class="o">=</span> <span class="n">raisim</span><span class="o">.</span><span class="n">RaisimServer</span><span class="p">(</span><span class="n">world</span><span class="p">)</span>
+<span class="n">server</span><span class="o">.</span><span class="n">launchServer</span><span class="p">(</span><span class="mi">8080</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">500000</span><span class="p">):</span>
+    <span class="n">world</span><span class="o">.</span><span class="n">integrate</span><span class="p">()</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.0005</span><span class="p">)</span>
+
+<span class="n">server</span><span class="o">.</span><span class="n">killServer</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
 </div>
 
 
