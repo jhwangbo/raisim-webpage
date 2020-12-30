@@ -13,6 +13,10 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_tabs/semantic-ui-2.4.1/segment.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_tabs/semantic-ui-2.4.1/menu.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_tabs/semantic-ui-2.4.1/tab.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_tabs/tabs.css" type="text/css" />
 
   
   
@@ -29,7 +33,8 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
+        <script src="../_static/sphinx_tabs/semantic-ui-2.4.1/tab.min.js"></script>
+        <script src="../_static/sphinx_tabs/tabs.js"></script>
         <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
@@ -204,39 +209,88 @@
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">RAISIM_EXAMPLE</span></code> : Compile C++ RaiSim examples</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">RAISIM_MATLAB</span></code> : Compile raisimMatlab (compiled binary is also provided). You need MATLAB for this option</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">RAISIM_PY</span></code> : Compile raisimPy. The desired python version can be set by <code class="docutils literal notranslate"><span class="pre">-DPYTHON_EXECUTABLE=$(python3</span> <span class="pre">-c</span> <span class="pre">&quot;import</span> <span class="pre">sys;</span> <span class="pre">print(sys.executable)&quot;)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RAISIM_PY</span></code> : Compile raisimPy. The desired python version can be set by <code class="docutils literal notranslate"><span class="pre">-DPYTHON_EXECUTABLE=$(python3</span> <span class="pre">-c</span> <span class="pre">&quot;import</span> <span class="pre">sys;</span> <span class="pre">print(sys.executable)&quot;)</span></code> in Linux or Mac.</p></li>
 </ul>
-<p>Example install in Linux/Mac</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> <span class="nv">$WORKSPACE</span>/raisimLib
+<p>You can generate build files using CMake as following</p>
+<div class="sphinx-tabs docutils container">
+<div class="ui top attached tabular menu sphinx-menu docutils container">
+<div class="active item sphinx-data-tab-TGludXggb3IgTWFj docutils container">
+<div class="docutils container">
+<p>Linux or Mac</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-V2luZG93cw== docutils container">
+<div class="docutils container">
+<p>Windows</p>
+</div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-TGludXggb3IgTWFj active docutils container">
+<p>Replace <code class="docutils literal notranslate"><span class="pre">$(python3</span> <span class="pre">-c</span> <span class="pre">&quot;import</span> <span class="pre">sys;</span> <span class="pre">print(sys.executable)&quot;)</span></code> to specify which python executable to use.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">$WORKSPACE</span><span class="o">/</span><span class="n">raisimLib</span>
+<span class="n">mkdir</span> <span class="n">build</span>
+<span class="n">cd</span> <span class="n">build</span>
+<span class="n">cmake</span> <span class="p">..</span> <span class="o">-</span><span class="n">DCMAKE_INSTALL_PREFIX</span><span class="o">=</span><span class="n">$LOCAL_INSTALL</span> <span class="o">-</span><span class="n">DRAISIM_EXAMPLE</span><span class="o">=</span><span class="n">ON</span> <span class="o">-</span><span class="n">DRAISIM_PY</span><span class="o">=</span><span class="n">ON</span> <span class="o">-</span><span class="n">DPYTHON_EXECUTABLE</span><span class="o">=</span><span class="n">$</span><span class="p">(</span><span class="n">python3</span> <span class="o">-</span><span class="n">c</span> <span class="s">&quot;import sys; print(sys.executable)&quot;</span><span class="p">)</span>
+<span class="n">make</span> <span class="n">install</span> <span class="o">-</span><span class="n">j4</span>
+</pre></div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-V2luZG93cw== docutils container">
+<p>We recommend using the CMake GUI.
+After generating the build files with the CMake GUI, you can build and install RaiSim using Visual Studio.
+Alternatively, you can do it as below in Windows Powershell</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>cd $WORKSPACE/raisimLib
 mkdir build
-<span class="nb">cd</span> build
-cmake .. -DCMAKE_INSTALL_PREFIX<span class="o">=</span><span class="nv">$LOCAL_INSTALL</span> -DRAISIM_EXAMPLE<span class="o">=</span>ON -DRAISIM_PY<span class="o">=</span>ON
-make install -j4
+cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=$LOCAL_INSTALL -DRAISIM_EXAMPLE=ON -DRAISIM_PY=ON -DPYTHON_EXECUTABLE=&lt;THE-PATH-TO-THE-PYTHON-EXE&gt;
+cmake --build . --target install --config Release
 </pre></div>
 </div>
-<p>In Windows, you can use CMake gui or just use powershell.
-CMake gui will open Visual Studio
-Instead of <cite>make install -j4</cite> command, you should use the following command in Windows</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake --build . --target install --config Release
-</pre></div>
 </div>
-<p>Because the build is done by Visual Studio, not by make.</p>
+</div>
 <p>To use RaiSim more conveniently, you have to let your linker know where you installed RaiSim</p>
-<p>In <strong>Linux</strong>, you can do that by adding the following line to your <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code> file</p>
-<blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$LD_LIBRARY_PATH</span>:~/&lt;WHERE-YOU-HAVE-INSTALLED-RAISIM&gt;/lib
+<div class="sphinx-tabs docutils container">
+<div class="ui top attached tabular menu sphinx-menu docutils container">
+<div class="active item sphinx-data-tab-TGludXg= docutils container">
+<div class="docutils container">
+<p>Linux</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-TWFj docutils container">
+<div class="docutils container">
+<p>Mac</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-V2luZG93cw== docutils container">
+<div class="docutils container">
+<p>Windows</p>
+</div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-TGludXg= active docutils container">
+<p>Add the following lines to your <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code> file</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$LD_LIBRARY_PATH</span>:~/&lt;WHERE-YOU-HAVE-INSTALLED-RAISIM&gt;/lib
 <span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:~/&lt;WHERE-YOU-HAVE-INSTALLED-RAISIM&gt;/lib
 </pre></div>
 </div>
-</div></blockquote>
-<p>In <strong>Mac</strong>, you can do that by adding the following line to your <cite>.zshrc</cite> file</p>
-<blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span>DYLD_LIBRARY_PATH:~/&lt;WHERE-YOU-HAVE-INSTALLED-RAISIM&gt;/lib
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-TWFj docutils container">
+<p>Add the following lines to your <code class="docutils literal notranslate"><span class="pre">.zshrc</span></code> file</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span>DYLD_LIBRARY_PATH:~/&lt;WHERE-YOU-HAVE-INSTALLED-RAISIM&gt;/lib
 <span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:~/&lt;WHERE-YOU-HAVE-INSTALLED-RAISIM&gt;/lib
 </pre></div>
 </div>
-</div></blockquote>
-<p>In <strong>Windows</strong>, you can do that by adding the installation directory to your <cite>Path</cite> environment variable.</p>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-V2luZG93cw== docutils container">
+<p>You can do that by following these steps</p>
+<ol class="arabic simple">
+<li><p>“Edit the system environment variables”</p></li>
+<li><p>In “Advanced tab”, “Environment Variables”</p></li>
+<li><p>Click “Path” variable in the “System variables” list and click “edit”</p></li>
+<li><p>Append the install directory</p></li>
+</ol>
+</div>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><strong>For Linux users</strong>
@@ -253,7 +307,7 @@ It only supports minimalistic graphics.</p>
 </div>
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
-<p>To run examples, copy-paste the activation that you received by email to <code class="docutils literal notranslate"><span class="pre">rsc</span></code> directory.
+<p>To run examples, copy-paste the activation that you received by email to <code class="docutils literal notranslate"><span class="pre">rsc</span></code> directory and rename it to <code class="docutils literal notranslate"><span class="pre">activation,raisim</span></code>.
 When you run CMake, it will copy the <code class="docutils literal notranslate"><span class="pre">rsc</span></code> directory to a build directory.</p>
 <p>In <strong>Windows</strong>, also copy your activation key to <code class="docutils literal notranslate"><span class="pre">raisim\win32\mt_release\bin\rsc</span></code> directory.
 Then, you can run prebuilt examples in <code class="docutils literal notranslate"><span class="pre">raisim\win32\mt_release\bin</span></code>.</p>
