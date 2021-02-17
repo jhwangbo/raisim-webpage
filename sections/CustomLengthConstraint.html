@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>StiffLengthConstraint &mdash; raisim 1.0.0 documentation</title>
+  <title>CustomLengthConstraint &mdash; raisim 1.0.0 documentation</title>
   
 
   
@@ -40,8 +40,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="CompliantLengthConstraint" href="CompliantLengthConstraint.html" />
-    <link rel="prev" title="Constraints" href="Constraints.html" /> 
+    <link rel="next" title="Ray Test" href="RayTest.html" />
+    <link rel="prev" title="CompliantLengthConstraint" href="CompliantLengthConstraint.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -103,9 +103,12 @@
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="Constraints.html">Constraints</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">StiffLengthConstraint</a></li>
+<li class="toctree-l2"><a class="reference internal" href="StiffLengthConstraint.html">StiffLengthConstraint</a></li>
 <li class="toctree-l2"><a class="reference internal" href="CompliantLengthConstraint.html">CompliantLengthConstraint</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CustomLengthConstraint.html">CustomLengthConstraint</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">CustomLengthConstraint</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api">API</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="Constraints.html#api">API</a></li>
 </ul>
 </li>
@@ -165,7 +168,7 @@
         
           <li><a href="Constraints.html">Constraints</a> &raquo;</li>
         
-      <li>StiffLengthConstraint</li>
+      <li>CustomLengthConstraint</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -182,35 +185,41 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="stifflengthconstraint">
-<h1>StiffLengthConstraint<a class="headerlink" href="#stifflengthconstraint" title="Permalink to this headline">¶</a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">StiffLengthConstraint</span></code> is treated as a collision and solved using a contact solver.
-This ensures that the constraint is respected with a high accuracy but it is computationally costly (as if there is one more collision).</p>
-<p><code class="docutils literal notranslate"><span class="pre">StiffLengthConstraint</span></code> can be added between two objects as</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">pin1</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">);</span>
-<span class="n">pin1</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">);</span>
-<span class="n">pin1</span><span class="o">-&gt;</span><span class="n">setBodyType</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">BodyType</span><span class="o">::</span><span class="n">STATIC</span><span class="p">);</span>
-<span class="k">auto</span> <span class="n">ball1</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="s">&quot;steel&quot;</span><span class="p">);</span>
-<span class="n">ball1</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">);</span>
-<span class="k">auto</span> <span class="n">wire</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">addStiffWire</span><span class="p">(</span><span class="n">pin1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span> <span class="n">ball1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span> <span class="mf">2.0</span><span class="p">);</span>
+  <div class="section" id="customlengthconstraint">
+<h1>CustomLengthConstraint<a class="headerlink" href="#customlengthconstraint" title="Permalink to this headline">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">CustomLengthConstraint</span></code> allows users to apply any kind of custom constraints.
+Users simply set the tension between two points using <code class="docutils literal notranslate"><span class="pre">setTension()</span></code>.</p>
+<p>An example of this type of constraints is shown below</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">wire7</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">addCustomWire</span><span class="p">(</span><span class="n">pin7</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span> <span class="n">anymalB</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">{</span><span class="mf">0.</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">},</span> <span class="mf">2.0</span><span class="p">);</span>
+<span class="n">wire7</span><span class="o">-&gt;</span><span class="n">setTension</span><span class="p">(</span><span class="mi">400</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>By default, this constraint is <code class="docutils literal notranslate"><span class="pre">STRETCH_RESISTANT_ONLY</span></code>, which means that it acts like a string (i.e., it cannot push).
-Above code will create dynamics shown below</p>
-<img alt="../_images/stiff_stretch_constraint.gif" src="../_images/stiff_stretch_constraint.gif" />
-<p>The type can be changed with the following command</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">wire</span><span class="o">-&gt;</span><span class="n">setStretchType</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">LengthConstraint</span><span class="o">::</span><span class="n">StretchType</span><span class="o">::</span><span class="n">COMPRESSION_RESISTANT_ONLY</span><span class="p">);</span>
-</pre></div>
+<p>The following code will results in</p>
+<img alt="../_images/customWire.gif" src="../_images/customWire.gif" />
+<p>You can find a runnable example in <a class="reference external" href="https://github.com/raisimTech/raisimLib/blob/master/examples/src/server/newtonsCradle.cpp">here</a>.</p>
+<div class="section" id="api">
+<h2>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h2>
+<dl class="cpp class">
+<dt id="_CPPv4N6raisim22CustomLengthConstraintE">
+<span id="_CPPv3N6raisim22CustomLengthConstraintE"></span><span id="_CPPv2N6raisim22CustomLengthConstraintE"></span><span id="raisim::CustomLengthConstraint"></span><span class="target" id="classraisim_1_1CustomLengthConstraint"></span><em class="property">class </em><code class="sig-prename descclassname">raisim<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">CustomLengthConstraint</code> : <em class="property">public</em> raisim::<a class="reference internal" href="Constraints.html#_CPPv4N6raisim16LengthConstraintE" title="raisim::LengthConstraint">LengthConstraint</a><a class="headerlink" href="#_CPPv4N6raisim22CustomLengthConstraintE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="cpp function">
+<dt id="_CPPv4N6raisim22CustomLengthConstraint10setTensionEd">
+<span id="_CPPv3N6raisim22CustomLengthConstraint10setTensionEd"></span><span id="_CPPv2N6raisim22CustomLengthConstraint10setTensionEd"></span><span id="raisim::CustomLengthConstraint::setTension__double"></span><span class="target" id="classraisim_1_1CustomLengthConstraint_1a861567165b0638b4a8326950f8525d86"></span>void <code class="sig-name descname">setTension</code><span class="sig-paren">(</span>double <em>tension</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim22CustomLengthConstraint10setTensionEd" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>set the tension of the wire <dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">tension</span></code>: the applied tension. If this number is positive, then the force is acting such a way that brings the two objects together </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
 </div>
-<p>By appending the above code and moving the ball higher, the simulation changes to</p>
-<img alt="../_images/stiff_comp_constraint.gif" src="../_images/stiff_comp_constraint.gif" />
-<p>The following code</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">wire</span><span class="o">-&gt;</span><span class="n">setStretchType</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">LengthConstraint</span><span class="o">::</span><span class="n">StretchType</span><span class="o">::</span><span class="n">BOTH</span><span class="p">);</span>
-</pre></div>
+</dd></dl>
+
 </div>
-<p>results in</p>
-<img alt="../_images/stiff_both_constraint.gif" src="../_images/stiff_both_constraint.gif" />
-<p>This option resists both compression and stretch.</p>
 </div>
 
 
@@ -221,10 +230,10 @@ Above code will create dynamics shown below</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="CompliantLengthConstraint.html" class="btn btn-neutral float-right" title="CompliantLengthConstraint" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="RayTest.html" class="btn btn-neutral float-right" title="Ray Test" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="Constraints.html" class="btn btn-neutral float-left" title="Constraints" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="CompliantLengthConstraint.html" class="btn btn-neutral float-left" title="CompliantLengthConstraint" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
