@@ -558,8 +558,8 @@ The elements are ordered by the body indicies (which is the same as the joint in
 <ul class="simple">
 <li><p><strong>Center of Mass Position</strong></p></li>
 </ul>
-<p><code class="code docutils literal notranslate"><span class="pre">getLinkCOM</span></code> method returns (a non-const reference to) a <code class="code docutils literal notranslate"><span class="pre">std::vector</span></code> of the COM of the links.
-The elements are ordered by the body indicies.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">getBodyCOM_B</span></code> method returns (a non-const reference to) a <code class="code docutils literal notranslate"><span class="pre">std::vector</span></code> of the COM of the bodies.
+The elements are ordered by the body indices.</p>
 <ul class="simple">
 <li><p><strong>Link Inertia</strong></p></li>
 </ul>
@@ -1560,10 +1560,20 @@ This material affects the contact dynamics.</p>
 </dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N6raisim17ArticulatedSystem10getLinkCOMEv">
-<span id="_CPPv3N6raisim17ArticulatedSystem10getLinkCOMEv"></span><span id="_CPPv2N6raisim17ArticulatedSystem10getLinkCOMEv"></span><span id="raisim::ArticulatedSystem::getLinkCOM"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1a840d2377c6d39147f4c63b6ffff2fb8c"></span>std::vector&lt;raisim::Vec&lt;3&gt;&gt; &amp;<code class="sig-name descname">getLinkCOM</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim17ArticulatedSystem10getLinkCOMEv" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N6raisim17ArticulatedSystem12getBodyCOM_BEv">
+<span id="_CPPv3N6raisim17ArticulatedSystem12getBodyCOM_BEv"></span><span id="_CPPv2N6raisim17ArticulatedSystem12getBodyCOM_BEv"></span><span id="raisim::ArticulatedSystem::getBodyCOM_B"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1afc9653d8e665fdb18c9d9340000986a7"></span>std::vector&lt;raisim::Vec&lt;3&gt;&gt; &amp;<code class="sig-name descname">getBodyCOM_B</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim17ArticulatedSystem12getBodyCOM_BEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p><dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>a reference to the position of the center of the mass in the body frame. </p>
+<dt><strong>Return</strong></dt><dd><p>a reference to the position of the center of the mass of each body in the body frame. </p>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N6raisim17ArticulatedSystem12getBodyCOM_WEv">
+<span id="_CPPv3N6raisim17ArticulatedSystem12getBodyCOM_WEv"></span><span id="_CPPv2N6raisim17ArticulatedSystem12getBodyCOM_WEv"></span><span id="raisim::ArticulatedSystem::getBodyCOM_W"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1ac1e402eb2ac4b3e5d11051a8c00061c1"></span>std::vector&lt;raisim::Vec&lt;3&gt;&gt; &amp;<code class="sig-name descname">getBodyCOM_W</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim17ArticulatedSystem12getBodyCOM_WEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to the position of the center of the mass of each body in the world frame. </p>
 </dd>
 </dl>
 </p>
@@ -1885,7 +1895,7 @@ This material affects the contact dynamics.</p>
 
 <dl class="cpp function">
 <dt id="_CPPv4N6raisim17ArticulatedSystem20computeSparseInverseERK6MatDynR6MatDyn">
-<span id="_CPPv3N6raisim17ArticulatedSystem20computeSparseInverseERK6MatDynR6MatDyn"></span><span id="_CPPv2N6raisim17ArticulatedSystem20computeSparseInverseERK6MatDynR6MatDyn"></span><span id="raisim::ArticulatedSystem::computeSparseInverse__MatDynCR.MatDynR"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1ab499a9ad8189b019699a4ed1b423ffe1"></span>void <code class="sig-name descname">computeSparseInverse</code><span class="sig-paren">(</span><em class="property">const</em> MatDyn &amp;<em>M</em>, MatDyn &amp;<em>Minv</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim17ArticulatedSystem20computeSparseInverseERK6MatDynR6MatDyn" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N6raisim17ArticulatedSystem20computeSparseInverseERK6MatDynR6MatDyn"></span><span id="_CPPv2N6raisim17ArticulatedSystem20computeSparseInverseERK6MatDynR6MatDyn"></span><span id="raisim::ArticulatedSystem::computeSparseInverse__MatDynCR.MatDynR"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1a17f5f8c0ebe5bb88f0a66f4a5a306021"></span>void <code class="sig-name descname">computeSparseInverse</code><span class="sig-paren">(</span><em class="property">const</em> MatDyn &amp;<em>M</em>, MatDyn &amp;<em>Minv</em><span class="sig-paren">)</span> <em class="property">noexcept</em><a class="headerlink" href="#_CPPv4N6raisim17ArticulatedSystem20computeSparseInverseERK6MatDynR6MatDyn" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This computes the inverse mass matrix given the mass matrix. The return type is dense. It exploits the sparsity of the mass matrix to efficiently perform the computation. The outcome also contains effects of the joint damping and strings <dl class="simple">
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">M</span></code>: mass matrix </p></li>
