@@ -219,12 +219,38 @@ You can also mix the two ways, by loading an XML file and dynamically adding obj
 The (optional) tag means that the element is optional given the parent.
 If the element is not marked (optional), it must exist given that the parent exist.
 The (multiple) tag means that there can be multiple elements for the same parent.</p>
+<p>RaiSim uses a preprocessor to generate an xml.
+An example of an xml script that uses the preprocessor can be found <a class="reference external" href="https://github.com/raisimTech/raisimLib/blob/master/rsc/xmlScripts/objects/SingleBodies.xml">here</a>.
+Currently, you can use two features.</p>
+<ol class="arabic simple">
+<li><p><strong>Array</strong>: Array is like a forloop in C++. It can be used in any nodes</p></li>
+<li><p><strong>Math expresion</strong>: Inside of <code class="docutils literal notranslate"><span class="pre">{}</span></code>, you can define a one-liner math expression.</p></li>
+</ol>
+<p>An example of the two features are shown below.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;array</span> <span class="na">idx=</span><span class="s">&quot;@@idx&quot;</span> <span class="na">start=</span><span class="s">&quot;0&quot;</span> <span class="na">end=</span><span class="s">&quot;80&quot;</span> <span class="na">increment=</span><span class="s">&quot;1&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;sphere</span> <span class="na">name=</span><span class="s">&quot;sphere_array_@@idx&quot;</span>  <span class="na">mass=</span><span class="s">&quot;1&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;dim</span> <span class="na">radius=</span><span class="s">&quot;{0.5+@@idx*0.001}&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;state</span> <span class="na">pos=</span><span class="s">&quot;{cos(0.1*@@idx)*(@@idx*0.2+0.1)} {sin(0.1*@@idx)*(@@idx*0.2+0.1)} {@@sphere_height_offset+@@idx*1.0}&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/sphere&gt;</span>
+    <span class="nt">&lt;box</span> <span class="na">name=</span><span class="s">&quot;box&quot;</span> <span class="na">mass=</span><span class="s">&quot;1&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;dim</span> <span class="na">x=</span><span class="s">&quot;0.5&quot;</span> <span class="na">y=</span><span class="s">&quot;0.5&quot;</span> <span class="na">z=</span><span class="s">&quot;1&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;inertia</span> <span class="na">xx=</span><span class="s">&quot;0.1&quot;</span> <span class="na">xy=</span><span class="s">&quot;0&quot;</span> <span class="na">xz=</span><span class="s">&quot;0&quot;</span> <span class="na">yy=</span><span class="s">&quot;0.1&quot;</span> <span class="na">yz=</span><span class="s">&quot;0&quot;</span> <span class="na">zz=</span><span class="s">&quot;0.1&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;state</span> <span class="na">pos=</span><span class="s">&quot;{cos(0.1*@@idx)*(@@idx*0.3+0.2)} {sin(0.1*@@idx)*(@@idx*0.3+0.2)} {@@sphere_height_offset+@@idx*1.0}&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/box&gt;</span>
+<span class="nt">&lt;/array&gt;</span>
+</pre></div>
+</div>
+<p>Note that these feature are node independent. You can use them anywhere in the xml script.
+<strong>You have to be careful not to generate multiple object with the same name</strong>.
+Otherwise, the RaisimUnity will not work probably.</p>
+<p>The main xml structure is shown below</p>
 <ol class="arabic">
 <li><dl>
-<dt>raisim: Top most node.</dt><dd><ol class="arabic">
-<li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">version</span></code> : Describes the version of RaiSim that created the configuration file. The file might be read by different version.</p></li>
-<li><dl>
-<dt>&lt;child&gt; (optional) <code class="docutils literal notranslate"><span class="pre">material</span></code><span class="classifier">For more information and examples, check out <a class="reference external" href="https://raisim.com/sections/MaterialSystem.html">here</a>.</span></dt><dd><ol class="arabic">
+<dt>raisim: Top most node.</dt><dd><p>1. &lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">version</span></code> : Describes the version of RaiSim that created the configuration file. The file might be read by different version.
+1. &lt;child&gt; <code class="docutils literal notranslate"><span class="pre">params</span></code> : list of parameters to generate the xml script, <a class="reference external" href="https://github.com/raisimTech/raisimLib/blob/master/rsc/xmlScripts/objects/SingleBodies.xml">EXAMPLE</a>. Parameters are handled by the preprocessor.
+2. &lt;child&gt; (optional) <code class="docutils literal notranslate"><span class="pre">material</span></code> : For more information and examples, check out <a class="reference external" href="https://raisim.com/sections/MaterialSystem.html">here</a>.</p>
+<blockquote>
+<div><ol class="arabic">
 <li><dl>
 <dt>&lt;child&gt; (optional) <code class="docutils literal notranslate"><span class="pre">default</span></code><span class="classifier">If it doesn’t exist, the default parameters are as described <a class="reference external" href="https://raisim.com/sections/MaterialSystem.html">here</a>.</span></dt><dd><ol class="arabic simple">
 <li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">friction</span></code> [double]</p></li>
@@ -246,9 +272,8 @@ The (multiple) tag means that there can be multiple elements for the same parent
 </dl>
 </li>
 </ol>
-</dd>
-</dl>
-</li>
+</div></blockquote>
+<ol class="arabic" start="3">
 <li><dl class="simple">
 <dt>&lt;child&gt; (optional) <code class="docutils literal notranslate"><span class="pre">gravity</span></code></dt><dd><ol class="arabic simple">
 <li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">value</span></code> [Vec&lt;3&gt;]: default={0, 0, -9.81}</p></li>
@@ -762,6 +787,26 @@ In a single body object case, local index arguments are ignored and users can si
 </dd>
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">filePathOrURDFScript</span></code>: Path to urdf file or a URDF string. Depending on the contents of the string, RaiSim will interpret it as an xml string or a file path. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">resPath</span></code>: Path to the resource directory. Leave it empty (“”) if it is the urdf file directory </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">jointOrder</span></code>: this can be used to redefine the joint order. A child cannot precede its parent. Leave it empty ({}) to use the joint order defined in the URDF file. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">collisionGroup</span></code>: read “Contact and Collision/ Collision Group and Mask” </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">collisionMask</span></code>: read “Contact and Collision/ Collision Group and Mask” </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">option</span></code>: Currently only support “doNotCollideWithParent” </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N6raisim5World20addArticulatedSystemERKNSt6stringERKNSt13unordered_mapINSt6stringENSt6stringEEERKNSt6stringERKNSt6vectorINSt6stringEEE14CollisionGroup14CollisionGroup23ArticulatedSystemOption">
+<span id="_CPPv3N6raisim5World20addArticulatedSystemERKNSt6stringERKNSt13unordered_mapINSt6stringENSt6stringEEERKNSt6stringERKNSt6vectorINSt6stringEEE14CollisionGroup14CollisionGroup23ArticulatedSystemOption"></span><span id="_CPPv2N6raisim5World20addArticulatedSystemERKNSt6stringERKNSt13unordered_mapINSt6stringENSt6stringEEERKNSt6stringERKNSt6vectorINSt6stringEEE14CollisionGroup14CollisionGroup23ArticulatedSystemOption"></span><span id="raisim::World::addArticulatedSystem__ssCR.std::unordered_map:ss.ss:CR.ssCR.std::vector:ss:CR.CollisionGroup.CollisionGroup.ArticulatedSystemOption"></span><span class="target" id="classraisim_1_1World_1a884ca9266443b38637c2d20f549edeed"></span><a class="reference internal" href="ArticulatedSystem.html#_CPPv4N6raisim17ArticulatedSystemE" title="raisim::ArticulatedSystem">ArticulatedSystem</a> *<code class="sig-name descname">addArticulatedSystem</code><span class="sig-paren">(</span><em class="property">const</em> std::string &amp;<em>xmlFileTemplate</em>, <em class="property">const</em> std::unordered_map&lt;std::string, std::string&gt; &amp;<em>params</em>, <em class="property">const</em> std::string &amp;<em>resPath</em> = &quot;&quot;, <em class="property">const</em> std::vector&lt;std::string&gt; &amp;<em>jointOrder</em> = {}, CollisionGroup <em>collisionGroup</em> = 1, CollisionGroup <em>collisionMask</em> = CollisionGroup(-1), ArticulatedSystemOption <em>options</em> = ArticulatedSystemOption()<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim5World20addArticulatedSystemERKNSt6stringERKNSt13unordered_mapINSt6stringENSt6stringEEERKNSt6stringERKNSt6vectorINSt6stringEEE14CollisionGroup14CollisionGroup23ArticulatedSystemOption" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>pointer to the articulated system </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xmlFileTemplate</span></code>: xml template file. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">params</span></code>: parameters for the xml file. </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">resPath</span></code>: Path to the resource directory. Leave it empty (“”) if it is the urdf file directory </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">jointOrder</span></code>: this can be used to redefine the joint order. A child cannot precede its parent. Leave it empty ({}) to use the joint order defined in the URDF file. </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">collisionGroup</span></code>: read “Contact and Collision/ Collision Group and Mask” </p></li>
