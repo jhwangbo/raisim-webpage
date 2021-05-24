@@ -19,38 +19,8 @@ The (optional) tag means that the element is optional given the parent.
 If the element is not marked (optional), it must exist given that the parent exist.
 The (multiple) tag means that there can be multiple elements for the same parent.
 
-RaiSim uses a preprocessor to generate an xml.
-An example of an xml script that uses the preprocessor can be found `here <https://github.com/raisimTech/raisimLib/blob/master/rsc/xmlScripts/objects/SingleBodies.xml>`_.
-Currently, you can use two features.
-
-1. **Array**: Array is like a forloop in C++. It can be used in any nodes
-2. **Math expresion**: Inside of ``{}``, you can define a one-liner math expression.
-
-An example of the two features are shown below.
-
-.. code-block:: xml
-
-    <array idx="@@idx" start="0" end="80" increment="1">
-        <sphere name="sphere_array_@@idx"  mass="1">
-            <dim radius="{0.5+@@idx*0.001}" />
-            <state pos="{cos(0.1*@@idx)*(@@idx*0.2+0.1)} {sin(0.1*@@idx)*(@@idx*0.2+0.1)} {@@sphere_height_offset+@@idx*1.0}"/>
-        </sphere>
-        <box name="box" mass="1">
-            <dim x="0.5" y="0.5" z="1"/>
-            <inertia xx="0.1" xy="0" xz="0" yy="0.1" yz="0" zz="0.1" />
-            <state pos="{cos(0.1*@@idx)*(@@idx*0.3+0.2)} {sin(0.1*@@idx)*(@@idx*0.3+0.2)} {@@sphere_height_offset+@@idx*1.0}"/>
-        </box>
-    </array>
-
-Note that these feature are node independent. You can use them anywhere in the xml script.
-**You have to be careful not to generate multiple object with the same name**.
-Otherwise, the RaisimUnity will not work probably.
-
-The main xml structure is shown below
-
 1. raisim: Top most node.
     1. <attribute> ``version`` : Describes the version of RaiSim that created the configuration file. The file might be read by different version.
-    1. <child> ``params`` : list of parameters to generate the xml script, `EXAMPLE <https://github.com/raisimTech/raisimLib/blob/master/rsc/xmlScripts/objects/SingleBodies.xml>`_. Parameters are handled by the preprocessor.
     2. <child> (optional) ``material`` : For more information and examples, check out `here <https://raisim.com/sections/MaterialSystem.html>`_.
         1. <child> (optional) ``default`` : If it doesn't exist, the default parameters are as described `here <https://raisim.com/sections/MaterialSystem.html>`_.
             1. <attribute> ``friction`` [double]
@@ -130,6 +100,7 @@ compound
     **attributes**: ``xx`` [double], ``xy`` [double], ``xz`` [double], ``yy`` [double], ``yz`` [double], ``zz`` [double]
 
 2. <child> ``children``
+        Common attributes of the children: ``appearance`` [string]
     1. <child> (optional, multiple) ``sphere``
         1. <child> dim
             1. <attribute> ``radius`` [double]
