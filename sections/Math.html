@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Support &mdash; raisim 1.1.0 documentation</title>
+  <title>Math Classes &mdash; raisim 1.1.0 documentation</title>
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -21,8 +21,8 @@
   <script src="../_static/js/theme.js"></script>
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
-  <link rel="next" title="Performance" href="Performance.html" />
-  <link rel="prev" title="Acknowledgement" href="Acknowledgement.html" /> 
+  <link rel="next" title="Logging System" href="LoggingSystem.html" />
+  <link rel="prev" title="Conventions and Notations" href="ConventionsAndNotations.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -46,19 +46,19 @@
       </div>
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Main">
         <p class="caption"><span class="caption-text">Get started</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Support.html">Support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ChangeLog.html">Change Log</a></li>
 </ul>
 <p class="caption"><span class="caption-text">RaiSim C++</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ConventionsAndNotations.html">Conventions and Notations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Math.html">Math Classes</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Math Classes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="LoggingSystem.html">Logging System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="WorldSystem.html">World</a></li>
 <li class="toctree-l1"><a class="reference internal" href="WorldConfigurationFile.html">RaiSim World Configuration File</a></li>
@@ -112,7 +112,7 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Support</li>
+      <li>Math Classes</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -129,12 +129,27 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div itemprop="articleBody">
               
-  <div class="section" id="support">
-<h1>Support<a class="headerlink" href="#support" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><p>For commercial license owners: You can send an email to <a class="reference external" href="mailto:info&#46;raisim&#37;&#52;&#48;gmail&#46;com">info<span>&#46;</span>raisim<span>&#64;</span>gmail<span>&#46;</span>com</a>. We will treat any information provided by you confidential. If you don’t care about confidentiality, you can also post issues in the github repo <a class="reference external" href="https://github.com/raisimTech/raisimlib">https://github.com/raisimTech/raisimlib</a></p></li>
-<li><p>For other license owners: Please post all questions as an issue to our github repo <a class="reference external" href="https://github.com/raisimTech/raisimlib">https://github.com/raisimTech/raisimlib</a></p></li>
-</ul>
+  <div class="section" id="math-classes">
+<h1>Math Classes<a class="headerlink" href="#math-classes" title="Permalink to this headline">¶</a></h1>
+<p>RaiSim provides its own math library.
+All files related to the math library can be found in <cite>raisim/math</cite>.
+I do not recommend using RaiSim math library to users.
+But many RaiSim methods return a RaiSim math object so you have to convert it Eigen objects.
+For that, RaiSim Mat class includes <cite>e()</cite> method which returns the corresponding <cite>Eigen::Map</cite>.
+For example, you can use it like this</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="c1">/// convertsion from a raisim object to an Eigen object (i.e., Eigen::Map)</span>
+<span class="n">raisim</span><span class="o">::</span><span class="n">Mat</span><span class="o">&lt;</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="o">&gt;</span> <span class="n">matrix33RaiSim</span><span class="p">;</span>
+<span class="n">matrix33RaiSim</span><span class="p">.</span><span class="n">setIdentity</span><span class="p">();</span>
+<span class="n">Eigen</span><span class="o">::</span><span class="n">Matrix3d</span> <span class="n">matrix33Eigen</span> <span class="o">=</span> <span class="n">matrix33RaiSim</span><span class="p">.</span><span class="n">e</span><span class="p">();</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;matrix33Eigen</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">&lt;&lt;</span><span class="n">matrix33Eigen</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="c1">// pretty std output formatting is not implemented yet. So we use Eigen&#39;s</span>
+
+<span class="c1">/// use a raisim object as if it is an Eigen object</span>
+<span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span> <span class="n">vector3Eigen1</span><span class="p">,</span> <span class="n">vector3Eigen2</span><span class="p">;</span>
+<span class="n">vector3Eigen1</span><span class="p">.</span><span class="n">setConstant</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">vector3Eigen2</span> <span class="o">=</span> <span class="n">matrix33RaiSim</span><span class="p">.</span><span class="n">e</span><span class="p">()</span> <span class="o">*</span> <span class="n">vector3Eigen1</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;vector3Eigen2</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">&lt;&lt;</span><span class="n">vector3Eigen2</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</pre></div>
+</div>
 </div>
 
 
@@ -144,10 +159,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="Performance.html" class="btn btn-neutral float-right" title="Performance" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="LoggingSystem.html" class="btn btn-neutral float-right" title="Logging System" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="Acknowledgement.html" class="btn btn-neutral float-left" title="Acknowledgement" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="ConventionsAndNotations.html" class="btn btn-neutral float-left" title="Conventions and Notations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
