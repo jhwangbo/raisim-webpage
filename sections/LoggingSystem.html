@@ -2,8 +2,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
-
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Logging System &mdash; raisim 1.1.0 documentation</title>
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
@@ -11,8 +10,8 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
   <link rel="stylesheet" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
   <link rel="stylesheet" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" type="text/css" />
   <!--[if lt IE 9]>
   <script src="../_static/js/html5shiv.min.js"></script>
@@ -49,7 +48,7 @@
 </div>
       </div>
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Main">
-        <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+        <p class="caption"><span class="caption-text">Get started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
@@ -57,7 +56,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ChangeLog.html">Change Log</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<p class="caption"><span class="caption-text">RaiSim C++</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
@@ -74,7 +73,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Related Software</span></p>
+<p class="caption"><span class="caption-text">Related Software</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
@@ -133,21 +132,21 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div itemprop="articleBody">
               
-  <section id="logging-system">
+  <div class="section" id="logging-system">
 <h1>Logging System<a class="headerlink" href="#logging-system" title="Permalink to this headline">¶</a></h1>
 <p>RaiSim logging system has been inspired by <code class="docutils literal notranslate"><span class="pre">glog</span></code> library.
 It can compactly represent multiple lines of logging.
 It does not save messages to a file.
 It only streams the message to the standard output (i.e., <code class="docutils literal notranslate"><span class="pre">cout</span></code>)
 For example, instead of writing</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="p">(</span><span class="n">fail</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">date</span><span class="o">&lt;&lt;</span><span class="n">FILENAME</span><span class="o">&lt;&lt;</span><span class="n">LINENUMBER</span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;failed here </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="p">(</span><span class="n">fail</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">date</span><span class="o">&lt;&lt;</span><span class="n">FILENAME</span><span class="o">&lt;&lt;</span><span class="n">LINENUMBER</span><span class="o">&lt;&lt;</span> <span class="p">...</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;failed here </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <p>you can write</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">RSFATAL_IF</span><span class="p">(</span><span class="n">fail</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed here&quot;</span><span class="p">)</span><span class="w"></span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">RSFATAL_IF</span><span class="p">(</span><span class="n">fail</span><span class="p">,</span> <span class="s">&quot;failed here&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The available logging macros are</p>
@@ -165,18 +164,18 @@ For example, instead of writing</p>
 </ul>
 <p>The fatal function is <code class="docutils literal notranslate"><span class="pre">std::exit(1);</span></code> by default.
 You can override it as</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">RaiSimMsg</span><span class="o">::</span><span class="n">setFatalCallback</span><span class="p">([](){</span><span class="n">throw</span><span class="p">;});</span><span class="w"></span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">RaiSimMsg</span><span class="o">::</span><span class="n">setFatalCallback</span><span class="p">([](){</span><span class="n">throw</span><span class="p">;});</span>
 </pre></div>
 </div>
 <p>The macros actually affect the performance.
 For examples, all <code class="docutils literal notranslate"><span class="pre">_IF</span></code> macros will check the boolean and branching might occur.</p>
 <p>So if you only want to add the macros only in the debugging mode, add these lines in your CMAKE</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp"># compiling options</span>
-<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">CMAKE_BUILD_TYPE</span><span class="w"> </span><span class="n">STREQUAL</span><span class="w"> </span><span class="s">&quot;Debug&quot;</span><span class="w"> </span><span class="n">OR</span><span class="w"> </span><span class="n">CMAKE_BUILD_TYPE</span><span class="w"> </span><span class="n">STREQUAL</span><span class="w"> </span><span class="s">&quot;DEBUG&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="n">add_definitions</span><span class="p">(</span><span class="o">-</span><span class="n">DRSDEBUG</span><span class="p">)</span><span class="w"></span>
-<span class="k">else</span><span class="p">()</span><span class="w"></span>
-<span class="w">    </span><span class="n">remove_definitions</span><span class="p">(</span><span class="o">-</span><span class="n">DRSDEBUG</span><span class="p">)</span><span class="w"></span>
-<span class="n">endif</span><span class="w"> </span><span class="p">()</span><span class="w"></span>
+<span class="k">if</span> <span class="p">(</span><span class="n">CMAKE_BUILD_TYPE</span> <span class="n">STREQUAL</span> <span class="s">&quot;Debug&quot;</span> <span class="n">OR</span> <span class="n">CMAKE_BUILD_TYPE</span> <span class="n">STREQUAL</span> <span class="s">&quot;DEBUG&quot;</span><span class="p">)</span>
+    <span class="n">add_definitions</span><span class="p">(</span><span class="o">-</span><span class="n">DRSDEBUG</span><span class="p">)</span>
+<span class="k">else</span><span class="p">()</span>
+    <span class="n">remove_definitions</span><span class="p">(</span><span class="o">-</span><span class="n">DRSDEBUG</span><span class="p">)</span>
+<span class="n">endif</span> <span class="p">()</span>
 </pre></div>
 </div>
 <p>and use these alternative macros instead</p>
@@ -193,7 +192,7 @@ For examples, all <code class="docutils literal notranslate"><span class="pre">_
 <li><p>DRSISNAN_MSG(val, msg)</p></li>
 </ul>
 <p>These are ignored if the <code class="docutils literal notranslate"><span class="pre">-DRSDEBUG</span></code> flag is not set (and because you modified your cmake as above, the flag is set only in the debug mode).</p>
-</section>
+</div>
 
 
             </div>
