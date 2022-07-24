@@ -207,14 +207,15 @@ Since we are not constraining their parameterization, in general,</p>
 <p>Every joint has a corresponding generalized coordinate and generalized velocity.
 A concatenation of all joint generalized coordinates and velocities are the generalized coordinates and velocities of the articulated system, respectively.
 The order of this concatenation is called <strong>joint order</strong>.
-The joint order is determined by the order the joint appears in the URDF unless otherwise it is explicitly given at the instance construction time.
+The URDF reader lists joints in the depth first manner.
+For the joints from the same parent, the joint order is determined by the order the joint appears in the URDF.
 The joint order can be accessed through <code class="code docutils literal notranslate"><span class="pre">getMovableJointNames()</span></code>.
 Note the keyword “movable”.
 The fixed joints contribute to neither the generalized coordinate nor the generalized velocity.
-Only movable joints do (with one exception metioned below).</p>
+Only movable joints do.</p>
 <p>The joint order starts with the <strong>root body</strong> which is the first body of the articulated system.
 For floating-base systems, the root body is the floating base.
-For fixed-base systems, the root body is the one rigidly attached to the wolrd.
+For fixed-base systems, the root body is the one rigidly attached to the world.
 Even though the fixed base cannot move physically, users can move them using <code class="code docutils literal notranslate"><span class="pre">setBaseOrientation</span></code> and <code class="code docutils literal notranslate"><span class="pre">setBasePosition</span></code>.
 So <code class="code docutils literal notranslate"><span class="pre">getMovableJointNames()</span></code> method will return the fixed base name and the fixed base joint is a part of the joint order.</p>
 <p>The following example illustrates how the generalized coordinates and velocities are defined.</p>
@@ -2486,7 +2487,7 @@ This material affects the contact dynamics.</p>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim17ArticulatedSystem29clearExternalForcesAndTorquesEv">
-<span id="_CPPv3N6raisim17ArticulatedSystem29clearExternalForcesAndTorquesEv"></span><span id="_CPPv2N6raisim17ArticulatedSystem29clearExternalForcesAndTorquesEv"></span><span id="raisim::ArticulatedSystem::clearExternalForcesAndTorques"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1a99843df6298942f4f29ddfa589ff28b8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clearExternalForcesAndTorques</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim17ArticulatedSystem29clearExternalForcesAndTorquesEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N6raisim17ArticulatedSystem29clearExternalForcesAndTorquesEv"></span><span id="_CPPv2N6raisim17ArticulatedSystem29clearExternalForcesAndTorquesEv"></span><span id="raisim::ArticulatedSystem::clearExternalForcesAndTorques"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1a28a3b5c704370134d090e263a8b9d4f8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clearExternalForcesAndTorques</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim17ArticulatedSystem29clearExternalForcesAndTorquesEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Clears all external forces and torques </p>
 </dd></dl>
 
@@ -2516,6 +2517,26 @@ This material affects the contact dynamics.</p>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>parent parent[i] is a parent body id of the i^th body </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN6raisim17ArticulatedSystem9getSensorEP1TRKNSt6stringE">
+<span id="_CPPv3I0EN6raisim17ArticulatedSystem9getSensorERKNSt6stringE"></span><span id="_CPPv2I0EN6raisim17ArticulatedSystem9getSensorERKNSt6stringE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classraisim_1_1ArticulatedSystem_1ab33df6f0785b732f40cd299665ddb9a1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN6raisim17ArticulatedSystem9getSensorEP1TRKNSt6stringE" title="raisim::ArticulatedSystem::getSensor::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">getSensor</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN6raisim17ArticulatedSystem9getSensorEP1TRKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>sensor of the specified type </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim17ArticulatedSystem10getSensorsEv">
+<span id="_CPPv3N6raisim17ArticulatedSystem10getSensorsEv"></span><span id="_CPPv2N6raisim17ArticulatedSystem10getSensorsEv"></span><span id="raisim::ArticulatedSystem::getSensors"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1ae60edc343d37dd36a4a7816d2dfd5767"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unordered_map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Sensor</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getSensors</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim17ArticulatedSystem10getSensorsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>sensors on the robot </p>
 </dd>
 </dl>
 </dd></dl>
