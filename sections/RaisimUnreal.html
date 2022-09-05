@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RaisimUnreal &mdash; raisim 1.1.2 documentation</title>
+  <title>RaisimUnreal &mdash; raisim 1.1.4 documentation</title>
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -25,7 +25,7 @@
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
   <link rel="next" title="RaisimMatlab Introduction" href="RaiSimMatlab.html" />
-  <link rel="prev" title="RaiSim Unity" href="RaisimUnity.html" /> 
+  <link rel="prev" title="RaiSimUnity" href="RaisimUnity.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -37,7 +37,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
           <div class="version">
-            1.1.2
+            1.1.4
           </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -48,7 +48,7 @@
 </div>
       </div>
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Main">
-        <p class="caption"><span class="caption-text">Get started</span></p>
+        <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
@@ -56,10 +56,11 @@
 <li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ChangeLog.html">Change Log</a></li>
 </ul>
-<p class="caption"><span class="caption-text">RaiSim C++</span></p>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Visualizers.html">Visualizers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ConventionsAndNotations.html">Conventions and Notations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Math.html">Math Classes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="LoggingSystem.html">Logging System</a></li>
@@ -74,18 +75,18 @@
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Related Software</span></p>
+<p class="caption" role="heading"><span class="caption-text">Related Software</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RaisimUnity.html">RaiSim Unity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimUnity.html">RaiSimUnity</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">RaisimUnreal</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#textures-types">Textures/Types</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#ground">Ground</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#heightmap">Heightmap</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#user-interface">User Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#maps">Maps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#weather">Weather</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#video-recording">Video recording</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#materials">Materials</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#troubleshooting-and-bug-reporting">Troubleshooting and bug reporting</a></li>
 </ul>
 </li>
@@ -179,7 +180,7 @@ Here are a few example shots from RaisimUnreal</p>
 </div>
 <p>Compared to other visualizers, RaisimUnreal looks absolutely stunning.
 However, it is much like video games and you need a good GPU to get high fps.
-In windows, Unreal is highly optimized and it can produce high fps.
+In windows, Unreal Engine is highly optimized and it can produce high fps.
 However, Linux version is not as fast.</p>
 <p>Do not use it during training because otherwise it will slow down your training.
 It will use 100% of your GPU to get the highest fps.
@@ -188,52 +189,69 @@ I prefer to use it for visualization of final policies after training.</p>
 From the server side, it is absolutely the same as raisimUnity.
 All you have to do is to create the server instance and launch it (check the examples in <code class="docutils literal notranslate"><span class="pre">examples/server</span></code>).</p>
 </div>
-<div class="section" id="textures-types">
-<h2>Textures/Types<a class="headerlink" href="#textures-types" title="Permalink to this headline">¶</a></h2>
-<p>You can set complex appearance (i.e., types/textures) on <code class="docutils literal notranslate"><span class="pre">Ground</span></code> and <code class="docutils literal notranslate"><span class="pre">HeightMap</span></code>.
-The available appearances are as shown</p>
-<div class="section" id="ground">
-<h3>Ground<a class="headerlink" href="#ground" title="Permalink to this headline">¶</a></h3>
-<a class="reference internal image-reference" href="../_images/RUnrealterrain_wheat.png"><img alt="raisimUnreal" src="../_images/RUnrealterrain_wheat.png" style="width: 400px;" /></a>
-<p>“wheat”</p>
-<a class="reference internal image-reference" href="../_images/RUnrealterrain_marble1.png"><img alt="raisimUnreal" src="../_images/RUnrealterrain_marble1.png" style="width: 400px;" /></a>
-<p>“marble1”</p>
-<a class="reference internal image-reference" href="../_images/RUnrealterrain_marble2.png"><img alt="raisimUnreal" src="../_images/RUnrealterrain_marble2.png" style="width: 400px;" /></a>
-<p>“marble2”</p>
-<a class="reference internal image-reference" href="../_images/RUnrealterrain_marble3.png"><img alt="raisimUnreal" src="../_images/RUnrealterrain_marble3.png" style="width: 400px;" /></a>
-<p>“marble3”</p>
-<a class="reference internal image-reference" href="../_images/RUnrealterrain_wood1.png"><img alt="raisimUnreal" src="../_images/RUnrealterrain_wood1.png" style="width: 400px;" /></a>
-<p>“wood1”</p>
-<a class="reference internal image-reference" href="../_images/RUnrealterrain_wood2.png"><img alt="raisimUnreal" src="../_images/RUnrealterrain_wood2.png" style="width: 400px;" /></a>
-<p>“wood2”</p>
-<a class="reference internal image-reference" href="../_images/RUnrealterrain_dune.png"><img alt="raisimUnreal" src="../_images/RUnrealterrain_dune.png" style="width: 400px;" /></a>
-<p>“dune”</p>
-<a class="reference internal image-reference" href="../_images/RUnrealterrain_snow.png"><img alt="raisimUnreal" src="../_images/RUnrealterrain_snow.png" style="width: 400px;" /></a>
-<p>“snow”</p>
-<a class="reference internal image-reference" href="../_images/RUnrealterrain_steel.png"><img alt="raisimUnreal" src="../_images/RUnrealterrain_steel.png" style="width: 400px;" /></a>
-<p>“steel”</p>
+<div class="section" id="user-interface">
+<h2>User Interface<a class="headerlink" href="#user-interface" title="Permalink to this headline">¶</a></h2>
+<p>There are two topmost menu panels: the main menu and object menu.
+You can press <code class="docutils literal notranslate"><span class="pre">m</span></code> to switch the menu panel.</p>
+<p>The object menu list all objects in the world.
+If you click the object name, the camera will focus on that object and the object menu will pop up.</p>
+<p>The main menu has the following structure.</p>
+<a class="reference internal image-reference" href="../_images/raisimUnrealManuel.png"><img alt="raisimUnrealMenu" src="../_images/raisimUnrealManuel.png" style="width: 1080px;" /></a>
 </div>
-<div class="section" id="heightmap">
-<h3>Heightmap<a class="headerlink" href="#heightmap" title="Permalink to this headline">¶</a></h3>
-<a class="reference internal image-reference" href="../_images/RUnrealHm_marble1.png"><img alt="raisimUnreal" src="../_images/RUnrealHm_marble1.png" style="width: 400px;" /></a>
-<p>“marble1”</p>
-<a class="reference internal image-reference" href="../_images/RUnrealHm_marble2.png"><img alt="raisimUnreal" src="../_images/RUnrealHm_marble2.png" style="width: 400px;" /></a>
-<p>“marble2”</p>
-<a class="reference internal image-reference" href="../_images/RUnrealHm_marble3.png"><img alt="raisimUnreal" src="../_images/RUnrealHm_marble3.png" style="width: 400px;" /></a>
-<p>“marble3”</p>
-<a class="reference internal image-reference" href="../_images/RUnrealHm_marble4.png"><img alt="raisimUnreal" src="../_images/RUnrealHm_marble4.png" style="width: 400px;" /></a>
-<p>“marble4”</p>
-<a class="reference internal image-reference" href="../_images/RUnrealHm_soil1.png"><img alt="raisimUnreal" src="../_images/RUnrealHm_soil1.png" style="width: 400px;" /></a>
-<p>“soil1”</p>
-<a class="reference internal image-reference" href="../_images/RUnrealHm_soil2.png"><img alt="raisimUnreal" src="../_images/RUnrealHm_soil2.png" style="width: 400px;" /></a>
-<p>“soil2”</p>
-<a class="reference internal image-reference" href="../_images/RUnrealHm_wood1.png"><img alt="raisimUnreal" src="../_images/RUnrealHm_wood1.png" style="width: 400px;" /></a>
-<p>“wood1”</p>
-<a class="reference internal image-reference" href="../_images/RUnrealHm_wood2.png"><img alt="raisimUnreal" src="../_images/RUnrealHm_wood2.png" style="width: 400px;" /></a>
-<p>“wood2”</p>
-<a class="reference internal image-reference" href="../_images/RUnrealHm_steel.png"><img alt="raisimUnreal" src="../_images/RUnrealHm_steel.png" style="width: 400px;" /></a>
-<p>“steel”</p>
+<div class="section" id="maps">
+<h2>Maps<a class="headerlink" href="#maps" title="Permalink to this headline">¶</a></h2>
+<p>You can use pre-configured maps using raisimUnreal using <code class="docutils literal notranslate"><span class="pre">RaisimServer::setMap</span></code>.
+These maps are visually astonishing but each map takes 1 Gb of storage.
+This is a primary reason that RaisimUnreal is so bulky.</p>
+<p>You should read the examples in <code class="docutils literal notranslate"><span class="pre">examples/src/maps</span></code> to understand how to use them.
+Note that some objects have appearance “hidden”.
+This will ensure that they only present in the simulation world, not in the visualization world.</p>
+<p>Currently, the following maps are available.</p>
+<a class="reference internal image-reference" href="../_images/rsu_maps.png"><img alt="rsu_maps" src="../_images/rsu_maps.png" style="width: 1080px;" /></a>
 </div>
+<div class="section" id="weather">
+<h2>Weather<a class="headerlink" href="#weather" title="Permalink to this headline">¶</a></h2>
+<p>If you see a dropdown menu on the main menu panel, that means that map supports dynamic weather.
+If it does not support dynamic weather, it will support dynamic lighting so that you can move the light sources around.
+Weather related computation and visualization are costly and you can use a simpler map such as “simple” if you want to save computational resources.
+Here is an example of weather changes</p>
+<a class="reference internal image-reference" href="../_images/rsu_weather.gif"><img alt="rsu_weather" src="../_images/rsu_weather.gif" style="width: 854px;" /></a>
+<p>If the map support dynamic weather, it also supports “timeOfDay” option. You can drag the scroll bar and specify the current time.</p>
+<a class="reference internal image-reference" href="../_images/rsu_timeOfDay.gif"><img alt="rsu_tod" src="../_images/rsu_timeOfDay.gif" style="width: 854px;" /></a>
+</div>
+<div class="section" id="video-recording">
+<h2>Video recording<a class="headerlink" href="#video-recording" title="Permalink to this headline">¶</a></h2>
+<p>RaisimUnreal uses <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> to record your screen in Linux and Windows.
+You first have to install ffmpeg to use the screen recording feature.
+In Windows, make sure that the directory where the ffmpeg executable lives is added to your <code class="docutils literal notranslate"><span class="pre">PATH</span></code> environment variable.
+This is a standard mechanism that Windows uses to find a necessary executable.</p>
+<p>The options in the menu panel are for ffmpeg.
+If you are new to ffmpeg, you should learn the options it offers before modifying this feature.</p>
+</div>
+<div class="section" id="materials">
+<h2>Materials<a class="headerlink" href="#materials" title="Permalink to this headline">¶</a></h2>
+<p>A <code class="docutils literal notranslate"><span class="pre">SingleBodyObject</span></code> has an appearance attribute which can be set using <code class="docutils literal notranslate"><span class="pre">setAppearance()</span></code>.
+You can use basic colors described as per <a class="reference external" href="https://raisim.com">here</a>.
+<strong>If you want to hide the object, you can set the appearance to “hidden”.</strong></p>
+<p>RaisimUnreal further provides additional appearances shown below</p>
+<p><strong>marble1</strong></p>
+<a class="reference internal image-reference" href="../_images/RUnrealHm_marble1.png"><img alt="raisimUnreal" src="../_images/RUnrealHm_marble1.png" style="width: 300px;" /></a>
+<p><strong>marble2</strong></p>
+<a class="reference internal image-reference" href="../_images/RUnrealHm_marble2.png"><img alt="raisimUnreal" src="../_images/RUnrealHm_marble2.png" style="width: 300px;" /></a>
+<p><strong>marble3</strong></p>
+<a class="reference internal image-reference" href="../_images/RUnrealHm_marble3.png"><img alt="raisimUnreal" src="../_images/RUnrealHm_marble3.png" style="width: 300px;" /></a>
+<p><strong>marble4</strong></p>
+<a class="reference internal image-reference" href="../_images/RUnrealHm_marble4.png"><img alt="raisimUnreal" src="../_images/RUnrealHm_marble4.png" style="width: 300px;" /></a>
+<p><strong>soil1</strong></p>
+<a class="reference internal image-reference" href="../_images/RUnrealHm_soil1.png"><img alt="raisimUnreal" src="../_images/RUnrealHm_soil1.png" style="width: 300px;" /></a>
+<p><strong>soil2</strong></p>
+<a class="reference internal image-reference" href="../_images/RUnrealHm_soil2.png"><img alt="raisimUnreal" src="../_images/RUnrealHm_soil2.png" style="width: 300px;" /></a>
+<p><strong>wood1</strong></p>
+<a class="reference internal image-reference" href="../_images/RUnrealHm_wood1.png"><img alt="raisimUnreal" src="../_images/RUnrealHm_wood1.png" style="width: 300px;" /></a>
+<p><strong>wood2</strong></p>
+<a class="reference internal image-reference" href="../_images/RUnrealHm_wood2.png"><img alt="raisimUnreal" src="../_images/RUnrealHm_wood2.png" style="width: 300px;" /></a>
+<p><strong>steel</strong></p>
+<a class="reference internal image-reference" href="../_images/RUnrealHm_steel.png"><img alt="raisimUnreal" src="../_images/RUnrealHm_steel.png" style="width: 300px;" /></a>
 </div>
 <div class="section" id="troubleshooting-and-bug-reporting">
 <h2>Troubleshooting and bug reporting<a class="headerlink" href="#troubleshooting-and-bug-reporting" title="Permalink to this headline">¶</a></h2>
@@ -253,7 +271,7 @@ If you cannot figure it out yourself, you can post an issue with the log file.</
         <a href="RaiSimMatlab.html" class="btn btn-neutral float-right" title="RaisimMatlab Introduction" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="RaisimUnity.html" class="btn btn-neutral float-left" title="RaiSim Unity" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="RaisimUnity.html" class="btn btn-neutral float-left" title="RaiSimUnity" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
