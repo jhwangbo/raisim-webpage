@@ -4,14 +4,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RaisimUnreal &mdash; raisim 1.1.4 documentation</title>
+  <title>RaisimUnreal &mdash; raisim 1.1.5 documentation</title>
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
   <link rel="stylesheet" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
   <link rel="stylesheet" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" type="text/css" />
   <!--[if lt IE 9]>
   <script src="../_static/js/html5shiv.min.js"></script>
@@ -37,7 +37,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
           <div class="version">
-            1.1.4
+            1.1.5
           </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -48,7 +48,7 @@
 </div>
       </div>
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Main">
-        <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+        <p class="caption"><span class="caption-text">Get started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
@@ -56,7 +56,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ChangeLog.html">Change Log</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<p class="caption"><span class="caption-text">RaiSim C++</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
@@ -75,7 +75,7 @@
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Related Software</span></p>
+<p class="caption"><span class="caption-text">Related Software</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
@@ -83,6 +83,13 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">RaisimUnreal</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#user-interface">User Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interaction">Interaction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#object-deletion">Object deletion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#object-spawning">Object spawning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#apply-force">Apply force</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#measure-position-or-distance">Measure position or distance</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#maps">Maps</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#weather">Weather</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#video-recording">Video recording</a></li>
@@ -149,7 +156,7 @@
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>RaisimUnreal is a visualization client, just like RaisimUnity.
-The simulation process should launch a RaisimServer in order to communicate with RaisimUnreal.
+The simulation process should launch (<code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer::launchServer</span></code>) a RaisimServer in order to communicate with RaisimUnreal.
 Once the server is running, RaisimUnreal can connect to it and obtain visualization information.</p>
 <p>You can get raisimUnreal in the <a class="reference external" href="https://github.com/raisimTech/raisimLib/releases">release tab</a>.
 Here are a few example shots from RaisimUnreal</p>
@@ -187,16 +194,56 @@ It will use 100% of your GPU to get the highest fps.
 I prefer to use it for visualization of final policies after training.</p>
 <p>To use RaisimUnreal, you do not have to commit anything.
 From the server side, it is absolutely the same as raisimUnity.
-All you have to do is to create the server instance and launch it (check the examples in <code class="docutils literal notranslate"><span class="pre">examples/server</span></code>).</p>
+All you have to do is to create the server instance (<code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code>) and launch it (check the examples in <code class="docutils literal notranslate"><span class="pre">examples/server</span></code>).</p>
 </div>
 <div class="section" id="user-interface">
 <h2>User Interface<a class="headerlink" href="#user-interface" title="Permalink to this headline">¶</a></h2>
-<p>There are two topmost menu panels: the main menu and object menu.
-You can press <code class="docutils literal notranslate"><span class="pre">m</span></code> to switch the menu panel.</p>
-<p>The object menu list all objects in the world.
-If you click the object name, the camera will focus on that object and the object menu will pop up.</p>
-<p>The main menu has the following structure.</p>
-<a class="reference internal image-reference" href="../_images/raisimUnrealManuel.png"><img alt="raisimUnrealMenu" src="../_images/raisimUnrealManuel.png" style="width: 1080px;" /></a>
+<p>There are three topmost menu panels: the main menu, object list menu, and object spawner menu.
+You can press <code class="docutils literal notranslate"><span class="pre">m</span></code> to switch the menu panel or to hide them.</p>
+<p>The <strong>main menu</strong> contains connection-related widgets, visualization related-widgets, and interaction-related widgets.
+Most of the widget items have a corresponding a keyboard binding.</p>
+<p>The <strong>object list menu</strong> list all objects in the world.
+You can click the object button to focus on the object.
+You can also type in the search bar to find an object with a specific name (the name can be set by <code class="docutils literal notranslate"><span class="pre">raisim::Object::setName</span></code>).</p>
+<p>The <strong>object spawner menu</strong> allows you to spawn new objects in the map.
+You can set the initial state of the object as well.</p>
+<p>There are also a few sub-menus which can be created at need.</p>
+<p>The <strong>object menu</strong> is created when an object is focused.
+You can focus on an object by clicking either the object in the scene or the object button in the object list menu to select an object.
+You can also focus on an object from the server side using <code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer::focusOn</span></code>.
+Once the object is focused, you can read about states of the object, frames associated with the object, and joints of the object.</p>
+<p>The <strong>event menu</strong> is created when you press <code class="docutils literal notranslate"><span class="pre">tab</span></code>.
+It lists events happened during the execution.
+It might be useful for debugging.</p>
+<p>The <strong>graph menu</strong> is created when you press <code class="docutils literal notranslate"><span class="pre">g</span></code>.
+It lists all graphs specified by the server (read the atlas.cpp example for details).</p>
+</div>
+<div class="section" id="interaction">
+<h2>Interaction<a class="headerlink" href="#interaction" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="object-deletion">
+<h3>Object deletion<a class="headerlink" href="#object-deletion" title="Permalink to this headline">¶</a></h3>
+<p>You can delete the focused object using <code class="docutils literal notranslate"><span class="pre">del</span></code> key.
+You can focus on an object using either by left-clicking the object or by selecting an object in the object list menu.</p>
+</div>
+<div class="section" id="object-spawning">
+<h3>Object spawning<a class="headerlink" href="#object-spawning" title="Permalink to this headline">¶</a></h3>
+<p>You can find an object spawner menu by pressing <code class="docutils literal notranslate"><span class="pre">m</span></code> key a few times.
+There are 8 different objects you can spawn.
+Click on the object you want to spawn and fill in the other parameters that are activated in the object spawner menu.
+Press <code class="docutils literal notranslate"><span class="pre">enter</span></code> or just click on the button to spawn the object.</p>
+</div>
+<div class="section" id="apply-force">
+<h3>Apply force<a class="headerlink" href="#apply-force" title="Permalink to this headline">¶</a></h3>
+<p>You can apply external forces by pressing <code class="docutils literal notranslate"><span class="pre">shift</span></code> and dragging the object.
+The force model is a spring so it will apply the force proportional to the distance you dragged.
+Once you release the left-mouse-button, it will stop applying the force.</p>
+</div>
+<div class="section" id="measure-position-or-distance">
+<h3>Measure position or distance<a class="headerlink" href="#measure-position-or-distance" title="Permalink to this headline">¶</a></h3>
+<p>You can press <code class="docutils literal notranslate"><span class="pre">alt</span></code> and <code class="docutils literal notranslate"><span class="pre">left-click</span></code> on an object to specify a <em>point of interest</em>.
+If there is one <em>point of interest</em>, the ruler will measure a position.
+If there are two, the ruler will measure the displacement.</p>
+</div>
 </div>
 <div class="section" id="maps">
 <h2>Maps<a class="headerlink" href="#maps" title="Permalink to this headline">¶</a></h2>
@@ -211,10 +258,10 @@ This will ensure that they only present in the simulation world, not in the visu
 </div>
 <div class="section" id="weather">
 <h2>Weather<a class="headerlink" href="#weather" title="Permalink to this headline">¶</a></h2>
-<p>If you see a dropdown menu on the main menu panel, that means that map supports dynamic weather.
-If it does not support dynamic weather, it will support dynamic lighting so that you can move the light sources around.
-Weather related computation and visualization are costly and you can use a simpler map such as “simple” if you want to save computational resources.
-Here is an example of weather changes</p>
+<p>If you see a dropdown menu for weather on the main menu panel, that means that map supports dynamic weather.
+If it does not support dynamic weather, it will support dynamic lighting so that you can move the light source around.
+Weather related computation and visualization are costly and you can use a simpler map such as “simple” if you want to save computational resources.</p>
+<p>Here is an example of weather changes</p>
 <a class="reference internal image-reference" href="../_images/rsu_weather.gif"><img alt="rsu_weather" src="../_images/rsu_weather.gif" style="width: 854px;" /></a>
 <p>If the map support dynamic weather, it also supports “timeOfDay” option. You can drag the scroll bar and specify the current time.</p>
 <a class="reference internal image-reference" href="../_images/rsu_timeOfDay.gif"><img alt="rsu_tod" src="../_images/rsu_timeOfDay.gif" style="width: 854px;" /></a>
@@ -256,7 +303,7 @@ You can use basic colors described as per <a class="reference external" href="ht
 <div class="section" id="troubleshooting-and-bug-reporting">
 <h2>Troubleshooting and bug reporting<a class="headerlink" href="#troubleshooting-and-bug-reporting" title="Permalink to this headline">¶</a></h2>
 <p>RaisimUnreal creates a log file <code class="docutils literal notranslate"><span class="pre">Error_Log.txt</span></code> inside the raisimUnreal2 folder.
-It it is not working properly, please read the log first.
+If RaisimUnreal is not working properly, please read the log first.
 If you cannot figure it out yourself, you can post an issue with the log file.</p>
 </div>
 </div>

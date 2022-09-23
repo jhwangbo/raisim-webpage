@@ -4,14 +4,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Articulated Systems &mdash; raisim 1.1.4 documentation</title>
+  <title>Articulated Systems &mdash; raisim 1.1.5 documentation</title>
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
   <link rel="stylesheet" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
   <link rel="stylesheet" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" type="text/css" />
   <!--[if lt IE 9]>
   <script src="../_static/js/html5shiv.min.js"></script>
@@ -38,7 +38,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
           <div class="version">
-            1.1.4
+            1.1.5
           </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -49,7 +49,7 @@
 </div>
       </div>
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Main">
-        <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+        <p class="caption"><span class="caption-text">Get started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
@@ -57,7 +57,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ChangeLog.html">Change Log</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<p class="caption"><span class="caption-text">RaiSim C++</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
@@ -103,7 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Related Software</span></p>
+<p class="caption"><span class="caption-text">Related Software</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
@@ -355,17 +355,17 @@ A dummy link with zero inertia and zero mass must be added on one side of the fi
 <p>A frame can be locally stored as an index in the user code. For e.g.,</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include “raisim/World.hpp”</span>
 
-<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">anymal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addArticulatedSystem</span><span class="p">(</span><span class="n">PATH_TO_URDF</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">footFrameIndex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getFrameIdxByName</span><span class="p">(</span><span class="s">&quot;foot_joint&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// the URDF has a joint named &quot;foot_joint&quot;</span>
-<span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="n">footPosition</span><span class="p">,</span><span class="w"> </span><span class="n">footVelocity</span><span class="p">,</span><span class="w"> </span><span class="n">footAngularVelocity</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">Mat</span><span class="o">&lt;</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="n">footOrientation</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getFramePosition</span><span class="p">(</span><span class="n">footFrameIndex</span><span class="p">,</span><span class="w"> </span><span class="n">footPosition</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getFrameOrientation</span><span class="p">(</span><span class="n">footFrameIndex</span><span class="p">,</span><span class="w"> </span><span class="n">footOrientation</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getFrameVelocity</span><span class="p">(</span><span class="n">footFrameIndex</span><span class="p">,</span><span class="w"> </span><span class="n">footVelocity</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getFrameAngularVelocity</span><span class="p">(</span><span class="n">footFrameIndex</span><span class="p">,</span><span class="w"> </span><span class="n">footAngularVelocity</span><span class="p">);</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">raisim</span><span class="o">::</span><span class="n">World</span> <span class="n">world</span><span class="p">;</span>
+  <span class="k">auto</span> <span class="n">anymal</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">addArticulatedSystem</span><span class="p">(</span><span class="n">PATH_TO_URDF</span><span class="p">);</span>
+  <span class="k">auto</span> <span class="n">footFrameIndex</span> <span class="o">=</span> <span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getFrameIdxByName</span><span class="p">(</span><span class="s">&quot;foot_joint&quot;</span><span class="p">);</span> <span class="c1">// the URDF has a joint named &quot;foot_joint&quot;</span>
+  <span class="n">raisim</span><span class="o">::</span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;</span> <span class="n">footPosition</span><span class="p">,</span> <span class="n">footVelocity</span><span class="p">,</span> <span class="n">footAngularVelocity</span><span class="p">;</span>
+  <span class="n">raisim</span><span class="o">::</span><span class="n">Mat</span><span class="o">&lt;</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="o">&gt;</span> <span class="n">footOrientation</span><span class="p">;</span>
+  <span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getFramePosition</span><span class="p">(</span><span class="n">footFrameIndex</span><span class="p">,</span> <span class="n">footPosition</span><span class="p">);</span>
+  <span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getFrameOrientation</span><span class="p">(</span><span class="n">footFrameIndex</span><span class="p">,</span> <span class="n">footOrientation</span><span class="p">);</span>
+  <span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getFrameVelocity</span><span class="p">(</span><span class="n">footFrameIndex</span><span class="p">,</span> <span class="n">footVelocity</span><span class="p">);</span>
+  <span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getFrameAngularVelocity</span><span class="p">(</span><span class="n">footFrameIndex</span><span class="p">,</span> <span class="n">footAngularVelocity</span><span class="p">);</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <p>You can also store a Frame reference.
@@ -441,18 +441,18 @@ Therefore, this PD controller exploits a more stable integration scheme and can 
 <p><strong>This PD controller does not respect the actuation limits of the robot</strong>.
 It uses an implicit integration scheme and we do not even compute the actual torque that is applied to the joints.</p>
 <p>To use this PD controller, you have to set the desirable control gains first</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="nf">pGain</span><span class="p">(</span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getDOF</span><span class="p">()),</span><span class="w"> </span><span class="n">dGain</span><span class="p">(</span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getDOF</span><span class="p">());</span><span class="w"></span>
-<span class="n">pGain</span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">...;</span><span class="w"> </span><span class="c1">// set your proportional gain values here</span>
-<span class="n">dGain</span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">...;</span><span class="w"> </span><span class="c1">// set your differential gain values here</span>
-<span class="n">robot</span><span class="o">-&gt;</span><span class="n">setPdGains</span><span class="p">(</span><span class="n">pGain</span><span class="p">,</span><span class="w"> </span><span class="n">dGain</span><span class="p">);</span><span class="w"></span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span> <span class="nf">pGain</span><span class="p">(</span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getDOF</span><span class="p">()),</span> <span class="n">dGain</span><span class="p">(</span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getDOF</span><span class="p">());</span>
+<span class="n">pGain</span><span class="o">&lt;&lt;</span> <span class="p">...;</span> <span class="c1">// set your proportional gain values here</span>
+<span class="n">dGain</span><span class="o">&lt;&lt;</span> <span class="p">...;</span> <span class="c1">// set your differential gain values here</span>
+<span class="n">robot</span><span class="o">-&gt;</span><span class="n">setPdGains</span><span class="p">(</span><span class="n">pGain</span><span class="p">,</span> <span class="n">dGain</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>Note that <strong>the dimension of the pGain vector is the same as that of the generalized velocity NOT that of the coordinate</strong>.</p>
 <p>Finally, the target position and the velocity can set as below</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="nf">pTarget</span><span class="p">(</span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getGeneralizedCoordinateDim</span><span class="p">()),</span><span class="w"> </span><span class="n">vTarget</span><span class="p">(</span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getDOF</span><span class="p">());</span><span class="w"></span>
-<span class="n">pTarget</span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">...;</span><span class="w"> </span><span class="c1">// set your position target</span>
-<span class="n">vTarget</span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">...;</span><span class="w"> </span><span class="c1">// set your velocity target</span>
-<span class="n">robot</span><span class="o">-&gt;</span><span class="n">setPdTarget</span><span class="p">(</span><span class="n">pTarget</span><span class="p">,</span><span class="w"> </span><span class="n">vTarget</span><span class="p">);</span><span class="w"></span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span> <span class="nf">pTarget</span><span class="p">(</span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getGeneralizedCoordinateDim</span><span class="p">()),</span> <span class="n">vTarget</span><span class="p">(</span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getDOF</span><span class="p">());</span>
+<span class="n">pTarget</span><span class="o">&lt;&lt;</span> <span class="p">...;</span> <span class="c1">// set your position target</span>
+<span class="n">vTarget</span><span class="o">&lt;&lt;</span> <span class="p">...;</span> <span class="c1">// set your velocity target</span>
+<span class="n">robot</span><span class="o">-&gt;</span><span class="n">setPdTarget</span><span class="p">(</span><span class="n">pTarget</span><span class="p">,</span> <span class="n">vTarget</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>Here, <strong>the dimension of the pTarget vector is the same as that of the generalized coordinate NOT that of the velocity</strong>.
@@ -574,7 +574,7 @@ This material affects the contact dynamics.</p>
 <h2>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim17ArticulatedSystemE">
-<span id="_CPPv3N6raisim17ArticulatedSystemE"></span><span id="_CPPv2N6raisim17ArticulatedSystemE"></span><span id="raisim::ArticulatedSystem"></span><span class="target" id="classraisim_1_1ArticulatedSystem"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ArticulatedSystem</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="Object.html#_CPPv4N6raisim6ObjectE" title="raisim::Object"><span class="n"><span class="pre">Object</span></span></a><a class="headerlink" href="#_CPPv4N6raisim17ArticulatedSystemE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N6raisim17ArticulatedSystemE"></span><span id="_CPPv2N6raisim17ArticulatedSystemE"></span><span id="raisim::ArticulatedSystem"></span><span class="target" id="classraisim_1_1ArticulatedSystem"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">ArticulatedSystem</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="Object.html#_CPPv4N6raisim6ObjectE" title="raisim::Object"><span class="n"><span class="pre">Object</span></span></a><a class="headerlink" href="#_CPPv4N6raisim17ArticulatedSystemE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
@@ -1500,7 +1500,7 @@ This material affects the contact dynamics.</p>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim17ArticulatedSystem11getVelocityE6size_tRK3VecIXL3EEER3VecIXL3EEE">
-<span id="_CPPv3NK6raisim17ArticulatedSystem11getVelocityE6size_tRK3VecIXL3EEER3VecIXL3EEE"></span><span id="_CPPv2NK6raisim17ArticulatedSystem11getVelocityE6size_tRK3VecIX3EER3VecIX3EE"></span><span id="raisim::ArticulatedSystem::getVelocity__s.Vec:3:CR.Vec:3:RC"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1aaccadace305a34145a6a3730afa52e7a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getVelocity</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bodyIdx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">posInBodyFrame</span></span>, <span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pointVel</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim17ArticulatedSystem11getVelocityE6size_tRK3VecIXL3EEER3VecIXL3EEE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3NK6raisim17ArticulatedSystem11getVelocityE6size_tRK3VecIXL3EEER3VecIXL3EEE"></span><span id="_CPPv2NK6raisim17ArticulatedSystem11getVelocityE6size_tRK3VecIX3EER3VecIX3EE"></span><span id="raisim::ArticulatedSystem::getVelocity__s.Vec:3:CR.Vec:3:RC"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1a6d5df99b506bad96f6c82b10aacb798f"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getVelocity</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bodyIdx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">posInBodyFrame</span></span>, <span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pointVel</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4NK6raisim17ArticulatedSystem11getVelocityE6size_tRK3VecIXL3EEER3VecIXL3EEE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -2235,10 +2235,43 @@ This material affects the contact dynamics.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim17ArticulatedSystem18setBaseOrientationERK3MatIXL3EEXL3EEE">
 <span id="_CPPv3N6raisim17ArticulatedSystem18setBaseOrientationERK3MatIXL3EEXL3EEE"></span><span id="_CPPv2N6raisim17ArticulatedSystem18setBaseOrientationERK3MatIX3EX3EE"></span><span id="raisim::ArticulatedSystem::setBaseOrientation__Mat:3.3:CR"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1a8b8f3f19a8aa82af0d250a9fb48dfb6d"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setBaseOrientation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Mat</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim17ArticulatedSystem18setBaseOrientationERK3MatIXL3EEXL3EEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>set the base orientation using an eigen vector </p>
+<dd><p>set the base orientation using a raisim rotation matrix (i.e., Mat&lt;3,3&gt;) </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>rot</strong> – <strong>[in]</strong> orientation of the base </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim17ArticulatedSystem18setBaseOrientationERK3VecIXL4EEE">
+<span id="_CPPv3N6raisim17ArticulatedSystem18setBaseOrientationERK3VecIXL4EEE"></span><span id="_CPPv2N6raisim17ArticulatedSystem18setBaseOrientationERK3VecIX4EE"></span><span id="raisim::ArticulatedSystem::setBaseOrientation__Vec:4:CR"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1a14d7ed7b6ca00393f2d9b0a008eca3e2"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setBaseOrientation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">4</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quat</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim17ArticulatedSystem18setBaseOrientationERK3VecIXL4EEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>set the base orientation using a raisim quaternion (i.e., Vec&lt;4&gt;) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rot</strong> – <strong>[in]</strong> orientation of the base </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim17ArticulatedSystem15setBaseVelocityERK3VecIXL3EEE">
+<span id="_CPPv3N6raisim17ArticulatedSystem15setBaseVelocityERK3VecIXL3EEE"></span><span id="_CPPv2N6raisim17ArticulatedSystem15setBaseVelocityERK3VecIX3EE"></span><span id="raisim::ArticulatedSystem::setBaseVelocity__Vec:3:CR"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1a5090e3e95b9ac8c221447439f74b178a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setBaseVelocity</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">vel</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim17ArticulatedSystem15setBaseVelocityERK3VecIXL3EEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>set the base position using an eigen vector </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>vel</strong> – <strong>[in]</strong> the linear velocity of the base </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim17ArticulatedSystem22setBaseAngularVelocityERK3VecIXL3EEE">
+<span id="_CPPv3N6raisim17ArticulatedSystem22setBaseAngularVelocityERK3VecIXL3EEE"></span><span id="_CPPv2N6raisim17ArticulatedSystem22setBaseAngularVelocityERK3VecIX3EE"></span><span id="raisim::ArticulatedSystem::setBaseAngularVelocity__Vec:3:CR"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1a32afb10e3dc511523101969338cc6299"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setBaseAngularVelocity</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">vel</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim17ArticulatedSystem22setBaseAngularVelocityERK3VecIXL3EEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>set the base position using an eigen vector </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>vel</strong> – <strong>[in]</strong> the angular velocity of the base </p>
 </dd>
 </dl>
 </dd></dl>
