@@ -4,14 +4,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contact and Collision &mdash; raisim 1.1.4 documentation</title>
+  <title>Contact and Collision &mdash; raisim 1.1.5 documentation</title>
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
   <link rel="stylesheet" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
   <link rel="stylesheet" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" type="text/css" />
   <!--[if lt IE 9]>
   <script src="../_static/js/html5shiv.min.js"></script>
@@ -37,7 +37,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
           <div class="version">
-            1.1.4
+            1.1.5
           </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -192,6 +192,11 @@ Here is an extensive example</p>
 <span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;Contact Normal in the world frame: &quot;</span><span class="o">&lt;&lt;</span><span class="n">contact</span><span class="p">.</span><span class="n">getNormal</span><span class="p">().</span><span class="n">e</span><span class="p">().</span><span class="n">transpose</span><span class="p">()</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"></span>
 <span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;Contact position in the world frame: &quot;</span><span class="o">&lt;&lt;</span><span class="n">contact</span><span class="p">.</span><span class="n">getPosition</span><span class="p">().</span><span class="n">e</span><span class="p">().</span><span class="n">transpose</span><span class="p">()</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"></span>
 <span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;It collides with: &quot;</span><span class="o">&lt;&lt;</span><span class="n">world</span><span class="p">.</span><span class="n">getObject</span><span class="p">(</span><span class="n">contact</span><span class="p">.</span><span class="n">getPairObjectIndex</span><span class="p">())</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">contact</span><span class="p">.</span><span class="n">getPairContactIndexInPairObject</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">BodyType</span><span class="o">::</span><span class="n">STATIC</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="c1">/// Static objects do not have Contacts store. So you must check if the pair object is static</span>
+<span class="w">      </span><span class="c1">/// This saves computation in raisim</span>
+<span class="w">      </span><span class="n">world</span><span class="p">.</span><span class="n">getObject</span><span class="p">(</span><span class="n">contact</span><span class="p">.</span><span class="n">getPairObjectIndex</span><span class="p">()).</span><span class="n">getContacts</span><span class="p">();</span><span class="w"> </span><span class="c1">/// You can use the same methods on the pair object</span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
 <span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;please check Contact.hpp for the full list of the methods&quot;</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"></span>
 <span class="w">  </span><span class="p">}</span><span class="w"></span>
 <span class="p">}</span><span class="w"></span>
@@ -208,9 +213,31 @@ Each element in the vector has the following API:</p>
 <dd><div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim7Contact11getPositionEv">
+<span id="_CPPv3NK6raisim7Contact11getPositionEv"></span><span id="_CPPv2NK6raisim7Contact11getPositionEv"></span><span id="raisim::Contact::getPositionC"></span><span class="target" id="classraisim_1_1Contact_1ae68157f81444ac2c7dfd18f567cea8e6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getPosition</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim7Contact11getPositionEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>the contact position </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the contact position </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim7Contact9getNormalEv">
+<span id="_CPPv3NK6raisim7Contact9getNormalEv"></span><span id="_CPPv2NK6raisim7Contact9getNormalEv"></span><span id="raisim::Contact::getNormalC"></span><span class="target" id="classraisim_1_1Contact_1a131a4131d49c53462e1e4e331bcda27f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getNormal</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim7Contact9getNormalEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>the contact normal vector pointing to ObjectA </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>frame </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim7Contact15getContactFrameEv">
 <span id="_CPPv3NK6raisim7Contact15getContactFrameEv"></span><span id="_CPPv2NK6raisim7Contact15getContactFrameEv"></span><span id="raisim::Contact::getContactFrameC"></span><span class="target" id="classraisim_1_1Contact_1aafbf3fd5c0f76a5b8fe469720a7e3e9e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Mat</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getContactFrame</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim7Contact15getContactFrameEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>treturns a TRANSPOSE of the frame that the impulse is expressed. </p>
+<dd><p>returns a TRANSPOSE of the frame that the impulse is expressed. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>contact frame </p>
@@ -254,7 +281,7 @@ Each element in the vector has the following API:</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim7Contact31getPairContactIndexInPairObjectEv">
 <span id="_CPPv3NK6raisim7Contact31getPairContactIndexInPairObjectEv"></span><span id="_CPPv2NK6raisim7Contact31getPairContactIndexInPairObjectEv"></span><span id="raisim::Contact::getPairContactIndexInPairObjectC"></span><span class="target" id="classraisim_1_1Contact_1a6c163e4f44ce84179e2c8f7d55f449e2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPairContactIndexInPairObject</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim7Contact31getPairContactIndexInPairObjectEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>returns the contact index in the contacting (the paired) object in <a class="reference internal" href="Object.html#classraisim_1_1Object_1a65419b5218019745228ed702b08ee16e"><span class="std std-ref">raisim::Object::getContacts</span></a> </p>
+<dd><p>returns the contact index in the contacting (the paired) object in <a class="reference internal" href="Object.html#classraisim_1_1Object_1a65419b5218019745228ed702b08ee16e"><span class="std std-ref">raisim::Object::getContacts</span></a> This does not work if the pair body is STATIC because contacts on static bodies are not stored. First check the pair body type with getPairObjectBodyType </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>contact index </p>

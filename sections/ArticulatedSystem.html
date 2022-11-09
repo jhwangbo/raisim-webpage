@@ -4,14 +4,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Articulated Systems &mdash; raisim 1.1.4 documentation</title>
+  <title>Articulated Systems &mdash; raisim 1.1.5 documentation</title>
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
   <link rel="stylesheet" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
   <link rel="stylesheet" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" type="text/css" />
   <!--[if lt IE 9]>
   <script src="../_static/js/html5shiv.min.js"></script>
@@ -38,7 +38,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
           <div class="version">
-            1.1.4
+            1.1.5
           </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -191,10 +191,14 @@ There are three ways to specify the system.</p>
 <ol class="arabic simple">
 <li><p>by providing the path to the URDF file (the most recommneded way)</p></li>
 <li><p>by providing <code class="code docutils literal notranslate"><span class="pre">std::string</span></code> of the URDF text (can be useful when working with Xacro)</p></li>
-<li><p>by providing a <code class="code docutils literal notranslate"><span class="pre">raisim::Child</span></code> instance. It is an advanced method and not recommnded to beginners.</p></li>
+<li><p>by providing a <code class="code docutils literal notranslate"><span class="pre">raisim::Child</span></code> instance. It is an advanced method and not recommended for beginners.</p></li>
 </ol>
 <p>Note that option 1 and 2 use the same method.
 You can provide either the path string or the contents string and the class will identify which one is provided.</p>
+<p>To use option 3, you have to provide all details of the robot in C++ code.
+Child is a tree node which contains <code class="docutils literal notranslate"><span class="pre">fixedBodies</span></code> and <code class="docutils literal notranslate"><span class="pre">child</span></code>.
+It also contains <code class="docutils literal notranslate"><span class="pre">joint</span></code>, <code class="docutils literal notranslate"><span class="pre">body</span></code>, and <code class="docutils literal notranslate"><span class="pre">name</span></code>.
+All properties should be filled.</p>
 </div>
 <div class="section" id="state-representation">
 <h2>State Representation<a class="headerlink" href="#state-representation" title="Permalink to this headline">¶</a></h2>
@@ -341,6 +345,17 @@ In other words, the value is the reflected rotor inertia observed at the joint.<
 Collision bodies contain a collision object of one of the following shapes: <em>mesh</em>, <em>sphere</em>, <em>box</em>, <em>cylinder</em>, <em>capsule</em>.
 Visual objects just store specifications for visualization and the actual visualzation happens in a visualizer (e.g., <a class="reference external" href="https://github.com/leggedrobotics/raisimOgre">raisimOgre</a>)
 For details, check the <a class="reference external" href="http://wiki.ros.org/urdf/XML">URDF protocol</a>.</p>
+<div class="section" id="templated-urdf">
+<h3>Templated URDF<a class="headerlink" href="#templated-urdf" title="Permalink to this headline">¶</a></h3>
+<p>You can template an URDF and create different robots by providing different parameters in C++.
+An example can be found in <a class="reference external" href="https://github.com/raisimTech/raisimLib/tree/master/rsc/templatedTrackedRobot">here</a>.</p>
+<p>In the URDF template, variables should be marked with <code class="docutils literal notranslate"><span class="pre">&#64;&#64;</span></code>.
+Just like in a world configuration template, you can write math expressions inside <code class="docutils literal notranslate"><span class="pre">{}</span></code>.
+Only basic functions (i.e., sin, cos, log, exp) are available.</p>
+<p>Template parameters should be provided at runtime in <code class="docutils literal notranslate"><span class="pre">raisim::World::addArticulatedSystem</span></code>.
+One of the overloading methods take <code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">std::unordered_map&lt;std::string,</span> <span class="pre">std::string&gt;&amp;</span> <span class="pre">params</span></code> as input.
+The first one in the pair is the name and the second one is the parameter in a form of string.</p>
+</div>
 </div>
 <div class="section" id="kinematics">
 <h2>Kinematics<a class="headerlink" href="#kinematics" title="Permalink to this headline">¶</a></h2>
@@ -372,7 +387,21 @@ A dummy link with zero inertia and zero mass must be added on one side of the fi
 For e.g., you can replace <code class="code docutils literal notranslate"><span class="pre">getFrameIdxByName</span></code> by <code class="code docutils literal notranslate"><span class="pre">getFrameByName</span></code> in the above example.
 In this way, you can access the internal variables and even modify them.
 Modifying the frames do not affect the joints.
-Frames are instantiated during initialization of the articulated system instance and affect neither kinematics nor dynamics of the system.</p>
+Frames are instantiated during initialization of the articulated system instance and affect neither kinematics nor dynamics of the system even if you change them.</p>
+</div>
+<div class="section" id="joint-limits">
+<h3>Joint limits<a class="headerlink" href="#joint-limits" title="Permalink to this headline">¶</a></h3>
+<p>Joint limits can be defined in an URDF file <strong>per joint</strong> as following</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">limit</span><span class="w"> </span><span class="n">effort</span><span class="o">=</span><span class="s">&quot;80&quot;</span><span class="w"> </span><span class="n">lower</span><span class="o">=</span><span class="s">&quot;-6.28&quot;</span><span class="w"> </span><span class="n">upper</span><span class="o">=</span><span class="s">&quot;6.28&quot;</span><span class="w"> </span><span class="n">velocity</span><span class="o">=</span><span class="s">&quot;15&quot;</span><span class="o">/&gt;</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">lower</span></code> and <code class="docutils literal notranslate"><span class="pre">upper</span></code> are joint position limits and the <code class="docutils literal notranslate"><span class="pre">velocity</span></code> is the joint velocity limit.
+The joint limits are implemented as if there is a hard stop at the limits.
+This means that there is a hard collision (with 0 restitution of coefficient) when the joint hits a limit.visualization</p>
+<p>You modify the position joint limits in C++ using <code class="docutils literal notranslate"><span class="pre">raisim::ArticulatedSystem::setJointLimits()</span></code>.
+Currently, you cannot modify the velocity joint limits in code.</p>
+<p>During simulation, you can get information on joint limit violations using <code class="docutils literal notranslate"><span class="pre">raisim::ArticulatedSystem::getJointLimitViolations</span></code>.
+Even though joint limits are collisions (and thus handled by a contact solver), they are not listed in <code class="docutils literal notranslate"><span class="pre">raisim::Object::getContacts()</span></code>.</p>
 </div>
 <div class="section" id="jacobians">
 <h3>Jacobians<a class="headerlink" href="#jacobians" title="Permalink to this headline">¶</a></h3>
@@ -548,6 +577,7 @@ This material affects the contact dynamics.</p>
 <li><p><code class="code docutils literal notranslate"><span class="pre">setExternalForce</span></code></p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">setExternalTorque</span></code></p></li>
 </ul>
+<p>You will find above methods in the API section on this page.</p>
 </div>
 <div class="section" id="collision">
 <h2>Collision<a class="headerlink" href="#collision" title="Permalink to this headline">¶</a></h2>
@@ -1500,7 +1530,7 @@ This material affects the contact dynamics.</p>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim17ArticulatedSystem11getVelocityE6size_tRK3VecIXL3EEER3VecIXL3EEE">
-<span id="_CPPv3NK6raisim17ArticulatedSystem11getVelocityE6size_tRK3VecIXL3EEER3VecIXL3EEE"></span><span id="_CPPv2NK6raisim17ArticulatedSystem11getVelocityE6size_tRK3VecIX3EER3VecIX3EE"></span><span id="raisim::ArticulatedSystem::getVelocity__s.Vec:3:CR.Vec:3:RC"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1aaccadace305a34145a6a3730afa52e7a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getVelocity</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bodyIdx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">posInBodyFrame</span></span>, <span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pointVel</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim17ArticulatedSystem11getVelocityE6size_tRK3VecIXL3EEER3VecIXL3EEE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3NK6raisim17ArticulatedSystem11getVelocityE6size_tRK3VecIXL3EEER3VecIXL3EEE"></span><span id="_CPPv2NK6raisim17ArticulatedSystem11getVelocityE6size_tRK3VecIX3EER3VecIX3EE"></span><span id="raisim::ArticulatedSystem::getVelocity__s.Vec:3:CR.Vec:3:RC"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1a6d5df99b506bad96f6c82b10aacb798f"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getVelocity</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bodyIdx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">posInBodyFrame</span></span>, <span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pointVel</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4NK6raisim17ArticulatedSystem11getVelocityE6size_tRK3VecIXL3EEER3VecIXL3EEE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -2235,10 +2265,43 @@ This material affects the contact dynamics.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim17ArticulatedSystem18setBaseOrientationERK3MatIXL3EEXL3EEE">
 <span id="_CPPv3N6raisim17ArticulatedSystem18setBaseOrientationERK3MatIXL3EEXL3EEE"></span><span id="_CPPv2N6raisim17ArticulatedSystem18setBaseOrientationERK3MatIX3EX3EE"></span><span id="raisim::ArticulatedSystem::setBaseOrientation__Mat:3.3:CR"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1a8b8f3f19a8aa82af0d250a9fb48dfb6d"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setBaseOrientation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Mat</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim17ArticulatedSystem18setBaseOrientationERK3MatIXL3EEXL3EEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>set the base orientation using an eigen vector </p>
+<dd><p>set the base orientation using a raisim rotation matrix (i.e., Mat&lt;3,3&gt;) </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>rot</strong> – <strong>[in]</strong> orientation of the base </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim17ArticulatedSystem18setBaseOrientationERK3VecIXL4EEE">
+<span id="_CPPv3N6raisim17ArticulatedSystem18setBaseOrientationERK3VecIXL4EEE"></span><span id="_CPPv2N6raisim17ArticulatedSystem18setBaseOrientationERK3VecIX4EE"></span><span id="raisim::ArticulatedSystem::setBaseOrientation__Vec:4:CR"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1a14d7ed7b6ca00393f2d9b0a008eca3e2"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setBaseOrientation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">4</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quat</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim17ArticulatedSystem18setBaseOrientationERK3VecIXL4EEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>set the base orientation using a raisim quaternion (i.e., Vec&lt;4&gt;) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rot</strong> – <strong>[in]</strong> orientation of the base </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim17ArticulatedSystem15setBaseVelocityERK3VecIXL3EEE">
+<span id="_CPPv3N6raisim17ArticulatedSystem15setBaseVelocityERK3VecIXL3EEE"></span><span id="_CPPv2N6raisim17ArticulatedSystem15setBaseVelocityERK3VecIX3EE"></span><span id="raisim::ArticulatedSystem::setBaseVelocity__Vec:3:CR"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1a5090e3e95b9ac8c221447439f74b178a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setBaseVelocity</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">vel</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim17ArticulatedSystem15setBaseVelocityERK3VecIXL3EEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>set the base position using an eigen vector </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>vel</strong> – <strong>[in]</strong> the linear velocity of the base </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim17ArticulatedSystem22setBaseAngularVelocityERK3VecIXL3EEE">
+<span id="_CPPv3N6raisim17ArticulatedSystem22setBaseAngularVelocityERK3VecIXL3EEE"></span><span id="_CPPv2N6raisim17ArticulatedSystem22setBaseAngularVelocityERK3VecIX3EE"></span><span id="raisim::ArticulatedSystem::setBaseAngularVelocity__Vec:3:CR"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1a32afb10e3dc511523101969338cc6299"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setBaseAngularVelocity</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">vel</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim17ArticulatedSystem22setBaseAngularVelocityERK3VecIXL3EEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>set the base position using an eigen vector </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>vel</strong> – <strong>[in]</strong> the angular velocity of the base </p>
 </dd>
 </dl>
 </dd></dl>

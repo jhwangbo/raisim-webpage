@@ -4,14 +4,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RaisimGymTorch &mdash; raisim 1.1.4 documentation</title>
+  <title>RaisimGymTorch &mdash; raisim 1.1.5 documentation</title>
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
   <link rel="stylesheet" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
   <link rel="stylesheet" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" type="text/css" />
   <!--[if lt IE 9]>
   <script src="../_static/js/html5shiv.min.js"></script>
@@ -37,7 +37,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
           <div class="version">
-            1.1.4
+            1.1.5
           </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -79,13 +79,14 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">RaisimGymTorch</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#what-is-raisimgymtorch">What is raisimGymTorch?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#why-raisimgymtorch">Why raisimGymTorch?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#how-to-run-the-example">How to run the example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#how-to-debug">How to debug</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#how-does-it-work">How does it work?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#how-to-add-a-custom-environment">How to add a custom environment?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#code-structure-if-you-are-curious">Code structure (if you are curious)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#common-issues-and-solutions">Common issues and solutions</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
@@ -155,13 +156,6 @@ A simple pytorch-based RL framework is provided as well but it should work well 
 Instead of using raisimPy, pybind11 wraps a vectorized environment in C++ so that the parallelization happens in C++.
 This improves the speed tremendously.</p>
 </div>
-<div class="section" id="dependencies">
-<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>raisim dependencies</p></li>
-<li><p>(optional) virtualenv or anaconda</p></li>
-</ul>
-</div>
 <div class="section" id="why-raisimgymtorch">
 <h2>Why raisimGymTorch?<a class="headerlink" href="#why-raisimgymtorch" title="Permalink to this headline">¶</a></h2>
 <p>raisimGymTorch is designed such that you can collect <strong>tens of billions of state transitions</strong> with a single desktop machine.
@@ -170,6 +164,16 @@ Such a number of state transitions is necessary to train for very difficult task
 <img alt="trained policy 2" src="../_images/raisimGymTorch_trainedPolicy2.gif" />
 <p>About <strong>160 billion time steps</strong> were used to train the above controller.
 raisimGymTorch can process about 500k time steps per second in the above environment (with 3950x) with an actuator network (which is as heavy as the physics simulation).</p>
+</div>
+<div class="section" id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<p>Assuming that you have installed raisim,</p>
+<ul class="simple">
+<li><p>Anaconda</p></li>
+<li><p>pytorch (<a class="reference external" href="https://pytorch.org/">https://pytorch.org/</a>)</p></li>
+<li><p>to use GPU, install cuda as well. Install the version recommended by pytorch</p></li>
+<li><p>The rest of the dependencies are installed when you build a raisimGym environment for the first time</p></li>
+</ul>
 </div>
 <div class="section" id="how-to-run-the-example">
 <h2>How to run the example<a class="headerlink" href="#how-to-run-the-example" title="Permalink to this headline">¶</a></h2>
@@ -215,9 +219,23 @@ Your launch file (e.g., <code class="docutils literal notranslate"><span class="
 </div>
 <div class="section" id="how-to-add-a-custom-environment">
 <h2>How to add a custom environment?<a class="headerlink" href="#how-to-add-a-custom-environment" title="Permalink to this headline">¶</a></h2>
-<p>You can add your environment in <code class="docutils literal notranslate"><span class="pre">raisimGymTorch/raisimGymTorch/env/envs</span></code>.
-If you want to keep your source file somewhere else, then add a symlink to it in <code class="docutils literal notranslate"><span class="pre">raisimGymTorch/raisimGymTorch/env/envs</span></code>.
-An example environment can be found <a class="reference external" href="https://github.com/raisimTech/raisimlib/tree/master/raisimGymTorch/raisimGymTorch/env/envs/rsg_anymal">here</a></p>
+<p>You can copy <code class="docutils literal notranslate"><span class="pre">raisimGymTorch/raisimGymTorch</span></code> to another location.
+Make sure that you delete all temporary directories <code class="docutils literal notranslate"><span class="pre">build</span></code> and <code class="docutils literal notranslate"><span class="pre">raisim_gym_torch.egg-info</span></code> (they are created when you run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">develop</span></code>).
+To build in another directory, you have to let cmake know where you have raisim as</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python setup.py develop --CMAKE_PREFIX_PATH &lt;WHERE-YOU-HAVE-RAISIM&gt;/raisim/&lt;OS&gt;
+</pre></div>
+</div>
+<p>Everything will work without further operations.
+However, if you want to keep multiple environments, you might want to change a few of them.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Package name: You can find it in <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> (<code class="docutils literal notranslate"><span class="pre">name='raisim_gym_torch'</span></code>). This is the name you will find in <code class="docutils literal notranslate"><span class="pre">site_packages</span></code> directory of your anaconda environment.</p></li>
+<li><p>Directory name: This is the directory name that you will find in the top <code class="docutils literal notranslate"><span class="pre">raisimGymTorch</span></code> directory. The default name is also <code class="docutils literal notranslate"><span class="pre">raisimGymTorch</span></code> directory. Modify it if necessary. Then, you have to modify the directories in the header of <code class="docutils literal notranslate"><span class="pre">runner.py</span></code> and the <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code>.</p></li>
+<li><p>Binary name: This is the name of the directory of your environment. The default name is <code class="docutils literal notranslate"><span class="pre">rsg_anymal</span></code>. If you change the directory name, you have to rename <code class="docutils literal notranslate"><span class="pre">rsg_anymal</span></code> in <code class="docutils literal notranslate"><span class="pre">runner.py</span></code> file.</p></li>
+<li><p>Environment name: This is the name of the binary that will be built from your <code class="docutils literal notranslate"><span class="pre">Environment.hpp</span></code> file. The default name is <code class="docutils literal notranslate"><span class="pre">RaisimGymVecEnv</span></code>. You can find it in <code class="docutils literal notranslate"><span class="pre">raisim_gym.cpp</span></code> file. If you change it, you also have to change the name is <code class="docutils literal notranslate"><span class="pre">runner.py</span></code> file.</p></li>
+</ul>
+<p>You can also just create another conda environment to avoid name conflicts.</p>
+</div></blockquote>
 </div>
 <div class="section" id="code-structure-if-you-are-curious">
 <h2>Code structure (if you are curious)<a class="headerlink" href="#code-structure-if-you-are-curious" title="Permalink to this headline">¶</a></h2>
@@ -229,6 +247,12 @@ You can consider it similar to <code class="docutils literal notranslate"><span 
 <p><code class="docutils literal notranslate"><span class="pre">raisim_gym.cpp</span></code> is a Pybind11 wrapping of <code class="docutils literal notranslate"><span class="pre">VectorizedEnvironment</span></code>.
 It simply defines the interface functions.</p>
 <p>Finally, <code class="docutils literal notranslate"><span class="pre">RaisimGymVecEnv</span></code> is a python class that wraps a python library created from <code class="docutils literal notranslate"><span class="pre">raisim_gym.cpp</span></code>.</p>
+</div>
+<div class="section" id="common-issues-and-solutions">
+<h2>Common issues and solutions<a class="headerlink" href="#common-issues-and-solutions" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>If python scripts complain about missing “libcudnn.so”: conda install -c nvidia cudnn</p></li>
+</ul>
 </div>
 </div>
 
