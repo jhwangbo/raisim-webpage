@@ -64,6 +64,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#setup">Setup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#raisim-install">RaiSim Install</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#building-raisim-examples-and-installing-raisimpy">Building RaiSim Examples and Installing RaisimPy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#activation-key">Activation Key</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
 </ul>
@@ -158,77 +159,94 @@ Here we introduce two variables</p>
 </div>
 <div class="section" id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
-<p>RaiSim depends on the following open-source libraries</p>
+<p>You have to install the following packages to use raisim</p>
 <ul class="simple">
-<li><p><em>Eigen3</em> (<code class="code docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">libeigen3-dev</span></code>)</p></li>
-<li><p>cmake &gt; 3.10 (Technically it is not a dependency but it makes the installation easier)</p></li>
-<li><p>For windows users, visual studio 2019 (we only support 2019 but it will probably work with 2015 or above)</p></li>
+<li><p>eigen library</p></li>
+<li><p>cmake &gt; 3.10</p></li>
+<li><p>For windows users, visual studio 2019 (we only support 2019 but it will probably work with 2015 or above). Make sure that you install the C++ module as well by checking the corresponding checkbox during install.</p></li>
 </ul>
-<p>RaiSim includes many open-source libraries. See the COPYING file for the full list.</p>
+<p>RaiSim includes many open-source libraries. See the COPYING file for the full list.
+Source code of Eigen and Pybind11 are included in the <code class="docutils literal notranslate"><span class="pre">thirdParty</span></code> directory.</p>
 </div>
 <div class="section" id="raisim-install">
 <h2>RaiSim Install<a class="headerlink" href="#raisim-install" title="Permalink to this headline">¶</a></h2>
 <p>Clone raisim from <a class="reference external" href="https://github.com/raisimTech/raisimlib">https://github.com/raisimTech/raisimlib</a>.</p>
-<p>RaiSim is installed using cmake. The following options are available</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">RAISIM_EXAMPLE</span></code> : Compile C++ RaiSim examples</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">RAISIM_MATLAB</span></code> : Compile raisimMatlab (compiled binary is also provided). You need MATLAB for this option</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">RAISIM_PY</span></code> : Compile raisimPy. The desired python version can be set by <code class="docutils literal notranslate"><span class="pre">-DPYTHON_EXECUTABLE=$(python3</span> <span class="pre">-c</span> <span class="pre">&quot;import</span> <span class="pre">sys;</span> <span class="pre">print(sys.executable)&quot;)</span></code> in Linux or Mac. In Linux, you need to install python library using <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt</span> <span class="pre">install</span> <span class="pre">libpython&lt;YOUR_PYTHON_VERSION&gt;-dev</span></code> to build a python package.</p></li>
-</ul>
-<p>You can generate build files using CMake as following</p>
+<p>The cloned repo is already a set of installed raisim packages.
+Under <code class="docutils literal notranslate"><span class="pre">raisimLib/raisim/&lt;OS-TYPE&gt;</span></code>, you will find the installed cmake packages.</p>
+<p>To use raisim in your project, you can simply add the cmake package path and the shared library path to their corresponding environment variables as following</p>
 <div class="sphinx-tabs docutils container">
-<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-TGludXggb3IgTWFj" aria-selected="true" class="sphinx-tabs-tab group-tab" id="tab-0-TGludXggb3IgTWFj" name="TGludXggb3IgTWFj" role="tab" tabindex="0">Linux or Mac</button><button aria-controls="panel-0-V2luZG93cw==" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-0-V2luZG93cw==" name="V2luZG93cw==" role="tab" tabindex="-1">Windows</button></div><div aria-labelledby="tab-0-TGludXggb3IgTWFj" class="sphinx-tabs-panel group-tab" id="panel-0-TGludXggb3IgTWFj" name="TGludXggb3IgTWFj" role="tabpanel" tabindex="0"><p>Replace <code class="docutils literal notranslate"><span class="pre">$(python3</span> <span class="pre">-c</span> <span class="pre">&quot;import</span> <span class="pre">sys;</span> <span class="pre">print(sys.executable)&quot;)</span></code> to specify which python executable to use.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span><span class="w"> </span><span class="n">$WORKSPACE</span><span class="o">/</span><span class="n">raisimLib</span><span class="w"></span>
-<span class="n">mkdir</span><span class="w"> </span><span class="n">build</span><span class="w"></span>
-<span class="n">cd</span><span class="w"> </span><span class="n">build</span><span class="w"></span>
-<span class="n">cmake</span><span class="w"> </span><span class="p">..</span><span class="w"> </span><span class="o">-</span><span class="n">DCMAKE_INSTALL_PREFIX</span><span class="o">=</span><span class="n">$LOCAL_INSTALL</span><span class="w"> </span><span class="o">-</span><span class="n">DRAISIM_EXAMPLE</span><span class="o">=</span><span class="n">ON</span><span class="w"> </span><span class="o">-</span><span class="n">DRAISIM_PY</span><span class="o">=</span><span class="n">ON</span><span class="w"> </span><span class="o">-</span><span class="n">DPYTHON_EXECUTABLE</span><span class="o">=</span><span class="n">$</span><span class="p">(</span><span class="n">python3</span><span class="w"> </span><span class="o">-</span><span class="n">c</span><span class="w"> </span><span class="s">&quot;import sys; print(sys.executable)&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="n">make</span><span class="w"> </span><span class="n">install</span><span class="w"> </span><span class="o">-</span><span class="n">j4</span><span class="w"></span>
+<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-TGludXg=" aria-selected="true" class="sphinx-tabs-tab group-tab" id="tab-0-TGludXg=" name="TGludXg=" role="tab" tabindex="0">Linux</button><button aria-controls="panel-0-TWFj" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-0-TWFj" name="TWFj" role="tab" tabindex="-1">Mac</button><button aria-controls="panel-0-V2luZG93cw==" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-0-V2luZG93cw==" name="V2luZG93cw==" role="tab" tabindex="-1">Windows</button></div><div aria-labelledby="tab-0-TGludXg=" class="sphinx-tabs-panel group-tab" id="panel-0-TGludXg=" name="TGludXg=" role="tabpanel" tabindex="0"><p>Add the following lines to your <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code> file</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$LD_LIBRARY_PATH</span>:<span class="nv">$WORKSPACE</span>/raisim/linux/lib
+<span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:<span class="nv">$WORKSPACE</span>/raisim/linux/lib
 </pre></div>
 </div>
-</div><div aria-labelledby="tab-0-V2luZG93cw==" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-0-V2luZG93cw==" name="V2luZG93cw==" role="tabpanel" tabindex="0"><p>We recommend using the CMake GUI.
-After generating the build files with the CMake GUI, you can build and install RaiSim using Visual Studio.
-Alternatively, you can do it as below in Windows Powershell</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>cd $WORKSPACE/raisimLib
-mkdir build
-cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=$LOCAL_INSTALL -DRAISIM_EXAMPLE=ON -DRAISIM_PY=ON -DPYTHON_EXECUTABLE=&lt;THE-PATH-TO-THE-PYTHON-EXE&gt;
-cmake --build . --target install --config Release
+<p>This allow the linux linker to find raisim shared libraries.
+To let your project CMake know where to find raisim, simply pass an argument <code class="docutils literal notranslate"><span class="pre">-DCMAKE_PREFIX_PATH=$WORKSPACE/raisim/linux</span></code>.</p>
+</div><div aria-labelledby="tab-0-TWFj" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-0-TWFj" name="TWFj" role="tabpanel" tabindex="0"><p>Add the following lines to your <code class="docutils literal notranslate"><span class="pre">.zshrc</span></code> file</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span>DYLD_LIBRARY_PATH:<span class="nv">$WORKSPACE</span>/raisim/mac/lib
+<span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:<span class="nv">$WORKSPACE</span>/raisim/mac/lib
 </pre></div>
 </div>
-</div></div>
-<p>To use RaiSim more conveniently, you have to let your linker know where you installed RaiSim</p>
-<div class="sphinx-tabs docutils container">
-<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-1-TGludXg=" aria-selected="true" class="sphinx-tabs-tab group-tab" id="tab-1-TGludXg=" name="TGludXg=" role="tab" tabindex="0">Linux</button><button aria-controls="panel-1-TWFj" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-1-TWFj" name="TWFj" role="tab" tabindex="-1">Mac</button><button aria-controls="panel-1-V2luZG93cw==" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-1-V2luZG93cw==" name="V2luZG93cw==" role="tab" tabindex="-1">Windows</button></div><div aria-labelledby="tab-1-TGludXg=" class="sphinx-tabs-panel group-tab" id="panel-1-TGludXg=" name="TGludXg=" role="tabpanel" tabindex="0"><p>Add the following lines to your <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code> file</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$LD_LIBRARY_PATH</span>:&lt;WHERE-YOU-HAVE-INSTALLED-RAISIM&gt;/lib
-<span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:&lt;WHERE-YOU-HAVE-INSTALLED-RAISIM&gt;/lib
-</pre></div>
-</div>
-<p>Do not use <code class="docutils literal notranslate"><span class="pre">~</span></code> to reference your home directory. Write the full path</p>
-</div><div aria-labelledby="tab-1-TWFj" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-1-TWFj" name="TWFj" role="tabpanel" tabindex="0"><p>Add the following lines to your <code class="docutils literal notranslate"><span class="pre">.zshrc</span></code> file</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span>DYLD_LIBRARY_PATH:&lt;WHERE-YOU-HAVE-INSTALLED-RAISIM&gt;/lib
-<span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:&lt;WHERE-YOU-HAVE-INSTALLED-RAISIM&gt;/lib
-</pre></div>
-</div>
-<p>Do not use <code class="docutils literal notranslate"><span class="pre">~</span></code> to reference your home directory. Write the full path</p>
-</div><div aria-labelledby="tab-1-V2luZG93cw==" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-1-V2luZG93cw==" name="V2luZG93cw==" role="tabpanel" tabindex="0"><p>Add the installation directory to your <cite>Path</cite> environment variable.
+<p>If you use an M1 or M2 based Mac, use <code class="docutils literal notranslate"><span class="pre">m1</span></code> directory instead of <code class="docutils literal notranslate"><span class="pre">mac</span></code>.
+Do not use <code class="docutils literal notranslate"><span class="pre">~</span></code> to reference your home directory.
+Write the full path.
+Now the Mac linker knows where to find raisim shared libraries.
+To let your project CMake know where to find raisim, simply pass an argument <code class="docutils literal notranslate"><span class="pre">-DCMAKE_PREFIX_PATH=$WORKSPACE/raisim/mac</span></code>.
+Again, use <code class="docutils literal notranslate"><span class="pre">m1</span></code> if you use an Apple silicon.</p>
+</div><div aria-labelledby="tab-0-V2luZG93cw==" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-0-V2luZG93cw==" name="V2luZG93cw==" role="tabpanel" tabindex="0"><p>Add the win32 cmake package directory to your <cite>Path</cite> environment variable.
 You can do that by following these steps</p>
 <ol class="arabic simple">
 <li><p>“Edit the system environment variables”</p></li>
 <li><p>In “Advanced tab”, “Environment Variables”</p></li>
 <li><p>Click “Path” variable in the “System variables” list and click “edit”</p></li>
-<li><p>Append the install directory</p></li>
+<li><p>Append <code class="docutils literal notranslate"><span class="pre">$WORKSPACE/raisim/win32/</span></code></p></li>
+<li><p>To let your project know where raisim is, simply pass an argument <code class="docutils literal notranslate"><span class="pre">-DCMAKE_PREFIX_PATH=$WORKSPACE/raisim/win32</span></code>. (Note that we no longer have separate directories for release and debug builds. They are combined in to a single one.)</p></li>
 </ol>
+</div></div>
+</div>
+<div class="section" id="building-raisim-examples-and-installing-raisimpy">
+<h2>Building RaiSim Examples and Installing RaisimPy<a class="headerlink" href="#building-raisim-examples-and-installing-raisimpy" title="Permalink to this headline">¶</a></h2>
+<p>You can use the <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> in the <code class="docutils literal notranslate"><span class="pre">raisimLib</span></code> directory to build raisim examples and other modules.
+The following options are available</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">RAISIM_EXAMPLE</span></code> : Compile C++ RaiSim examples</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RAISIM_MATLAB</span></code> : Compile raisimMatlab (compiled binary is also provided). You need MATLAB for this option</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RAISIM_PY</span></code> : Compile raisimPy.</p></li>
+</ul>
+<p>You can generate build files using CMake as following</p>
+<p>To build raisimPy for the correct python version, activate your conda environment before calling cmake.</p>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-1-TGludXggb3IgTWFj" aria-selected="true" class="sphinx-tabs-tab group-tab" id="tab-1-TGludXggb3IgTWFj" name="TGludXggb3IgTWFj" role="tab" tabindex="0">Linux or Mac</button><button aria-controls="panel-1-V2luZG93cw==" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-1-V2luZG93cw==" name="V2luZG93cw==" role="tab" tabindex="-1">Windows</button></div><div aria-labelledby="tab-1-TGludXggb3IgTWFj" class="sphinx-tabs-panel group-tab" id="panel-1-TGludXggb3IgTWFj" name="TGludXggb3IgTWFj" role="tabpanel" tabindex="0"><div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span><span class="w"> </span><span class="n">$WORKSPACE</span><span class="o">/</span><span class="n">raisimLib</span><span class="w"></span>
+<span class="n">mkdir</span><span class="w"> </span><span class="n">build</span><span class="w"></span>
+<span class="n">cd</span><span class="w"> </span><span class="n">build</span><span class="w"></span>
+<span class="n">cmake</span><span class="w"> </span><span class="p">..</span><span class="w"> </span><span class="o">-</span><span class="n">DCMAKE_INSTALL_PREFIX</span><span class="o">=</span><span class="n">$LOCAL_INSTALL</span><span class="w"> </span><span class="o">-</span><span class="n">DRAISIM_EXAMPLE</span><span class="o">=</span><span class="n">ON</span><span class="w"> </span><span class="o">-</span><span class="n">DRAISIM_PY</span><span class="o">=</span><span class="n">ON</span><span class="w"></span>
+<span class="n">make</span><span class="w"> </span><span class="n">install</span><span class="w"> </span><span class="o">-</span><span class="n">j4</span><span class="w"></span>
+</pre></div>
+</div>
+</div><div aria-labelledby="tab-1-V2luZG93cw==" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-1-V2luZG93cw==" name="V2luZG93cw==" role="tabpanel" tabindex="0"><p>We recommend using the CMake GUI.
+After generating the build files with the CMake GUI, you can build and install RaiSim using Visual Studio.
+Alternatively, you can do it as below in Windows Powershell</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>cd $WORKSPACE/raisimLib
+mkdir build
+cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=$LOCAL_INSTALL -DRAISIM_EXAMPLE=ON -DRAISIM_PY=ON
+cmake --build . --target install --config Release
+</pre></div>
+</div>
 </div></div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><strong>For Linux users</strong>
 To use (vulkan version) RaiSimUnity in Linux, you need to install <code class="docutils literal notranslate"><span class="pre">minizip</span></code>, <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> and <code class="docutils literal notranslate"><span class="pre">vulkan</span></code>.
-To install vulkan, follow this link <a class="reference external" href="https://linuxconfig.org/install-and-test-vulkan-on-linux">https://linuxconfig.org/install-and-test-vulkan-on-linux</a></p>
+To install vulkan, follow this link <a class="reference external" href="https://linuxconfig.org/install-and-test-vulkan-on-linux">https://linuxconfig.org/install-and-test-vulkan-on-linux</a>
+<strong>Do not install nvidia-graphics-drivers-396 as the link says</strong>.
+If you are going to use raisimGym, install the version recommended by pytorch.
+If not, install the latest version.</p>
 <p>To install <code class="docutils literal notranslate"><span class="pre">minizip</span></code> and <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code>,</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt install minizip ffmpeg
 </pre></div>
 </div>
-<p>If you still cannot raisimUnity, this probably means that your driver does not support vulkan so well.
+<p>If you still cannot use raisimUnity, this probably means that your driver does not support vulkan so well.
 In that case, you should use raisimUnityOpengl.
 It only supports minimalistic graphics.</p>
 </div>
@@ -239,7 +257,7 @@ It only supports minimalistic graphics.</p>
 Save that file in <code class="docutils literal notranslate"><span class="pre">&lt;YOUR-HOME-DIR&gt;/.raisim</span></code>.
 In Linux and Mac, this is <code class="docutils literal notranslate"><span class="pre">/home/&lt;YOUR-USERNAME&gt;/.raisim</span></code>.
 In Windows, this is <code class="docutils literal notranslate"><span class="pre">C:\Users\&lt;YOUR-USERNAME&gt;\.raisim</span></code> (You might not be using <code class="docutils literal notranslate"><span class="pre">C</span></code> as your home directory).</p>
-<p>RaiSim will check the path you set by <code class="docutils literal notranslate"><span class="pre">raisim::World::setActivationKey()</span></code>.
+<p>RaiSim will also check the path you set by <code class="docutils literal notranslate"><span class="pre">raisim::World::setActivationKey()</span></code>.
 If the file is not found, it will search in the user directory, where you saved your <code class="docutils literal notranslate"><span class="pre">activation.raisim</span></code> file.</p>
 </div>
 <div class="section" id="examples">
