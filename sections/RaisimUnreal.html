@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RaisimUnreal &mdash; raisim 1.1.6 documentation</title>
+  <title>RaisimUnreal &mdash; raisim 1.1.7 documentation</title>
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -37,7 +37,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
           <div class="version">
-            1.1.6
+            1.1.7
           </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -48,7 +48,7 @@
 </div>
       </div>
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Main">
-        <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+        <p class="caption"><span class="caption-text">Get started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
@@ -56,12 +56,13 @@
 <li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ChangeLog.html">Change Log</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<p class="caption"><span class="caption-text">RaiSim C++</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Visualizers.html">Visualizers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Determinism.html">Determinism</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Math.html">Math Classes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="LoggingSystem.html">Logging System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="WorldSystem.html">World</a></li>
@@ -75,7 +76,7 @@
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Related Software</span></p>
+<p class="caption"><span class="caption-text">Related Software</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
@@ -95,7 +96,13 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#user-interface">User Interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#interaction">Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interaction">Interaction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#object-deletion">Object deletion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#object-spawning">Object spawning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#apply-force">Apply force</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#measure-position-or-distance">Measure position or distance</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#maps">Maps</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#weather">Weather</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#video-recording">Video recording</a></li>
@@ -230,7 +237,7 @@ You can allow OS to run this app in the following ways</p>
 <div class="section" id="linux">
 <h3>Linux<a class="headerlink" href="#linux" title="Permalink to this headline">¶</a></h3>
 <p>Open a terminal, go to the <code class="docutils literal notranslate"><span class="pre">RaisimUnity/linux</span> <span class="pre">directory</span></code> and type</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">chmod</span><span class="w"> </span><span class="o">+</span><span class="n">x</span><span class="w"> </span><span class="p">.</span><span class="o">/</span><span class="n">raisimUnity</span><span class="p">.</span><span class="n">x86_64</span><span class="w"></span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">chmod</span> <span class="o">+</span><span class="n">x</span> <span class="p">.</span><span class="o">/</span><span class="n">raisimUnity</span><span class="p">.</span><span class="n">x86_64</span>
 </pre></div>
 </div>
 </div>
@@ -278,18 +285,30 @@ It lists all graphs specified by the server (read the atlas.cpp example for deta
 </div>
 <div class="section" id="interaction">
 <h2>Interaction<a class="headerlink" href="#interaction" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="object-deletion">
+<h3>Object deletion<a class="headerlink" href="#object-deletion" title="Permalink to this headline">¶</a></h3>
 <p>You can delete the focused object using <code class="docutils literal notranslate"><span class="pre">del</span></code> key.
 You can focus on an object using either by left-clicking the object or by selecting an object in the object list menu.</p>
+</div>
+<div class="section" id="object-spawning">
+<h3>Object spawning<a class="headerlink" href="#object-spawning" title="Permalink to this headline">¶</a></h3>
 <p>You can find an object spawner menu by pressing <code class="docutils literal notranslate"><span class="pre">m</span></code> key a few times.
 There are 8 different objects you can spawn.
 Click on the object you want to spawn and fill in the other parameters that are activated in the object spawner menu.
 Press <code class="docutils literal notranslate"><span class="pre">enter</span></code> or just click on the button to spawn the object.</p>
+</div>
+<div class="section" id="apply-force">
+<h3>Apply force<a class="headerlink" href="#apply-force" title="Permalink to this headline">¶</a></h3>
 <p>You can apply external forces by pressing <code class="docutils literal notranslate"><span class="pre">shift</span></code> and dragging the object.
 The force model is a spring so it will apply the force proportional to the distance you dragged.
 Once you release the left-mouse-button, it will stop applying the force.</p>
+</div>
+<div class="section" id="measure-position-or-distance">
+<h3>Measure position or distance<a class="headerlink" href="#measure-position-or-distance" title="Permalink to this headline">¶</a></h3>
 <p>You can press <code class="docutils literal notranslate"><span class="pre">alt</span></code> and <code class="docutils literal notranslate"><span class="pre">left-click</span></code> on an object to specify a <em>point of interest</em>.
 If there is one <em>point of interest</em>, the ruler will measure a position.
 If there are two, the ruler will measure the displacement.</p>
+</div>
 </div>
 <div class="section" id="maps">
 <h2>Maps<a class="headerlink" href="#maps" title="Permalink to this headline">¶</a></h2>

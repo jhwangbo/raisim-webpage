@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Math Classes &mdash; raisim 1.1.7 documentation</title>
+  <title>Determinism &mdash; raisim 1.1.7 documentation</title>
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -24,8 +24,8 @@
   <script src="../_static/js/theme.js"></script>
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
-  <link rel="next" title="Logging System" href="LoggingSystem.html" />
-  <link rel="prev" title="Determinism" href="Determinism.html" /> 
+  <link rel="next" title="Math Classes" href="Math.html" />
+  <link rel="prev" title="Conventions and Notations" href="ConventionsAndNotations.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -62,8 +62,8 @@
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Visualizers.html">Visualizers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ConventionsAndNotations.html">Conventions and Notations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Determinism.html">Determinism</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Math Classes</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Math.html">Math Classes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="LoggingSystem.html">Logging System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="WorldSystem.html">World</a></li>
 <li class="toctree-l1"><a class="reference internal" href="WorldConfigurationFile.html">RaiSim World Configuration File</a></li>
@@ -119,7 +119,7 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Math Classes</li>
+      <li>Determinism</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -136,28 +136,17 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div itemprop="articleBody">
               
-  <div class="section" id="math-classes">
-<h1>Math Classes<a class="headerlink" href="#math-classes" title="Permalink to this headline">¶</a></h1>
-<p>RaiSim provides its own math library.
-All files related to the math library can be found in <cite>raisim/math</cite>.
-I do not recommend using RaiSim math library to users.
-But many RaiSim methods return a RaiSim math object.
-In such a case, you have to convert it to an Eigen object.
-RaiSim includes a convenient conversion method in the Mat class: <code class="docutils literal notranslate"><span class="pre">e()</span></code> method returns the corresponding <code class="docutils literal notranslate"><span class="pre">Eigen::Map</span></code>.
-Here is an example.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="c1">/// convertsion from a raisim object to an Eigen object (i.e., Eigen::Map)</span>
-<span class="n">raisim</span><span class="o">::</span><span class="n">Mat</span><span class="o">&lt;</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="o">&gt;</span> <span class="n">matrix33RaiSim</span><span class="p">;</span>
-<span class="n">matrix33RaiSim</span><span class="p">.</span><span class="n">setIdentity</span><span class="p">();</span>
-<span class="n">Eigen</span><span class="o">::</span><span class="n">Matrix3d</span> <span class="n">matrix33Eigen</span> <span class="o">=</span> <span class="n">matrix33RaiSim</span><span class="p">.</span><span class="n">e</span><span class="p">();</span>
-<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;matrix33Eigen</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">&lt;&lt;</span><span class="n">matrix33Eigen</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="c1">// pretty std output formatting is not implemented yet. So we use Eigen&#39;s</span>
-
-<span class="c1">/// use a raisim object as if it is an Eigen object</span>
-<span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span> <span class="n">vector3Eigen1</span><span class="p">,</span> <span class="n">vector3Eigen2</span><span class="p">;</span>
-<span class="n">vector3Eigen1</span><span class="p">.</span><span class="n">setConstant</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-<span class="n">vector3Eigen2</span> <span class="o">=</span> <span class="n">matrix33RaiSim</span><span class="p">.</span><span class="n">e</span><span class="p">()</span> <span class="o">*</span> <span class="n">vector3Eigen1</span><span class="p">;</span>
-<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;vector3Eigen2</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">&lt;&lt;</span><span class="n">vector3Eigen2</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-</pre></div>
-</div>
+  <div class="section" id="determinism">
+<h1>Determinism<a class="headerlink" href="#determinism" title="Permalink to this headline">¶</a></h1>
+<p>Raisim can be fully deterministic given the contact solver iteration order.
+This order can be set by <code class="docutils literal notranslate"><span class="pre">raisim::World::setContactSolverIterationOrder</span></code>.</p>
+<p>Determinism is important because of the two reasons.
+First, determinism allows you to control stochasticity of simulation yourself.
+This makes many sampling-based stochastic optimal control methods possible.
+Second, determinism often means bug-free reliable simulation.
+Non-deterministic simulation is often caused by unintended memory read/write.
+It is very unlikely that programmers of a simulator intentionally implemented stochasticity in simulation.
+There are very few exceptions, such as stochastic contact solvers, but they are very rare.</p>
 </div>
 
 
@@ -167,10 +156,10 @@ Here is an example.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="LoggingSystem.html" class="btn btn-neutral float-right" title="Logging System" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="Math.html" class="btn btn-neutral float-right" title="Math Classes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="Determinism.html" class="btn btn-neutral float-left" title="Determinism" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="ConventionsAndNotations.html" class="btn btn-neutral float-left" title="Conventions and Notations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

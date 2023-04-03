@@ -1,5 +1,5 @@
 #############################
-RaiSim v1.1.6
+RaiSim v1.1.7
 #############################
 
 RaiSim is a cross-platform multi-body physics engine for robotics and AI.
@@ -59,6 +59,7 @@ The geometric model is created using the Full-body musculoskeletal model in Raja
    sections/Installation
    sections/Visualizers
    sections/ConventionsAndNotations
+   sections/Determinism
    sections/Math
    sections/LoggingSystem
    sections/WorldSystem
