@@ -7,21 +7,18 @@
   <title>Material System &mdash; raisim 1.1.7 documentation</title>
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" type="text/css" />
   <link rel="stylesheet" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" type="text/css" />
   <link rel="stylesheet" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" type="text/css" />
   <!--[if lt IE 9]>
   <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-  <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
   <script src="../_static/jquery.js"></script>
   <script src="../_static/underscore.js"></script>
   <script src="../_static/doctools.js"></script>
-  <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
   <script src="../_static/js/theme.js"></script>
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
@@ -49,7 +46,7 @@
 </div>
       </div>
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Main">
-        <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+        <p class="caption"><span class="caption-text">Get started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
@@ -57,7 +54,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ChangeLog.html">Change Log</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<p class="caption"><span class="caption-text">RaiSim C++</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
@@ -89,7 +86,7 @@
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Related Software</span></p>
+<p class="caption"><span class="caption-text">Related Software</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
@@ -166,14 +163,14 @@ The following graphs describe the effect of the material properties.</p>
 <p>Examples can be found in the <a class="reference external" href="https://github.com/raisimTech/raisimLib/blob/master/examples/src/server/material.cpp">restitution example</a> and <a class="reference external" href="https://github.com/raisimTech/raisimLib/blob/master/examples/src/server/materialStaticFriction.cpp">static friction example</a>.</p>
 <p>A material name is set when the material is created.
 For example,</p>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">ball</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;steel&quot;</span><span class="p">);</span><span class="w"></span>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">ball</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&quot;steel&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>World owns a materials manager which holds all material pair properties.
 Unrecognized material pairs will get <strong>default material properties</strong>, which can be set as <code class="code docutils literal notranslate"><span class="pre">raisim::World::setDefaultMaterial</span></code>.
 If the default material pair properties are not set, they are {<span class="math notranslate nohighlight">\(\mu=0.8\)</span>, <span class="math notranslate nohighlight">\(c_r=0\)</span>, <span class="math notranslate nohighlight">\(c_{th}=0\)</span>}.</p>
 <p>Material properties over a pair can be defined as following</p>
-<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">world</span><span class="p">.</span><span class="n">setMaterialPairProp</span><span class="p">(</span><span class="s">&quot;steel&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;glass&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">0.7</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.15</span><span class="p">);</span><span class="w"></span>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">world</span><span class="p">.</span><span class="n">setMaterialPairProp</span><span class="p">(</span><span class="s">&quot;steel&quot;</span><span class="p">,</span> <span class="s">&quot;glass&quot;</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>The first two arguments are the two material names and the following three are the coefficient of friction, coefficient of restitution, and restitution threshold.
@@ -214,42 +211,42 @@ The order of the material names does not matter.</p>
 </div>
 <div class="section" id="c-way">
 <h3>C++ Way<a class="headerlink" href="#c-way" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;raisim/RaisimServer.hpp&quot;</span><span class="cp"></span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;raisim/World.hpp&quot;</span><span class="cp"></span>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;raisim/RaisimServer.hpp&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;raisim/World.hpp&quot;</span><span class="cp"></span>
 
-<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">binaryPath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">Path</span><span class="o">::</span><span class="n">setFromArgv</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span><span class="w"></span>
-<span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">::</span><span class="n">setActivationKey</span><span class="p">(</span><span class="n">binaryPath</span><span class="p">.</span><span class="n">getDirectory</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;</span><span class="se">\\</span><span class="s">rsc</span><span class="se">\\</span><span class="s">activation.raisim&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+  <span class="k">auto</span> <span class="n">binaryPath</span> <span class="o">=</span> <span class="n">raisim</span><span class="o">::</span><span class="n">Path</span><span class="o">::</span><span class="n">setFromArgv</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+  <span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">::</span><span class="n">setActivationKey</span><span class="p">(</span><span class="n">binaryPath</span><span class="p">.</span><span class="n">getDirectory</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;</span><span class="se">\\</span><span class="s">rsc</span><span class="se">\\</span><span class="s">activation.raisim&quot;</span><span class="p">);</span>
 
-<span class="w">  </span><span class="c1">/// create raisim world</span>
-<span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="n">world</span><span class="p">.</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">);</span><span class="w"></span>
+  <span class="c1">/// create raisim world</span>
+  <span class="n">raisim</span><span class="o">::</span><span class="n">World</span> <span class="n">world</span><span class="p">;</span>
+  <span class="n">world</span><span class="p">.</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">);</span>
 
-<span class="w">  </span><span class="c1">/// create objects</span>
-<span class="w">  </span><span class="n">world</span><span class="p">.</span><span class="n">addGround</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;steel&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">sphere1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;steel&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">sphere2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;rubber&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">sphere3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;copper&quot;</span><span class="p">);</span><span class="w"></span>
+  <span class="c1">/// create objects</span>
+  <span class="n">world</span><span class="p">.</span><span class="n">addGround</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&quot;steel&quot;</span><span class="p">);</span>
+  <span class="k">auto</span> <span class="n">sphere1</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s">&quot;steel&quot;</span><span class="p">);</span>
+  <span class="k">auto</span> <span class="n">sphere2</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s">&quot;rubber&quot;</span><span class="p">);</span>
+  <span class="k">auto</span> <span class="n">sphere3</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s">&quot;copper&quot;</span><span class="p">);</span>
 
-<span class="w">  </span><span class="n">sphere1</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mi">-2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">sphere2</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">sphere3</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">);</span><span class="w"></span>
+  <span class="n">sphere1</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">);</span>
+  <span class="n">sphere2</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">);</span>
+  <span class="n">sphere3</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">);</span>
 
-<span class="w">  </span><span class="n">world</span><span class="p">.</span><span class="n">setMaterialPairProp</span><span class="p">(</span><span class="s">&quot;steel&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;steel&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">,</span><span class="w"> </span><span class="mf">0.95</span><span class="p">,</span><span class="w"> </span><span class="mf">0.001</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">world</span><span class="p">.</span><span class="n">setMaterialPairProp</span><span class="p">(</span><span class="s">&quot;steel&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;rubber&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">,</span><span class="w"> </span><span class="mf">0.15</span><span class="p">,</span><span class="w"> </span><span class="mf">0.001</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">world</span><span class="p">.</span><span class="n">setMaterialPairProp</span><span class="p">(</span><span class="s">&quot;steel&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;copper&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">,</span><span class="w"> </span><span class="mf">0.65</span><span class="p">,</span><span class="w"> </span><span class="mf">0.001</span><span class="p">);</span><span class="w"></span>
+  <span class="n">world</span><span class="p">.</span><span class="n">setMaterialPairProp</span><span class="p">(</span><span class="s">&quot;steel&quot;</span><span class="p">,</span> <span class="s">&quot;steel&quot;</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">);</span>
+  <span class="n">world</span><span class="p">.</span><span class="n">setMaterialPairProp</span><span class="p">(</span><span class="s">&quot;steel&quot;</span><span class="p">,</span> <span class="s">&quot;rubber&quot;</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">);</span>
+  <span class="n">world</span><span class="p">.</span><span class="n">setMaterialPairProp</span><span class="p">(</span><span class="s">&quot;steel&quot;</span><span class="p">,</span> <span class="s">&quot;copper&quot;</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.65</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">);</span>
 
-<span class="w">  </span><span class="c1">/// launch raisim server</span>
-<span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">RaisimServer</span><span class="w"> </span><span class="n">server</span><span class="p">(</span><span class="o">&amp;</span><span class="n">world</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">server</span><span class="p">.</span><span class="n">launchServer</span><span class="p">();</span><span class="w"></span>
+  <span class="c1">/// launch raisim server</span>
+  <span class="n">raisim</span><span class="o">::</span><span class="n">RaisimServer</span> <span class="n">server</span><span class="p">(</span><span class="o">&amp;</span><span class="n">world</span><span class="p">);</span>
+  <span class="n">server</span><span class="p">.</span><span class="n">launchServer</span><span class="p">();</span>
 
-<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">10000000</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">raisim</span><span class="o">::</span><span class="n">MSLEEP</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="n">server</span><span class="p">.</span><span class="n">integrateWorldThreadSafe</span><span class="p">();</span><span class="w"></span>
-<span class="w">  </span><span class="p">}</span><span class="w"></span>
+  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10000000</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">raisim</span><span class="o">::</span><span class="n">MSLEEP</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="n">server</span><span class="p">.</span><span class="n">integrateWorldThreadSafe</span><span class="p">();</span>
+  <span class="p">}</span>
 
-<span class="w">  </span><span class="n">server</span><span class="p">.</span><span class="n">killServer</span><span class="p">();</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+  <span class="n">server</span><span class="p">.</span><span class="n">killServer</span><span class="p">();</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 </div>
@@ -259,7 +256,7 @@ The order of the material names does not matter.</p>
 <div class="section" id="urdf-way">
 <h3>URDF Way<a class="headerlink" href="#urdf-way" title="Permalink to this headline">¶</a></h3>
 <p>The material can be specified in the URDF file as following</p>
-<div class="highlight-XML notranslate"><div class="highlight"><pre><span></span><span class="cm">&lt;!-- Foot link --&gt;</span>
+<div class="highlight-XML notranslate"><div class="highlight"><pre><span></span><span class="c">&lt;!-- Foot link --&gt;</span>
 <span class="nt">&lt;link</span> <span class="na">name=</span><span class="s">&quot;LF_FOOT&quot;</span><span class="nt">&gt;</span>
     <span class="nt">&lt;collision&gt;</span>
         <span class="nt">&lt;origin</span> <span class="na">xyz=</span><span class="s">&quot;0 0 0.02325&quot;</span><span class="nt">/&gt;</span>
@@ -277,17 +274,17 @@ The order of the material names does not matter.</p>
 <div class="section" id="id1">
 <h3>C++ Way<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <p>Alternatively, you can specify the material dynamically as following</p>
-<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getCollisionBody</span><span class="p">(</span><span class="s">&quot;LF_FOOT/0&quot;</span><span class="p">).</span><span class="n">setMaterial</span><span class="p">(</span><span class="s">&quot;ice&quot;</span><span class="p">);</span><span class="w"></span>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getCollisionBody</span><span class="p">(</span><span class="s">&quot;LF_FOOT/0&quot;</span><span class="p">).</span><span class="n">setMaterial</span><span class="p">(</span><span class="s">&quot;ice&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>“LF_FOOT/0” means the first collision body of the link “LF_FOOT”.</p>
 <p>To get the name of the assigned material, you can call</p>
-<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">ANYmal</span><span class="o">-&gt;</span><span class="n">getCollisionBody</span><span class="p">(</span><span class="s">&quot;LF_FOOT/0&quot;</span><span class="p">).</span><span class="n">getMaterial</span><span class="p">();</span><span class="w"></span>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">ANYmal</span><span class="o">-&gt;</span><span class="n">getCollisionBody</span><span class="p">(</span><span class="s">&quot;LF_FOOT/0&quot;</span><span class="p">).</span><span class="n">getMaterial</span><span class="p">();</span>
 </pre></div>
 </div>
 <p>To get contact properties when it collides with another material, you can use the following line</p>
-<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">world</span><span class="p">.</span><span class="n">getMaterialPairProp</span><span class="p">(</span><span class="n">ANYmal</span><span class="o">-&gt;</span><span class="n">getCollisionBody</span><span class="p">(</span><span class="s">&quot;LF_FOOT/0&quot;</span><span class="p">).</span><span class="n">getMaterial</span><span class="p">(),</span><span class="w"></span>
-<span class="w">                          </span><span class="n">ground</span><span class="o">-&gt;</span><span class="n">getCollisionObject</span><span class="p">().</span><span class="n">getMaterial</span><span class="p">());</span><span class="w"></span>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">world</span><span class="p">.</span><span class="n">getMaterialPairProp</span><span class="p">(</span><span class="n">ANYmal</span><span class="o">-&gt;</span><span class="n">getCollisionBody</span><span class="p">(</span><span class="s">&quot;LF_FOOT/0&quot;</span><span class="p">).</span><span class="n">getMaterial</span><span class="p">(),</span>
+                          <span class="n">ground</span><span class="o">-&gt;</span><span class="n">getCollisionObject</span><span class="p">().</span><span class="n">getMaterial</span><span class="p">());</span>
 </pre></div>
 </div>
 </div>
