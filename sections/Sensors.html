@@ -73,6 +73,8 @@
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Sensors</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#how-to-attach-a-sensor-to-a-link">How to attach a sensor to a link</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#update">Update</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
 </ul>
 </li>
 </ul>
@@ -138,8 +140,6 @@
               
   <div class="section" id="sensors">
 <h1>Sensors<a class="headerlink" href="#sensors" title="Permalink to this headline">¶</a></h1>
-<p><strong>The implementations of sensor modules are highly experimental at this stage.</strong>
-<strong>This documentation is only for the internal alpha testers.</strong></p>
 <p>This module provides a way to specify sensor properties using a URDF-like format.
 We provide a few implementation examples for depth camera, RGB camera, and IMU.
 Please note that the API of this module will likely change in the future.</p>
@@ -163,6 +163,19 @@ It should be stored in the same directory as the URDF file.
 If it is not found, raisim will search the following directories in order: <code class="docutils literal notranslate"><span class="pre">[urdf_dir]/sensor</span></code>, <code class="docutils literal notranslate"><span class="pre">[urdf_dir]/sensors</span></code>, <code class="docutils literal notranslate"><span class="pre">[urdf_dir]/..</span></code> and <code class="docutils literal notranslate"><span class="pre">[urdf_dir]/../sensors</span></code>.</p>
 <p>Any example of an sensor xml file can be found in <code class="docutils literal notranslate"><span class="pre">rsc/anymal_c/sensors</span></code>.
 A more formal xml definitions will be uploaded once the module is expanded and tested enough.</p>
+</div>
+<div class="section" id="update">
+<h2>Update<a class="headerlink" href="#update" title="Permalink to this headline">¶</a></h2>
+<p>The sensor update method can be set using <code class="docutils literal notranslate"><span class="pre">raisim::Sensor::setMeasurementSource</span></code>.
+It can be either updated using raisim (<code class="docutils literal notranslate"><span class="pre">raisim::Sensor::MeasurementSource::RAISIM</span></code>) or the visualizer (<code class="docutils literal notranslate"><span class="pre">raisim::Sensor::MeasurementSource::VISUALIZER</span></code>).
+<code class="docutils literal notranslate"><span class="pre">RGBSensor</span></code> can only be updated using the RaisimUnreal.
+<code class="docutils literal notranslate"><span class="pre">DepthSensor</span></code> can be updated either raisim or the RaisimUnreal.
+<code class="docutils literal notranslate"><span class="pre">InertialMeasurementUnit</span></code> can only be updated using raisim.</p>
+<p>The update is performed at the specified frequency (i.e., <code class="docutils literal notranslate"><span class="pre">update_rate</span></code> in the sensor xml).</p>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/raisimTech/raisimLib/blob/master/examples/src/server/sensors.cpp">https://github.com/raisimTech/raisimLib/blob/master/examples/src/server/sensors.cpp</a></p>
 </div>
 </div>
 
