@@ -85,7 +85,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#get-and-modify-robot-description-in-code">Get and Modify Robot Description in code</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#apply-external-forces-torques">Apply External Forces/torques</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#collision">Collision</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#types-of-indicies">Types of Indicies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#types-of-indices">Types of Indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#closed-loop-system">Closed-loop system</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#api">API</a></li>
 </ul>
 </li>
@@ -176,10 +177,15 @@
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>An articulated system comprises multiple bodies interconnected via joints.
-Within this framework, there exist two primary configurations: Kinematic trees and closed-loop systems.
+There exist two primary configurations of an articulated system: Kinematic trees and closed-loop systems.
 Kinematic trees are characterized by their absence of loops, ensuring that each body has only one parent joint.
-Consequently, the number of joints in a kinematic tree equals the number of bodies, with the provision of a floating joint on the root body for floating systems.
-It’s important to note that RaiSim exclusively supports simulation of <strong>kinematic trees</strong>.</p>
+Consequently, the number of joints in a kinematic tree equals the number of bodies, with the provision of a floating joint on the root body for floating systems.</p>
+<p>Closed-loop system has one or more loops.
+A loop means that there are multiple routes from the link to the ROOT.
+Raisim’s algorithmic backbone, Articulated Body Algorithm, cannot solve the dynamics of a closed system.
+However, we can simulate a closed-loop system using Raisim’s contact solver.
+This article will mainly cover kinematic trees.
+A simulation of a closed-loop system is mentioned in <strong>Closed-loop system</strong> at the bottom of this page.</p>
 <p>In kinematic trees, <strong>since each body has only one joint, the index of a body always matches that of its parent joint</strong>.
 Here, a “body” denotes a rigid body composed of one or more “links”, each of which is rigidly connected to others within the same body via fixed joints.</p>
 </div>
@@ -245,8 +251,8 @@ So <code class="code docutils literal notranslate"><span class="pre">getMovableJ
 <div class="section" id="joints">
 <span id="id1"></span><h2>Joints<a class="headerlink" href="#joints" title="Permalink to this headline">¶</a></h2>
 <p>Here are the available joints in RaiSim.</p>
-<table class="colwidths-given docutils align-default" id="id2">
-<caption><span class="caption-text">Joint Properties (<span class="math notranslate nohighlight">\(|\cdot|\)</span> is a symbol for dimension size (i.e., cardinality))</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
+<table class="colwidths-given docutils align-default" id="id4">
+<caption><span class="caption-text">Joint Properties (<span class="math notranslate nohighlight">\(|\cdot|\)</span> is a symbol for dimension size (i.e., cardinality))</span><a class="headerlink" href="#id4" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 16%" />
 <col style="width: 16%" />
@@ -597,22 +603,37 @@ This material affects the contact dynamics.</p>
 <h2>Collision<a class="headerlink" href="#collision" title="Permalink to this headline">¶</a></h2>
 <p>Apart from the collision mask and collision group set in the world, users can also disable a collision between a certain pair of the links with <code class="code docutils literal notranslate"><span class="pre">ignoreCollisionBetween</span></code>.</p>
 </div>
-<div class="section" id="types-of-indicies">
-<h2>Types of Indicies<a class="headerlink" href="#types-of-indicies" title="Permalink to this headline">¶</a></h2>
-<p>ArticulatedSystem class contains multiple types of indicies. To query a specific quantity, you have to provide an index of the right type. Here are the types of indicies in Articulated Systems</p>
+<div class="section" id="types-of-indices">
+<h2>Types of Indices<a class="headerlink" href="#types-of-indices" title="Permalink to this headline">¶</a></h2>
+<p>ArticulatedSystem class contains multiple types of indices. To query a specific quantity, you have to provide an index of the right type. Here are the types of indices in Articulated Systems</p>
 <ul class="simple">
 <li><p><strong>Body/Joint Index</strong>: All fixed bodies are combined to a single movable body. Each movable body has a unique body index. Because there is a movable joint associated with a movable body, there is a 1-to-1 mapping between the joints and the bodies and they share the same index. For a fixed-base system, the first body rigidly fixed to the world is body-0. For a floating-base system, the floating base is body-0.</p></li>
 <li><p><strong>Generalized Velocity (DOF) Index</strong>: All joints are mapped to a specific set of generalized velocity indicies.</p></li>
 <li><p><strong>Generalized Coordinate Index</strong>:</p></li>
 <li><p><strong>Frame Index</strong>:</p></li>
 </ul>
-<div class="section" id="conversions-between-indicies">
-<h3>Conversions Between Indicies<a class="headerlink" href="#conversions-between-indicies" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="conversions-between-indices">
+<h3>Conversions Between Indices<a class="headerlink" href="#conversions-between-indices" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>A body index to a generalized velocity index: <code class="code docutils literal notranslate"><span class="pre">ArticulatedSystem::getMappingFromBodyIndexToGeneralizedVelocityIndex()</span></code></p></li>
 <li><p>A body index to a generalized coordinate index: <code class="code docutils literal notranslate"><span class="pre">ArticulatedSystem::getMappingFromBodyIndexToGeneralizedCoordinateIndex()</span></code></p></li>
 </ul>
 </div>
+</div>
+<div class="section" id="closed-loop-system">
+<h2>Closed-loop system<a class="headerlink" href="#closed-loop-system" title="Permalink to this headline">¶</a></h2>
+<p>Before modeling a closed-loop system, it is necessary to model a corresponding spanning tree.
+A spanning tree is a kinematic tree that can be constructed by removing a minimum number of joints from a closed-loop system.
+Imagine a chain necklace. By disconnecting one of the joints, a kinematic tree will form.
+Only one joint should be removed because, otherwise, two separate kinematic trees will form.
+Note that there are multiple ways to form a kinematic tree because any of the joints can be removed.</p>
+<p>To model a closed-loop system in Raisim, a corresponding spanning tree should be modeled in a URDF format first.
+To convert the spanning tree into a closed-loop system, a pin constraint can be added.
+A pin constraint is an equality constraint that enforces two points on different bodies to be at the same position.
+A pin constraint is defined by the nominal configuration of the robot, the names of the two bodies to be pinned, and the position on the first body to be pinned.
+Note that the pinned position on the second body is defined by the nominal configuration and the position on the first body.</p>
+<p>An example of a closed loop system can be found <a class="reference external" href="https://github.com/raisimTech/raisimLib/blob/master/examples/src/server/minitaur.cpp">here</a>.
+An example of a closed loop system URDF can be found <a class="reference external" href="https://github.com/raisimTech/raisimLib/blob/master/rsc/minitaur/minitaur.urdf">here</a>.</p>
 </div>
 <div class="section" id="api">
 <h2>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h2>
