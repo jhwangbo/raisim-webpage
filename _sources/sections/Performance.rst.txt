@@ -2,84 +2,84 @@
 Performance
 #############################
 
-RaiSim Custom Algorithm for Articulated System
+RaiSim Custom Algorithm for Articulated Systems
 ===============================================
 
-RaiSim v1.1 brings a totally new simulation scheme.
-Older versions of RaiSim (and other simulators like MuJoCo according to its doc) use the following computation scheme for the articulated system forward dynamics.
+RaiSim v1.1 introduces a novel simulation scheme.
+Previous versions of RaiSim (as well as other simulators such as MuJoCo, according to their documentation) utilize the following computation scheme for the forward dynamics of articulated systems:
 
 + Composite Rigid Body Algorithm (CRBA)
-+ Recursive Newton Euler (RNE)
-+ Mass matrix inversion using Cholesky factorization.
++ Recursive Newton-Euler (RNE)
++ Mass matrix inversion using Cholesky factorization
 
-These algorithms are very efficient in computing the forward dynamics.
-However, there is a faster alternative: Articulated Body Algorithm (ABA).
-ABA skips the computation of the mass matrix and directly computes the generalized acceleration.
-Consequently, it outperforms the CRBA+RNE+Cholesky (CRC) combination by a fairly big margin.
+These algorithms are highly efficient for computing forward dynamics.
+However, a more efficient alternative exists: the Articulated Body Algorithm (ABA).
+ABA bypasses the explicit computation of the mass matrix, directly calculating the generalized acceleration.
+Consequently, it significantly outperforms the CRBA+RNE+Cholesky (CRC) combination.
 
-The computational complexity of the CRC is O(n^3), n being the degree of freedom (search for "the big O notation" in wikipedia if you don't know what it is).
-This means that the computational cost increases cubic to the degree of freedom of the system.
-The computational cost of the ABA is O(n).
-Therefore, the ABA is much more efficient than the CRC for high-degree-of-freedom systems.
+The computational complexity of the CRC method is O(n^3), where n represents the number of degrees of freedom.
+This implies that the computational cost scales cubically with the degrees of freedom.
+In contrast, the computational complexity of the ABA is O(n).
+Thus, the ABA offers superior efficiency compared to the CRC for high-degree-of-freedom systems.
 
-However, the mass matrix and its inverse are essential in computing many contact related properties that contact solvers need.
-This is why the older versions of RaiSim and other simulators use the CRC combo.
-Because the ABA does not compute those properties, it was not useful in rigid body simulation.
+Nevertheless, the mass matrix and its inverse are critical for computing numerous contact-related properties required by contact solvers.
+This necessitates the use of the CRC combination in older versions of RaiSim and other simulators.
+Since standard ABA does not yield these properties, it was historically less applicable to rigid-body simulation with contacts.
 
-RaiSim v1.1 is equipped with a family of new algorithms that compute the contact related properties at O(n).
-These algorithms do not compute the mass matrix nor its inverse (they have n^2 elements and there is no way to compute them at O(n)).
-These properties are in fact not necessary to compute any contact related properties that the RaiSim contact solver needs.
-Consequently, **RaiSim (>v1.1) computes the whole forward dynamics of an articulated system at O(n) including contact related properties**.
-We cannot share exactly what these algorithms are and what they compute.
-They are not published.
+RaiSim v1.1 is equipped with a family of novel algorithms that compute contact-related properties with O(n) complexity.
+These algorithms do not explicitly compute the mass matrix or its inverse (which contain n^2 elements and cannot be computed in O(n)).
+Instead, they calculate only the specific properties required by the RaiSim contact solver.
+Consequently, **RaiSim (>v1.1) computes the entire forward dynamics of an articulated system, including contact-related properties, with O(n) complexity.**
+The specifics of these algorithms and their computations are proprietary.
+No materials related to these algorithms have been published.
 
 
-What matters to performance
+Performance Factors
 ==============================
 
-There are four major computational units in most rigid-body simulators.
+Rigid-body simulators typically comprise four major computational units:
 
 1. Collision detection: O(n^2)
 2. Forward dynamics computation: O(n)
 3. Contact properties computation: O(nm)
 4. Contact solver: O(???)
 
-n is the degree of freedom and m is the number of contact points.
+Here, n represents the degrees of freedom, and m represents the number of contact points.
 
-In many robotic simulations, **1** is the most time-consuming part.
-It is highly recommended that you only model necessary collision bodies.
-Otherwise, you are not exploiting the fast rigid-body simulation pipeline in **2**, **3** and **4**.
+In many robotic simulations, collision detection (**1**) consumes the majority of computational resources.
+It is recommended to model only essential collision bodies.
+Failure to do so negates the benefits of the optimized rigid-body simulation pipeline in **2**, **3**, and **4**.
 
-When there is no collision, the simulation time should be roughly linear to the degree of freedom of the system.
-Here is a plot showing the scaling.
+In the absence of collisions, simulation time should scale roughly linearly with the degrees of freedom of the system.
+The following plot illustrates this scaling.
 
 .. image:: ../image/chainSpeed.png
   :alt: Chain simulation speed
   :width: 400
 
-As shown above, we can simulate a 60-dof system at 114 kHz.
+As demonstrated above, a 60-DoF system can be simulated at 114 kHz.
 
-The model used above does not have a collision body.
-If you have a big system like the 60-dof chain, the collision detection will take most of the time.
-So it is important to model only important collision bodies.
+The model utilized in the aforementioned benchmark lacks collision bodies.
+For a large system such as the 60-DoF chain, collision detection would dominate the computation time.
+Therefore, minimizing the number of collision bodies is crucial.
 
-The new simulation scheme is on average faster than the old scheme.
-However, **3** in the old scheme is faster because the computation of the inverse mass matrix helps the computation of **3**.
-Our O(n) algorithm is very close to the old scheme even without the inverse mass matrix but there is still a small gap.
-Consequently, the old scheme might be faster if there are many contact points.
+The new simulation scheme demonstrates superior average performance compared to the legacy scheme.
+However, unit **3** (contact properties computation) was faster in the legacy scheme because the pre-computed inverse mass matrix facilitated this step.
+Although our O(n) algorithm performs comparably to the legacy scheme even without the inverse mass matrix, a marginal difference remains.
+Consequently, the legacy scheme may exhibit higher performance in scenarios involving a large number of contact points.
 
-For the ANYmal robot without collision, the new scheme runs at 318 kHz.
-This is faster than the old version which runs at 272 Hz.
+For the ANYmal robot without collision, the new scheme executes at 318 kHz.
+This represents an improvement over the legacy version, which ran at 272 kHz.
 
-All simulation tests were performed on a single core of 3950X, which is not excellent at single-thread performance.
-The current best single-thread cpu (for RaiSim at least) is Apple's M2.
-The ANYmal simulation without contacts runs at 380 kHz on M1.
+All simulation benchmarks were conducted on a single core of an AMD Ryzen 3950X, which offers respectable but not industry-leading single-thread performance.
+Currently, the Apple M2 processor demonstrates the highest single-thread performance for RaiSim.
+The ANYmal simulation without contacts achieves 380 kHz on the M1 chip.
 
-Linux and OSX are the best for high-speed simulation applications.
-In Windows, you get less than half the performance because it is compiled with MSVC, which is bad optimizing math operations.
+Linux and macOS are the preferred platforms for high-speed simulation applications.
+Performance on Windows may be reduced due to compilation with MSVC, which generally applies less aggressive optimization to mathematical operations compared to other compilers.
 
-The computational speed of **4** becomes very significant when there are more than 10 coupled contact points.
-Therefore, it is important to check if there are unnecessary contact points.
-The computational cost of **4** is highly dependent on their nature of coupling.
-If they are not coupled at all, the computational cost is O(n).
-If they are highly coupled, the computational cost becomes NP hard, which means that it is no longer a polynomial relationship.
+The computational cost of unit **4** (contact solver) becomes significant when there are more than 10 coupled contact points.
+Therefore, identifying and eliminating unnecessary contact points is important.
+The computational cost of **4** depends on the nature of the coupling.
+If contact points are uncoupled, the cost is O(n).
+However, if they are highly coupled, the problem becomes NP-hard, implying that the computational cost no longer follows a polynomial relationship.

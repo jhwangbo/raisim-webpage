@@ -2,49 +2,49 @@
 Material System
 #############################
 
-**In RaiSim, all material properties are associated with a material pair.**
+**In RaiSim, material properties are defined per material pair.**
 
-Currently, there are five material properties used in RaiSim.
+RaiSim currently utilizes five material properties:
 
-* **Coefficient of friction** (:math:`\mu\ge 0`): This defines how much friction is applied between the two materials
-* **Coefficient of restitution** (:math:`c_r\ge 0`): How bouncy the material pair is
-* **Restitution Threshold** (:math:`r_{th}\ge 0`): If the impact velocity is smaller than this number, objects do not bounce off
-* **Coefficient of static friction** (:math:`\mu_{s}\ge \mu`): If specified, it defines how much friction is applied when the relative velocity between the contact points is very small. By default, it is the same as the coefficient of friction.
-* **Velocity threshold for static friction** (:math:`v_s \ge 0`): Must be specified if the coefficient of static friction is specified. If the relative velocity is bigger than this value, than static friction is not used. Otherwise, the effective coefficient of friction is interpolated between the two coefficients.
+* **Coefficient of friction** (:math:`\mu\ge 0`): Defines the frictional force applied between two contacting materials.
+* **Coefficient of restitution** (:math:`c_r\ge 0`): Determines the elasticity of the material pair.
+* **Restitution threshold** (:math:`r_{th}\ge 0`): Objects will not rebound if the impact velocity falls below this threshold.
+* **Coefficient of static friction** (:math:`\mu_{s}\ge \mu`): When specified, this defines the frictional force applied during near-zero relative velocity between contact points. By default, it equals the coefficient of friction.
+* **Velocity threshold for static friction** (:math:`v_s \ge 0`): Required when the coefficient of static friction is defined. If the relative velocity exceeds this value, static friction is disregarded. Otherwise, the effective coefficient of friction is interpolated between the static and dynamic coefficients.
 
-The bounce velocity is computed as :math:`c_{th}(v_i-c_{th})`, where :math:`v_i` is the impact velocity.
-The following graphs describe the effect of the material properties.
+The bounce velocity is computed as :math:`c_{th}(v_i-c_{th})`, where :math:`v_i` represents the impact velocity.
+The following graphs illustrate the effects of these material properties.
 
 .. image:: ../image/materials.png
 
-Examples can be found in the `restitution example <https://github.com/raisimTech/raisimLib/blob/master/examples/src/server/material.cpp>`_ and `static friction example <https://github.com/raisimTech/raisimLib/blob/master/examples/src/server/materialStaticFriction.cpp>`_.
+Examples are available in the `restitution example <https://github.com/raisimTech/raisimLib/blob/master/examples/src/server/material_restitution.cpp>`_ and the `static friction example <https://github.com/raisimTech/raisimLib/blob/master/examples/src/server/material_static_friction.cpp>`_.
 
-A material name is set when the material is created.
-For example,
+A material name is assigned upon creation.
+For instance:
 
-.. code-block:: C
+.. code-block:: cpp
 
   auto ball = world.addSphere(1, 1, "steel");
 
-World owns a materials manager which holds all material pair properties.
-Unrecognized material pairs will get **default material properties**, which can be set as :code:`raisim::World::setDefaultMaterial`.
-If the default material pair properties are not set, they are {:math:`\mu=0.8`, :math:`c_r=0`, :math:`c_{th}=0`}.
+The ``World`` instance maintains a ``MaterialManager`` that stores all material pair properties.
+Undefined material pairs utilize **default material properties**, which can be configured via :code:`raisim::World::setDefaultMaterial`.
+If default properties are not explicitly set, they default to {:math:`\mu=0.8`, :math:`c_r=0`, :math:`c_{th}=0`}.
 
-Material properties over a pair can be defined as following
+Material properties for a specific pair can be defined as follows:
 
-.. code-block:: C++
+.. code-block:: cpp
 
   world.setMaterialPairProp("steel", "glass", 0.7, 0.1, 0.15);
 
-The first two arguments are the two material names and the following three are the coefficient of friction, coefficient of restitution, and restitution threshold.
-The order of the material names does not matter.
+The first two arguments specify the material names, followed by the coefficient of friction, coefficient of restitution, and restitution threshold.
+The order of the material names is interchangeable.
 
 Example - Single Bodies
 =============================
 
 .. image:: ../image/materials.gif
 
-XML Way
+XML Approach
 -----------------------------
 
 .. code-block:: xml
@@ -77,10 +77,10 @@ XML Way
     </raisim>
 
 
-C++ Way
--------------------------
+C++ Approach (Single Bodies)
+----------------------------
 
-.. code-block:: C++
+.. code-block:: cpp
 
     #include "raisim/RaisimServer.hpp"
     #include "raisim/World.hpp"
@@ -89,11 +89,11 @@ C++ Way
       auto binaryPath = raisim::Path::setFromArgv(argv[0]);
       raisim::World::setActivationKey(binaryPath.getDirectory() + "\\rsc\\activation.raisim");
 
-      /// create raisim world
+      /// Create RaiSim world
       raisim::World world;
       world.setTimeStep(0.001);
 
-      /// create objects
+      /// Create objects
       world.addGround(0, "steel");
       auto sphere1 = world.addSphere(0.5, 1.0, "steel");
       auto sphere2 = world.addSphere(0.5, 1.0, "rubber");
@@ -107,7 +107,7 @@ C++ Way
       world.setMaterialPairProp("steel", "rubber", 0.8, 0.15, 0.001);
       world.setMaterialPairProp("steel", "copper", 0.8, 0.65, 0.001);
 
-      /// launch raisim server
+      /// Launch RaiSim server
       raisim::RaisimServer server(&world);
       server.launchServer();
 
@@ -122,12 +122,12 @@ C++ Way
 Example - Articulated Systems
 ==============================
 
-URDF Way
+URDF Approach
 -----------------------------
 
-The material can be specified in the URDF file as following
+Material properties can be specified within the URDF file as follows:
 
-.. code-block:: XML
+.. code-block:: xml
 
     <!-- Foot link -->
     <link name="LF_FOOT">
@@ -142,28 +142,44 @@ The material can be specified in the URDF file as following
         </collision>
     </link>
 
-C++ Way
------------------------------
+C++ Approach (Articulated Systems)
+----------------------------------
 
-Alternatively, you can specify the material dynamically as following
+Alternatively, materials can be assigned dynamically:
 
-.. code-block:: C++
+.. code-block:: cpp
 
     anymal->getCollisionBody("LF_FOOT/0").setMaterial("ice");
 
-"LF_FOOT/0" means the first collision body of the link "LF_FOOT".
+Here, "LF_FOOT/0" refers to the first collision body of the "LF_FOOT" link.
 
-To get the name of the assigned material, you can call
+To retrieve the name of an assigned material:
 
-.. code-block:: C++
+.. code-block:: cpp
 
     ANYmal->getCollisionBody("LF_FOOT/0").getMaterial();
 
-To get contact properties when it collides with another material, you can use the following line
+To obtain contact properties for a collision between two materials:
 
-.. code-block:: C++
+.. code-block:: cpp
 
     world.getMaterialPairProp(ANYmal->getCollisionBody("LF_FOOT/0").getMaterial(),
                               ground->getCollisionObject().getMaterial());
+
+
+API
+====
+
+Material Pair Properties
+------------------------
+
+.. doxygenstruct:: raisim::MaterialPairProperties
+   :members:
+
+Material Manager
+----------------
+
+.. doxygenclass:: raisim::MaterialManager
+   :members:
 
 
