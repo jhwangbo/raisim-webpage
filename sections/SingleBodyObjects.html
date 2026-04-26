@@ -163,1027 +163,181 @@ It is a <code class="docutils literal notranslate"><span class="pre">struct</spa
 <h2>Mesh<a class="headerlink" href="#mesh" title="Link to this heading"></a></h2>
 <a class="reference internal image-reference" href="../_images/mesh.png"><img alt="mesh" src="../_images/mesh.png" style="width: 300px;" />
 </a>
-<p><code class="docutils literal notranslate"><span class="pre">raisim::Mesh</span></code> represents a single-body object defined by a triangle mesh
-(typically from an OBJ file). It is commonly used for static or kinematic
-geometry such as props, terrains, or scanned environments. Meshes are added
-via <code class="docutils literal notranslate"><span class="pre">raisim::World::addMesh</span></code> with several overloads:</p>
+<p><code class="docutils literal notranslate"><span class="pre">raisim::Mesh</span></code> represents a single-body object defined by a triangle mesh.
+It is commonly used for props, scanned objects, and imported object models.
+Meshes are added via <code class="docutils literal notranslate"><span class="pre">raisim::World::addMesh</span></code>.</p>
+<section id="public-mesh-collision-modes">
+<h3>Public mesh collision modes<a class="headerlink" href="#public-mesh-collision-modes" title="Link to this heading"></a></h3>
+<p>The public <code class="docutils literal notranslate"><span class="pre">addMesh</span></code> API exposes three collision representations:</p>
 <ul class="simple">
-<li><p>Explicit inertia/COM: <code class="docutils literal notranslate"><span class="pre">addMesh(meshFile,</span> <span class="pre">mass,</span> <span class="pre">inertia,</span> <span class="pre">com,</span> <span class="pre">scale,</span> <span class="pre">material,</span> <span class="pre">collisionMode,</span> <span class="pre">collisionGroup,</span> <span class="pre">collisionMask)</span></code>.</p></li>
-<li><p>Auto inertia/COM: <code class="docutils literal notranslate"><span class="pre">addMesh(meshFile,</span> <span class="pre">mass,</span> <span class="pre">scale,</span> <span class="pre">material,</span> <span class="pre">collisionMode,</span> <span class="pre">collisionGroup,</span> <span class="pre">collisionMask)</span></code>,
-which estimates inertia and COM from the scaled axis-aligned bounding box.</p></li>
-<li><p>Clone: <code class="docutils literal notranslate"><span class="pre">addMesh(existingMesh,</span> <span class="pre">material,</span> <span class="pre">collisionGroup,</span> <span class="pre">collisionMask)</span></code> to reuse a loaded mesh.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEXIFY</span></code>: CoACD convex decomposition. This creates multiple convex collision parts from one mesh. This is the default.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEX_HULL</span></code>: one convex hull built from the mesh.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::ORIGINAL_MESH</span></code>: the original non-convex triangle mesh.</p></li>
 </ul>
-<p><code class="docutils literal notranslate"><span class="pre">collisionMode</span></code> selects the mesh collision representation:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::ORIGINAL_MESH</span></code>: uses the original triangle mesh.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEX_HULL</span></code>: uses a single convex hull.</p></li>
-</ul>
-<p>The <code class="docutils literal notranslate"><span class="pre">addMesh</span></code> overloads default to <code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::ORIGINAL_MESH</span></code> unless specified.
-Convex decomposition (formerly <code class="docutils literal notranslate"><span class="pre">CONVEX_SPLIT</span></code>) is no longer available in the API.
-If you need a decomposed collision shape, pre-decompose the mesh and load the
-parts as multiple meshes (or as a Compound) instead.</p>
-<p>Mesh collision is supported for OBJ files; keep collision meshes reasonably sized for performance.</p>
+<p>Original non-convex triangle mesh collision is useful for imported visual meshes that are invalid
+CoACD input, but it is usually slower and less robust than convex collision geometry.</p>
+</section>
+<section id="default-convexify">
+<h3>Default convexify<a class="headerlink" href="#default-convexify" title="Link to this heading"></a></h3>
+<p>The shortest overload uses CoACD convex decomposition by default and estimates inertia/COM from the
+scaled axis-aligned bounding box. If CoACD cannot process the mesh, RaiSim warns and falls back to
+original non-convex triangle mesh collision:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">mesh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addMesh</span><span class="p">(</span><span class="n">meshFile</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="n">scale</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The explicit-inertia overload is also convexified by default:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">mesh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addMesh</span><span class="p">(</span><span class="n">meshFile</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="n">inertia</span><span class="p">,</span><span class="w"> </span><span class="n">com</span><span class="p">,</span><span class="w"> </span><span class="n">scale</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="explicit-collision-modes">
+<h3>Explicit collision modes<a class="headerlink" href="#explicit-collision-modes" title="Link to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEX_HULL</span></code> for the cheapest convex mesh collider:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">mesh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addMesh</span><span class="p">(</span><span class="n">meshFile</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="n">scale</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span>
+<span class="w">                           </span><span class="n">raisim</span><span class="o">::</span><span class="n">MeshCollisionMode</span><span class="o">::</span><span class="n">CONVEX_HULL</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::ORIGINAL_MESH</span></code> when you intentionally want the non-convex triangle mesh:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">mesh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addMesh</span><span class="p">(</span><span class="n">meshFile</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="n">scale</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span>
+<span class="w">                           </span><span class="n">raisim</span><span class="o">::</span><span class="n">MeshCollisionMode</span><span class="o">::</span><span class="n">ORIGINAL_MESH</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>You can still pass <code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEXIFY</span></code> explicitly when you want to make the default
+choice visible at the call site:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">mesh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addMesh</span><span class="p">(</span><span class="n">meshFile</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="n">scale</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span>
+<span class="w">                           </span><span class="n">raisim</span><span class="o">::</span><span class="n">MeshCollisionMode</span><span class="o">::</span><span class="n">CONVEXIFY</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="custom-coacd-options">
+<h3>Custom CoACD options<a class="headerlink" href="#custom-coacd-options" title="Link to this heading"></a></h3>
+<p>Tune <code class="docutils literal notranslate"><span class="pre">CoacdOptions</span></code> when you need more or fewer convex parts. Lower thresholds and larger
+<code class="docutils literal notranslate"><span class="pre">maxConvexHull</span></code> values can preserve more shape detail, but they increase build time and can
+make contact processing slower.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">CoacdOptions</span><span class="w"> </span><span class="n">options</span><span class="p">;</span>
+<span class="n">options</span><span class="p">.</span><span class="n">threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.08</span><span class="p">;</span>
+<span class="n">options</span><span class="p">.</span><span class="n">maxConvexHull</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span><span class="p">;</span>
+<span class="n">options</span><span class="p">.</span><span class="n">sampleResolution</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1200</span><span class="p">;</span>
+<span class="n">options</span><span class="p">.</span><span class="n">mctsIteration</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">80</span><span class="p">;</span>
+
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">mesh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addMesh</span><span class="p">(</span><span class="n">meshFile</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="n">scale</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span>
+<span class="w">                           </span><span class="n">raisim</span><span class="o">::</span><span class="n">MeshCollisionMode</span><span class="o">::</span><span class="n">CONVEXIFY</span><span class="p">,</span>
+<span class="w">                           </span><span class="n">raisim</span><span class="o">::</span><span class="n">CollisionGroup</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+<span class="w">                           </span><span class="n">raisim</span><span class="o">::</span><span class="n">CollisionGroup</span><span class="p">(</span><span class="mi">-1</span><span class="p">),</span>
+<span class="w">                           </span><span class="n">options</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>You can also pass options directly:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">mesh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addMesh</span><span class="p">(</span><span class="n">meshFile</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="n">scale</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">options</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="coacd-input-requirements">
+<h3>CoACD input requirements<a class="headerlink" href="#coacd-input-requirements" title="Link to this heading"></a></h3>
+<p>The bundled CoACD integration is intentionally small and does not include heavy preprocessing
+dependencies. It works best with closed, reasonably manifold meshes.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEXIFY</span></code> fails, RaiSim prints a warning and falls back to original
+non-convex triangle mesh collision for that object. This keeps imported visual meshes such as
+robot body panels usable when they are not valid CoACD input. The fallback is a compatibility path,
+not the preferred high-performance collider: it can be slower and less robust than convex hulls or
+CoACD parts, especially for dynamic object stacks or dense contact scenes. For performance-critical
+simulation, use a cleaner manifold mesh, a preprocessed convex collision asset, or the default
+<code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEX_HULL</span></code> path.</p>
+</section>
+<section id="coacd-cache-files">
+<h3>CoACD cache files<a class="headerlink" href="#coacd-cache-files" title="Link to this heading"></a></h3>
+<p>Successful <code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEXIFY</span></code> calls write an OBJ cache beside the source mesh. This
+keeps repeated runs cheap: the first call pays the CoACD decomposition cost, while later calls with
+the same parameters load the saved convex parts directly.</p>
+<p>The file name starts with <code class="docutils literal notranslate"><span class="pre">raisim_coacd_</span></code> and includes the source mesh stem, scale, and CoACD
+option values, for example:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>raisim_coacd_model_scale_1_threshold_0_08_maxhull_8_..._realmetric_0.obj
+</pre></div>
+</div>
+<p>The cache stores each convex part as a separate OBJ group named <code class="docutils literal notranslate"><span class="pre">raisim_coacd_part_N</span></code>. On later
+<code class="docutils literal notranslate"><span class="pre">addMesh</span></code> calls with the same source mesh and CoACD parameters, RaiSim loads these groups instead
+of running CoACD again. The loaded convex parts are expected to match the generated parts exactly.</p>
+<p>If the source mesh is newer than the cache file, RaiSim recomputes the decomposition and overwrites
+the cache. Different CoACD settings produce different cache file names, so changing options such as
+<code class="docutils literal notranslate"><span class="pre">threshold</span></code>, <code class="docutils literal notranslate"><span class="pre">maxConvexHull</span></code>, <code class="docutils literal notranslate"><span class="pre">sampleResolution</span></code>, or <code class="docutils literal notranslate"><span class="pre">mctsIteration</span></code> does not reuse an
+incompatible cache.</p>
+<p>For a 16k-triangle YCB apple mesh using the default CoACD options, a local timing run took about
+4.3 seconds on the first uncached call and about 49 ms on the second cached call. Exact timings are
+machine- and mesh-dependent, but large meshes should see the largest benefit.</p>
+<p>These files are generated artifacts and are ignored by the repository <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> rules via
+<code class="docutils literal notranslate"><span class="pre">raisim_coacd_*</span></code>. Delete the corresponding <code class="docutils literal notranslate"><span class="pre">raisim_coacd_*</span></code> file manually if you want to force a
+fresh decomposition without editing the source mesh.</p>
+</section>
+<section id="inspection-helpers">
+<h3>Inspection helpers<a class="headerlink" href="#inspection-helpers" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">raisim::Mesh</span></code> exposes the generated convex parts for debugging and visualization:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">parts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mesh</span><span class="o">-&gt;</span><span class="n">getCoacdConvexParts</span><span class="p">();</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">mesh</span><span class="o">-&gt;</span><span class="n">getCollisionBodyCount</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>When CoACD falls back to original non-convex mesh collision, <code class="docutils literal notranslate"><span class="pre">getCoacdConvexParts()</span></code> is empty and
+<code class="docutils literal notranslate"><span class="pre">getCollisionBodyCount()</span></code> returns <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+<p>The rayrai example <code class="docutils literal notranslate"><span class="pre">rayrai_coacd_mesh_approximation</span></code> displays original meshes next to colored
+convex decomposition parts.</p>
+<p>Mesh collision is supported for mesh formats handled by Assimp. Keep collision meshes reasonably
+sized for performance.</p>
+</section>
 </section>
 <section id="singlebodyobject-api-parent-class">
 <h2>SingleBodyObject API (Parent class)<a class="headerlink" href="#singlebodyobject-api-parent-class" title="Link to this heading"></a></h2>
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObjectE">
-<span id="_CPPv3N6raisim16SingleBodyObjectE"></span><span id="_CPPv2N6raisim16SingleBodyObjectE"></span><span id="raisim::SingleBodyObject"></span><span class="target" id="classraisim_1_1SingleBodyObject"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SingleBodyObject</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="Object.html#_CPPv4N6raisim6ObjectE" title="raisim::Object"><span class="n"><span class="pre">Object</span></span></a><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObjectE" title="Link to this definition"></a><br /></dt>
-<dd><p>this class is only for inheritance </p>
-<p>Subclassed by <a class="reference internal" href="#classraisim_1_1Box"><span class="std std-ref">raisim::Box</span></a>, <a class="reference internal" href="#classraisim_1_1Capsule"><span class="std std-ref">raisim::Capsule</span></a>, <a class="reference internal" href="#classraisim_1_1Compound"><span class="std std-ref">raisim::Compound</span></a>, raisim::Cone, <a class="reference internal" href="#classraisim_1_1Cylinder"><span class="std std-ref">raisim::Cylinder</span></a>, <a class="reference internal" href="#classraisim_1_1Ground"><span class="std std-ref">raisim::Ground</span></a>, <a class="reference internal" href="HeightMap.html#classraisim_1_1HeightMap"><span class="std std-ref">raisim::HeightMap</span></a>, <a class="reference internal" href="#classraisim_1_1Mesh"><span class="std std-ref">raisim::Mesh</span></a>, <a class="reference internal" href="#classraisim_1_1Sphere"><span class="std std-ref">raisim::Sphere</span></a></p>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject13getQuaternionEv">
-<span id="_CPPv3NK6raisim16SingleBodyObject13getQuaternionEv"></span><span id="_CPPv2NK6raisim16SingleBodyObject13getQuaternionEv"></span><span id="raisim::SingleBodyObject::getQuaternionC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a30f0ce241985d52836191d2c3c19deb1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector4d</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getQuaternion</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject13getQuaternionEv" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the quaternion in Eigen::Vector4d </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the orientation of the object </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject13getQuaternionER3VecIXL4EEE">
-<span id="_CPPv3NK6raisim16SingleBodyObject13getQuaternionER3VecIXL4EEE"></span><span id="_CPPv2NK6raisim16SingleBodyObject13getQuaternionER3VecIX4EE"></span><span id="raisim::SingleBodyObject::getQuaternion__Vec:4:RC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1ae3ec3fc49edbaea6b250bc324c1e782b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getQuaternion</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">4</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quat</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject13getQuaternionER3VecIXL4EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the quaternion in raisim::Vec&lt;4&gt; </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>quat</strong> – <strong>[out]</strong> the orientation of the object </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject17getRotationMatrixEv">
-<span id="_CPPv3NK6raisim16SingleBodyObject17getRotationMatrixEv"></span><span id="_CPPv2NK6raisim16SingleBodyObject17getRotationMatrixEv"></span><span id="raisim::SingleBodyObject::getRotationMatrixC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1abfcd85e4c1c2dfd778e50b5a3484c118"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Matrix3d</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getRotationMatrix</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject17getRotationMatrixEv" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the rotation matrix in Eigen::Matrix3d </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the orientation of the object </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject17getRotationMatrixER3MatIXL3EEXL3EEE">
-<span id="_CPPv3NK6raisim16SingleBodyObject17getRotationMatrixER3MatIXL3EEXL3EEE"></span><span id="_CPPv2NK6raisim16SingleBodyObject17getRotationMatrixER3MatIX3EX3EE"></span><span id="raisim::SingleBodyObject::getRotationMatrix__Mat:3.3:RC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1ac025aa036aa8667f83af970c5217c001"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getRotationMatrix</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Mat</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rotation</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject17getRotationMatrixER3MatIXL3EEXL3EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the quaternion in raisim::Mat&lt;3,3&gt; </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>rotation</strong> – <strong>[out]</strong> the orientation of the object </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject11getPositionEv">
-<span id="_CPPv3NK6raisim16SingleBodyObject11getPositionEv"></span><span id="_CPPv2NK6raisim16SingleBodyObject11getPositionEv"></span><span id="raisim::SingleBodyObject::getPositionC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1ab35be4b7d32259c094f3b7544b1737bf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector3d</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPosition</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject11getPositionEv" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the body position in Eigen::Vector3d. Currently, all body positions are the same as the COM position </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the position of the object </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject14getComPositionEv">
-<span id="_CPPv3NK6raisim16SingleBodyObject14getComPositionEv"></span><span id="_CPPv2NK6raisim16SingleBodyObject14getComPositionEv"></span><span id="raisim::SingleBodyObject::getComPositionC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1aef26cf3545d0f12704da67799cf70bea"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector3d</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getComPosition</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject14getComPositionEv" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the body position in Eigen::Vector3d. Currently, all body positions are the same as the COM position </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the position of the object </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject17getComPosition_rsEv">
-<span id="_CPPv3NK6raisim16SingleBodyObject17getComPosition_rsEv"></span><span id="_CPPv2NK6raisim16SingleBodyObject17getComPosition_rsEv"></span><span id="raisim::SingleBodyObject::getComPosition_rsC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a59050a3c948eddb87361baafe819cde6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getComPosition_rs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject17getComPosition_rsEv" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the body position in raisim::Vec&lt;3&gt;. Currently, all body positions are the same as the COM position </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the position of the object </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject23getBodyToComPosition_rsEv">
-<span id="_CPPv3NK6raisim16SingleBodyObject23getBodyToComPosition_rsEv"></span><span id="_CPPv2NK6raisim16SingleBodyObject23getBodyToComPosition_rsEv"></span><span id="raisim::SingleBodyObject::getBodyToComPosition_rsC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1ad7c1403917e2d8105803eb0a94445f2e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getBodyToComPosition_rs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject23getBodyToComPosition_rsEv" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the body position in raisim::Vec&lt;3&gt;. Currently, all body positions are the same as the COM position </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the position of the object </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject17getLinearVelocityEv">
-<span id="_CPPv3NK6raisim16SingleBodyObject17getLinearVelocityEv"></span><span id="_CPPv2NK6raisim16SingleBodyObject17getLinearVelocityEv"></span><span id="raisim::SingleBodyObject::getLinearVelocityC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a9ce587437a6862e477502b73d5a36e60"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector3d</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getLinearVelocity</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject17getLinearVelocityEv" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the linear velocity </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the linear velocity of the object </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject17getLinearVelocityER3VecIXL3EEE">
-<span id="_CPPv3N6raisim16SingleBodyObject17getLinearVelocityER3VecIXL3EEE"></span><span id="_CPPv2N6raisim16SingleBodyObject17getLinearVelocityER3VecIX3EE"></span><span id="raisim::SingleBodyObject::getLinearVelocity__Vec:3:R"></span><span class="target" id="classraisim_1_1SingleBodyObject_1ad38a3816e8aadfe8f5b426d0b6c9a35a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getLinearVelocity</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">linVel</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject17getLinearVelocityER3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the linear velocity </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>linVel</strong> – <strong>[out]</strong> the linear velocity of the object </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject18getAngularVelocityEv">
-<span id="_CPPv3NK6raisim16SingleBodyObject18getAngularVelocityEv"></span><span id="_CPPv2NK6raisim16SingleBodyObject18getAngularVelocityEv"></span><span id="raisim::SingleBodyObject::getAngularVelocityC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a12b2a0d0d5d3992be3a5e352f418f1df"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector3d</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getAngularVelocity</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject18getAngularVelocityEv" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the angular velocity </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the angular velocity of the object </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject18getAngularVelocityER3VecIXL3EEE">
-<span id="_CPPv3N6raisim16SingleBodyObject18getAngularVelocityER3VecIXL3EEE"></span><span id="_CPPv2N6raisim16SingleBodyObject18getAngularVelocityER3VecIX3EE"></span><span id="raisim::SingleBodyObject::getAngularVelocity__Vec:3:R"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a4453b62df2fb1fb8969b30f2cf2785a8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getAngularVelocity</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">angVel</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject18getAngularVelocityER3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the angular velocity </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>angVel</strong> – <strong>[out]</strong> the angular velocity of the object </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject11getPositionE6size_tR3VecIXL3EEE">
-<span id="_CPPv3NK6raisim16SingleBodyObject11getPositionE6size_tR3VecIXL3EEE"></span><span id="_CPPv2NK6raisim16SingleBodyObject11getPositionE6size_tR3VecIX3EE"></span><span id="raisim::SingleBodyObject::getPosition__s.Vec:3:RC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a9a1fe1542db388b343056b714d5a8900"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPosition</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">localIdx</span></span>, <span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pos_w</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject11getPositionE6size_tR3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>returns position vector. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>localIdx</strong> – <strong>[in]</strong> this should be always 0 (this method is just to keep the same api as the <a class="reference internal" href="ArticulatedSystem.html#classraisim_1_1ArticulatedSystem"><span class="std std-ref">ArticulatedSystem</span></a> class) </p></li>
-<li><p><strong>pos_w</strong> – <strong>[out]</strong> the position vector of the object </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject14getOrientationE6size_tR3MatIXL3EEXL3EEE">
-<span id="_CPPv3NK6raisim16SingleBodyObject14getOrientationE6size_tR3MatIXL3EEXL3EEE"></span><span id="_CPPv2NK6raisim16SingleBodyObject14getOrientationE6size_tR3MatIX3EX3EE"></span><span id="raisim::SingleBodyObject::getOrientation__s.Mat:3.3:RC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1aae24303caa3d9598f66a89cfc63de691"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getOrientation</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">localIdx</span></span>, <span class="n"><span class="pre">Mat</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rot</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject14getOrientationE6size_tR3MatIXL3EEXL3EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the orientation of the object </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>localIdx</strong> – <strong>[in]</strong> local idx should be always 0 (this method is just to keep the same api as the <a class="reference internal" href="ArticulatedSystem.html#classraisim_1_1ArticulatedSystem"><span class="std std-ref">ArticulatedSystem</span></a> class) </p></li>
-<li><p><strong>rot</strong> – <strong>[out]</strong> the rotation matrix of the object </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject14getOrientationEv">
-<span id="_CPPv3NK6raisim16SingleBodyObject14getOrientationEv"></span><span id="_CPPv2NK6raisim16SingleBodyObject14getOrientationEv"></span><span id="raisim::SingleBodyObject::getOrientationC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a85a3b089e7644a36c265254ba86eea58"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Mat</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getOrientation</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject14getOrientationEv" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the rotation matrix </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>rotation matrix </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject16getKineticEnergyEv">
-<span id="_CPPv3NK6raisim16SingleBodyObject16getKineticEnergyEv"></span><span id="_CPPv2NK6raisim16SingleBodyObject16getKineticEnergyEv"></span><span id="raisim::SingleBodyObject::getKineticEnergyC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1adada09372a2d1c2b5180c74bdeabc689"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getKineticEnergy</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject16getKineticEnergyEv" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the kinetic energy </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the kinetic energy of the object </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject18getPotentialEnergyERK3VecIXL3EEE">
-<span id="_CPPv3NK6raisim16SingleBodyObject18getPotentialEnergyERK3VecIXL3EEE"></span><span id="_CPPv2NK6raisim16SingleBodyObject18getPotentialEnergyERK3VecIX3EE"></span><span id="raisim::SingleBodyObject::getPotentialEnergy__Vec:3:CRC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1ad2e7898cec3b23cfa94f8c58d1df7b4f"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPotentialEnergy</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">gravity</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject18getPotentialEnergyERK3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the potential energy w.r.t. z=0 and the given gravitational acceleration </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>gravity</strong> – <strong>[in]</strong> gravitational acceleration </p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the potential energy of the object </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject9getEnergyERK3VecIXL3EEE">
-<span id="_CPPv3NK6raisim16SingleBodyObject9getEnergyERK3VecIXL3EEE"></span><span id="_CPPv2NK6raisim16SingleBodyObject9getEnergyERK3VecIX3EE"></span><span id="raisim::SingleBodyObject::getEnergy__Vec:3:CRC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a3b845dde1d6a6df98f3970244a7976c2"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getEnergy</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">gravity</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject9getEnergyERK3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>equivalent to <a class="reference internal" href="#classraisim_1_1SingleBodyObject_1adada09372a2d1c2b5180c74bdeabc689"><span class="std std-ref">getKineticEnergy()</span></a> + getPotentialEnergy(gravity) </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>gravity</strong> – <strong>[in]</strong> gravitational acceleration </p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the sum of the potential and gravitational energy of the object </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject17getLinearMomentumEv">
-<span id="_CPPv3NK6raisim16SingleBodyObject17getLinearMomentumEv"></span><span id="_CPPv2NK6raisim16SingleBodyObject17getLinearMomentumEv"></span><span id="raisim::SingleBodyObject::getLinearMomentumC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a968e06aea651851183326e47943d3eb3"></span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector3d</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getLinearMomentum</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject17getLinearMomentumEv" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the linear momentum of the object </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the linear momentum of the object </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject7getMassE6size_t">
-<span id="_CPPv3NK6raisim16SingleBodyObject7getMassE6size_t"></span><span id="_CPPv2NK6raisim16SingleBodyObject7getMassE6size_t"></span><span id="raisim::SingleBodyObject::getMass__sC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a2f10104c93474a727433106119fecfae"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getMass</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">localIdx</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject7getMassE6size_t" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the mass of the object. The localIdx is unused </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the mass of the object </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject7setMassEd">
-<span id="_CPPv3N6raisim16SingleBodyObject7setMassEd"></span><span id="_CPPv2N6raisim16SingleBodyObject7setMassEd"></span><span id="raisim::SingleBodyObject::setMass__double"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a0a123b1acfac3f89122e5dd6b2ec3d5f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setMass</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">mass</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject7setMassEd" title="Link to this definition"></a><br /></dt>
-<dd><p>set the mass of the object. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>mass</strong> – <strong>[in]</strong> set the mass of the object </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject18getInertiaMatrix_BEv">
-<span id="_CPPv3NK6raisim16SingleBodyObject18getInertiaMatrix_BEv"></span><span id="_CPPv2NK6raisim16SingleBodyObject18getInertiaMatrix_BEv"></span><span id="raisim::SingleBodyObject::getInertiaMatrix_BC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a61100527d6aa7f51cb557e803f60cdf1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Matrix3d</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getInertiaMatrix_B</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject18getInertiaMatrix_BEv" title="Link to this definition"></a><br /></dt>
-<dd><p>get the inertia matrix in the body frame. This value is constant. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the inertia matrix in the body frame </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject18getInertiaMatrix_WEv">
-<span id="_CPPv3NK6raisim16SingleBodyObject18getInertiaMatrix_WEv"></span><span id="_CPPv2NK6raisim16SingleBodyObject18getInertiaMatrix_WEv"></span><span id="raisim::SingleBodyObject::getInertiaMatrix_WC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1aef84683a34d5da2b945c73f266d749cc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Matrix3d</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getInertiaMatrix_W</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject18getInertiaMatrix_WEv" title="Link to this definition"></a><br /></dt>
-<dd><p>get the inertia matrix in the world frame. This value changes as the body rotates. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the inertia matrix in the world frame </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject21getInertiaMatrix_B_rsEv">
-<span id="_CPPv3NK6raisim16SingleBodyObject21getInertiaMatrix_B_rsEv"></span><span id="_CPPv2NK6raisim16SingleBodyObject21getInertiaMatrix_B_rsEv"></span><span id="raisim::SingleBodyObject::getInertiaMatrix_B_rsC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a791b587e53bbae99140a271cd7d9a6d8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Mat</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getInertiaMatrix_B_rs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject21getInertiaMatrix_B_rsEv" title="Link to this definition"></a><br /></dt>
-<dd><p>get the inertia matrix in the body frame (raisim matrix type). This value is constant. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the inertia matrix in the body frame </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject21getInertiaMatrix_W_rsEv">
-<span id="_CPPv3NK6raisim16SingleBodyObject21getInertiaMatrix_W_rsEv"></span><span id="_CPPv2NK6raisim16SingleBodyObject21getInertiaMatrix_W_rsEv"></span><span id="raisim::SingleBodyObject::getInertiaMatrix_W_rsC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1ae368df88efb01adc1559f569f242d059"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Mat</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getInertiaMatrix_W_rs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject21getInertiaMatrix_W_rsEv" title="Link to this definition"></a><br /></dt>
-<dd><p>get the inertia matrix in the world frame (raisim matrix type). This value changes as the body rotates. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the inertia matrix in the world frame </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject13getObjectTypeEv">
-<span id="_CPPv3NK6raisim16SingleBodyObject13getObjectTypeEv"></span><span id="_CPPv2NK6raisim16SingleBodyObject13getObjectTypeEv"></span><span id="raisim::SingleBodyObject::getObjectTypeC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a7694d4acc332b9d2e166d56bce254ddb"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">ObjectType</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getObjectType</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject13getObjectTypeEv" title="Link to this definition"></a><br /></dt>
-<dd><p>get the object type. Possible types are SPHERE, BOX, CYLINDER, CONE, CAPSULE, MESH, HALFSPACE, COMPOUND, HEIGHTMAP, ARTICULATED_SYSTEM </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the object type </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject11setPositionERKN5Eigen3RefIKN5Eigen8Vector3dEN5Eigen9UnalignedEEE">
-<span id="_CPPv3N6raisim16SingleBodyObject11setPositionERKN5Eigen3RefIKN5Eigen8Vector3dEN5Eigen9UnalignedEEE"></span><span id="_CPPv2N6raisim16SingleBodyObject11setPositionERKN5Eigen3RefIKN5Eigen8Vector3dEN5Eigen9UnalignedEEE"></span><span id="raisim::SingleBodyObject::setPosition__Eigen::Ref:Eigen::Vector3dC.Eigen::Unaligned:CR"></span><span class="target" id="classraisim_1_1SingleBodyObject_1aeaef6fce20b6cf4fb9a4cb87a6a2c5da"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setPosition</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Ref</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector3d</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Unaligned</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">originPosition</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject11setPositionERKN5Eigen3RefIKN5Eigen8Vector3dEN5Eigen9UnalignedEEE" title="Link to this definition"></a><br /></dt>
-<dd><p>Set position of the object (using Eigen) </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>originPosition</strong> – <strong>[in]</strong> Position </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject11setPositionEddd">
-<span id="_CPPv3N6raisim16SingleBodyObject11setPositionEddd"></span><span id="_CPPv2N6raisim16SingleBodyObject11setPositionEddd"></span><span id="raisim::SingleBodyObject::setPosition__double.double.double"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a075d0ad77275f37c680302cac2cf9b45"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setPosition</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">z</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject11setPositionEddd" title="Link to this definition"></a><br /></dt>
-<dd><p>Set position of the object (using three doubles) </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> – <strong>[in]</strong> x position </p></li>
-<li><p><strong>y</strong> – <strong>[in]</strong> y position </p></li>
-<li><p><strong>z</strong> – <strong>[in]</strong> z position </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject14setOrientationERKN5Eigen11QuaterniondE">
-<span id="_CPPv3N6raisim16SingleBodyObject14setOrientationERKN5Eigen11QuaterniondE"></span><span id="_CPPv2N6raisim16SingleBodyObject14setOrientationERKN5Eigen11QuaterniondE"></span><span id="raisim::SingleBodyObject::setOrientation__Eigen::QuaterniondCR"></span><span class="target" id="classraisim_1_1SingleBodyObject_1aaf901b131123f1e32884fc5482c86046"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setOrientation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Quaterniond</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quaternion</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject14setOrientationERKN5Eigen11QuaterniondE" title="Link to this definition"></a><br /></dt>
-<dd><p>Set orientation of the object (using Eigen::Quaterniond) </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>quaternion</strong> – <strong>[in]</strong> quaternion </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject14setOrientationERKN5Eigen8Vector4dE">
-<span id="_CPPv3N6raisim16SingleBodyObject14setOrientationERKN5Eigen8Vector4dE"></span><span id="_CPPv2N6raisim16SingleBodyObject14setOrientationERKN5Eigen8Vector4dE"></span><span id="raisim::SingleBodyObject::setOrientation__Eigen::Vector4dCR"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a9a120477c980542724a821cd1f547105"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setOrientation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector4d</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quaternion</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject14setOrientationERKN5Eigen8Vector4dE" title="Link to this definition"></a><br /></dt>
-<dd><p>Set orientation of the object (using Eigen::Vector4d) </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>quaternion</strong> – <strong>[in]</strong> quaternion </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject14setOrientationERK3VecIXL4EEE">
-<span id="_CPPv3N6raisim16SingleBodyObject14setOrientationERK3VecIXL4EEE"></span><span id="_CPPv2N6raisim16SingleBodyObject14setOrientationERK3VecIX4EE"></span><span id="raisim::SingleBodyObject::setOrientation__Vec:4:CR"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a7aa3d166bcd2be8314f034d9615fc48f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setOrientation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">4</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quaternion</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject14setOrientationERK3VecIXL4EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>Set orientation of the object (using raisim::Vec&lt;4&gt;) </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>quaternion</strong> – <strong>[in]</strong> quaternion </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject14setOrientationEdddd">
-<span id="_CPPv3N6raisim16SingleBodyObject14setOrientationEdddd"></span><span id="_CPPv2N6raisim16SingleBodyObject14setOrientationEdddd"></span><span id="raisim::SingleBodyObject::setOrientation__double.double.double.double"></span><span class="target" id="classraisim_1_1SingleBodyObject_1ac150f5ad4d0b6ca1ca96e7a6513d116c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setOrientation</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">w</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">z</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject14setOrientationEdddd" title="Link to this definition"></a><br /></dt>
-<dd><p>Set orientation of the object (using doubles) </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>w</strong> – <strong>[in]</strong> w </p></li>
-<li><p><strong>x</strong> – <strong>[in]</strong> w </p></li>
-<li><p><strong>y</strong> – <strong>[in]</strong> w </p></li>
-<li><p><strong>z</strong> – <strong>[in]</strong> w </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject14setOrientationERKN5Eigen8Matrix3dE">
-<span id="_CPPv3N6raisim16SingleBodyObject14setOrientationERKN5Eigen8Matrix3dE"></span><span id="_CPPv2N6raisim16SingleBodyObject14setOrientationERKN5Eigen8Matrix3dE"></span><span id="raisim::SingleBodyObject::setOrientation__Eigen::Matrix3dCR"></span><span class="target" id="classraisim_1_1SingleBodyObject_1ade945ae4daa53aeaf5a88a48087ddb7c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setOrientation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Matrix3d</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rotationMatrix</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject14setOrientationERKN5Eigen8Matrix3dE" title="Link to this definition"></a><br /></dt>
-<dd><p>Set orientation of the object (using Eigen::Matrix3d) </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>rotationMatrix</strong> – <strong>[in]</strong> rotation matrix </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject14setOrientationERK3MatIXL3EEXL3EEE">
-<span id="_CPPv3N6raisim16SingleBodyObject14setOrientationERK3MatIXL3EEXL3EEE"></span><span id="_CPPv2N6raisim16SingleBodyObject14setOrientationERK3MatIX3EX3EE"></span><span id="raisim::SingleBodyObject::setOrientation__Mat:3.3:CR"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a777301b1c02f9608c7a67429183e4e5f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setOrientation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Mat</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rotationMatrix</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject14setOrientationERK3MatIXL3EEXL3EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>Set orientation of the object (using raisim::Mat&lt;3,3&gt;) </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>rotationMatrix</strong> – <strong>[in]</strong> rotation matrix </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject7setPoseERKN5Eigen8Vector3dERKN5Eigen11QuaterniondE">
-<span id="_CPPv3N6raisim16SingleBodyObject7setPoseERKN5Eigen8Vector3dERKN5Eigen11QuaterniondE"></span><span id="_CPPv2N6raisim16SingleBodyObject7setPoseERKN5Eigen8Vector3dERKN5Eigen11QuaterniondE"></span><span id="raisim::SingleBodyObject::setPose__Eigen::Vector3dCR.Eigen::QuaterniondCR"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a856a720e89fb89681af18961ba5f1ebd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setPose</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector3d</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">originPosition</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Quaterniond</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quaternion</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject7setPoseERKN5Eigen8Vector3dERKN5Eigen11QuaterniondE" title="Link to this definition"></a><br /></dt>
-<dd><p>Set both the position and orientation of the object (using Eigen::Vector3d and Eigen::Quaterniond) </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>originPosition</strong> – <strong>[in]</strong> position </p></li>
-<li><p><strong>quaternion</strong> – <strong>[in]</strong> quaternion </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject7setPoseERKN5Eigen8Vector3dERKN5Eigen8Vector4dE">
-<span id="_CPPv3N6raisim16SingleBodyObject7setPoseERKN5Eigen8Vector3dERKN5Eigen8Vector4dE"></span><span id="_CPPv2N6raisim16SingleBodyObject7setPoseERKN5Eigen8Vector3dERKN5Eigen8Vector4dE"></span><span id="raisim::SingleBodyObject::setPose__Eigen::Vector3dCR.Eigen::Vector4dCR"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a7d7891a52d9c0090bbbe59a0631fb36d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setPose</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector3d</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">originPosition</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector4d</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quaternion</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject7setPoseERKN5Eigen8Vector3dERKN5Eigen8Vector4dE" title="Link to this definition"></a><br /></dt>
-<dd><p>Set both the position and orientation of the object (using Eigen::Vector3d and Eigen::Vector4d) </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>originPosition</strong> – <strong>[in]</strong> position </p></li>
-<li><p><strong>quaternion</strong> – <strong>[in]</strong> quaternion </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject7setPoseERKN5Eigen8Vector3dERKN5Eigen8Matrix3dE">
-<span id="_CPPv3N6raisim16SingleBodyObject7setPoseERKN5Eigen8Vector3dERKN5Eigen8Matrix3dE"></span><span id="_CPPv2N6raisim16SingleBodyObject7setPoseERKN5Eigen8Vector3dERKN5Eigen8Matrix3dE"></span><span id="raisim::SingleBodyObject::setPose__Eigen::Vector3dCR.Eigen::Matrix3dCR"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a81505c742153ce78c04589ae280f57b6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setPose</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector3d</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">originPosition</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Matrix3d</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rotationMatrix</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject7setPoseERKN5Eigen8Vector3dERKN5Eigen8Matrix3dE" title="Link to this definition"></a><br /></dt>
-<dd><p>Set both the position and orientation of the object (using Eigen::Vector3d and Eigen::Matrix3d) </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>originPosition</strong> – <strong>[in]</strong> position </p></li>
-<li><p><strong>rotationMatrix</strong> – <strong>[in]</strong> rotation matrix </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject10setInertiaERKN5Eigen3RefIKN5Eigen8Matrix3dEN5Eigen9UnalignedEEE">
-<span id="_CPPv3N6raisim16SingleBodyObject10setInertiaERKN5Eigen3RefIKN5Eigen8Matrix3dEN5Eigen9UnalignedEEE"></span><span id="_CPPv2N6raisim16SingleBodyObject10setInertiaERKN5Eigen3RefIKN5Eigen8Matrix3dEN5Eigen9UnalignedEEE"></span><span id="raisim::SingleBodyObject::setInertia__Eigen::Ref:Eigen::Matrix3dC.Eigen::Unaligned:CR"></span><span class="target" id="classraisim_1_1SingleBodyObject_1ae10f3ad972a791cb999053d18d691159"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setInertia</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Ref</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Matrix3d</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Unaligned</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inertia</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject10setInertiaERKN5Eigen3RefIKN5Eigen8Matrix3dEN5Eigen9UnalignedEEE" title="Link to this definition"></a><br /></dt>
-<dd><p>Set inertia of the object (using Eigen::Matrix3d) </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>inertia</strong> – <strong>[in]</strong> inertia of the object </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject6getComEv">
-<span id="_CPPv3N6raisim16SingleBodyObject6getComEv"></span><span id="_CPPv2N6raisim16SingleBodyObject6getComEv"></span><span id="raisim::SingleBodyObject::getCom"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a12e3a59269db0b658b9bb0ec5ab3f7bb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getCom</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject6getComEv" title="Link to this definition"></a><br /></dt>
-<dd><p>get the center of mass position </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the position of the center of mass </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject6setComERK3VecIXL3EEE">
-<span id="_CPPv3N6raisim16SingleBodyObject6setComERK3VecIXL3EEE"></span><span id="_CPPv2N6raisim16SingleBodyObject6setComERK3VecIX3EE"></span><span id="raisim::SingleBodyObject::setCom__Vec:3:CR"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a0c4a00487ae6c962162c48af9cecfa81"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setCom</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">com</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject6setComERK3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>set the center of mass position </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>com</strong> – <strong>[in]</strong> the position of the center of mass </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject11setVelocityERKN5Eigen3RefIKN5Eigen8Vector3dEN5Eigen9UnalignedEEERKN5Eigen3RefIKN5Eigen8Vector3dEN5Eigen9UnalignedEEE">
-<span id="_CPPv3N6raisim16SingleBodyObject11setVelocityERKN5Eigen3RefIKN5Eigen8Vector3dEN5Eigen9UnalignedEEERKN5Eigen3RefIKN5Eigen8Vector3dEN5Eigen9UnalignedEEE"></span><span id="_CPPv2N6raisim16SingleBodyObject11setVelocityERKN5Eigen3RefIKN5Eigen8Vector3dEN5Eigen9UnalignedEEERKN5Eigen3RefIKN5Eigen8Vector3dEN5Eigen9UnalignedEEE"></span><span id="raisim::SingleBodyObject::setVelocity__Eigen::Ref:Eigen::Vector3dC.Eigen::Unaligned:CR.Eigen::Ref:Eigen::Vector3dC.Eigen::Unaligned:CR"></span><span class="target" id="classraisim_1_1SingleBodyObject_1afae80558642bb4fdf0292b2e77777a21"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setVelocity</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Ref</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector3d</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Unaligned</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">linearVelocity</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Ref</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector3d</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Unaligned</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">angularVelocity</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject11setVelocityERKN5Eigen3RefIKN5Eigen8Vector3dEN5Eigen9UnalignedEEERKN5Eigen3RefIKN5Eigen8Vector3dEN5Eigen9UnalignedEEE" title="Link to this definition"></a><br /></dt>
-<dd><p>set both the linear and angular velocity of the object (using Eigen::Vector3d) </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>linearVelocity</strong> – <strong>[in]</strong> the linear velocity of the object </p></li>
-<li><p><strong>angularVelocity</strong> – <strong>[in]</strong> the angular velocity of the object </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject11setVelocityEdddddd">
-<span id="_CPPv3N6raisim16SingleBodyObject11setVelocityEdddddd"></span><span id="_CPPv2N6raisim16SingleBodyObject11setVelocityEdddddd"></span><span id="raisim::SingleBodyObject::setVelocity__double.double.double.double.double.double"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a9fb161b3affccb4c648cc5234832eb6b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setVelocity</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">dx</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">dy</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">dz</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">wx</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">wy</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">wz</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject11setVelocityEdddddd" title="Link to this definition"></a><br /></dt>
-<dd><p>set both the linear and angular velocity of the object (using 6 doubles) </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dx</strong> – <strong>[in]</strong> the x-axis linear velocity of the object </p></li>
-<li><p><strong>dy</strong> – <strong>[in]</strong> the y-axis linear velocity of the object </p></li>
-<li><p><strong>dz</strong> – <strong>[in]</strong> the z-axis linear velocity of the object </p></li>
-<li><p><strong>wx</strong> – <strong>[in]</strong> the x-axis angular velocity of the object </p></li>
-<li><p><strong>wy</strong> – <strong>[in]</strong> the y-axis angular velocity of the object </p></li>
-<li><p><strong>wz</strong> – <strong>[in]</strong> the z-axis angular velocity of the object </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject17setLinearVelocityERK3VecIXL3EEE">
-<span id="_CPPv3N6raisim16SingleBodyObject17setLinearVelocityERK3VecIXL3EEE"></span><span id="_CPPv2N6raisim16SingleBodyObject17setLinearVelocityERK3VecIX3EE"></span><span id="raisim::SingleBodyObject::setLinearVelocity__Vec:3:CR"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a1983daa39240aa3fa9671db91c5542ba"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setLinearVelocity</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">linearVelocity</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject17setLinearVelocityERK3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>set only the linear velocity </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>linearVelocity</strong> – <strong>[in]</strong> the linear velocity </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject18setAngularVelocityERK3VecIXL3EEE">
-<span id="_CPPv3N6raisim16SingleBodyObject18setAngularVelocityERK3VecIXL3EEE"></span><span id="_CPPv2N6raisim16SingleBodyObject18setAngularVelocityERK3VecIX3EE"></span><span id="raisim::SingleBodyObject::setAngularVelocity__Vec:3:CR"></span><span class="target" id="classraisim_1_1SingleBodyObject_1ada010f40f04ace68eb944c7ffead469f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setAngularVelocity</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">angularVelocity</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject18setAngularVelocityERK3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>set only the angular velocity </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>angularVelocity</strong> – <strong>[in]</strong> the angular velocity </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject16setExternalForceE6size_tRK3VecIXL3EEE">
-<span id="_CPPv3N6raisim16SingleBodyObject16setExternalForceE6size_tRK3VecIXL3EEE"></span><span id="_CPPv2N6raisim16SingleBodyObject16setExternalForceE6size_tRK3VecIX3EE"></span><span id="raisim::SingleBodyObject::setExternalForce__s.Vec:3:CR"></span><span class="target" id="classraisim_1_1SingleBodyObject_1ad1999709fef1f54b02b29c778b7bed0e"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setExternalForce</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">localIdx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">force</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject16setExternalForceE6size_tRK3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>set external force on the object </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>localIdx</strong> – <strong>[in]</strong> this should always be 0 (because the single body object only has one body) </p></li>
-<li><p><strong>force</strong> – <strong>[in]</strong> force acting on the center of the mass (expressed in the world frame) </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject17setExternalTorqueE6size_tRK3VecIXL3EEE">
-<span id="_CPPv3N6raisim16SingleBodyObject17setExternalTorqueE6size_tRK3VecIXL3EEE"></span><span id="_CPPv2N6raisim16SingleBodyObject17setExternalTorqueE6size_tRK3VecIX3EE"></span><span id="raisim::SingleBodyObject::setExternalTorque__s.Vec:3:CR"></span><span class="target" id="classraisim_1_1SingleBodyObject_1af3d072108a6df351873e3174af218fd5"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setExternalTorque</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">localIdx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">torque</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject17setExternalTorqueE6size_tRK3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>set external torque on the object </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>localIdx</strong> – <strong>[in]</strong> this should always be 0 (because the single body object only has one body) </p></li>
-<li><p><strong>torque</strong> – <strong>[in]</strong> torque acting on body (expressed in the world frame) </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject16setExternalForceE6size_tRK3VecIXL3EEERK3VecIXL3EEE">
-<span id="_CPPv3N6raisim16SingleBodyObject16setExternalForceE6size_tRK3VecIXL3EEERK3VecIXL3EEE"></span><span id="_CPPv2N6raisim16SingleBodyObject16setExternalForceE6size_tRK3VecIX3EERK3VecIX3EE"></span><span id="raisim::SingleBodyObject::setExternalForce__s.Vec:3:CR.Vec:3:CR"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a3a328ca33826ea556f2d4d5d5ae10cf5"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setExternalForce</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">localIdx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pos</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">force</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject16setExternalForceE6size_tRK3VecIXL3EEERK3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>set external force on the object </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>localIdx</strong> – <strong>[in]</strong> this should always be 0 (because the single body object only has one body) </p></li>
-<li><p><strong>pos</strong> – <strong>[in]</strong> the application point of the force (expressed in the world frame) </p></li>
-<li><p><strong>force</strong> – <strong>[in]</strong> force acting on the center of the mass (expressed in the world frame) </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject18setConstraintForceE6size_tRK3VecIXL3EEERK3VecIXL3EEE">
-<span id="_CPPv3N6raisim16SingleBodyObject18setConstraintForceE6size_tRK3VecIXL3EEERK3VecIXL3EEE"></span><span id="_CPPv2N6raisim16SingleBodyObject18setConstraintForceE6size_tRK3VecIX3EERK3VecIX3EE"></span><span id="raisim::SingleBodyObject::setConstraintForce__s.Vec:3:CR.Vec:3:CR"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a207c2b09940eb3fd06cc168b75c24f15"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setConstraintForce</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">localIdx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pos</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">force</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject18setConstraintForceE6size_tRK3VecIXL3EEERK3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>should not be used by the users </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject11getPositionE6size_tRK3VecIXL3EEER3VecIXL3EEE">
-<span id="_CPPv3NK6raisim16SingleBodyObject11getPositionE6size_tRK3VecIXL3EEER3VecIXL3EEE"></span><span id="_CPPv2NK6raisim16SingleBodyObject11getPositionE6size_tRK3VecIX3EER3VecIX3EE"></span><span id="raisim::SingleBodyObject::getPosition__s.Vec:3:CR.Vec:3:RC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1ab8ab3e7d365eb364ced3620e8dfadeea"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPosition</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">localIdx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pos_b</span></span>, <span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pos_w</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject11getPositionE6size_tRK3VecIXL3EEER3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>Get position of a point on the body </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>localIdx</strong> – <strong>[in]</strong> this should always be 0 (because the single body object only has one body) </p></li>
-<li><p><strong>pos_b</strong> – <strong>[in]</strong> the position of the body </p></li>
-<li><p><strong>pos_w</strong> – <strong>[out]</strong> the corresponding position in the world </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject11getPositionER3VecIXL3EEE">
-<span id="_CPPv3N6raisim16SingleBodyObject11getPositionER3VecIXL3EEE"></span><span id="_CPPv2N6raisim16SingleBodyObject11getPositionER3VecIX3EE"></span><span id="raisim::SingleBodyObject::getPosition__Vec:3:R"></span><span class="target" id="classraisim_1_1SingleBodyObject_1ac0a49a519089e9559382180042a145d9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPosition</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pos_w</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject11getPositionER3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>Get the geometric center of the object </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>pos_w</strong> – <strong>[out]</strong> the geometric center </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject18getContactPointVelE6size_tR3VecIXL3EEE">
-<span id="_CPPv3NK6raisim16SingleBodyObject18getContactPointVelE6size_tR3VecIXL3EEE"></span><span id="_CPPv2NK6raisim16SingleBodyObject18getContactPointVelE6size_tR3VecIX3EE"></span><span id="raisim::SingleBodyObject::getContactPointVel__s.Vec:3:RC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a28f901432e722936875eb378c58788df"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getContactPointVel</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pointId</span></span>, <span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">vel</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject18getContactPointVelE6size_tR3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>get the contact point velocity in the world frame. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>pointId</strong> – <strong>[in]</strong> the contact index. This is an index of a contact in the contact vector that you can retrieve from getContacts(). </p></li>
-<li><p><strong>vel</strong> – <strong>[out]</strong> the contact point velocity in the world frame </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject16setLinearDampingEd">
-<span id="_CPPv3N6raisim16SingleBodyObject16setLinearDampingEd"></span><span id="_CPPv2N6raisim16SingleBodyObject16setLinearDampingEd"></span><span id="raisim::SingleBodyObject::setLinearDamping__double"></span><span class="target" id="classraisim_1_1SingleBodyObject_1aab5e17958e2115dd93a796477d03434f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setLinearDamping</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">damping</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject16setLinearDampingEd" title="Link to this definition"></a><br /></dt>
-<dd><p>Set the linear damping that the object experiences due to air </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>damping</strong> – <strong>[in]</strong> the damping coefficient in the body frame </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject17setAngularDampingE3VecIXL3EEE">
-<span id="_CPPv3N6raisim16SingleBodyObject17setAngularDampingE3VecIXL3EEE"></span><span id="_CPPv2N6raisim16SingleBodyObject17setAngularDampingE3VecIX3EE"></span><span id="raisim::SingleBodyObject::setAngularDamping__Vec:3:"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a34150ea1d8ab213d44ee84d781ba52d9"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setAngularDamping</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">damping</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject17setAngularDampingE3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>Set the angular damping that the object experiences due to air (proportional to the angular velocity). </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>damping</strong> – <strong>[in]</strong> the damping coefficient in the body frame </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject11setBodyTypeE8BodyType">
-<span id="_CPPv3N6raisim16SingleBodyObject11setBodyTypeE8BodyType"></span><span id="_CPPv2N6raisim16SingleBodyObject11setBodyTypeE8BodyType"></span><span id="raisim::SingleBodyObject::setBodyType__BodyType"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a2c86b529e5390deb87c459d50afc6d00"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setBodyType</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">BodyType</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject11setBodyTypeE8BodyType" title="Link to this definition"></a><br /></dt>
-<dd><p>set the body type. Dynamic means that object is free to move. Kinematic means that the object can have velocity but has an infinite mass (like a conveyor belt). Static means that the object cannot move and has an infinite mass. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>type</strong> – <strong>[in]</strong> the body type </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject17getCollisionGroupEv">
-<span id="_CPPv3N6raisim16SingleBodyObject17getCollisionGroupEv"></span><span id="_CPPv2N6raisim16SingleBodyObject17getCollisionGroupEv"></span><span id="raisim::SingleBodyObject::getCollisionGroup"></span><span class="target" id="classraisim_1_1SingleBodyObject_1acbb3000ddd47236636f24b1fa4ca1fc7"></span><span class="n"><span class="pre">CollisionGroup</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getCollisionGroup</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject17getCollisionGroupEv" title="Link to this definition"></a><br /></dt>
-<dd><p>get the current collision group of the object. Read the “Contact and Collision” to learn what the collision group is. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the collision group </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject16getCollisionMaskEv">
-<span id="_CPPv3N6raisim16SingleBodyObject16getCollisionMaskEv"></span><span id="_CPPv2N6raisim16SingleBodyObject16getCollisionMaskEv"></span><span id="raisim::SingleBodyObject::getCollisionMask"></span><span class="target" id="classraisim_1_1SingleBodyObject_1ae941909a3cebac5d1acd74bc1d90bc61"></span><span class="n"><span class="pre">CollisionGroup</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getCollisionMask</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject16getCollisionMaskEv" title="Link to this definition"></a><br /></dt>
-<dd><p>get the current collision mast of the object. Read the “Contact and Collision” to learn what the collision mast is. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the collision mast </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject13setAppearanceERKNSt6stringE">
-<span id="_CPPv3N6raisim16SingleBodyObject13setAppearanceERKNSt6stringE"></span><span id="_CPPv2N6raisim16SingleBodyObject13setAppearanceERKNSt6stringE"></span><span id="raisim::SingleBodyObject::setAppearance__ssCR"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a1de1098ce38e26132bafb13a6238e7d6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setAppearance</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">appearance</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject13setAppearanceERKNSt6stringE" title="Link to this definition"></a><br /></dt>
-<dd><p>set the appearance of the object. This works in both RaisimUnity and RaisimUnreal. But depending on the visualizer, they might do different things. You can specify the color by name like “blue”, “green”, “red” You can also specify the color by a string like “0, 0.5, 0.5, 1.0”, which represent the RGBA values </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>appearance</strong> – <strong>[in]</strong> the appearance of the object </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16SingleBodyObject13getAppearanceEv">
-<span id="_CPPv3NK6raisim16SingleBodyObject13getAppearanceEv"></span><span id="_CPPv2NK6raisim16SingleBodyObject13getAppearanceEv"></span><span id="raisim::SingleBodyObject::getAppearanceC"></span><span class="target" id="classraisim_1_1SingleBodyObject_1afb4c60f47969bd3a8cf50d138e5a2d5a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getAppearance</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16SingleBodyObject13getAppearanceEv" title="Link to this definition"></a><br /></dt>
-<dd><p>get the current appearance of the object </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>appearance </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16SingleBodyObject29clearExternalForcesAndTorquesEv">
-<span id="_CPPv3N6raisim16SingleBodyObject29clearExternalForcesAndTorquesEv"></span><span id="_CPPv2N6raisim16SingleBodyObject29clearExternalForcesAndTorquesEv"></span><span id="raisim::SingleBodyObject::clearExternalForcesAndTorques"></span><span class="target" id="classraisim_1_1SingleBodyObject_1a79071f34d8f471b55a8d34696740f860"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clearExternalForcesAndTorques</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N6raisim16SingleBodyObject29clearExternalForcesAndTorquesEv" title="Link to this definition"></a><br /></dt>
-<dd><p>delete all external forces and torques specified on the object. This method is called at the end of every frame. </p>
-</dd></dl>
-
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>doxygenclass: breathe_default_project value ‘raisim’ does not seem to be a valid key for the breathe_projects dictionary</p>
 </div>
-</dd></dl>
-
 </section>
 <section id="compound-api">
 <h2>Compound API<a class="headerlink" href="#compound-api" title="Link to this heading"></a></h2>
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim8CompoundE">
-<span id="_CPPv3N6raisim8CompoundE"></span><span id="_CPPv2N6raisim8CompoundE"></span><span id="raisim::Compound"></span><span class="target" id="classraisim_1_1Compound"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Compound</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6raisim16SingleBodyObjectE" title="raisim::SingleBodyObject"><span class="n"><span class="pre">SingleBodyObject</span></span></a><a class="headerlink" href="#_CPPv4N6raisim8CompoundE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim8Compound10getObjListEv">
-<span id="_CPPv3N6raisim8Compound10getObjListEv"></span><span id="_CPPv2N6raisim8Compound10getObjListEv"></span><span id="raisim::Compound::getObjList"></span><span class="target" id="classraisim_1_1Compound_1ae4b54291a2505452ad308fb27008abaf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6raisim8Compound19CompoundObjectChildE" title="raisim::Compound::CompoundObjectChild"><span class="n"><span class="pre">CompoundObjectChild</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getObjList</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim8Compound10getObjListEv" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the children of the compound </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the children of the compound </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim8Compound20getCollisionBodyListEv">
-<span id="_CPPv3N6raisim8Compound20getCollisionBodyListEv"></span><span id="_CPPv2N6raisim8Compound20getCollisionBodyListEv"></span><span id="raisim::Compound::getCollisionBodyList"></span><span class="target" id="classraisim_1_1Compound_1a30f7605e6c3dac451b78a6abec20eb5e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">CollisionBodyHandle</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getCollisionBodyList</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim8Compound20getCollisionBodyListEv" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the collision list of the compound </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the collision list of the compound </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim8Compound11setBodyTypeE8BodyType">
-<span id="_CPPv3N6raisim8Compound11setBodyTypeE8BodyType"></span><span id="_CPPv2N6raisim8Compound11setBodyTypeE8BodyType"></span><span id="raisim::Compound::setBodyType__BodyType"></span><span class="target" id="classraisim_1_1Compound_1ad7d55ca2b851ac258894cf5e6c3837ee"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setBodyType</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">BodyType</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim8Compound11setBodyTypeE8BodyType" title="Link to this definition"></a><br /></dt>
-<dd><p>set the body type. Dynamic means that object is free to move. Kinematic means that the object can have velocity but has an infinite mass (like a conveyor belt). Static means that the object cannot move and has an infinite mass. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>type</strong> – <strong>[in]</strong> the body type </p>
-</dd>
-</dl>
-</dd></dl>
-
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>doxygenclass: breathe_default_project value ‘raisim’ does not seem to be a valid key for the breathe_projects dictionary</p>
 </div>
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim8Compound19CompoundObjectChildE">
-<span id="_CPPv3N6raisim8Compound19CompoundObjectChildE"></span><span id="_CPPv2N6raisim8Compound19CompoundObjectChildE"></span><span id="raisim::Compound::CompoundObjectChild"></span><span class="target" id="structraisim_1_1Compound_1_1CompoundObjectChild"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CompoundObjectChild</span></span></span><a class="headerlink" href="#_CPPv4N6raisim8Compound19CompoundObjectChildE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim8Compound19CompoundObjectChild13childCompoundE">
-<span id="_CPPv3N6raisim8Compound19CompoundObjectChild13childCompoundE"></span><span id="_CPPv2N6raisim8Compound19CompoundObjectChild13childCompoundE"></span><span id="raisim::Compound::CompoundObjectChild::childCompound__ss"></span><span class="target" id="structraisim_1_1Compound_1_1CompoundObjectChild_1a48364b6bb03f748076fc5cb7f0c8b4c7"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">childCompound</span></span></span><a class="headerlink" href="#_CPPv4N6raisim8Compound19CompoundObjectChild13childCompoundE" title="Link to this definition"></a><br /></dt>
-<dd><p>Child compound name (reserved, currently unused). </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim8Compound19CompoundObjectChild10objectTypeE">
-<span id="_CPPv3N6raisim8Compound19CompoundObjectChild10objectTypeE"></span><span id="_CPPv2N6raisim8Compound19CompoundObjectChild10objectTypeE"></span><span id="raisim::Compound::CompoundObjectChild::objectType__ObjectType"></span><span class="target" id="structraisim_1_1Compound_1_1CompoundObjectChild_1aaff7a2a53c7162252880093359d20e27"></span><span class="n"><span class="pre">ObjectType</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">objectType</span></span></span><a class="headerlink" href="#_CPPv4N6raisim8Compound19CompoundObjectChild10objectTypeE" title="Link to this definition"></a><br /></dt>
-<dd><p>Child object type. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim8Compound19CompoundObjectChild11objectParamE">
-<span id="_CPPv3N6raisim8Compound19CompoundObjectChild11objectParamE"></span><span id="_CPPv2N6raisim8Compound19CompoundObjectChild11objectParamE"></span><span id="raisim::Compound::CompoundObjectChild::objectParam__Vec:4:"></span><span class="target" id="structraisim_1_1Compound_1_1CompoundObjectChild_1ad567f8acdb075bb484989ceed0605eae"></span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">4</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">objectParam</span></span></span><a class="headerlink" href="#_CPPv4N6raisim8Compound19CompoundObjectChild11objectParamE" title="Link to this definition"></a><br /></dt>
-<dd><p>Child shape parameters. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim8Compound19CompoundObjectChild8materialE">
-<span id="_CPPv3N6raisim8Compound19CompoundObjectChild8materialE"></span><span id="_CPPv2N6raisim8Compound19CompoundObjectChild8materialE"></span><span id="raisim::Compound::CompoundObjectChild::material__ss"></span><span class="target" id="structraisim_1_1Compound_1_1CompoundObjectChild_1a3f18cb4d778432f60f8fd898d2e85fe4"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">material</span></span></span><a class="headerlink" href="#_CPPv4N6raisim8Compound19CompoundObjectChild8materialE" title="Link to this definition"></a><br /></dt>
-<dd><p>Material name for contacts. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim8Compound19CompoundObjectChild10appearanceE">
-<span id="_CPPv3N6raisim8Compound19CompoundObjectChild10appearanceE"></span><span id="_CPPv2N6raisim8Compound19CompoundObjectChild10appearanceE"></span><span id="raisim::Compound::CompoundObjectChild::appearance__ss"></span><span class="target" id="structraisim_1_1Compound_1_1CompoundObjectChild_1ab0f5167037539348d45dd7959f4633f4"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">appearance</span></span></span><a class="headerlink" href="#_CPPv4N6raisim8Compound19CompoundObjectChild10appearanceE" title="Link to this definition"></a><br /></dt>
-<dd><p>Appearance material name for visualization. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim8Compound19CompoundObjectChild5transE">
-<span id="_CPPv3N6raisim8Compound19CompoundObjectChild5transE"></span><span id="_CPPv2N6raisim8Compound19CompoundObjectChild5transE"></span><span id="raisim::Compound::CompoundObjectChild::trans__Transformation"></span><span class="target" id="structraisim_1_1Compound_1_1CompoundObjectChild_1aa3ca6190455de128cadf7b6797574293"></span><span class="n"><span class="pre">Transformation</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">trans</span></span></span><a class="headerlink" href="#_CPPv4N6raisim8Compound19CompoundObjectChild5transE" title="Link to this definition"></a><br /></dt>
-<dd><p>Transform from compound frame to child frame. </p>
-</dd></dl>
-
-</div>
-</dd></dl>
-
-</dd></dl>
-
 </section>
 <section id="sphere-api">
 <h2>Sphere API<a class="headerlink" href="#sphere-api" title="Link to this heading"></a></h2>
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim6SphereE">
-<span id="_CPPv3N6raisim6SphereE"></span><span id="_CPPv2N6raisim6SphereE"></span><span id="raisim::Sphere"></span><span class="target" id="classraisim_1_1Sphere"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Sphere</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6raisim16SingleBodyObjectE" title="raisim::SingleBodyObject"><span class="n"><span class="pre">SingleBodyObject</span></span></a><a class="headerlink" href="#_CPPv4N6raisim6SphereE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim6Sphere6SphereEdd">
-<span id="_CPPv3N6raisim6Sphere6SphereEdd"></span><span id="_CPPv2N6raisim6Sphere6SphereEdd"></span><span id="raisim::Sphere::Sphere__double.double"></span><span class="target" id="classraisim_1_1Sphere_1af7156f3a0225fa87bb6a730b21d5a749"></span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Sphere</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">radius</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">mass</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim6Sphere6SphereEdd" title="Link to this definition"></a><br /></dt>
-<dd><p>NOTE body frame origin of <a class="reference internal" href="#classraisim_1_1Sphere"><span class="std std-ref">Sphere</span></a> is C.O.M of <a class="reference internal" href="#classraisim_1_1Sphere"><span class="std std-ref">Sphere</span></a></p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim6Sphere9getRadiusEv">
-<span id="_CPPv3NK6raisim6Sphere9getRadiusEv"></span><span id="_CPPv2NK6raisim6Sphere9getRadiusEv"></span><span id="raisim::Sphere::getRadiusC"></span><span class="target" id="classraisim_1_1Sphere_1a6d566eeb28bba474559e64054e395cf8"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getRadius</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim6Sphere9getRadiusEv" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the radius of the sphere </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the radius of the sphere </p>
-</dd>
-</dl>
-</dd></dl>
-
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>doxygenclass: breathe_default_project value ‘raisim’ does not seem to be a valid key for the breathe_projects dictionary</p>
 </div>
-</dd></dl>
-
 </section>
 <section id="box-api">
 <h2>Box API<a class="headerlink" href="#box-api" title="Link to this heading"></a></h2>
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim3BoxE">
-<span id="_CPPv3N6raisim3BoxE"></span><span id="_CPPv2N6raisim3BoxE"></span><span id="raisim::Box"></span><span class="target" id="classraisim_1_1Box"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Box</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6raisim16SingleBodyObjectE" title="raisim::SingleBodyObject"><span class="n"><span class="pre">SingleBodyObject</span></span></a><a class="headerlink" href="#_CPPv4N6raisim3BoxE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim3Box3BoxEdddd">
-<span id="_CPPv3N6raisim3Box3BoxEdddd"></span><span id="_CPPv2N6raisim3Box3BoxEdddd"></span><span id="raisim::Box::Box__double.double.double.double"></span><span class="target" id="classraisim_1_1Box_1a7f2cbec5bbeb7af5cb5dee82708b1ad0"></span><span class="sig-name descname"><span class="n"><span class="pre">Box</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">xLength</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">yLength</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">zLength</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">mass</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim3Box3BoxEdddd" title="Link to this definition"></a><br /></dt>
-<dd><p>NOTE body origin of <a class="reference internal" href="#classraisim_1_1Box"><span class="std std-ref">Box</span></a> is C.O.M of <a class="reference internal" href="#classraisim_1_1Box"><span class="std std-ref">Box</span></a></p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim3Box6getDimEv">
-<span id="_CPPv3N6raisim3Box6getDimEv"></span><span id="_CPPv2N6raisim3Box6getDimEv"></span><span id="raisim::Box::getDim"></span><span class="target" id="classraisim_1_1Box_1aaa180a7ac1aa0ad5197753646fba7d4d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getDim</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim3Box6getDimEv" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the dimension of the box </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the box dimensions </p>
-</dd>
-</dl>
-</dd></dl>
-
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>doxygenclass: breathe_default_project value ‘raisim’ does not seem to be a valid key for the breathe_projects dictionary</p>
 </div>
-</dd></dl>
-
 </section>
 <section id="capsule-api">
 <h2>Capsule API<a class="headerlink" href="#capsule-api" title="Link to this heading"></a></h2>
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim7CapsuleE">
-<span id="_CPPv3N6raisim7CapsuleE"></span><span id="_CPPv2N6raisim7CapsuleE"></span><span id="raisim::Capsule"></span><span class="target" id="classraisim_1_1Capsule"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Capsule</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6raisim16SingleBodyObjectE" title="raisim::SingleBodyObject"><span class="n"><span class="pre">SingleBodyObject</span></span></a><a class="headerlink" href="#_CPPv4N6raisim7CapsuleE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim7Capsule7CapsuleEddd">
-<span id="_CPPv3N6raisim7Capsule7CapsuleEddd"></span><span id="_CPPv2N6raisim7Capsule7CapsuleEddd"></span><span id="raisim::Capsule::Capsule__double.double.double"></span><span class="target" id="classraisim_1_1Capsule_1a12c6ea231b99663d5cc9aed58b35aea2"></span><span class="sig-name descname"><span class="n"><span class="pre">Capsule</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">radius</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">height</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">mass</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim7Capsule7CapsuleEddd" title="Link to this definition"></a><br /></dt>
-<dd><p>NOTE body origin of <a class="reference internal" href="#classraisim_1_1Capsule"><span class="std std-ref">Capsule</span></a> is C.O.M of <a class="reference internal" href="#classraisim_1_1Capsule"><span class="std std-ref">Capsule</span></a></p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim7Capsule9getRadiusEv">
-<span id="_CPPv3NK6raisim7Capsule9getRadiusEv"></span><span id="_CPPv2NK6raisim7Capsule9getRadiusEv"></span><span id="raisim::Capsule::getRadiusC"></span><span class="target" id="classraisim_1_1Capsule_1aa870183eaa601622b3cbd40d3c062f9e"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getRadius</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim7Capsule9getRadiusEv" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the radius of the capsule </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the radius of the capsule </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim7Capsule9getHeightEv">
-<span id="_CPPv3NK6raisim7Capsule9getHeightEv"></span><span id="_CPPv2NK6raisim7Capsule9getHeightEv"></span><span id="raisim::Capsule::getHeightC"></span><span class="target" id="classraisim_1_1Capsule_1abacc7e5385635e23fc3b8dcc5801a78c"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getHeight</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim7Capsule9getHeightEv" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the height of the capsule </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the height of the capsule </p>
-</dd>
-</dl>
-</dd></dl>
-
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>doxygenclass: breathe_default_project value ‘raisim’ does not seem to be a valid key for the breathe_projects dictionary</p>
 </div>
-</dd></dl>
-
 </section>
 <section id="cylinder-api">
 <h2>Cylinder API<a class="headerlink" href="#cylinder-api" title="Link to this heading"></a></h2>
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim8CylinderE">
-<span id="_CPPv3N6raisim8CylinderE"></span><span id="_CPPv2N6raisim8CylinderE"></span><span id="raisim::Cylinder"></span><span class="target" id="classraisim_1_1Cylinder"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Cylinder</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6raisim16SingleBodyObjectE" title="raisim::SingleBodyObject"><span class="n"><span class="pre">SingleBodyObject</span></span></a><a class="headerlink" href="#_CPPv4N6raisim8CylinderE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim8Cylinder8CylinderEddd">
-<span id="_CPPv3N6raisim8Cylinder8CylinderEddd"></span><span id="_CPPv2N6raisim8Cylinder8CylinderEddd"></span><span id="raisim::Cylinder::Cylinder__double.double.double"></span><span class="target" id="classraisim_1_1Cylinder_1abb61870a1628cd95433da5d5035b7581"></span><span class="sig-name descname"><span class="n"><span class="pre">Cylinder</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">radius</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">height</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">mass</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim8Cylinder8CylinderEddd" title="Link to this definition"></a><br /></dt>
-<dd><p>NOTE body frame origin of <a class="reference internal" href="#classraisim_1_1Cylinder"><span class="std std-ref">Cylinder</span></a> is C.O.M of <a class="reference internal" href="#classraisim_1_1Cylinder"><span class="std std-ref">Cylinder</span></a></p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim8Cylinder9getRadiusEv">
-<span id="_CPPv3NK6raisim8Cylinder9getRadiusEv"></span><span id="_CPPv2NK6raisim8Cylinder9getRadiusEv"></span><span id="raisim::Cylinder::getRadiusC"></span><span class="target" id="classraisim_1_1Cylinder_1a000702a5d11f398de5bf13cdb151870d"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getRadius</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim8Cylinder9getRadiusEv" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the radius of the cylinder </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the radius of the cylinder </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim8Cylinder9getHeightEv">
-<span id="_CPPv3NK6raisim8Cylinder9getHeightEv"></span><span id="_CPPv2NK6raisim8Cylinder9getHeightEv"></span><span id="raisim::Cylinder::getHeightC"></span><span class="target" id="classraisim_1_1Cylinder_1a8a6c22d2e511fb76c465e2960b263c50"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getHeight</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim8Cylinder9getHeightEv" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the height of the cylinder </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the height of the cylinder </p>
-</dd>
-</dl>
-</dd></dl>
-
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>doxygenclass: breathe_default_project value ‘raisim’ does not seem to be a valid key for the breathe_projects dictionary</p>
 </div>
-</dd></dl>
-
 </section>
 <section id="ground-api">
 <h2>Ground API<a class="headerlink" href="#ground-api" title="Link to this heading"></a></h2>
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim6GroundE">
-<span id="_CPPv3N6raisim6GroundE"></span><span id="_CPPv2N6raisim6GroundE"></span><span id="raisim::Ground"></span><span class="target" id="classraisim_1_1Ground"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Ground</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6raisim16SingleBodyObjectE" title="raisim::SingleBodyObject"><span class="n"><span class="pre">SingleBodyObject</span></span></a><a class="headerlink" href="#_CPPv4N6raisim6GroundE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim6Ground9getHeightEv">
-<span id="_CPPv3NK6raisim6Ground9getHeightEv"></span><span id="_CPPv2NK6raisim6Ground9getHeightEv"></span><span id="raisim::Ground::getHeightC"></span><span class="target" id="classraisim_1_1Ground_1a5f2208510612e61f17d3663cfa70ab3e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getHeight</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim6Ground9getHeightEv" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the height of the plane </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the height </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim6Ground11setPositionERKN5Eigen3RefIKN5Eigen8Vector3dEN5Eigen9UnalignedEEE">
-<span id="_CPPv3N6raisim6Ground11setPositionERKN5Eigen3RefIKN5Eigen8Vector3dEN5Eigen9UnalignedEEE"></span><span id="_CPPv2N6raisim6Ground11setPositionERKN5Eigen3RefIKN5Eigen8Vector3dEN5Eigen9UnalignedEEE"></span><span id="raisim::Ground::setPosition__Eigen::Ref:Eigen::Vector3dC.Eigen::Unaligned:CR"></span><span class="target" id="classraisim_1_1Ground_1a70840a45d37fc7dbb6d026dea2d911c6"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setPosition</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Ref</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector3d</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Unaligned</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">originPosition</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N6raisim6Ground11setPositionERKN5Eigen3RefIKN5Eigen8Vector3dEN5Eigen9UnalignedEEE" title="Link to this definition"></a><br /></dt>
-<dd><p>Set position of the object (using Eigen) </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>originPosition</strong> – <strong>[in]</strong> Position </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim6Ground11setPositionEddd">
-<span id="_CPPv3N6raisim6Ground11setPositionEddd"></span><span id="_CPPv2N6raisim6Ground11setPositionEddd"></span><span id="raisim::Ground::setPosition__double.double.double"></span><span class="target" id="classraisim_1_1Ground_1a9b52d576d5b57b7de8499dde5fb4e426"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setPosition</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">z</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N6raisim6Ground11setPositionEddd" title="Link to this definition"></a><br /></dt>
-<dd><p>Set position of the object (using three doubles) </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> – <strong>[in]</strong> x position </p></li>
-<li><p><strong>y</strong> – <strong>[in]</strong> y position </p></li>
-<li><p><strong>z</strong> – <strong>[in]</strong> z position </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>doxygenclass: breathe_default_project value ‘raisim’ does not seem to be a valid key for the breathe_projects dictionary</p>
 </div>
-</dd></dl>
-
 </section>
 <section id="mesh-api">
 <h2>Mesh API<a class="headerlink" href="#mesh-api" title="Link to this heading"></a></h2>
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim4MeshE">
-<span id="_CPPv3N6raisim4MeshE"></span><span id="_CPPv2N6raisim4MeshE"></span><span id="raisim::Mesh"></span><span class="target" id="classraisim_1_1Mesh"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Mesh</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6raisim16SingleBodyObjectE" title="raisim::SingleBodyObject"><span class="n"><span class="pre">SingleBodyObject</span></span></a><a class="headerlink" href="#_CPPv4N6raisim4MeshE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim4Mesh11setBodyTypeE8BodyType">
-<span id="_CPPv3N6raisim4Mesh11setBodyTypeE8BodyType"></span><span id="_CPPv2N6raisim4Mesh11setBodyTypeE8BodyType"></span><span id="raisim::Mesh::setBodyType__BodyType"></span><span class="target" id="classraisim_1_1Mesh_1acd0daa4173b66d0b860b8100cf39a48d"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setBodyType</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">BodyType</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N6raisim4Mesh11setBodyTypeE8BodyType" title="Link to this definition"></a><br /></dt>
-<dd><p>set the body type. Dynamic means that object is free to move. Kinematic means that the object can have velocity but has an infinite mass (like a conveyor belt). Static means that the object cannot move and has an infinite mass. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>type</strong> – <strong>[in]</strong> the body type </p>
-</dd>
-</dl>
-</dd></dl>
-
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>doxygenclass: breathe_default_project value ‘raisim’ does not seem to be a valid key for the breathe_projects dictionary</p>
 </div>
-</dd></dl>
-
 </section>
 </section>
 
