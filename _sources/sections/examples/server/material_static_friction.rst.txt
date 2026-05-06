@@ -8,23 +8,24 @@ Compares static and dynamic friction by pushing a box across a ground plane. Mat
 
 Screenshot
 ==========
-.. image:: ../../../image/materials.png
+.. image:: ../../../image/material_static_friction.png
+   :alt: material_static_friction example
+   :width: 100%
 
 Binary
 ======
-CMake target and executable name: ``material_static_friction``.
+Installed executable: ``material_static_friction``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target material_static_friction
-   ./material_static_friction
+   <raisim-install>/bin/material_static_friction
 
 On Windows, run ``material_static_friction.exe`` instead.
-This example uses RaisimServer. Start a visualizer client (RaisimUnity, RaisimUnreal, or the rayrai TCP viewer) and connect to port 8080.
+This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.
 
 
 Details
@@ -33,7 +34,3 @@ Details
 - Loads material properties from an XML file.
 - Prints console hints when friction regime changes.
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/server/material_static_friction.cpp
-   :language: cpp

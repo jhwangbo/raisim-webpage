@@ -9,22 +9,23 @@ Creates a kinematic ground platform that moves sinusoidally under an ANYmal. It 
 Screenshot
 ==========
 .. image:: ../../../image/kinematic_platform.png
+   :alt: kinematic_platform example
+   :width: 100%
 
 Binary
 ======
-CMake target and executable name: ``kinematic_platform``.
+Installed executable: ``kinematic_platform``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target kinematic_platform
-   ./kinematic_platform
+   <raisim-install>/bin/kinematic_platform
 
 On Windows, run ``kinematic_platform.exe`` instead.
-This example uses RaisimServer. Start a visualizer client (RaisimUnity, RaisimUnreal, or the rayrai TCP viewer) and connect to port 8080.
+This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.
 
 
 Details
@@ -33,7 +34,3 @@ Details
 - Places ANYmal on top with PD posture control.
 - Demonstrates ``BodyType::KINEMATIC`` and prescribed motion.
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/server/kinematic_platform.cpp
-   :language: cpp

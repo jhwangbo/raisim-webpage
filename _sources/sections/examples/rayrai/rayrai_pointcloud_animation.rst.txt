@@ -9,19 +9,20 @@ Generates animated ring point clouds to show per-point color updates and dynamic
 Screenshot
 ==========
 .. image:: ../../../image/rayrai_pointcloud_animation.png
+   :alt: rayrai_pointcloud_animation example
+   :width: 100%
 
 Binary
 ======
-CMake target and executable name: ``rayrai_pointcloud_animation``.
+Installed executable: ``rayrai_pointcloud_animation``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target rayrai_pointcloud_animation
-   ./rayrai_pointcloud_animation
+   <raisim-install>/bin/rayrai_pointcloud_animation
 
 On Windows, run ``rayrai_pointcloud_animation.exe`` instead.
 This example uses the in-process rayrai renderer (no external client required).
@@ -33,7 +34,3 @@ Details
 - Updates positions every frame to create an orbiting animation.
 - Good for testing point-cloud upload and rendering.
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/rayrai/rayrai_pointcloud_animation.cpp
-   :language: cpp

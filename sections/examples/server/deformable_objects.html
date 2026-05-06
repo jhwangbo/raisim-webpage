@@ -1,0 +1,294 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Server Example: Deformable Objects &mdash; raisim 2.2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=b21de401"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Server Example: Dynamic Heightmap" href="dynamic_heightmap_unreal.html" />
+    <link rel="prev" title="Server Example: Compound Object" href="compound_object.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Visualization.html">Visualization</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../Examples.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#run">Run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#visualization-modes">Visualization modes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#example-layout">Example layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#choosing-an-example">Choosing an example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#optional-targets">Optional targets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#rayrai-tools">Rayrai Tools</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../Examples.html#server-examples">Server Examples</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="compound_object.html">Server Example: Compound Object</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Server Example: Deformable Objects</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#binary">Binary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#run">Run</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#details">Details</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#construction-modes">Construction modes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#material-parameters">Material parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#visualization">Visualization</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="dynamic_heightmap_unreal.html">Server Example: Dynamic Heightmap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dynamic_object_addition.html">Server Example: Dynamic Object Addition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dzhanibekov_effect.html">Server Example: Dzhanibekov Effect</a></li>
+<li class="toctree-l3"><a class="reference internal" href="granular_media.html">granular_media</a></li>
+<li class="toctree-l3"><a class="reference internal" href="heightmap_from_png.html">Server Example: Heightmap From Png</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inverse_dynamics.html">Server Example: Inverse Dynamics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="kinematic_platform.html">Server Example: Kinematic Platform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="length_constraints_newtons_cradle.html">Server Example: Length Constraints Newtons Cradle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="material_restitution.html">Server Example: Material Restitution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="material_static_friction.html">Server Example: Material Static Friction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mesh_stack.html">Server Example: Mesh Stack</a></li>
+<li class="toctree-l3"><a class="reference internal" href="minitaur_pd.html">Server Example: Minitaur PD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mjcf_gymnasium_hopper.html">mjcf_gymnasium_hopper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mjcf_gymnasium_humanoid.html">mjcf_gymnasium_humanoid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mjcf_gymnasium_walker2d.html">mjcf_gymnasium_walker2d</a></li>
+<li class="toctree-l3"><a class="reference internal" href="model_asset_pipeline.html">Server Example: Model Asset Pipeline</a></li>
+<li class="toctree-l3"><a class="reference internal" href="object_lifecycle_stress.html">Server Example: Object Lifecycle Stress</a></li>
+<li class="toctree-l3"><a class="reference internal" href="primitive_grid.html">Server Example: Primitive Grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="procedural_heightmap.html">Server Example: Procedural Heightmap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ray_casting.html">Server Example: Ray Casting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ray_scan_lidar.html">Server Example: Ray Scan LiDAR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spring_damper_joints.html">Server Example: Spring Damper Joints</a></li>
+<li class="toctree-l3"><a class="reference internal" href="templated_tracked_robot.html">Server Example: Templated Tracked Robot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="visual_objects_showcase.html">Server Example: Visual Objects Showcase</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wheeled_robot_force_control.html">Server Example: Wheeled Robot Force Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ycb_objects.html">ycb_objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../worlds/anymal_pair.html">ANYmal Pair</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../worlds/atlas.html">Atlas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../worlds/hill1_heightmap.html">Hill1 Heightmap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../worlds/kinova_arm.html">Kinova Arm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../worlds/lake1_heightmap.html">Lake1 Heightmap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../worlds/mountain1_heightmap.html">Mountain1 Heightmap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../worlds/office1_scene.html">Office1 Scene</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#xml-examples">XML Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#rayrai-example-gallery">Rayrai Example Gallery</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Changelog.html">Changelog: v2.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../RayTest.html">Ray Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Sensors.html">Sensors</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../Examples.html">Examples</a></li>
+      <li class="breadcrumb-item active">Server Example: Deformable Objects</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="server-example-deformable-objects">
+<h1>Server Example: Deformable Objects<a class="headerlink" href="#server-example-deformable-objects" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>Creates a raised soft cloth over a static sphere and also constructs a
+randomly oriented mesh-based deformable cube stack to the side. The cubes use
+resampled OBJ surface particles with automatically generated internal struts
+so they share the same volumetric behavior.</p>
+<p>Use this example as the starting point for soft-body setup. It shows explicit
+cloth topology and deformable mesh construction from closed OBJ meshes.</p>
+<a class="reference internal image-reference" href="../../../_images/deformable_objects.png"><img alt="deformable_objects example" src="../../../_images/deformable_objects.png" style="width: 100%;" />
+</a>
+</section>
+<section id="binary">
+<h2>Binary<a class="headerlink" href="#binary" title="Link to this heading"></a></h2>
+<p>Installed executable: <code class="docutils literal notranslate"><span class="pre">deformable_objects</span></code>.</p>
+<p>This example is only built when the installed RaiSim package exposes
+<code class="docutils literal notranslate"><span class="pre">raisim::DeformableObject</span></code>.</p>
+</section>
+<section id="run">
+<h2>Run<a class="headerlink" href="#run" title="Link to this heading"></a></h2>
+<p>Run the installed executable:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/deformable_objects
+</pre></div>
+</div>
+<p>On Windows, run <code class="docutils literal notranslate"><span class="pre">deformable_objects.exe</span></code> instead.
+This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.</p>
+</section>
+<section id="details">
+<h2>Details<a class="headerlink" href="#details" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Demonstrates <code class="docutils literal notranslate"><span class="pre">World::addDeformableCloth</span></code> with explicit vertices and
+triangle indices.</p></li>
+<li><p>Demonstrates OBJ particle generation and automatic internal struts.</p></li>
+<li><p>Generates deterministic random cube orientations at startup, so repeated runs
+show the same pile while still exercising non-axis-aligned contacts.</p></li>
+<li><p>Uses <code class="docutils literal notranslate"><span class="pre">MeshParticleOptions::spacing</span></code> so RaiSim resamples the mesh surface and
+builds a dense particle/sphere contact proxy instead of relying only on the
+raw OBJ vertices. During mesh loading, RaiSim also raises the deformable
+collision radius to at least <code class="docutils literal notranslate"><span class="pre">0.58</span> <span class="pre">*</span> <span class="pre">spacing</span></code> so the generated spheres cover
+the surface without particle-scale holes.</p></li>
+<li><p>Uses <code class="docutils literal notranslate"><span class="pre">distanceCompliance</span></code> and <code class="docutils literal notranslate"><span class="pre">bendCompliance</span></code> for the cloth, and
+<code class="docutils literal notranslate"><span class="pre">distanceCompliance</span></code> plus internal struts for the mesh objects.</p></li>
+<li><p>Tunes the cloth to be highly deformable, with high bend and stretch
+compliance so it visibly sags and wraps around the sphere.</p></li>
+<li><p>Uses identical mesh settings for every cube and low-restitution
+contact material pairs so impacts settle without bouncing.</p></li>
+<li><p>Keeps the generated cloth and cube particle counts moderate so the example
+remains interactive while still showing visible deformation.</p></li>
+<li><p>Writes temporary closed cube OBJ files in the current working directory at
+startup and removes them on exit, so no extra mesh asset is required.</p></li>
+</ul>
+</section>
+<section id="construction-modes">
+<h2>Construction modes<a class="headerlink" href="#construction-modes" title="Link to this heading"></a></h2>
+<p>The example covers:</p>
+<ul class="simple">
+<li><p><strong>Cloth</strong>: user-provided vertices and triangle indices define a sheet. This
+is the right model for flags, hanging cloth, and thin surfaces.</p></li>
+<li><p><strong>Mesh object</strong>: particles are generated from a closed OBJ mesh and
+connected with internal struts. This is the starting point for deformable
+objects that should compress and spring back.</p></li>
+</ul>
+</section>
+<section id="material-parameters">
+<h2>Material parameters<a class="headerlink" href="#material-parameters" title="Link to this heading"></a></h2>
+<p>The material controls the XPBD/PBD response:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">distanceCompliance</span></code> controls stretch resistance.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bendCompliance</span></code> controls bending resistance for cloth-like surfaces.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">distanceCompliance</span></code> also controls the elastic response of the mesh-based
+cubes in this example.</p></li>
+</ul>
+<p>Lower compliance means stiffer constraints. Use lower-resolution settings for
+performance comparisons when increasing particle count or decreasing
+compliance.</p>
+<p>The cloth in this example uses deliberately soft values so it visibly sags and
+wraps over the raised sphere. The mesh-based deformable cubes are stacked to
+the side without obscuring the cloth-sphere interaction. The cube material uses
+mesh internal struts, damping, and low-restitution contact material pairs so
+the dropped cubes deform, settle, and recover without excessive bouncing. The
+example sets the cube <code class="docutils literal notranslate"><span class="pre">collisionRadius</span></code> from the requested particle spacing.
+For a stiffer fabric, reduce
+<code class="docutils literal notranslate"><span class="pre">distanceCompliance</span></code> and <code class="docutils literal notranslate"><span class="pre">bendCompliance</span></code> or increase the solver iteration
+count.</p>
+</section>
+<section id="visualization">
+<h2>Visualization<a class="headerlink" href="#visualization" title="Link to this heading"></a></h2>
+<p>This example uses RaisimServer. Start the rayrai TCP viewer before running it:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>/path/to/raisim2Lib/rayrai/bin/rayrai_raisim_tcp_viewer
+&lt;raisim-install&gt;/bin/deformable_objects
+</pre></div>
+</div>
+<p>The visualizer receives dynamic deformable topology and vertex updates through
+the server stream.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="compound_object.html" class="btn btn-neutral float-left" title="Server Example: Compound Object" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="dynamic_heightmap_unreal.html" class="btn btn-neutral float-right" title="Server Example: Dynamic Heightmap" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

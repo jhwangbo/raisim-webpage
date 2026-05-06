@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="Server Example: Visual Objects Showcase" href="visual_objects_showcase.html" />
-    <link rel="prev" title="Server Example: Sensor Suite" href="sensor_suite.html" /> 
+    <link rel="prev" title="Server Example: Kinematic Platform" href="kinematic_platform.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -58,8 +58,12 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../../Examples.html">Examples</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../Examples.html#overview">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../Examples.html#build-and-run">Build and run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#visualization-modes">Visualization modes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#example-layout">Example layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#choosing-an-example">Choosing an example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#optional-targets">Optional targets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#installed-output">Installed output</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../Examples.html#xml">XML</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#maps">Maps</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../Examples.html#rayrai">Rayrai</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../../Examples.html#raisimserver">RaisimServer</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="primitive_grid.html">Server Example: Primitive Grid</a></li>
@@ -73,7 +77,6 @@
 <li class="toctree-l3"><a class="reference internal" href="spring_damper_joints.html">Server Example: Spring Damper Joints</a></li>
 <li class="toctree-l3"><a class="reference internal" href="templated_tracked_robot.html">Server Example: Templated Tracked Robot</a></li>
 <li class="toctree-l3"><a class="reference internal" href="kinematic_platform.html">Server Example: Kinematic Platform</a></li>
-<li class="toctree-l3"><a class="reference internal" href="sensor_suite.html">Server Example: Sensor Suite</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Server Example: Synchronous Server Update</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#overview">Overview</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#binary">Binary</a></li>
@@ -93,8 +96,14 @@
 <li class="toctree-l3"><a class="reference internal" href="dzhanibekov_effect.html">Server Example: Dzhanibekov Effect</a></li>
 <li class="toctree-l3"><a class="reference internal" href="object_lifecycle_stress.html">Server Example: Object Lifecycle Stress</a></li>
 <li class="toctree-l3"><a class="reference internal" href="island_sleep_benchmark.html">Island Sleep Benchmark</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deformable_objects.html">Server Example: Deformable Objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="model_asset_pipeline.html">Server Example: Model Asset Pipeline</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mjcf_gymnasium_hopper.html">mjcf_gymnasium_hopper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mjcf_gymnasium_walker2d.html">mjcf_gymnasium_walker2d</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mjcf_gymnasium_humanoid.html">mjcf_gymnasium_humanoid</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#world-scenes">World Scenes</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../ConventionsAndNotations.html">Conventions and Notations</a></li>
@@ -110,6 +119,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DeformableObject.html">Deformable Objects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../RayTest.html">Ray Test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Sensors.html">Sensors</a></li>
 </ul>
@@ -151,7 +161,9 @@
 <h1>Server Example: Synchronous Server Update<a class="headerlink" href="#server-example-synchronous-server-update" title="Link to this heading"></a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
-<p>Runs the RaisimServer in a manual socket loop and updates sensors only when the client requests them. This shows how to drive synchronous visualization and sensor updates.</p>
+<p>Runs the RaisimServer in a manual socket loop. This shows how to drive
+synchronous TCP visualization updates. RaiSim does not support sensor
+measurement updates from the visualizer.</p>
 </section>
 <section id="binary">
 <h2>Binary<a class="headerlink" href="#binary" title="Link to this heading"></a></h2>
@@ -165,14 +177,15 @@
 </pre></div>
 </div>
 <p>On Windows, run <code class="docutils literal notranslate"><span class="pre">synchronous_server_update.exe</span></code> instead.
-This example uses RaisimServer. Start a visualizer client (RaisimUnity, RaisimUnreal, or the rayrai TCP viewer) and connect to port 8080.</p>
+This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.</p>
 </section>
 <section id="details">
 <h2>Details<a class="headerlink" href="#details" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Runs RaisimServer in synchronous request/response mode.</p></li>
-<li><p>Manually accepts a TCP connection and processes sensor update requests.</p></li>
-<li><p>Uses VISUALIZER RGB/depth sensors with <code class="docutils literal notranslate"><span class="pre">needsSensorUpdate()</span></code>.</p></li>
+<li><p>Manually accepts a TCP connection and processes world-state update requests.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">needsSensorUpdate()</span></code> always returns false because RaiSim does not request
+RGB/depth sensor frames from TCP visualizers.</p></li>
 </ul>
 </section>
 <section id="source">
@@ -218,18 +231,6 @@ This example uses RaisimServer. Start a visualizer client (RaisimUnity, RaisimUn
 <span class="w">  </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">setGeneralizedForce</span><span class="p">(</span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="o">::</span><span class="n">Zero</span><span class="p">(</span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getDOF</span><span class="p">()));</span>
 <span class="w">  </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">setName</span><span class="p">(</span><span class="s">&quot;Anymal&quot;</span><span class="p">);</span>
 
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">front_depthSensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getSensorSet</span><span class="p">(</span><span class="s">&quot;depth_camera_rear_camera_parent&quot;</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">getSensor</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">DepthCamera</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;depth&quot;</span><span class="p">);</span>
-<span class="w">  </span><span class="n">front_depthSensor</span><span class="o">-&gt;</span><span class="n">setMeasurementSource</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">Sensor</span><span class="o">::</span><span class="n">MeasurementSource</span><span class="o">::</span><span class="n">VISUALIZER</span><span class="p">);</span>
-
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">front_rgbCamera</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getSensorSet</span><span class="p">(</span><span class="s">&quot;depth_camera_front_camera_parent&quot;</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">getSensor</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">RGBCamera</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;color&quot;</span><span class="p">);</span>
-<span class="w">  </span><span class="n">front_rgbCamera</span><span class="o">-&gt;</span><span class="n">setMeasurementSource</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">Sensor</span><span class="o">::</span><span class="n">MeasurementSource</span><span class="o">::</span><span class="n">VISUALIZER</span><span class="p">);</span>
-
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">rear_depthSensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getSensorSet</span><span class="p">(</span><span class="s">&quot;depth_camera_rear_camera_parent&quot;</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">getSensor</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">DepthCamera</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;depth&quot;</span><span class="p">);</span>
-<span class="w">  </span><span class="n">rear_depthSensor</span><span class="o">-&gt;</span><span class="n">setMeasurementSource</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">Sensor</span><span class="o">::</span><span class="n">MeasurementSource</span><span class="o">::</span><span class="n">VISUALIZER</span><span class="p">);</span>
-
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">rear_rgbCamera</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getSensorSet</span><span class="p">(</span><span class="s">&quot;depth_camera_rear_camera_parent&quot;</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">getSensor</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">RGBCamera</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;color&quot;</span><span class="p">);</span>
-<span class="w">  </span><span class="n">rear_rgbCamera</span><span class="o">-&gt;</span><span class="n">setMeasurementSource</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">Sensor</span><span class="o">::</span><span class="n">MeasurementSource</span><span class="o">::</span><span class="n">VISUALIZER</span><span class="p">);</span>
-
 <span class="w">  </span><span class="n">server</span><span class="p">.</span><span class="n">setupSocket</span><span class="p">();</span>
 <span class="w">  </span><span class="n">raisim_examples</span><span class="o">::</span><span class="n">warnIfNoClientConnected</span><span class="p">(</span><span class="n">server</span><span class="p">);</span>
 <span class="w">  </span><span class="n">server</span><span class="p">.</span><span class="n">acceptConnection</span><span class="p">(</span><span class="mf">2000.0</span><span class="p">);</span>
@@ -258,7 +259,7 @@ This example uses RaisimServer. Start a visualizer client (RaisimUnity, RaisimUn
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="sensor_suite.html" class="btn btn-neutral float-left" title="Server Example: Sensor Suite" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="kinematic_platform.html" class="btn btn-neutral float-left" title="Server Example: Kinematic Platform" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="visual_objects_showcase.html" class="btn btn-neutral float-right" title="Server Example: Visual Objects Showcase" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

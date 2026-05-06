@@ -8,23 +8,24 @@ Loads a mesh (the monkey OBJ) multiple times and stacks them in a grid. This dem
 
 Screenshot
 ==========
-.. image:: ../../../image/mesh.png
+.. image:: ../../../image/mesh_stack.png
+   :alt: mesh_stack example
+   :width: 100%
 
 Binary
 ======
-CMake target and executable name: ``mesh_stack``.
+Installed executable: ``mesh_stack``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target mesh_stack
-   ./mesh_stack
+   <raisim-install>/bin/mesh_stack
 
 On Windows, run ``mesh_stack.exe`` instead.
-This example uses RaisimServer. Start a visualizer client (RaisimUnity, RaisimUnreal, or the rayrai TCP viewer) and connect to port 8080.
+This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.
 
 
 Details
@@ -33,7 +34,3 @@ Details
 - Adjusts ERP and timestep for stable stacking.
 - Positions the camera for a clear view of the pile.
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/server/mesh_stack.cpp
-   :language: cpp

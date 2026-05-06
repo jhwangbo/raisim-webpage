@@ -2,25 +2,29 @@
 XML Example: Templated World
 ############################
 
+.. image:: ../../../image/xml_templated_world.png
+   :alt: xml_templated_world example
+   :width: 100%
+
+
 Overview
 ========
 Instantiates a templated XML world with parameter overrides (spawn options, counts, offsets). Use this to see how parameterized XML files can generate variants of a scene without duplicating the XML.
 
 Binary
 ======
-CMake target and executable name: ``xml_templated_world``.
+Installed executable: ``xml_templated_world``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target xml_templated_world
-   ./xml_templated_world
+   <raisim-install>/bin/xml_templated_world
 
 On Windows, run ``xml_templated_world.exe`` instead.
-This example uses RaisimServer. Start a visualizer client (RaisimUnity, RaisimUnreal, or the rayrai TCP viewer) and connect to port 8080.
+This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.
 
 
 Details
@@ -29,7 +33,3 @@ Details
 - Uses ``World::ParameterContainer`` to set spawn flags and counts.
 - Runs the scene with RaisimServer for visualization.
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/xml/xml_templated_world.cpp
-   :language: cpp

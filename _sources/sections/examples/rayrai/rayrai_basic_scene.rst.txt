@@ -9,19 +9,20 @@ Minimal scene with Go1 on a textured ground plane. It is a quick sanity check fo
 Screenshot
 ==========
 .. image:: ../../../image/rayrai_basic_scene.png
+   :alt: rayrai_basic_scene example
+   :width: 100%
 
 Binary
 ======
-CMake target and executable name: ``rayrai_basic_scene``.
+Installed executable: ``rayrai_basic_scene``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target rayrai_basic_scene
-   ./rayrai_basic_scene
+   <raisim-install>/bin/rayrai_basic_scene
 
 On Windows, run ``rayrai_basic_scene.exe`` instead.
 This example uses the in-process rayrai renderer (no external client required).
@@ -33,7 +34,3 @@ Details
 - Sets a background color and a checkerboard ground texture.
 - Minimal render loop for a basic rayrai scene.
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/rayrai/rayrai_basic_scene.cpp
-   :language: cpp

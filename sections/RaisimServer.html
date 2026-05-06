@@ -6,14 +6,14 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Raisim Server &mdash; raisim 2.0.0 documentation</title>
+  <title>Raisim Server &mdash; raisim 2.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=51b770b3"></script>
+      <script src="../_static/documentation_options.js?v=b21de401"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -45,17 +45,19 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog: v2.2.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Support.html">Support</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Visualizers.html">Visualizers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ConventionsAndNotations.html">Conventions and Notations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Determinism.html">Determinism</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Math.html">Math Classes</a></li>
@@ -65,7 +67,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Raisim Server</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#typical-usage">Typical usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#thread-safety-and-lifecycle">Thread safety and lifecycle</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#sensor-updates-from-the-visualizer">Sensor updates from the visualizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sensor-measurements">Sensor measurements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#synchronous-updates-optional">Synchronous updates (optional)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#raisimserver-api">RaisimServer API</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6raisim12RaisimServerE"><code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code></a><ul>
@@ -73,7 +75,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim12RaisimServer11setupSocketEi"><code class="docutils literal notranslate"><span class="pre">setupSocket()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim12RaisimServer16acceptConnectionEi"><code class="docutils literal notranslate"><span class="pre">acceptConnection()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisim12RaisimServer15closeConnectionEv"><code class="docutils literal notranslate"><span class="pre">closeConnection()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim12RaisimServer6setMapERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">setMap()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim12RaisimServer12launchServerEi"><code class="docutils literal notranslate"><span class="pre">launchServer()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim12RaisimServer24integrateWorldThreadSafeEv"><code class="docutils literal notranslate"><span class="pre">integrateWorldThreadSafe()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim12RaisimServer21applyInteractionForceEv"><code class="docutils literal notranslate"><span class="pre">applyInteractionForce()</span></code></a></li>
@@ -188,14 +189,13 @@
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Related Software</span></p>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="Rayrai.html">rayrai Visualizer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Rayrai.html">rayrai Visualizer</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RaisimUnity.html">RaiSimUnity</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RaisimUnreal.html">RaisimUnreal</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LegacyIntegrations.html">Legacy Integrations</a></li>
 </ul>
 
         </div>
@@ -224,11 +224,13 @@
   <section id="raisim-server">
 <h1>Raisim Server<a class="headerlink" href="#raisim-server" title="Link to this heading"></a></h1>
 <p>RaisimServer serializes <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> and streams the data to clients via TCP/IP.
-We provide the RaisimUnity (<a class="reference external" href="https://raisim.com/sections/RaisimUnity.html">doc</a>) client, which visualizes a <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code>.
-Basic usage is described in the <a class="reference external" href="https://raisim.com/sections/RaisimUnity.html#how-to-use-raisimunity">documentation</a>.</p>
+Use the rayrai TCP viewer for supported server-side visualization.
+For older Unity or Unreal visualization workflows, see <a class="reference internal" href="LegacyIntegrations.html"><span class="doc">Legacy Integrations</span></a>.
+For a workflow-level comparison between server-based visualization and
+in-process rayrai rendering, see <a class="reference internal" href="Visualization.html"><span class="doc">Visualization</span></a>.</p>
 <p>In addition to visualizing a <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code>, <code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code> can visualize additional objects.
-An example can be found <a class="reference external" href="https://github.com/raisimTech/raisim2Lib/blob/master/examples/src/server/visual_objects_showcase.cpp">here</a>.
-The example is displayed as follows:</p>
+The legacy visual-object showcase is displayed as follows; use the current
+examples index for runnable source targets:</p>
 <img alt="../_images/visuals.gif" src="../_images/visuals.gif" />
 <section id="typical-usage">
 <h2>Typical usage<a class="headerlink" href="#typical-usage" title="Link to this heading"></a></h2>
@@ -255,20 +257,22 @@ to avoid races.</p>
 <p>The server can be paused with <code class="docutils literal notranslate"><span class="pre">hibernate()</span></code> and resumed with <code class="docutils literal notranslate"><span class="pre">wakeup()</span></code>.
 Call <code class="docutils literal notranslate"><span class="pre">killServer()</span></code> to stop the server thread and disconnect the client.</p>
 </section>
-<section id="sensor-updates-from-the-visualizer">
-<h2>Sensor updates from the visualizer<a class="headerlink" href="#sensor-updates-from-the-visualizer" title="Link to this heading"></a></h2>
-<p>If a sensor’s measurement source is set to
-<code class="docutils literal notranslate"><span class="pre">Sensor::MeasurementSource::VISUALIZER</span></code>, the server requests updates only
-when the sensor’s update period elapses. The visualizer sends the rendered
-RGB/depth buffers back to the server, which then writes them into the sensor’s
-internal buffers and updates the timestamp. Sensors with non-visualizer
-measurement sources are serialized directly from RaiSim.</p>
+<section id="sensor-measurements">
+<h2>Sensor measurements<a class="headerlink" href="#sensor-measurements" title="Link to this heading"></a></h2>
+<p>RaiSim does not support sensor measurement updates from a visualizer.
+<code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> streams the world state to visualizer clients, but it does not
+request RGB or depth frames back from TCP visualizers and does not write
+visualizer-rendered data into RaiSim sensor buffers.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">Sensor::MeasurementSource::RAISIM</span></code> for sensors that RaiSim can compute
+from the physics world, such as IMU, spinning LiDAR, and depth-camera CPU ray
+updates. Use <code class="docutils literal notranslate"><span class="pre">Sensor::MeasurementSource::MANUAL</span></code> when user code or an
+in-process renderer writes the sensor buffer.</p>
 </section>
 <section id="synchronous-updates-optional">
 <h2>Synchronous updates (optional)<a class="headerlink" href="#synchronous-updates-optional" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">processRequests()</span></code> implements a synchronous request/response loop used by
-clients that explicitly pull updates. It returns <code class="docutils literal notranslate"><span class="pre">false</span></code> if the client does not
-respond, rejects the protocol version, or fails to deliver sensor data in time.</p>
+clients that explicitly pull world-state updates. It returns <code class="docutils literal notranslate"><span class="pre">false</span></code> if the
+client does not respond or rejects the protocol version.</p>
 </section>
 <section id="raisimserver-api">
 <h2>RaisimServer API<a class="headerlink" href="#raisimserver-api" title="Link to this heading"></a></h2>
@@ -311,16 +315,6 @@ respond, rejects the protocol version, or fails to deliver sensor data in time.<
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim12RaisimServer15closeConnectionEv">
 <span id="_CPPv3NK6raisim12RaisimServer15closeConnectionEv"></span><span id="_CPPv2NK6raisim12RaisimServer15closeConnectionEv"></span><span id="raisim::RaisimServer::closeConnectionC"></span><span class="target" id="classraisim_1_1RaisimServer_1a71e981f6745c15a18570acc7d47eb3fe"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">closeConnection</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim12RaisimServer15closeConnectionEv" title="Link to this definition"></a><br /></dt>
 <dd><p>Close the current connection from a client. For new connections, the port has to be setup again. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim12RaisimServer6setMapERKNSt6stringE">
-<span id="_CPPv3N6raisim12RaisimServer6setMapERKNSt6stringE"></span><span id="_CPPv2N6raisim12RaisimServer6setMapERKNSt6stringE"></span><span id="raisim::RaisimServer::setMap__ssCR"></span><span class="target" id="classraisim_1_1RaisimServer_1a5f6a41abc4a98159284dbaa601e4903c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setMap</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">map</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim12RaisimServer6setMapERKNSt6stringE" title="Link to this definition"></a><br /></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>map</strong> – <strong>[in]</strong> name of the map to be loaded. This only works with RaisimUnreal. Currently, the following maps are available “”: Empty map. Supports weather and time. “simple”: Empty map. Simple sky for faster rendering. “wheat”: a flat wheat field “dune”: flat dune </p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="cpp function">
@@ -890,10 +884,10 @@ respond, rejects the protocol version, or fails to deliver sensor data in time.<
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim12RaisimServer17needsSensorUpdateEv">
 <span id="_CPPv3N6raisim12RaisimServer17needsSensorUpdateEv"></span><span id="_CPPv2N6raisim12RaisimServer17needsSensorUpdateEv"></span><span id="raisim::RaisimServer::needsSensorUpdate"></span><span class="target" id="classraisim_1_1RaisimServer_1a4cf73289738339792d72d30e7214389f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">needsSensorUpdate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim12RaisimServer17needsSensorUpdateEv" title="Link to this definition"></a><br /></dt>
-<dd><p>Check if there is any sensor that has to be updated from the visualizer </p>
+<dd><p>RaiSim does not support sensor measurement updates from visualizers. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>if any of the sensors needs an update </p>
+<dd class="field-odd"><p>false </p>
 </dd>
 </dl>
 </dd></dl>

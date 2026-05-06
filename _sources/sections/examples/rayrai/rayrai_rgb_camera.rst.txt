@@ -9,19 +9,20 @@ Renders the Go1 RGB camera into an ImGui window and draws the camera frustum in 
 Screenshot
 ==========
 .. image:: ../../../image/rayrai_rgb_camera.png
+   :alt: rayrai_rgb_camera example
+   :width: 100%
 
 Binary
 ======
-CMake target and executable name: ``rayrai_rgb_camera``.
+Installed executable: ``rayrai_rgb_camera``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target rayrai_rgb_camera
-   ./rayrai_rgb_camera
+   <raisim-install>/bin/rayrai_rgb_camera
 
 On Windows, run ``rayrai_rgb_camera.exe`` instead.
 This example uses the in-process rayrai renderer (no external client required).
@@ -33,7 +34,3 @@ Details
 - Renders the RGB frame with an external camera and shows it in ImGui.
 - Adds a camera frustum overlay for debugging intrinsics.
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/rayrai/rayrai_rgb_camera.cpp
-   :language: cpp

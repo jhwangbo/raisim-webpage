@@ -40,7 +40,7 @@ Like any other object, an articulated system is created by the world instance us
 There are four ways to specify an articulated system.
 
 1. by providing the path to the URDF file (recommended)
-2. by providing the path to the URDF template file (`example <https://github.com/raisimTech/raisim2Lib/blob/master/examples/src/server/templated_tracked_robot.cpp>`_)
+2. by providing the path to the URDF template file
 3. by providing a :code:`std::string` containing the URDF text (useful when working with Xacro)
 4. by providing a :code:`raisim::Child` instance (advanced; not recommended for beginners)
 
@@ -234,7 +234,8 @@ Two preprocessor features (also available in the RaiSim world configuration file
 
 * You can specify an equation instead of a variable. For example, {@@Robot_Height*@@Robot_Width*2}.
 
-The preprocessor example can be found in ``examples/src/server/templated_tracked_robot.cpp`` and the corresponding URDF template in ``rsc/templatedTrackedRobot/trackedTemplate.urdf``.
+The corresponding URDF template format is shown by resources such as
+``rsc/templatedTrackedRobot/trackedTemplate.urdf``.
 
 
 In RaiSim, each body of an articulated system has a set of collision bodies and visual objects.
@@ -414,7 +415,9 @@ Note that the inverse dynamics pipeline will slow down the simulation by about 1
 After a simulation loop, you can call ``raisim::ArticulatedSystem::getForceAtJointInWorldFrame()`` and ``raisim::ArticulatedSystem::getTorqueAtJointInWorldFrame()`` to get forces and torques acting at the specified joint.
 
 Assuming that there are no joint position/velocity limit forces acting at the joint, you can compute the joint actuation as a dot product of the joint axis and the joint torque.
-An example can be found in ``examples/server/inverse_dynamics.cpp``.
+The current articulated examples, ``example_anymal_contacts`` and
+``example_atlas_contacts``, show the current source layout for loading and
+stepping articulated systems.
 
 PD Controller
 =============================
@@ -616,7 +619,6 @@ as equality constraints inside the same loop. This makes closed-loop systems
 numerically robust in RaiSim, because the loop constraints are enforced
 through the same stabilized contact solver that resolves impacts and friction.
 
-An example of a closed-loop system can be found `here <https://github.com/raisimTech/raisim2Lib/blob/master/examples/src/server/minitaur_pd.cpp>`__.
 An example of a closed-loop system URDF can be found `here <https://github.com/raisimTech/raisim2Lib/blob/master/rsc/minitaur/minitaur.urdf>`__.
 
 

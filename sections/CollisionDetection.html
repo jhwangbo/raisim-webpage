@@ -6,14 +6,14 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Collision Detection and Colliders &mdash; raisim 2.0.0 documentation</title>
+  <title>Collision Detection and Colliders &mdash; raisim 2.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=51b770b3"></script>
+      <script src="../_static/documentation_options.js?v=b21de401"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -45,17 +45,19 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog: v2.2.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Support.html">Support</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Visualizers.html">Visualizers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ConventionsAndNotations.html">Conventions and Notations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Determinism.html">Determinism</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Math.html">Math Classes</a></li>
@@ -80,6 +82,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#ray-tests-query-only">Ray tests (query-only)</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#swept-ccd">Swept CCD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#collision-counters">Collision counters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#unsupported-or-no-op-pairs">Unsupported or no-op pairs</a></li>
 </ul>
 </li>
@@ -89,14 +93,13 @@
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Related Software</span></p>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="Rayrai.html">rayrai Visualizer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Rayrai.html">rayrai Visualizer</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RaisimUnity.html">RaiSimUnity</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RaisimUnreal.html">RaisimUnreal</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LegacyIntegrations.html">Legacy Integrations</a></li>
 </ul>
 
         </div>
@@ -524,6 +527,33 @@ penetration.</p>
 </tbody>
 </table>
 </section>
+</section>
+<section id="swept-ccd">
+<h2>Swept CCD<a class="headerlink" href="#swept-ccd" title="Link to this heading"></a></h2>
+<p>Swept continuous collision detection is opt-in through <code class="docutils literal notranslate"><span class="pre">contact::ContactSettings</span></code>. It is intended
+for fast rigid bodies that may cross thin static terrain or rigid geometry within one time step.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">settings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">getContactSettings</span><span class="p">();</span>
+<span class="n">settings</span><span class="p">.</span><span class="n">sweptCcdEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">settings</span><span class="p">.</span><span class="n">sweptCcdMinSpeed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">8.0</span><span class="p">;</span>
+<span class="n">settings</span><span class="p">.</span><span class="n">sweptCcdSpeculativeMargin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0e-4</span><span class="p">;</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setContactSettings</span><span class="p">(</span><span class="n">settings</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>When enabled, RaiSim adds speculative contacts for sufficiently fast moving rigid collision bodies.
+Use <code class="docutils literal notranslate"><span class="pre">World::setCollisionCountersEnabled(true)</span></code> and <code class="docutils literal notranslate"><span class="pre">getLastCollisionCounters()</span></code> to inspect
+<code class="docutils literal notranslate"><span class="pre">sweptCcdCandidates</span></code> and <code class="docutils literal notranslate"><span class="pre">sweptCcdContacts</span></code> in benchmark or diagnostic code. Deformable particle
+contacts are still handled by the discrete deformable collision path.</p>
+</section>
+<section id="collision-counters">
+<h2>Collision counters<a class="headerlink" href="#collision-counters" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">World::CollisionCounters</span></code> exposes optional diagnostic counters for deformable particle contact
+candidate counts and swept CCD candidate/contact counts. Counters are disabled by default to keep the
+normal simulation path cheap.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">world</span><span class="p">.</span><span class="n">setCollisionCountersEnabled</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">integrate</span><span class="p">();</span>
+<span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">counters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">getLastCollisionCounters</span><span class="p">();</span>
+</pre></div>
+</div>
 </section>
 <section id="unsupported-or-no-op-pairs">
 <h2>Unsupported or no-op pairs<a class="headerlink" href="#unsupported-or-no-op-pairs" title="Link to this heading"></a></h2>

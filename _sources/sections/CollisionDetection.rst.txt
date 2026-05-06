@@ -292,6 +292,36 @@ penetration.
      - 1
      - Contact if distance < 1e-6.
 
+Swept CCD
+=========
+Swept continuous collision detection is opt-in through ``contact::ContactSettings``. It is intended
+for fast rigid bodies that may cross thin static terrain or rigid geometry within one time step.
+
+.. code-block:: cpp
+
+    auto settings = world.getContactSettings();
+    settings.sweptCcdEnabled = true;
+    settings.sweptCcdMinSpeed = 8.0;
+    settings.sweptCcdSpeculativeMargin = 1.0e-4;
+    world.setContactSettings(settings);
+
+When enabled, RaiSim adds speculative contacts for sufficiently fast moving rigid collision bodies.
+Use ``World::setCollisionCountersEnabled(true)`` and ``getLastCollisionCounters()`` to inspect
+``sweptCcdCandidates`` and ``sweptCcdContacts`` in benchmark or diagnostic code. Deformable particle
+contacts are still handled by the discrete deformable collision path.
+
+Collision counters
+==================
+``World::CollisionCounters`` exposes optional diagnostic counters for deformable particle contact
+candidate counts and swept CCD candidate/contact counts. Counters are disabled by default to keep the
+normal simulation path cheap.
+
+.. code-block:: cpp
+
+    world.setCollisionCountersEnabled(true);
+    world.integrate();
+    const auto& counters = world.getLastCollisionCounters();
+
 Unsupported or no-op pairs
 ==========================
 * **Plane vs Plane**: no contact generation.

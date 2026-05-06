@@ -9,22 +9,23 @@ Loads a wheeled robot (SMB/megabot) and applies wheel forces in force-control mo
 Screenshot
 ==========
 .. image:: ../../../image/wheeled_robot_force_control.png
+   :alt: wheeled_robot_force_control example
+   :width: 100%
 
 Binary
 ======
-CMake target and executable name: ``wheeled_robot_force_control``.
+Installed executable: ``wheeled_robot_force_control``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target wheeled_robot_force_control
-   ./wheeled_robot_force_control
+   <raisim-install>/bin/wheeled_robot_force_control
 
 On Windows, run ``wheeled_robot_force_control.exe`` instead.
-This example uses RaisimServer. Start a visualizer client (RaisimUnity, RaisimUnreal, or the rayrai TCP viewer) and connect to port 8080.
+This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.
 
 
 Details
@@ -33,7 +34,3 @@ Details
 - Uses ``FORCE_AND_TORQUE`` control mode with semi-implicit integration.
 - Focuses the camera on the robot for rollout.
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/server/wheeled_robot_force_control.cpp
-   :language: cpp

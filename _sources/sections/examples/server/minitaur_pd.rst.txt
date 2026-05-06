@@ -8,23 +8,24 @@ Runs Minitaur with PD control, including per-joint gains that zero out unactuate
 
 Screenshot
 ==========
-.. image:: ../../../image/minitaur_cpp.png
+.. image:: ../../../image/minitaur_pd.png
+   :alt: minitaur_pd example
+   :width: 100%
 
 Binary
 ======
-CMake target and executable name: ``minitaur_pd``.
+Installed executable: ``minitaur_pd``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target minitaur_pd
-   ./minitaur_pd
+   <raisim-install>/bin/minitaur_pd
 
 On Windows, run ``minitaur_pd.exe`` instead.
-This example uses RaisimServer. Start a visualizer client (RaisimUnity, RaisimUnreal, or the rayrai TCP viewer) and connect to port 8080.
+This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.
 
 
 Details
@@ -33,7 +34,3 @@ Details
 - Sets gains to zero for unactuated joints in the closed-loop model.
 - Focuses the camera on the robot to show posture stability.
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/server/minitaur_pd.cpp
-   :language: cpp

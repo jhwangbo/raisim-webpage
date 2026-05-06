@@ -8,23 +8,24 @@ Adds visual primitives, meshes, arrows, polylines, dynamic meshes, and a visual 
 
 Screenshot
 ==========
-.. image:: ../../../image/visuals.gif
+.. image:: ../../../image/visual_objects_showcase.png
+   :alt: visual_objects_showcase example
+   :width: 100%
 
 Binary
 ======
-CMake target and executable name: ``visual_objects_showcase``.
+Installed executable: ``visual_objects_showcase``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target visual_objects_showcase
-   ./visual_objects_showcase
+   <raisim-install>/bin/visual_objects_showcase
 
 On Windows, run ``visual_objects_showcase.exe`` instead.
-This example uses RaisimServer. Start a visualizer client (RaisimUnity, RaisimUnreal, or the rayrai TCP viewer) and connect to port 8080.
+This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.
 
 
 Details
@@ -33,7 +34,3 @@ Details
 - Updates colors/sizes and dynamic mesh data every frame.
 - Shows visual articulated systems and custom mesh streaming.
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/server/visual_objects_showcase.cpp
-   :language: cpp

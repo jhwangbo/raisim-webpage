@@ -1,89 +1,72 @@
 #############################
-RaiSim v2.0.0
+RaiSim |raisim_version_title|
 #############################
 
-RaiSim is a cross-platform multi-body physics engine for robotics and AI.
-It fully supports **Linux**, **macOS**, and **Windows**.
-RaiSim is closed-source and distributed under a few different types of license. See the License section for details.
+.. image:: image/rayrai_complete_showcase.gif
+  :alt: rayrai_complete_showcase animated example
+  :width: 100%
 
-Examples
-========
+.. image:: image/granular_media.gif
+  :alt: granular_media animated example
+  :width: 100%
 
-.. image:: image/minitaur_cpp.png
-  :alt: RaiSim demo (minitaur_pd.cpp)
-  :width: 600
+.. image:: image/deformable_objects.gif
+  :alt: deformable_objects animated example
+  :width: 100%
 
-**RaiSim example** (closed-loop) `minitaur_pd.cpp <https://github.com/raisimTech/raisim2Lib/blob/master/examples/src/server/minitaur_pd.cpp>`_
+.. image:: image/procedural_heightmap.gif
+  :alt: procedural_heightmap animated example
+  :width: 100%
 
-.. image:: image/sensors_cpp.png
-  :alt: RaiSim demo (sensor_suite.cpp)
-  :width: 600
+RaiSim is a cross-platform multi-body physics engine for robotics and AI. The
+binary package includes rigid bodies, articulated systems, deformable bodies,
+granular particles, rayrai RGB/depth sensor rendering, deterministic CPU ray
+sensors for headless fallback, ``RaisimServer`` streaming, and the rayrai
+OpenGL visualizer.
 
-**RaiSim example** `sensor_suite.cpp <https://github.com/raisimTech/raisim2Lib/blob/master/examples/src/server/sensor_suite.cpp>`_
+Use this documentation in this order if you are new to RaiSim:
 
-.. image:: image/atlas_cpp.png
-  :alt: RaiSim demo (map_atlas_charts.cpp)
-  :width: 600
+.. list-table::
+   :header-rows: 1
+   :widths: 28 72
 
-**RaiSim example** `map_atlas_charts.cpp <https://github.com/raisimTech/raisim2Lib/blob/master/examples/src/maps/map_atlas_charts.cpp>`_
+   * - Goal
+     - Start here
+   * - Install and run one example
+     - :doc:`sections/QuickStart`
+   * - Find the right example target
+     - :doc:`sections/Examples`
+   * - Visualize a running ``RaisimServer`` scene
+     - :doc:`sections/Visualization`, :doc:`sections/RaisimServer`, and
+       :doc:`sections/Rayrai`
+   * - Add objects, contacts, sensors, or materials
+     - :doc:`sections/WorldSystem`, :doc:`sections/Object`,
+       :doc:`sections/Contact`, :doc:`sections/Sensors`, and
+       :doc:`sections/MaterialSystem`
 
-.. image:: image/office1_cpp.png
-  :alt: RaiSim demo (map_office1_scene.cpp)
-  :width: 600
-
-**RaiSim example** `map_office1_scene.cpp <https://github.com/raisimTech/raisim2Lib/blob/master/examples/src/maps/map_office1_scene.cpp>`_
-
-.. image:: image/demo_robots.gif
-  :alt: RaiSimPy demo (robots.py)
-  :width: 600
-
-**RaisimPy example** `robot.py <https://github.com/raisimTech/raisim2Lib/blob/master/raisimPy/examples/robots.py>`_
-
-.. image:: image/skeleton.bmp
-  :alt: Skeleton img from S. K at KAIST
-  :width: 600
-
-**Biomechanical simulation**, created by Young-Jun Koo, PhD and Seungbum Koo, PhD at Musculoskeletal BioDynamics Lab, KAIST.
-
-The geometric model is created using the Full-body musculoskeletal model in Rajagopal et al. (2016).
-
-The KAIST team provided this image, but the model is not included in this repository.
-
-.. image:: image/huskyScan.gif
-  :alt: husky
-  :width: 600
-
-**RaiSim example** `ray_scan_lidar.cpp <https://github.com/raisimTech/raisim2Lib/blob/master/examples/src/server/ray_scan_lidar.cpp>`_
-
-.. image:: image/anymals.png
-  :alt: anymals
-  :width: 600
-
-**RaiSim example** `map_anymal_graphs.cpp <https://github.com/raisimTech/raisim2Lib/blob/master/examples/src/maps/map_anymal_graphs.cpp>`_
-
-.. image:: image/trackedRobot.gif
-  :alt: trackedRobot
-  :width: 600
-
-**RaiSim example** `templated_tracked_robot.cpp <https://github.com/raisimTech/raisim2Lib/blob/master/examples/src/server/templated_tracked_robot.cpp>`_
+.. image:: image/examples_overview.png
+  :alt: Current RaiSim and rayrai example overview
+  :width: 100%
 
 .. toctree::
    :maxdepth: 1
    :caption: Get started
 
+   sections/QuickStart
+   sections/Installation
+   sections/Visualization
+   sections/Examples
+   sections/Troubleshooting
+   sections/Changelog
    sections/License
-   sections/Acknowledgement
    sections/Support
-   sections/Performance
+   sections/Acknowledgement
 
 .. toctree::
    :maxdepth: 1
    :caption: RaiSim C++
 
    sections/Introduction
-   sections/Installation
-   sections/Visualizers
-   sections/Examples
    sections/ConventionsAndNotations
    sections/Determinism
    sections/Math
@@ -102,11 +85,10 @@ The KAIST team provided this image, but the model is not included in this reposi
 
 .. toctree::
    :maxdepth: 1
-   :caption: Related Software
+   :caption: Related software
 
+   sections/Rayrai
    sections/RaisimGymTorch
    sections/RaiSimPy
-   sections/Rayrai
-   sections/RaisimUnity
-   sections/RaisimUnreal
    sections/RaiSimMatlab
+   sections/LegacyIntegrations

@@ -9,19 +9,20 @@ Comprehensive rayrai showcase with Go1, Livox LiDAR, D455 RGB/depth sensors, hei
 Screenshot
 ==========
 .. image:: ../../../image/rayrai_complete_showcase.png
+   :alt: rayrai_complete_showcase example
+   :width: 100%
 
 Binary
 ======
-CMake target and executable name: ``rayrai_complete_showcase``.
+Installed executable: ``rayrai_complete_showcase``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target rayrai_complete_showcase
-   ./rayrai_complete_showcase
+   <raisim-install>/bin/rayrai_complete_showcase
 
 On Windows, run ``rayrai_complete_showcase.exe`` instead.
 This example uses the in-process rayrai renderer (no external client required).
@@ -33,7 +34,3 @@ Details
 - Updates LiDAR scans into a point cloud and renders RGB/depth sensors.
 - Shows camera frustums and raw sensor buffers in ImGui.
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/rayrai/rayrai_complete_showcase.cpp
-   :language: cpp

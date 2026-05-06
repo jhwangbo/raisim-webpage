@@ -9,19 +9,20 @@ Attaches a Livox LiDAR module to Go1 and visualizes the scan as a point cloud ev
 Screenshot
 ==========
 .. image:: ../../../image/rayrai_lidar_pointcloud.png
+   :alt: rayrai_lidar_pointcloud example
+   :width: 100%
 
 Binary
 ======
-CMake target and executable name: ``rayrai_lidar_pointcloud``.
+Installed executable: ``rayrai_lidar_pointcloud``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target rayrai_lidar_pointcloud
-   ./rayrai_lidar_pointcloud
+   <raisim-install>/bin/rayrai_lidar_pointcloud
 
 On Windows, run ``rayrai_lidar_pointcloud.exe`` instead.
 This example uses the in-process rayrai renderer (no external client required).
@@ -33,7 +34,3 @@ Details
 - Transforms LiDAR points from sensor to world frame.
 - Visualizes the scan as a point cloud with adjustable point size.
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/rayrai/rayrai_lidar_pointcloud.cpp
-   :language: cpp

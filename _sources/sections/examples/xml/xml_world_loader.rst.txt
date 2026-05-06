@@ -12,20 +12,19 @@ Screenshot
 
 Binary
 ======
-CMake target and executable name: ``xml_world_loader``.
+Installed executable: ``xml_world_loader``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target xml_world_loader
-   ./xml_world_loader /full/path/to/world.xml
+   <raisim-install>/bin/xml_world_loader /full/path/to/world.xml
 
 On Windows, run ``xml_world_loader.exe`` instead.
 The XML loader expects an absolute path to the world file.
-This example uses RaisimServer. Start a visualizer client (RaisimUnity, RaisimUnreal, or the rayrai TCP viewer) and connect to port 8080.
+This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.
 
 
 Details
@@ -34,7 +33,3 @@ Details
 - Starts RaisimServer and records a video output file.
 - Useful as a reference for XML-driven world creation.
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/xml/xml_world_loader.cpp
-   :language: cpp

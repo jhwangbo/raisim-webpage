@@ -8,23 +8,24 @@ Sweeps rays from a robot frame to emulate a LiDAR scan and visualizes hits with 
 
 Screenshot
 ==========
-.. image:: ../../../image/huskyScan.gif
+.. image:: ../../../image/ray_scan_lidar.png
+   :alt: ray_scan_lidar example
+   :width: 100%
 
 Binary
 ======
-CMake target and executable name: ``ray_scan_lidar``.
+Installed executable: ``ray_scan_lidar``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target ray_scan_lidar
-   ./ray_scan_lidar
+   <raisim-install>/bin/ray_scan_lidar
 
 On Windows, run ``ray_scan_lidar.exe`` instead.
-This example uses RaisimServer. Start a visualizer client (RaisimUnity, RaisimUnreal, or the rayrai TCP viewer) and connect to port 8080.
+This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.
 
 
 Details
@@ -33,7 +34,3 @@ Details
 - Displays scan points as instanced boxes colored by range.
 - Uses an IMU frame for ray orientation and resets the robot when out of bounds.
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/server/ray_scan_lidar.cpp
-   :language: cpp

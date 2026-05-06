@@ -58,9 +58,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#visualizer-selection-guide-summary">Visualizer Selection Guide (Summary)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#visualizer-selection-guide-detailed">Visualizer Selection Guide (Detailed)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#rayrai-in-process-offscreen">Rayrai (In-Process/Offscreen)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#raisimunity">RaisimUnity</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#raisimunreal-beta">RaisimUnreal (Beta)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#raisimunity-vs-raisimunreal-comparison">RaiSimUnity vs. RaiSimUnreal Comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#unsupported-legacy-clients">Unsupported legacy clients</a></li>
 </ul>
 </li>
 </ul>
@@ -79,6 +77,7 @@
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
@@ -119,17 +118,15 @@
 <h1>Visualizers<a class="headerlink" href="#visualizers" title="Link to this heading"></a></h1>
 <p>Several visualization options are available.
 For in-process rendering, Rayrai is the recommended option and runs inside the
-simulation process (no RaisimServer required). For server-based visualization,
-RaisimUnity and RaisimUnreal provide external viewers. A server-based visualizer
-is required to view simulations when using RaisimServer-based examples.
-This site provides documentation for Rayrai, RaisimUnity, and RaisimUnreal.</p>
+simulation process (no RaisimServer required). The rayrai TCP viewer can also
+connect to RaisimServer-based examples.</p>
+<p>RaisimUnity and RaisimUnreal are no longer supported.</p>
 <section id="visualizer-selection-guide-summary">
 <h2>Visualizer Selection Guide (Summary)<a class="headerlink" href="#visualizer-selection-guide-summary" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>For in-process/offscreen rendering or UI embedding: Rayrai.</p></li>
-<li><p>For a cross-platform, user-friendly solution: RaisimUnity.</p></li>
-<li><p>For integrated GPUs on Linux: RaisimUnityOpenGL.</p></li>
-<li><p>For maximum versatility, publication-quality visuals, or RL vision data: RaisimUnreal.</p></li>
+<li><p>For server-based examples: rayrai TCP viewer.</p></li>
+<li><p>RaisimUnity, RaisimUnityOpenGL, and RaisimUnreal are no longer supported.</p></li>
 </ul>
 </section>
 <section id="visualizer-selection-guide-detailed">
@@ -143,97 +140,14 @@ It renders to an OpenGL texture and is architected for integration with custom U
 <li><p>Offscreen render targets via <code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code>.</p></li>
 <li><p>Supports custom visuals, point clouds, coordinate frames, and object picking.</p></li>
 <li><p>Optimal for tooling, camera sensor simulation, and custom pipelines.</p></li>
-<li><p>Not a full-featured server visualizer (lacks built-in maps or UI tooling).</p></li>
+<li><p>Not a full-featured server visualizer (lacks built-in environment presets or UI tooling).</p></li>
 </ul>
 <p>Build instructions are available in the Installation section. Detailed usage and API coverage are provided in the Rayrai section.</p>
 </section>
-<section id="raisimunity">
-<h3>RaisimUnity<a class="headerlink" href="#raisimunity" title="Link to this heading"></a></h3>
-<a class="reference internal image-reference" href="../_images/raisimUnity4.png"><img alt="raisimUnity" src="../_images/raisimUnity4.png" style="width: 600px;" />
-</a>
-<ul class="simple">
-<li><p>Binaries are included in the <code class="docutils literal notranslate"><span class="pre">raisimUnity</span></code> directory.</p></li>
-<li><p>User-friendly.</p></li>
-<li><p>Lower frame rate but reduced system resource consumption compared to RaisimUnreal.</p></li>
-<li><p>Executes as an independent process (via RaisimServer).</p></li>
-<li><p>Closed-source.</p></li>
-<li><p>Compatible with Linux, macOS, and Windows.</p></li>
-</ul>
-</section>
-<section id="raisimunreal-beta">
-<h3>RaisimUnreal (Beta)<a class="headerlink" href="#raisimunreal-beta" title="Link to this heading"></a></h3>
-<a class="reference internal image-reference" href="../_images/raisimUnreal1.png"><img alt="raisimUnity" src="../_images/raisimUnreal1.png" style="width: 600px;" />
-</a>
-<ul class="simple">
-<li><p>Binaries are provided via GitHub releases.</p></li>
-<li><p>Currently available <strong>only on Windows and Linux</strong>.</p></li>
-<li><p>The most feature-rich visualizer. Only RaisimUnreal supports maps (refer to the RaisimUnreal section).</p></li>
-<li><p>Utilizes multithreading for performance; however, it may <strong>impede RL training or simulation speed</strong>.</p></li>
-<li><p>User-friendly.</p></li>
-<li><p>Supports graphs and bar charts (see <code class="docutils literal notranslate"><span class="pre">examples/map_atlas_charts.cpp</span></code>).</p></li>
-<li><p>Executes as an independent process (via RaisimServer).</p></li>
-<li><p>Closed-source.</p></li>
-</ul>
-</section>
-<section id="raisimunity-vs-raisimunreal-comparison">
-<h3>RaiSimUnity vs. RaiSimUnreal Comparison<a class="headerlink" href="#raisimunity-vs-raisimunreal-comparison" title="Link to this heading"></a></h3>
-<p>The following comparison highlights differences between RaisimUnity and RaisimUnreal.</p>
-<ul class="simple">
-<li><p><strong>Graphics Quality</strong></p>
-<ul>
-<li><p><strong>RaisimUnity</strong>: 7/10.</p></li>
-<li><p><strong>RaisimUnreal</strong>: 10/10 (Quality may be lower on Linux due to driver discrepancies).</p></li>
-</ul>
-</li>
-<li><p><strong>Compatibility</strong></p>
-<ul>
-<li><p><strong>RaisimUnity</strong>: Includes an OpenGL variant to ensure compatibility with legacy or integrated GPUs lacking Vulkan support on Linux.</p></li>
-<li><p><strong>RaisimUnreal</strong>: Experimental support; reporting issues via GitHub is encouraged.</p></li>
-</ul>
-</li>
-<li><p><strong>GPU Utilization (based on reference system benchmarks)</strong></p>
-<ul>
-<li><p><strong>RaisimUnity</strong>: 90%.</p></li>
-<li><p><strong>RaisimUnreal</strong>: 98% (Performance is significantly higher on Windows; Linux performance can be impacted by driver behavior and weather presets).</p></li>
-</ul>
-</li>
-<li><p><strong>GPU Memory Usage (with RaiSim examples)</strong></p>
-<ul>
-<li><p><strong>RaisimUnity</strong>: ~2 GB.</p></li>
-<li><p><strong>RaisimUnreal</strong>: ~2 GB.</p></li>
-</ul>
-</li>
-<li><p><strong>Mesh Loading Time</strong></p>
-<ul>
-<li><p><strong>RaisimUnity</strong>: Very fast.</p></li>
-<li><p><strong>RaisimUnreal</strong>: Considerably slower due to the lack of mesh instancing, resulting in redundant asset loading.</p></li>
-</ul>
-</li>
-<li><p><strong>Support</strong></p>
-<ul>
-<li><p><strong>RaisimUnity</strong>: Actively supported and maintained.</p></li>
-<li><p><strong>RaisimUnreal</strong>: Development focus has shifted to RaisimUnreal.</p></li>
-</ul>
-</li>
-<li><p><strong>Graphs (Time Series and Bar Charts)</strong></p>
-<ul>
-<li><p><strong>RaisimUnity</strong>: None.</p></li>
-<li><p><strong>RaisimUnreal</strong>: Uses Kantan Chart to visualize server-provided graphs; see <code class="docutils literal notranslate"><span class="pre">examples/map_atlas_charts.cpp</span></code>.</p></li>
-</ul>
-</li>
-<li><p><strong>Video Recording</strong></p>
-<ul>
-<li><p><strong>RaisimUnity</strong>: Functional on Linux.</p></li>
-<li><p><strong>RaisimUnreal</strong>: Functional on Linux and Windows.</p></li>
-</ul>
-</li>
-<li><p><strong>Object Interactions</strong></p>
-<ul>
-<li><p><strong>RaisimUnity</strong>: Unsupported.</p></li>
-<li><p><strong>RaisimUnreal</strong>: Supports force application, distance measurement, and object lifecycle management.</p></li>
-</ul>
-</li>
-</ul>
+<section id="unsupported-legacy-clients">
+<h3>Unsupported legacy clients<a class="headerlink" href="#unsupported-legacy-clients" title="Link to this heading"></a></h3>
+<p>RaisimUnity and RaisimUnreal are no longer supported. Use rayrai for current
+visualization workflows.</p>
 </section>
 </section>
 </section>

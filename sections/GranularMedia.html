@@ -1,0 +1,847 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Granular Media &mdash; raisim 2.2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=b21de401"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Contact and Collision" href="Contact.html" />
+    <link rel="prev" title="Deformable Objects" href="DeformableObject.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog: v2.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="Object.html">Objects</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Object.html#body-types">Body types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Object.html#object-identity-and-indices">Object Identity And Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Object.html#name">Name</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="Object.html#types">Types</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Granular Media</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#api-surface">API Surface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data-model">Data Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#creating-granular-media">Creating Granular Media</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#material-parameters">Material Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#particle-materials-and-boundary-materials">Particle Materials And Boundary Materials</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#contact-and-rigid-body-interaction">Contact And Rigid-Body Interaction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#boundaries">Boundaries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#particle-lifecycle">Particle Lifecycle</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#external-forces-and-fixed-particles">External Forces And Fixed Particles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#state-statistics-and-diagnostics">State, Statistics, And Diagnostics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#save-and-load">Save And Load</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#visualization">Visualization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#numerical-tuning">Numerical Tuning</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#performance-model">Performance Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#limitations">Limitations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#api-reference">API Reference</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Object.html#contacts-and-external-forces">Contacts And External Forces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Object.html#threaded-visualization">Threaded Visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Object.html#api">API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="Object.html">Objects</a></li>
+      <li class="breadcrumb-item active">Granular Media</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="granular-media">
+<h1>Granular Media<a class="headerlink" href="#granular-media" title="Link to this heading"></a></h1>
+<a class="reference internal image-reference" href="../_images/granular_media.png"><img alt="granular_media example" src="../_images/granular_media.png" style="width: 100%;" />
+</a>
+<p><code class="docutils literal notranslate"><span class="pre">raisim::GranularSystem</span></code> is RaiSim’s native granular-material object. It is
+designed for fast single-threaded simulation of many spherical grains without
+creating one <code class="docutils literal notranslate"><span class="pre">Sphere</span></code> object per particle. All particles are owned by one
+RaiSim object, and particle-particle contacts are resolved internally with a
+discrete-element-style contact model.</p>
+<p>The primary use case is robotics simulation where terrain compliance, sinkage,
+surface flow, and foot or wheel interaction matter more than rendering every
+grain as a full rigid body. The implementation favors deterministic,
+single-threaded stepping and a compact memory layout. It should not change the
+performance characteristics of ordinary rigid-body worlds unless a
+<code class="docutils literal notranslate"><span class="pre">GranularSystem</span></code> is actually added to the world.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>Granular media in RaiSim are represented by spherical particles with individual
+positions, velocities, angular velocities, radii, material ids, and optional
+fixed flags. The system supports:</p>
+<ul class="simple">
+<li><p>Particle-particle normal contact.</p></li>
+<li><p>Tangential friction with persistent contact history.</p></li>
+<li><p>Rolling friction.</p></li>
+<li><p>Linear and Hertz normal-force laws.</p></li>
+<li><p>Optional short-range cohesion.</p></li>
+<li><p>Horizontal ground-plane contact.</p></li>
+<li><p>Axis-aligned container-box contact.</p></li>
+<li><p>Height-map contact.</p></li>
+<li><p>Rigid primitive contact with spheres, boxes, capsules, and cylinders.</p></li>
+<li><p>Compound-object contact for primitive children.</p></li>
+<li><p>Triangle-mesh contact by closest-point queries against mesh triangles.</p></li>
+<li><p>Articulated-system contact for primitive collision bodies.</p></li>
+<li><p>Particle insertion and removal during simulation.</p></li>
+<li><p>Fixed particles for rough beds or anchored granular layers.</p></li>
+<li><p>Periodic boundaries.</p></li>
+<li><p>Binary save/load of granular state.</p></li>
+<li><p>Rayrai/TCP visualization through instanced sphere visuals.</p></li>
+</ul>
+<p>The granular solver is not a separate global solver. During a world step,
+<code class="docutils literal notranslate"><span class="pre">GranularSystem</span></code> computes its own particle forces, applies equal-and-opposite
+forces to dynamic rigid and articulated bodies, and integrates the granular
+particles inside the regular RaiSim stepping sequence.</p>
+</section>
+<section id="api-surface">
+<h2>API Surface<a class="headerlink" href="#api-surface" title="Link to this heading"></a></h2>
+<p>The public construction API is exposed through <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">World::addGranularParticles(positions,</span> <span class="pre">radii,</span> <span class="pre">material)</span></code> creates a
+granular system from explicit world-space particle centers and radii.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">World::addGranularBox(options,</span> <span class="pre">material)</span></code> creates a deterministic regular
+packing inside an axis-aligned box.</p></li>
+</ul>
+<p>After construction, <code class="docutils literal notranslate"><span class="pre">GranularSystem</span></code> owns all particles as one RaiSim object.
+Particle-level APIs use local particle indices. Fixed particles report
+<code class="docutils literal notranslate"><span class="pre">BodyType::STATIC</span></code> through <code class="docutils literal notranslate"><span class="pre">getBodyType(localIdx)</span></code>; all other particles
+report <code class="docutils literal notranslate"><span class="pre">BodyType::DYNAMIC</span></code>.</p>
+</section>
+<section id="data-model">
+<h2>Data Model<a class="headerlink" href="#data-model" title="Link to this heading"></a></h2>
+<p>Granular state is stored in structure-of-arrays form and can be inspected
+without creating individual <code class="docutils literal notranslate"><span class="pre">Sphere</span></code> objects:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">getNumParticles()</span></code> returns the current particle count.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">getPositions()</span></code>, <code class="docutils literal notranslate"><span class="pre">getVelocities()</span></code>, and <code class="docutils literal notranslate"><span class="pre">getAngularVelocities()</span></code>
+return per-particle state arrays.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">getRadii()</span></code> returns per-particle radii.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">getParticleMaterialIds()</span></code> returns material ids used for friction mixing.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">getFixedParticleFlags()</span></code> returns <code class="docutils literal notranslate"><span class="pre">1</span></code> for fixed particles and <code class="docutils literal notranslate"><span class="pre">0</span></code> for
+dynamic particles.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">getMaterial()</span></code> and <code class="docutils literal notranslate"><span class="pre">getBoundaryMaterial()</span></code> return the global material
+and boundary material currently used by the system.</p></li>
+</ul>
+<p>The returned vectors are owned by the granular system. Treat references as
+short-lived views and reacquire them after particle insertion, removal, or
+checkpoint loading.</p>
+</section>
+<section id="creating-granular-media">
+<h2>Creating Granular Media<a class="headerlink" href="#creating-granular-media" title="Link to this heading"></a></h2>
+<section id="explicit-particles">
+<h3>Explicit particles<a class="headerlink" href="#explicit-particles" title="Link to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">World::addGranularParticles</span></code> when you already have particle positions
+and radii. Positions are world-space particle centers.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setGravity</span><span class="p">({</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">-9.81</span><span class="p">});</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">positions</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">radii</span><span class="p">;</span>
+<span class="n">positions</span><span class="p">.</span><span class="n">push_back</span><span class="p">({</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.10</span><span class="p">});</span>
+<span class="n">positions</span><span class="p">.</span><span class="n">push_back</span><span class="p">({</span><span class="mf">0.09</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.18</span><span class="p">});</span>
+<span class="n">positions</span><span class="p">.</span><span class="n">push_back</span><span class="p">({</span><span class="mf">0.18</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.10</span><span class="p">});</span>
+<span class="n">radii</span><span class="p">.</span><span class="n">assign</span><span class="p">(</span><span class="n">positions</span><span class="p">.</span><span class="n">size</span><span class="p">(),</span><span class="w"> </span><span class="mf">0.04</span><span class="p">);</span>
+
+<span class="n">raisim</span><span class="o">::</span><span class="n">GranularSystem</span><span class="o">::</span><span class="n">Material</span><span class="w"> </span><span class="n">material</span><span class="p">;</span>
+<span class="n">material</span><span class="p">.</span><span class="n">density</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1600.0</span><span class="p">;</span>
+<span class="n">material</span><span class="p">.</span><span class="n">normalStiffness</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">5.0e4</span><span class="p">;</span>
+<span class="n">material</span><span class="p">.</span><span class="n">normalDamping</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">25.0</span><span class="p">;</span>
+<span class="n">material</span><span class="p">.</span><span class="n">tangentialStiffness</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.5e4</span><span class="p">;</span>
+<span class="n">material</span><span class="p">.</span><span class="n">tangentialDamping</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">6.0</span><span class="p">;</span>
+<span class="n">material</span><span class="p">.</span><span class="n">friction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.8</span><span class="p">;</span>
+<span class="n">material</span><span class="p">.</span><span class="n">rollingFriction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.02</span><span class="p">;</span>
+<span class="n">material</span><span class="p">.</span><span class="n">substeps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">grains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addGranularParticles</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span><span class="w"> </span><span class="n">radii</span><span class="p">,</span><span class="w"> </span><span class="n">material</span><span class="p">);</span>
+<span class="n">grains</span><span class="o">-&gt;</span><span class="n">setName</span><span class="p">(</span><span class="s">&quot;sand&quot;</span><span class="p">);</span>
+<span class="n">grains</span><span class="o">-&gt;</span><span class="n">setGroundPlane</span><span class="p">(</span><span class="mf">0.0</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The constructor requires at least one particle, matching position/radius vector
+sizes, positive radii, positive density, and non-negative material parameters.</p>
+</section>
+<section id="packed-boxes">
+<h3>Packed boxes<a class="headerlink" href="#packed-boxes" title="Link to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">World::addGranularBox</span></code> for a deterministic regular packing inside an
+axis-aligned box. The generated particle centers start at <code class="docutils literal notranslate"><span class="pre">minCorner</span> <span class="pre">+</span> <span class="pre">radius</span></code>
+and advance by <code class="docutils literal notranslate"><span class="pre">spacing</span></code> along x, y, and z.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">GranularSystem</span><span class="o">::</span><span class="n">BoxOptions</span><span class="w"> </span><span class="n">bed</span><span class="p">;</span>
+<span class="n">bed</span><span class="p">.</span><span class="n">minCorner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">-0.6</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.4</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">};</span>
+<span class="n">bed</span><span class="p">.</span><span class="n">maxCorner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mf">0.6</span><span class="p">,</span><span class="w">  </span><span class="mf">0.4</span><span class="p">,</span><span class="w"> </span><span class="mf">0.25</span><span class="p">};</span>
+<span class="n">bed</span><span class="p">.</span><span class="n">radius</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.02</span><span class="p">;</span>
+<span class="n">bed</span><span class="p">.</span><span class="n">spacing</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.043</span><span class="p">;</span>
+<span class="n">bed</span><span class="p">.</span><span class="n">maxParticles</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5000</span><span class="p">;</span>
+
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">grains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addGranularBox</span><span class="p">(</span><span class="n">bed</span><span class="p">,</span><span class="w"> </span><span class="n">material</span><span class="p">);</span>
+<span class="n">grains</span><span class="o">-&gt;</span><span class="n">setName</span><span class="p">(</span><span class="s">&quot;granular_bed&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Set <code class="docutils literal notranslate"><span class="pre">BoxOptions::fixed</span> <span class="pre">=</span> <span class="pre">true</span></code> to create a fixed rough bed. Fixed particles
+keep zero velocity, ignore external particle forces, and still participate in
+contacts as static grains. A common pattern is to create a bottom layer of
+fixed particles, then add dynamic grains above it.</p>
+</section>
+<section id="runtime-emission">
+<h3>Runtime emission<a class="headerlink" href="#runtime-emission" title="Link to this heading"></a></h3>
+<p>Particles can be added during simulation. <code class="docutils literal notranslate"><span class="pre">emitBox</span></code> adds a deterministic
+regular grid, while <code class="docutils literal notranslate"><span class="pre">emitBoxRandom</span></code> adds a deterministic jittered grid with
+seeded radii in <code class="docutils literal notranslate"><span class="pre">[minRadius,</span> <span class="pre">maxRadius]</span></code>.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">grains</span><span class="o">-&gt;</span><span class="n">reserveParticles</span><span class="p">(</span><span class="mi">20000</span><span class="p">);</span>
+
+<span class="n">grains</span><span class="o">-&gt;</span><span class="n">emitBox</span><span class="p">({</span><span class="mf">-0.2</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.2</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">},</span>
+<span class="w">                </span><span class="p">{</span><span class="w"> </span><span class="mf">0.2</span><span class="p">,</span><span class="w">  </span><span class="mf">0.2</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">},</span>
+<span class="w">                </span><span class="mf">0.018</span><span class="p">,</span>
+<span class="w">                </span><span class="mf">0.04</span><span class="p">,</span>
+<span class="w">                </span><span class="mi">1000</span><span class="p">,</span>
+<span class="w">                </span><span class="p">{</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.1</span><span class="p">});</span>
+
+<span class="n">grains</span><span class="o">-&gt;</span><span class="n">emitBoxRandom</span><span class="p">({</span><span class="mf">-0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.9</span><span class="p">},</span>
+<span class="w">                      </span><span class="p">{</span><span class="w"> </span><span class="mf">0.1</span><span class="p">,</span><span class="w">  </span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">1.1</span><span class="p">},</span>
+<span class="w">                      </span><span class="mf">0.014</span><span class="p">,</span>
+<span class="w">                      </span><span class="mf">0.020</span><span class="p">,</span>
+<span class="w">                      </span><span class="mf">0.045</span><span class="p">,</span>
+<span class="w">                      </span><span class="mi">500</span><span class="p">,</span>
+<span class="w">                      </span><span class="mi">1234</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Call <code class="docutils literal notranslate"><span class="pre">reserveParticles</span></code> before repeated emission to avoid allocation in the
+hot loop. The random emitter is deterministic for the same seed and input
+options; it is meant for reproducible scenes, not for non-deterministic
+sampling.</p>
+<p>For one-off insertion, use <code class="docutils literal notranslate"><span class="pre">addParticle</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">grains</span><span class="o">-&gt;</span><span class="n">addParticle</span><span class="p">({</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.6</span><span class="p">},</span>
+<span class="w">                                      </span><span class="mf">0.02</span><span class="p">,</span>
+<span class="w">                                      </span><span class="p">{</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.1</span><span class="p">},</span>
+<span class="w">                                      </span><span class="p">{</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">},</span>
+<span class="w">                                      </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">                                      </span><span class="nb">false</span><span class="p">);</span>
+<span class="n">grains</span><span class="o">-&gt;</span><span class="n">setVelocity</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">});</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">addParticle</span></code> returns the local index assigned at insertion time. If later
+removals are possible, do not store local indices as permanent identifiers;
+indices can shift when particles are compacted.</p>
+</section>
+</section>
+<section id="material-parameters">
+<h2>Material Parameters<a class="headerlink" href="#material-parameters" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">GranularSystem::Material</span></code> controls mass, contact forces, friction, and
+substepping:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">density</span></code>: particle material density. Particle mass is computed from sphere
+volume, <code class="docutils literal notranslate"><span class="pre">4/3*pi*r^3</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">normalStiffness</span></code>: normal contact stiffness. Larger values reduce overlap
+but require a smaller time step or more substeps.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">normalDamping</span></code>: normal relative-velocity damping.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tangentialStiffness</span></code>: tangential spring stiffness. If this is zero, RaiSim
+uses a stiffness derived from the normal stiffness.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tangentialDamping</span></code>: tangential relative-velocity damping.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">friction</span></code>: default particle-particle friction coefficient.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rollingFriction</span></code>: default rolling-friction coefficient.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cohesionStiffness</span></code>: attractive force slope for cohesive grains.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cohesionMaxDistance</span></code>: maximum surface gap where cohesion can act.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">normalContactModel</span></code>: either <code class="docutils literal notranslate"><span class="pre">LINEAR</span></code> or <code class="docutils literal notranslate"><span class="pre">HERTZ</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">substeps</span></code>: number of granular substeps per RaiSim world step.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">maxSpeed</span></code>: optional particle linear speed clamp. <code class="docutils literal notranslate"><span class="pre">0</span></code> disables it.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">maxAngularSpeed</span></code>: optional angular speed clamp. <code class="docutils literal notranslate"><span class="pre">0</span></code> disables it.</p></li>
+</ul>
+<p>The default normal model is linear:</p>
+<div class="math notranslate nohighlight">
+\[f_n = k_n \delta - c_n v_n\]</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">delta</span></code> is penetration depth and <code class="docutils literal notranslate"><span class="pre">v_n</span></code> is relative normal velocity.
+The Hertz model is opt-in:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">material</span><span class="p">.</span><span class="n">normalContactModel</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="n">raisim</span><span class="o">::</span><span class="n">GranularSystem</span><span class="o">::</span><span class="n">NormalContactModel</span><span class="o">::</span><span class="n">HERTZ</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>For small overlaps, Hertz contact is softer than the linear law with the same
+<code class="docutils literal notranslate"><span class="pre">normalStiffness</span></code>. This can be useful when a scene needs smoother initial
+contact formation, but the time step and stiffness should still be tuned
+together.</p>
+</section>
+<section id="particle-materials-and-boundary-materials">
+<h2>Particle Materials And Boundary Materials<a class="headerlink" href="#particle-materials-and-boundary-materials" title="Link to this heading"></a></h2>
+<p>The global material provides default friction and rolling friction. For mixed
+granular beds, assign per-particle material ids:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">grains</span><span class="o">-&gt;</span><span class="n">setParticleMaterial</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.3</span><span class="p">,</span><span class="w"> </span><span class="mf">0.00</span><span class="p">});</span><span class="w">  </span><span class="c1">// low-friction grains</span>
+<span class="n">grains</span><span class="o">-&gt;</span><span class="n">setParticleMaterial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.9</span><span class="p">,</span><span class="w"> </span><span class="mf">0.03</span><span class="p">});</span><span class="w">  </span><span class="c1">// rough grains</span>
+<span class="n">grains</span><span class="o">-&gt;</span><span class="n">setParticleMaterialId</span><span class="p">(</span><span class="mi">17</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Particle-particle friction uses geometric mixing for different material ids.
+When both particles have the same material id, RaiSim uses that material’s
+friction directly.</p>
+<p>The boundary material is mixed with each particle material for ground,
+container, height-map, rigid-body, compound, mesh, and articulated contacts:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">grains</span><span class="o">-&gt;</span><span class="n">setBoundaryMaterial</span><span class="p">({</span><span class="mf">0.7</span><span class="p">,</span><span class="w"> </span><span class="mf">0.02</span><span class="p">});</span>
+</pre></div>
+</div>
+<p>Use a low boundary friction to emulate a smooth wall, and a high boundary
+friction to emulate rough terrain or rough container walls.</p>
+</section>
+<section id="contact-and-rigid-body-interaction">
+<h2>Contact And Rigid-Body Interaction<a class="headerlink" href="#contact-and-rigid-body-interaction" title="Link to this heading"></a></h2>
+<p>Granular-rigid interaction is two-way for dynamic bodies. When a grain overlaps
+a dynamic rigid body, RaiSim applies force and torque to the grain and applies
+the opposite force to the rigid body at the contact point. Static bodies push
+grains but do not receive velocity changes.</p>
+<p>Supported rigid contact targets are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Sphere</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Box</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Capsule</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cylinder</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Compound</span></code> objects made from primitive children</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Mesh</span></code> objects with triangle collision meshes</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ArticulatedSystem</span></code> primitive collision bodies</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">HeightMap</span></code></p></li>
+</ul>
+<p>This allows robot feet, wheels, tools, buckets, and terrain meshes to interact
+with granular beds without replacing those bodies with granular-specific
+objects.</p>
+<p>For an articulated robot standing in granular media, create the bed first,
+settle it, then place the robot so that its feet slightly touch the settled
+surface:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">grains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addGranularBox</span><span class="p">(</span><span class="n">bed</span><span class="p">,</span><span class="w"> </span><span class="n">material</span><span class="p">);</span>
+<span class="n">grains</span><span class="o">-&gt;</span><span class="n">setGroundPlane</span><span class="p">(</span><span class="mf">0.0</span><span class="p">);</span>
+
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">500</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">world</span><span class="p">.</span><span class="n">integrate</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">anymal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addArticulatedSystem</span><span class="p">(</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">(</span><span class="n">rscPath</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;/anymal/urdf/anymal.urdf&quot;</span><span class="p">);</span>
+
+<span class="c1">// Set generalized coordinates so the feet start close to the granular</span>
+<span class="c1">// surface, then use the usual PD targets for standing.</span>
+</pre></div>
+</div>
+<p>The granular system uses broad-phase pruning for rigid contacts. AABB pruning
+keeps the number of particle-shape candidate pairs low when only a small part
+of the granular bed is near a rigid or articulated body.</p>
+</section>
+<section id="boundaries">
+<h2>Boundaries<a class="headerlink" href="#boundaries" title="Link to this heading"></a></h2>
+<section id="ground-plane">
+<h3>Ground plane<a class="headerlink" href="#ground-plane" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">setGroundPlane</span></code> adds a horizontal plane used only by this
+<code class="docutils literal notranslate"><span class="pre">GranularSystem</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">grains</span><span class="o">-&gt;</span><span class="n">setGroundPlane</span><span class="p">(</span><span class="mf">0.0</span><span class="p">);</span>
+<span class="n">grains</span><span class="o">-&gt;</span><span class="n">disableGroundPlane</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>This does not add a world <code class="docutils literal notranslate"><span class="pre">Ground</span></code> object. Use it when the grains need an
+internal supporting plane. Use regular RaiSim static objects when the same
+surface must also collide with robots or other rigid bodies.</p>
+</section>
+<section id="container-box">
+<h3>Container box<a class="headerlink" href="#container-box" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">setContainerBox</span></code> confines grains to an axis-aligned box:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">grains</span><span class="o">-&gt;</span><span class="n">setContainerBox</span><span class="p">({</span><span class="mf">-0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">},</span>
+<span class="w">                        </span><span class="p">{</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w">  </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4</span><span class="p">});</span>
+</pre></div>
+</div>
+<p>The container is internal to the granular system. It affects grains, but it is
+not a visible or physical obstacle for other RaiSim objects. If a robot must
+collide with the same container, add physical static boxes to the world as
+walls and floor.</p>
+</section>
+<section id="periodic-boundary">
+<h3>Periodic boundary<a class="headerlink" href="#periodic-boundary" title="Link to this heading"></a></h3>
+<p>Periodic boundaries wrap particle centers after integration:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">grains</span><span class="o">-&gt;</span><span class="n">setPeriodicBoundary</span><span class="p">({</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">},</span>
+<span class="w">                            </span><span class="p">{</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">},</span>
+<span class="w">                            </span><span class="nb">true</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This is useful for homogeneous material tests and steady-flow studies. Avoid
+periodic boundaries when the scene contains local objects such as robot feet
+unless that wraparound behavior is physically intended.</p>
+</section>
+</section>
+<section id="particle-lifecycle">
+<h2>Particle Lifecycle<a class="headerlink" href="#particle-lifecycle" title="Link to this heading"></a></h2>
+<p>Particles can be removed by index, by z threshold, or by an axis-aligned drain
+box:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">grains</span><span class="o">-&gt;</span><span class="n">removeParticle</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+<span class="n">grains</span><span class="o">-&gt;</span><span class="n">removeParticlesBelowZ</span><span class="p">(</span><span class="mf">-0.2</span><span class="p">);</span>
+<span class="n">grains</span><span class="o">-&gt;</span><span class="n">removeParticlesInBox</span><span class="p">({</span><span class="mf">-0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">},</span>
+<span class="w">                             </span><span class="p">{</span><span class="w"> </span><span class="mf">0.1</span><span class="p">,</span><span class="w">  </span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.2</span><span class="p">});</span>
+</pre></div>
+</div>
+<p>Removal also clears contact histories associated with the removed particles, so
+newly added particles do not inherit tangential state from old particle ids.
+The implementation uses stable internal particle ids for contact history; this
+keeps add/remove sequences deterministic.</p>
+</section>
+<section id="external-forces-and-fixed-particles">
+<h2>External Forces And Fixed Particles<a class="headerlink" href="#external-forces-and-fixed-particles" title="Link to this heading"></a></h2>
+<p>The standard <code class="docutils literal notranslate"><span class="pre">Object</span></code> force APIs work on dynamic granular particles:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">grains</span><span class="o">-&gt;</span><span class="n">setExternalForce</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">});</span>
+<span class="n">grains</span><span class="o">-&gt;</span><span class="n">setExternalTorque</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.01</span><span class="p">});</span>
+<span class="n">grains</span><span class="o">-&gt;</span><span class="n">clearExternalForcesAndTorques</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>Fixed particles are intentionally different. They are useful as static rough
+terrain and do not move under gravity, external force setters, or collision
+forces:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">grains</span><span class="o">-&gt;</span><span class="n">setParticleFixed</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Dynamic rigid and articulated bodies can still receive forces from fixed
+particles. This makes fixed grains useful for rough support layers under a
+dynamic granular bed.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">setVelocity</span></code> and <code class="docutils literal notranslate"><span class="pre">setAngularVelocity</span></code> for initialization, scripted
+emission, or controlled validation scenes:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">grains</span><span class="o">-&gt;</span><span class="n">setVelocity</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.2</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">});</span>
+<span class="n">grains</span><span class="o">-&gt;</span><span class="n">setAngularVelocity</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">});</span>
+</pre></div>
+</div>
+<p>Velocity setters are ignored for fixed particles.</p>
+</section>
+<section id="state-statistics-and-diagnostics">
+<h2>State, Statistics, And Diagnostics<a class="headerlink" href="#state-statistics-and-diagnostics" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">getLastStepStats</span></code> returns counters from the previous granular step:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">stats</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">grains</span><span class="o">-&gt;</span><span class="n">getLastStepStats</span><span class="p">();</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;particle contacts: &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">stats</span><span class="p">.</span><span class="n">particleContacts</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;rigid contacts: &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">stats</span><span class="p">.</span><span class="n">rigidContacts</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;max penetration: &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">stats</span><span class="p">.</span><span class="n">maxPenetration</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The most useful fields are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">candidatePairs</span></code>: particle-particle broad-phase candidates.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rigidCandidatePairs</span></code>: particle-rigid or particle-articulated candidates.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">meshTriangleCandidatePairs</span></code>: mesh triangle candidates tested.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">particleContacts</span></code>: active particle-particle contacts.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">boundaryContacts</span></code>: contacts with ground, container, and height maps.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rigidContacts</span></code>: contacts with rigid, compound, mesh, or articulated bodies.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cohesiveContacts</span></code>: contacts where cohesion produced attraction.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">activeContactHistories</span></code>: persistent tangential histories kept this step.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">staleContactHistoriesRemoved</span></code>: histories removed because the contact
+disappeared.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">emittedParticles</span></code> and <code class="docutils literal notranslate"><span class="pre">removedParticles</span></code>: lifecycle counters.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">wrappedParticles</span></code>: periodic-boundary wraps.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">velocityClamps</span></code>: linear or angular speed clamps.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">maxPenetration</span></code>: largest overlap detected in the step.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">maxSpeed</span></code>: largest particle speed after the step.</p></li>
+</ul>
+<p>These counters are intentionally cheap to query and are useful for profiling,
+automated validation, and scene tuning.</p>
+</section>
+<section id="save-and-load">
+<h2>Save And Load<a class="headerlink" href="#save-and-load" title="Link to this heading"></a></h2>
+<p>Granular checkpoints store particle state and material data in a binary format:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">grains</span><span class="o">-&gt;</span><span class="n">saveGranularState</span><span class="p">(</span><span class="s">&quot;/tmp/bed.bin&quot;</span><span class="p">);</span>
+<span class="n">grains</span><span class="o">-&gt;</span><span class="n">saveGranularState</span><span class="p">(</span><span class="s">&quot;/tmp/bed_no_history.bin&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span>
+
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">restored</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addGranularParticles</span><span class="p">(</span>
+<span class="w">    </span><span class="p">{{</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">}},</span><span class="w"> </span><span class="p">{</span><span class="mf">0.05</span><span class="p">},</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">GranularSystem</span><span class="o">::</span><span class="n">Material</span><span class="p">());</span>
+<span class="n">restored</span><span class="o">-&gt;</span><span class="n">loadGranularState</span><span class="p">(</span><span class="s">&quot;/tmp/bed.bin&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The optional <code class="docutils literal notranslate"><span class="pre">includeContactHistories</span></code> flag controls whether persistent
+tangential contact histories are written. Including histories is useful when
+continuing a simulation exactly. Skipping histories creates smaller files and
+is usually sufficient for initialization snapshots.</p>
+<p>Boundary settings such as ground planes, containers, and periodic boundaries
+are not serialized. Reapply those settings after loading if the restored scene
+needs them.</p>
+</section>
+<section id="visualization">
+<h2>Visualization<a class="headerlink" href="#visualization" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> and the Rayrai TCP viewer can visualize granular particles as
+instanced sphere visuals. Installed examples can use an <code class="docutils literal notranslate"><span class="pre">InstancedVisuals</span></code>
+object and update each instance from <code class="docutils literal notranslate"><span class="pre">GranularSystem::getPositions</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">visual</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">server</span><span class="p">.</span><span class="n">addInstancedVisuals</span><span class="p">(</span>
+<span class="w">    </span><span class="s">&quot;granular_particles&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">raisim</span><span class="o">::</span><span class="n">Shape</span><span class="o">::</span><span class="n">Sphere</span><span class="p">,</span>
+<span class="w">    </span><span class="n">grains</span><span class="o">-&gt;</span><span class="n">getNumParticles</span><span class="p">(),</span>
+<span class="w">    </span><span class="p">{</span><span class="n">radius</span><span class="p">,</span><span class="w"> </span><span class="n">radius</span><span class="p">,</span><span class="w"> </span><span class="n">radius</span><span class="p">},</span>
+<span class="w">    </span><span class="s">&quot;sand&quot;</span><span class="p">);</span>
+
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">grains</span><span class="o">-&gt;</span><span class="n">getNumParticles</span><span class="p">();</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">grains</span><span class="o">-&gt;</span><span class="n">getPositions</span><span class="p">()[</span><span class="n">i</span><span class="p">];</span>
+<span class="w">  </span><span class="n">visual</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]));</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If a container must be visible and physically collide with a robot, create
+actual static boxes in the world and assign a transparent appearance:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">wall</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addBox</span><span class="p">(</span><span class="mf">0.04</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="n">wall</span><span class="o">-&gt;</span><span class="n">setBodyType</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">BodyType</span><span class="o">::</span><span class="n">STATIC</span><span class="p">);</span>
+<span class="n">wall</span><span class="o">-&gt;</span><span class="n">setAppearance</span><span class="p">(</span><span class="s">&quot;0.2, 0.35, 0.7, 0.5&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Using both internal granular containers and physical static wall boxes is valid,
+but remember their roles: the internal container confines grains; the physical
+boxes collide with robots and are visible to the viewer.</p>
+</section>
+<section id="numerical-tuning">
+<h2>Numerical Tuning<a class="headerlink" href="#numerical-tuning" title="Link to this heading"></a></h2>
+<p>Granular scenes are sensitive to time step, stiffness, damping, particle size,
+and packing density. The following guidelines are practical starting points:</p>
+<ul class="simple">
+<li><p>Start with a lower <code class="docutils literal notranslate"><span class="pre">normalStiffness</span></code> and increase it until penetration is
+acceptable.</p></li>
+<li><p>Increase <code class="docutils literal notranslate"><span class="pre">substeps</span></code> before increasing stiffness aggressively.</p></li>
+<li><p>Keep <code class="docutils literal notranslate"><span class="pre">spacing</span></code> greater than <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">*</span> <span class="pre">radius</span></code> for generated initial packings
+unless you deliberately want pre-compressed particles.</p></li>
+<li><p>Add a settling phase before placing robots or tools on the bed.</p></li>
+<li><p>Use a fixed bottom layer or a physical floor to prevent the whole bed from
+drifting.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">maxSpeed</span></code> and <code class="docutils literal notranslate"><span class="pre">maxAngularSpeed</span></code> only as stability safeguards; a
+well-tuned scene should not rely on frequent clamping.</p></li>
+<li><p>Watch <code class="docutils literal notranslate"><span class="pre">maxPenetration</span></code>, <code class="docutils literal notranslate"><span class="pre">maxSpeed</span></code>, and contact counts while tuning.</p></li>
+<li><p>Prefer fewer, larger particles for controller development and more particles
+only when the local terrain response requires it.</p></li>
+</ul>
+<p>A good robotics workflow is:</p>
+<ol class="arabic simple">
+<li><p>Build and settle the bed without the robot.</p></li>
+<li><p>Record <code class="docutils literal notranslate"><span class="pre">maxPenetration</span></code> and <code class="docutils literal notranslate"><span class="pre">maxSpeed</span></code> during settling.</p></li>
+<li><p>Add the robot slightly above the settled surface.</p></li>
+<li><p>Run a short robot-settling phase with normal control gains.</p></li>
+<li><p>Increase particle count only after the contact model and robot behavior are
+stable.</p></li>
+</ol>
+<section id="parameter-interactions">
+<h3>Parameter Interactions<a class="headerlink" href="#parameter-interactions" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">normalStiffness</span></code>, <code class="docutils literal notranslate"><span class="pre">normalDamping</span></code>, <code class="docutils literal notranslate"><span class="pre">substeps</span></code>, and the world time step
+should be tuned together. A stiffer contact law reduces overlap but increases
+the natural contact frequency. If the simulation becomes noisy after increasing
+<code class="docutils literal notranslate"><span class="pre">normalStiffness</span></code>, first increase <code class="docutils literal notranslate"><span class="pre">substeps</span></code> or reduce the world time step
+instead of adding damping blindly.</p>
+<p><code class="docutils literal notranslate"><span class="pre">tangentialStiffness</span></code> controls how strongly tangential contact history resists
+sliding. Leaving it at <code class="docutils literal notranslate"><span class="pre">0</span></code> uses an internally derived value from the normal
+stiffness. Set it explicitly when you need reproducible comparisons across
+normal-stiffness sweeps.</p>
+<p><code class="docutils literal notranslate"><span class="pre">cohesionStiffness</span></code> and <code class="docutils literal notranslate"><span class="pre">cohesionMaxDistance</span></code> should be kept small relative
+to normal contact stiffness and particle radius. Cohesion acts only over a
+short surface gap; it is suitable for qualitative clumping, not for modeling
+moisture or cemented grains.</p>
+</section>
+</section>
+<section id="performance-model">
+<h2>Performance Model<a class="headerlink" href="#performance-model" title="Link to this heading"></a></h2>
+<p>The implementation is single-threaded. It does not use <code class="docutils literal notranslate"><span class="pre">thread_local</span></code> state,
+and it is intended to preserve RaiSim’s deterministic stepping model.</p>
+<p>Main cost drivers are:</p>
+<ul class="simple">
+<li><p>Number of particles.</p></li>
+<li><p>Number of particle-particle candidate pairs.</p></li>
+<li><p>Number of persistent tangential contact histories.</p></li>
+<li><p>Number and complexity of nearby rigid, compound, mesh, and articulated
+collision shapes.</p></li>
+<li><p>Substep count.</p></li>
+<li><p>Contact model stiffness, because stiffer scenes usually need smaller time
+steps or more substeps.</p></li>
+</ul>
+<p>RaiSim uses a spatial grid for particle broad phase. Homogeneous-radius scenes
+use a fast path for contact thresholds and effective radius. Rigid and
+articulated contacts use contact AABBs to avoid checking every particle against
+every shape when possible. Mesh contacts first query candidate triangles, then
+run closest-point checks only on those candidates.</p>
+<p>For fast simulation:</p>
+<ul class="simple">
+<li><p>Keep particle count as low as the task allows.</p></li>
+<li><p>Use uniform radii when possible.</p></li>
+<li><p>Use simple rigid collision shapes for robot feet and tools when possible.</p></li>
+<li><p>Prefer primitive or compound collision for robot contact surfaces; use mesh
+collision only where the shape detail matters.</p></li>
+<li><p>Reserve particle capacity before repeated emission.</p></li>
+<li><p>Disable visualization when it is not needed.</p></li>
+<li><p>Use the optimized binary package for performance-sensitive applications.</p></li>
+</ul>
+</section>
+<section id="limitations">
+<h2>Limitations<a class="headerlink" href="#limitations" title="Link to this heading"></a></h2>
+<p>The current granular implementation is a fast engineering model, not a full
+continuum soil model. Important limitations are:</p>
+<ul class="simple">
+<li><p>Particles are spheres. Non-spherical grains are not represented directly.</p></li>
+<li><p>Particle cohesion is a simple short-range attraction, not a capillary bridge
+or moisture transport model.</p></li>
+<li><p>The solver does not model fracture, compaction curves, pore pressure, or
+fluid-grain coupling.</p></li>
+<li><p>Internal granular containers are not world collision objects. Add physical
+static geometry when non-granular objects must collide with the same walls.</p></li>
+<li><p>Mesh contact uses closest-point checks against candidate triangles and is
+more expensive than primitive contact.</p></li>
+<li><p>Very stiff, dense, or deeply interpenetrating initial states can require more
+substeps or smaller world time steps.</p></li>
+</ul>
+<p>Use granular media when particle-scale terrain response is important. Use
+height maps or rigid terrain when only the terrain surface profile matters and
+grain rearrangement is not needed.</p>
+</section>
+<section id="api-reference">
+<h2>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h2>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim14GranularSystemE">
+<span id="_CPPv3N6raisim14GranularSystemE"></span><span id="_CPPv2N6raisim14GranularSystemE"></span><span id="raisim::GranularSystem"></span><span class="target" id="classraisim_1_1GranularSystem"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GranularSystem</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="Object.html#_CPPv4N6raisim6ObjectE" title="raisim::Object"><span class="n"><span class="pre">Object</span></span></a><a class="headerlink" href="#_CPPv4N6raisim14GranularSystemE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim14GranularSystem13getObjectTypeEv">
+<span id="_CPPv3NK6raisim14GranularSystem13getObjectTypeEv"></span><span id="_CPPv2NK6raisim14GranularSystem13getObjectTypeEv"></span><span id="raisim::GranularSystem::getObjectTypeC"></span><span class="target" id="classraisim_1_1GranularSystem_1a60881d9da23dbf406e3d1b0321133951"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">ObjectType</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getObjectType</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4NK6raisim14GranularSystem13getObjectTypeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>get the object type. Possible types are SPHERE, BOX, CYLINDER, CONE, CAPSULE, MESH, HALFSPACE, COMPOUND, HEIGHTMAP, ARTICULATED_SYSTEM </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the object type </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim14GranularSystem19setBoundaryMaterialERK16ParticleMaterial">
+<span id="_CPPv3N6raisim14GranularSystem19setBoundaryMaterialERK16ParticleMaterial"></span><span id="_CPPv2N6raisim14GranularSystem19setBoundaryMaterialERK16ParticleMaterial"></span><span id="raisim::GranularSystem::setBoundaryMaterial__ParticleMaterialCR"></span><span class="target" id="classraisim_1_1GranularSystem_1ad3bd9ec3605c5100773187ffd0a0f4bd"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setBoundaryMaterial</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim14GranularSystem16ParticleMaterialE" title="raisim::GranularSystem::ParticleMaterial"><span class="n"><span class="pre">ParticleMaterial</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">material</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim14GranularSystem19setBoundaryMaterialERK16ParticleMaterial" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the material mixed with particle materials for ground, container, mesh, and rigid contacts. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim14GranularSystem11addParticleERK3VecIXL3EEEdRK3VecIXL3EEERK3VecIXL3EEE8uint16_tb">
+<span id="_CPPv3N6raisim14GranularSystem11addParticleERK3VecIXL3EEEdRK3VecIXL3EEERK3VecIXL3EEE8uint16_tb"></span><span id="_CPPv2N6raisim14GranularSystem11addParticleERK3VecIX3EEdRK3VecIX3EERK3VecIX3EE8uint16_tb"></span><span id="raisim::GranularSystem::addParticle__Vec:3:CR.double.Vec:3:CR.Vec:3:CR.uint16_t.b"></span><span class="target" id="classraisim_1_1GranularSystem_1a42960a33f95073e0a3e3108a4d7543a0"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addParticle</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">position</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">radius</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">velocity</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">{</span></span><span class="m"><span class="pre">0.0</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.0</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.0</span></span><span class="p"><span class="pre">}</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">angularVelocity</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">{</span></span><span class="m"><span class="pre">0.0</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.0</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.0</span></span><span class="p"><span class="pre">}</span></span>, <span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">materialId</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fixed</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim14GranularSystem11addParticleERK3VecIXL3EEEdRK3VecIXL3EEERK3VecIXL3EEE8uint16_tb" title="Link to this definition"></a><br /></dt>
+<dd><p>Add one particle. Fixed particles keep zero velocity and are treated as static rough-bed particles. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim14GranularSystem7emitBoxERK3VecIXL3EEERK3VecIXL3EEEdd6size_tRK3VecIXL3EEERK3VecIXL3EEE8uint16_tb">
+<span id="_CPPv3N6raisim14GranularSystem7emitBoxERK3VecIXL3EEERK3VecIXL3EEEdd6size_tRK3VecIXL3EEERK3VecIXL3EEE8uint16_tb"></span><span id="_CPPv2N6raisim14GranularSystem7emitBoxERK3VecIX3EERK3VecIX3EEdd6size_tRK3VecIX3EERK3VecIX3EE8uint16_tb"></span><span id="raisim::GranularSystem::emitBox__Vec:3:CR.Vec:3:CR.double.double.s.Vec:3:CR.Vec:3:CR.uint16_t.b"></span><span class="target" id="classraisim_1_1GranularSystem_1abc7a3c7c0d954ce523c50bcfc9f05ef1"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">emitBox</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">minCorner</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">maxCorner</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">radius</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">spacing</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxParticles</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">velocity</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">{</span></span><span class="m"><span class="pre">0.0</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.0</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.0</span></span><span class="p"><span class="pre">}</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">angularVelocity</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">{</span></span><span class="m"><span class="pre">0.0</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.0</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.0</span></span><span class="p"><span class="pre">}</span></span>, <span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">materialId</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fixed</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim14GranularSystem7emitBoxERK3VecIXL3EEERK3VecIXL3EEEdd6size_tRK3VecIXL3EEERK3VecIXL3EEE8uint16_tb" title="Link to this definition"></a><br /></dt>
+<dd><p>Emit a regular grid of particles inside the box. maxParticles bounds this call; zero emits none. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim14GranularSystem13emitBoxRandomERK3VecIXL3EEERK3VecIXL3EEEddd6size_t8uint64_tRK3VecIXL3EEERK3VecIXL3EEE8uint16_tb">
+<span id="_CPPv3N6raisim14GranularSystem13emitBoxRandomERK3VecIXL3EEERK3VecIXL3EEEddd6size_t8uint64_tRK3VecIXL3EEERK3VecIXL3EEE8uint16_tb"></span><span id="_CPPv2N6raisim14GranularSystem13emitBoxRandomERK3VecIX3EERK3VecIX3EEddd6size_t8uint64_tRK3VecIX3EERK3VecIX3EE8uint16_tb"></span><span id="raisim::GranularSystem::emitBoxRandom__Vec:3:CR.Vec:3:CR.double.double.double.s.uint64_t.Vec:3:CR.Vec:3:CR.uint16_t.b"></span><span class="target" id="classraisim_1_1GranularSystem_1a4347c22cfe689e7575ec6961d8cddc98"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">emitBoxRandom</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">minCorner</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">maxCorner</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">minRadius</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxRadius</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">spacing</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxParticles</span></span>, <span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">seed</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">velocity</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">{</span></span><span class="m"><span class="pre">0.0</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.0</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.0</span></span><span class="p"><span class="pre">}</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">angularVelocity</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">{</span></span><span class="m"><span class="pre">0.0</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.0</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.0</span></span><span class="p"><span class="pre">}</span></span>, <span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">materialId</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fixed</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim14GranularSystem13emitBoxRandomERK3VecIXL3EEERK3VecIXL3EEEddd6size_t8uint64_tRK3VecIXL3EEERK3VecIXL3EEE8uint16_tb" title="Link to this definition"></a><br /></dt>
+<dd><p>Emit a deterministic jittered grid with radii sampled in [minRadius, maxRadius]. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim14GranularSystem20removeParticlesInBoxERK3VecIXL3EEERK3VecIXL3EEE">
+<span id="_CPPv3N6raisim14GranularSystem20removeParticlesInBoxERK3VecIXL3EEERK3VecIXL3EEE"></span><span id="_CPPv2N6raisim14GranularSystem20removeParticlesInBoxERK3VecIX3EERK3VecIX3EE"></span><span id="raisim::GranularSystem::removeParticlesInBox__Vec:3:CR.Vec:3:CR"></span><span class="target" id="classraisim_1_1GranularSystem_1aeb4d3d3cd98340b8d092b48207cda04e"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">removeParticlesInBox</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">minCorner</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">maxCorner</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim14GranularSystem20removeParticlesInBoxERK3VecIXL3EEERK3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove particles whose centers are inside the closed axis-aligned box. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim14GranularSystem17saveGranularStateERKNSt6stringEb">
+<span id="_CPPv3NK6raisim14GranularSystem17saveGranularStateERKNSt6stringEb"></span><span id="_CPPv2NK6raisim14GranularSystem17saveGranularStateERKNSt6stringEb"></span><span id="raisim::GranularSystem::saveGranularState__ssCR.bC"></span><span class="target" id="classraisim_1_1GranularSystem_1a3f5dd3215e8d565cdb4ba1448cdc7af5"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">saveGranularState</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">path</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">includeContactHistories</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim14GranularSystem17saveGranularStateERKNSt6stringEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Save a binary granular checkpoint. <a class="reference internal" href="Contact.html#classraisim_1_1Contact"><span class="std std-ref">Contact</span></a> histories are optional because they can be large. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim14GranularSystem17loadGranularStateERKNSt6stringE">
+<span id="_CPPv3N6raisim14GranularSystem17loadGranularStateERKNSt6stringE"></span><span id="_CPPv2N6raisim14GranularSystem17loadGranularStateERKNSt6stringE"></span><span id="raisim::GranularSystem::loadGranularState__ssCR"></span><span class="target" id="classraisim_1_1GranularSystem_1a718c8233efdd6a73090338dc92ac06e2"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">loadGranularState</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">path</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim14GranularSystem17loadGranularStateERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Load a checkpoint produced by saveGranularState. Boundary settings such as ground/container are not serialized. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim14GranularSystem16setParticleFixedE6size_tb">
+<span id="_CPPv3N6raisim14GranularSystem16setParticleFixedE6size_tb"></span><span id="_CPPv2N6raisim14GranularSystem16setParticleFixedE6size_tb"></span><span id="raisim::GranularSystem::setParticleFixed__s.b"></span><span class="target" id="classraisim_1_1GranularSystem_1af6f39cfed8c7a3d202f85ae19be22469"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setParticleFixed</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">localIdx</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fixed</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim14GranularSystem16setParticleFixedE6size_tb" title="Link to this definition"></a><br /></dt>
+<dd><p>Toggle a particle between dynamic and fixed; fixed particles ignore velocity and external-force setters. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim14GranularSystem19setPeriodicBoundaryERK3VecIXL3EEERK3VecIXL3EEEbbb">
+<span id="_CPPv3N6raisim14GranularSystem19setPeriodicBoundaryERK3VecIXL3EEERK3VecIXL3EEEbbb"></span><span id="_CPPv2N6raisim14GranularSystem19setPeriodicBoundaryERK3VecIX3EERK3VecIX3EEbbb"></span><span id="raisim::GranularSystem::setPeriodicBoundary__Vec:3:CR.Vec:3:CR.b.b.b"></span><span class="target" id="classraisim_1_1GranularSystem_1a10e85e28b398d488d92fcdd3557bfd1c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setPeriodicBoundary</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">minCorner</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">maxCorner</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">z</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim14GranularSystem19setPeriodicBoundaryERK3VecIXL3EEERK3VecIXL3EEEbbb" title="Link to this definition"></a><br /></dt>
+<dd><p>Wrap particle centers in enabled axes after integration. minCorner must be below maxCorner on enabled axes. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim14GranularSystem16setExternalForceE6size_tRK3VecIXL3EEE">
+<span id="_CPPv3N6raisim14GranularSystem16setExternalForceE6size_tRK3VecIXL3EEE"></span><span id="_CPPv2N6raisim14GranularSystem16setExternalForceE6size_tRK3VecIX3EE"></span><span id="raisim::GranularSystem::setExternalForce__s.Vec:3:CR"></span><span class="target" id="classraisim_1_1GranularSystem_1acf550c0d7a4dce648345a4e8da1ddd6c"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setExternalForce</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">localIdx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">force</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim14GranularSystem16setExternalForceE6size_tRK3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
+<dd><p>apply forces at the Center of Mass </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim14GranularSystem17setExternalTorqueE6size_tRK3VecIXL3EEE">
+<span id="_CPPv3N6raisim14GranularSystem17setExternalTorqueE6size_tRK3VecIXL3EEE"></span><span id="_CPPv2N6raisim14GranularSystem17setExternalTorqueE6size_tRK3VecIX3EE"></span><span id="raisim::GranularSystem::setExternalTorque__s.Vec:3:CR"></span><span class="target" id="classraisim_1_1GranularSystem_1a99b70b8cffbb0de1c2fe316e05c035d6"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setExternalTorque</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">localIdx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">torque</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim14GranularSystem17setExternalTorqueE6size_tRK3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
+<dd><p>apply torque on a body </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim14GranularSystem16setExternalForceE6size_tRK3VecIXL3EEERK3VecIXL3EEE">
+<span id="_CPPv3N6raisim14GranularSystem16setExternalForceE6size_tRK3VecIXL3EEERK3VecIXL3EEE"></span><span id="_CPPv2N6raisim14GranularSystem16setExternalForceE6size_tRK3VecIX3EERK3VecIX3EE"></span><span id="raisim::GranularSystem::setExternalForce__s.Vec:3:CR.Vec:3:CR"></span><span class="target" id="classraisim_1_1GranularSystem_1ac6ac02351921faa0938d82abd6ed7422"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setExternalForce</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">localIdx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pos</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">force</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim14GranularSystem16setExternalForceE6size_tRK3VecIXL3EEERK3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
+<dd><p>apply force (expressed in the world frame) at specific location of the body (expressed in the body frame) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim14GranularSystem18setConstraintForceE6size_tRK3VecIXL3EEERK3VecIXL3EEE">
+<span id="_CPPv3N6raisim14GranularSystem18setConstraintForceE6size_tRK3VecIXL3EEERK3VecIXL3EEE"></span><span id="_CPPv2N6raisim14GranularSystem18setConstraintForceE6size_tRK3VecIX3EERK3VecIX3EE"></span><span id="raisim::GranularSystem::setConstraintForce__s.Vec:3:CR.Vec:3:CR"></span><span class="target" id="classraisim_1_1GranularSystem_1ab9c7fa08729889ef7e100137a17946e7"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setConstraintForce</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">localIdx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pos</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">force</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim14GranularSystem18setConstraintForceE6size_tRK3VecIXL3EEERK3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
+<dd><p>apply spring force (expressed in the world frame) at specific location of the body (expressed in the body frame) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim14GranularSystem11getBodyTypeE6size_t">
+<span id="_CPPv3NK6raisim14GranularSystem11getBodyTypeE6size_t"></span><span id="_CPPv2NK6raisim14GranularSystem11getBodyTypeE6size_t"></span><span id="raisim::GranularSystem::getBodyType__sC"></span><span class="target" id="classraisim_1_1GranularSystem_1a27e9dc61b15c8e83bdc4ff7a9eef73f5"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">BodyType</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getBodyType</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">localIdx</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4NK6raisim14GranularSystem11getBodyTypeE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>get the object body type. Available types are: DYNAMIC (movable and finite mass), STATIC (not movable and infinite mass), KINETIC (movable and infinite mass) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the body type </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim14GranularSystem18getContactPointVelE6size_tR3VecIXL3EEE">
+<span id="_CPPv3NK6raisim14GranularSystem18getContactPointVelE6size_tR3VecIXL3EEE"></span><span id="_CPPv2NK6raisim14GranularSystem18getContactPointVelE6size_tR3VecIX3EE"></span><span id="raisim::GranularSystem::getContactPointVel__s.Vec:3:RC"></span><span class="target" id="classraisim_1_1GranularSystem_1a71189ed852d46d5aff02d900906b7722"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getContactPointVel</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pointId</span></span>, <span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">vel</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4NK6raisim14GranularSystem18getContactPointVelE6size_tR3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
+<dd><p>get the contact point velocity in the world frame. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pointId</strong> – <strong>[in]</strong> the contact index. This is an index of a contact in the contact vector that you can retrieve from getContacts(). </p></li>
+<li><p><strong>vel</strong> – <strong>[out]</strong> the contact point velocity in the world frame </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim14GranularSystem10BoxOptionsE">
+<span id="_CPPv3N6raisim14GranularSystem10BoxOptionsE"></span><span id="_CPPv2N6raisim14GranularSystem10BoxOptionsE"></span><span id="raisim::GranularSystem::BoxOptions"></span><span class="target" id="structraisim_1_1GranularSystem_1_1BoxOptions"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BoxOptions</span></span></span><a class="headerlink" href="#_CPPv4N6raisim14GranularSystem10BoxOptionsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim14GranularSystem8MaterialE">
+<span id="_CPPv3N6raisim14GranularSystem8MaterialE"></span><span id="_CPPv2N6raisim14GranularSystem8MaterialE"></span><span id="raisim::GranularSystem::Material"></span><span class="target" id="structraisim_1_1GranularSystem_1_1Material"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Material</span></span></span><a class="headerlink" href="#_CPPv4N6raisim14GranularSystem8MaterialE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim14GranularSystem16ParticleMaterialE">
+<span id="_CPPv3N6raisim14GranularSystem16ParticleMaterialE"></span><span id="_CPPv2N6raisim14GranularSystem16ParticleMaterialE"></span><span id="raisim::GranularSystem::ParticleMaterial"></span><span class="target" id="structraisim_1_1GranularSystem_1_1ParticleMaterial"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ParticleMaterial</span></span></span><a class="headerlink" href="#_CPPv4N6raisim14GranularSystem16ParticleMaterialE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim14GranularSystem9StepStatsE">
+<span id="_CPPv3N6raisim14GranularSystem9StepStatsE"></span><span id="_CPPv2N6raisim14GranularSystem9StepStatsE"></span><span id="raisim::GranularSystem::StepStats"></span><span class="target" id="structraisim_1_1GranularSystem_1_1StepStats"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StepStats</span></span></span><a class="headerlink" href="#_CPPv4N6raisim14GranularSystem9StepStatsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="DeformableObject.html" class="btn btn-neutral float-left" title="Deformable Objects" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Contact.html" class="btn btn-neutral float-right" title="Contact and Collision" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

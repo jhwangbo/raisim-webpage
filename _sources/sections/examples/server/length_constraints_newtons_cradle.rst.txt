@@ -8,23 +8,24 @@ Creates a Newton's cradle with stiff and compliant wires, adds robots, and expor
 
 Screenshot
 ==========
-.. image:: ../../../image/constraints.gif
+.. image:: ../../../image/length_constraints_newtons_cradle.png
+   :alt: length_constraints_newtons_cradle example
+   :width: 100%
 
 Binary
 ======
-CMake target and executable name: ``length_constraints_newtons_cradle``.
+Installed executable: ``length_constraints_newtons_cradle``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target length_constraints_newtons_cradle
-   ./length_constraints_newtons_cradle
+   <raisim-install>/bin/length_constraints_newtons_cradle
 
 On Windows, run ``length_constraints_newtons_cradle.exe`` instead.
-This example uses RaisimServer. Start a visualizer client (RaisimUnity, RaisimUnreal, or the rayrai TCP viewer) and connect to port 8080.
+This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.
 
 
 Details
@@ -33,7 +34,3 @@ Details
 - Adds compliant and custom wires attached to a box and robots.
 - Exports the world to XML and removes a custom wire mid-simulation.
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/server/length_constraints_newtons_cradle.cpp
-   :language: cpp

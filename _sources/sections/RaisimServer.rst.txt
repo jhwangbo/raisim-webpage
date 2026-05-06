@@ -3,12 +3,14 @@ Raisim Server
 #############################
 
 RaisimServer serializes ``raisim::World`` and streams the data to clients via TCP/IP.
-We provide the RaisimUnity (`doc <https://raisim.com/sections/RaisimUnity.html>`_) client, which visualizes a ``raisim::World``.
-Basic usage is described in the `documentation <https://raisim.com/sections/RaisimUnity.html#how-to-use-raisimunity>`_.
+Use the rayrai TCP viewer for supported server-side visualization.
+For older Unity or Unreal visualization workflows, see :doc:`LegacyIntegrations`.
+For a workflow-level comparison between server-based visualization and
+in-process rayrai rendering, see :doc:`Visualization`.
 
 In addition to visualizing a ``raisim::World``, ``raisim::RaisimServer`` can visualize additional objects.
-An example can be found `here <https://github.com/raisimTech/raisim2Lib/blob/master/examples/src/server/visual_objects_showcase.cpp>`__.
-The example is displayed as follows:
+The legacy visual-object showcase is displayed as follows; use the current
+examples index for runnable source targets:
 
 .. image:: ../image/visuals.gif
 
@@ -40,20 +42,23 @@ to avoid races.
 The server can be paused with ``hibernate()`` and resumed with ``wakeup()``.
 Call ``killServer()`` to stop the server thread and disconnect the client.
 
-Sensor updates from the visualizer
+Sensor measurements
 ==================================
-If a sensor's measurement source is set to
-``Sensor::MeasurementSource::VISUALIZER``, the server requests updates only
-when the sensor's update period elapses. The visualizer sends the rendered
-RGB/depth buffers back to the server, which then writes them into the sensor's
-internal buffers and updates the timestamp. Sensors with non-visualizer
-measurement sources are serialized directly from RaiSim.
+RaiSim does not support sensor measurement updates from a visualizer.
+``RaisimServer`` streams the world state to visualizer clients, but it does not
+request RGB or depth frames back from TCP visualizers and does not write
+visualizer-rendered data into RaiSim sensor buffers.
+
+Use ``Sensor::MeasurementSource::RAISIM`` for sensors that RaiSim can compute
+from the physics world, such as IMU, spinning LiDAR, and depth-camera CPU ray
+updates. Use ``Sensor::MeasurementSource::MANUAL`` when user code or an
+in-process renderer writes the sensor buffer.
 
 Synchronous updates (optional)
 ==============================
 ``processRequests()`` implements a synchronous request/response loop used by
-clients that explicitly pull updates. It returns ``false`` if the client does not
-respond, rejects the protocol version, or fails to deliver sensor data in time.
+clients that explicitly pull world-state updates. It returns ``false`` if the
+client does not respond or rejects the protocol version.
 
 
 RaisimServer API

@@ -1,0 +1,590 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deformable Objects &mdash; raisim 2.2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=b21de401"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Granular Media" href="GranularMedia.html" />
+    <link rel="prev" title="Single-Body Objects" href="SingleBodyObjects.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog: v2.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="Object.html">Objects</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Object.html#body-types">Body types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Object.html#object-identity-and-indices">Object Identity And Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Object.html#name">Name</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="Object.html#types">Types</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Deformable Objects</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#api-surface">API Surface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data-model">Data Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#creating-a-deformable-object">Creating A Deformable Object</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#material-parameters">Material Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elastic-modulus">Elastic Modulus</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pinned-vertices-and-forces">Pinned Vertices And Forces</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#solver-tuning">Solver Tuning</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rayrai-visualization">Rayrai Visualization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#limitations">Limitations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#api-reference">API Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Object.html#contacts-and-external-forces">Contacts And External Forces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Object.html#threaded-visualization">Threaded Visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Object.html#api">API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="Object.html">Objects</a></li>
+      <li class="breadcrumb-item active">Deformable Objects</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="deformable-objects">
+<h1>Deformable Objects<a class="headerlink" href="#deformable-objects" title="Link to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">raisim::DeformableObject</span></code> is RaiSim’s XPBD/PBD deformable-body object.
+It is intended for fast simulation and data-generation workloads that need
+cloth, soft shells, or coarse volumetric proxies without leaving RaiSim’s
+single-threaded stepping model.</p>
+<p>The implementation uses distance constraints between particles and optional
+isometric bending constraints between adjacent triangles. Collision is handled
+by one aggregate deformable object in the broad phase, with spherical particle
+proxies used internally for contact generation. This keeps deformable objects
+cheap to register in the world while still allowing particle-level contacts
+against the ground, rigid bodies, and other deformable objects.</p>
+<section id="api-surface">
+<h2>API Surface<a class="headerlink" href="#api-surface" title="Link to this heading"></a></h2>
+<p>The public constructors are exposed through <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">World::addDeformableCloth(vertices,</span> <span class="pre">triangles,</span> <span class="pre">pinnedVertices,</span> <span class="pre">material,</span> <span class="pre">contactMaterial,</span> <span class="pre">collisionGroup,</span> <span class="pre">collisionMask)</span></code>
+creates a deformable cloth or shell directly from world-space particle
+positions and triangle indices.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">World::addDeformableCloth(meshFileInObjFormat,</span> <span class="pre">scale,</span> <span class="pre">pinnedVertices,</span> <span class="pre">material,</span> <span class="pre">contactMaterial,</span> <span class="pre">collisionGroup,</span> <span class="pre">collisionMask)</span></code>
+loads an OBJ mesh as a surface cloth/shell.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">World::addDeformableObject(meshFileInObjFormat,</span> <span class="pre">material,</span> <span class="pre">options,</span> <span class="pre">pinnedVertices,</span> <span class="pre">contactMaterial,</span> <span class="pre">collisionGroup,</span> <span class="pre">collisionMask)</span></code>
+loads an OBJ mesh with <code class="docutils literal notranslate"><span class="pre">MeshBuildOptions</span></code> for surface particles, filled
+particles, and optional internal struts.</p></li>
+</ul>
+<p>All three creation paths register one <code class="docutils literal notranslate"><span class="pre">DeformableObject</span></code> in the world.
+Particle-level operations use local particle indices. Pinned particles report
+<code class="docutils literal notranslate"><span class="pre">BodyType::STATIC</span></code> through <code class="docutils literal notranslate"><span class="pre">getBodyType(localIdx)</span></code>; all other particles
+report <code class="docutils literal notranslate"><span class="pre">BodyType::DYNAMIC</span></code>.</p>
+</section>
+<section id="data-model">
+<h2>Data Model<a class="headerlink" href="#data-model" title="Link to this heading"></a></h2>
+<p>The simulated state is particle based:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">getNumParticles()</span></code> returns the number of particles.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">getPositions()</span></code> returns world-space particle positions.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">getTriangles()</span></code> returns the visual/surface triangle topology.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">getVisualPosition(idx)</span></code> returns the particle position plus any visual
+offset created by filled-mesh construction.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">getDistanceConstraintCount()</span></code> and <code class="docutils literal notranslate"><span class="pre">getBendingConstraintCount()</span></code> expose
+the generated constraint counts for diagnostics.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">getCollisionBodyCount()</span></code> is normally <code class="docutils literal notranslate"><span class="pre">1</span></code> because one aggregate collision
+body represents the deformable object in the broad phase.</p></li>
+</ul>
+<p>The collision proxy radius is not the visual mesh thickness. It controls the
+spherical particle contacts used by the solver. If visual geometry appears to
+touch but contacts are weak or delayed, check <code class="docutils literal notranslate"><span class="pre">collisionRadius</span></code> and particle
+spacing before increasing stiffness.</p>
+</section>
+<section id="creating-a-deformable-object">
+<h2>Creating A Deformable Object<a class="headerlink" href="#creating-a-deformable-object" title="Link to this heading"></a></h2>
+<section id="explicit-vertices">
+<h3>Explicit vertices<a class="headerlink" href="#explicit-vertices" title="Link to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">World::addDeformableCloth</span></code> when you already have particle positions and
+surface triangle indices. The vertices are in world coordinates.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">vertices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">{</span><span class="mf">-0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w">  </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="mf">-0.5</span><span class="p">,</span><span class="w">  </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">}};</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">DeformableObject</span><span class="o">::</span><span class="n">Triangle</span><span class="o">&gt;</span><span class="w"> </span><span class="n">triangles</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">}};</span>
+
+<span class="n">raisim</span><span class="o">::</span><span class="n">DeformableObject</span><span class="o">::</span><span class="n">Material</span><span class="w"> </span><span class="n">material</span><span class="p">;</span>
+<span class="n">material</span><span class="p">.</span><span class="n">totalMass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span>
+<span class="n">material</span><span class="p">.</span><span class="n">distanceCompliance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0e-5</span><span class="p">;</span>
+<span class="n">material</span><span class="p">.</span><span class="n">bendCompliance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0e-5</span><span class="p">;</span>
+<span class="n">material</span><span class="p">.</span><span class="n">damping</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.02</span><span class="p">;</span>
+<span class="n">material</span><span class="p">.</span><span class="n">collisionRadius</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.01</span><span class="p">;</span>
+<span class="n">material</span><span class="p">.</span><span class="n">iterations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
+
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">cloth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addDeformableCloth</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span><span class="w"> </span><span class="n">triangles</span><span class="p">,</span><span class="w"> </span><span class="p">{},</span><span class="w"> </span><span class="n">material</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="mesh-surface-particles">
+<h3>Mesh surface particles<a class="headerlink" href="#mesh-surface-particles" title="Link to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">World::addDeformableObject</span></code> with <code class="docutils literal notranslate"><span class="pre">MeshParticleOptions::Mode::Surface</span></code>
+when the simulated particles should be the OBJ mesh vertices.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">DeformableObject</span><span class="o">::</span><span class="n">MeshBuildOptions</span><span class="w"> </span><span class="n">build</span><span class="p">;</span>
+<span class="n">build</span><span class="p">.</span><span class="n">particles</span><span class="p">.</span><span class="n">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">DeformableObject</span><span class="o">::</span><span class="n">MeshParticleOptions</span><span class="o">::</span><span class="n">Mode</span><span class="o">::</span><span class="n">Surface</span><span class="p">;</span>
+<span class="n">build</span><span class="p">.</span><span class="n">particles</span><span class="p">.</span><span class="n">scale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span>
+
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">shell</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addDeformableObject</span><span class="p">(</span><span class="s">&quot;soft_shell.obj&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">material</span><span class="p">,</span><span class="w"> </span><span class="n">build</span><span class="p">);</span>
+<span class="n">shell</span><span class="o">-&gt;</span><span class="n">setPositionOffset</span><span class="p">({</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">});</span>
+</pre></div>
+</div>
+<p>OBJ polygon faces are triangulated as a fan. Texture and normal indices are
+ignored. This mode is suitable for cloth and shell meshes.</p>
+</section>
+<section id="filled-mesh-particles">
+<h3>Filled mesh particles<a class="headerlink" href="#filled-mesh-particles" title="Link to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">MeshParticleOptions::Mode::Filled</span></code> for a closed OBJ triangle mesh that
+should receive interior particles. RaiSim samples interior particles on a
+regular grid controlled by <code class="docutils literal notranslate"><span class="pre">spacing</span></code>.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">DeformableObject</span><span class="o">::</span><span class="n">MeshBuildOptions</span><span class="w"> </span><span class="n">build</span><span class="p">;</span>
+<span class="n">build</span><span class="p">.</span><span class="n">particles</span><span class="p">.</span><span class="n">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">DeformableObject</span><span class="o">::</span><span class="n">MeshParticleOptions</span><span class="o">::</span><span class="n">Mode</span><span class="o">::</span><span class="n">Filled</span><span class="p">;</span>
+<span class="n">build</span><span class="p">.</span><span class="n">particles</span><span class="p">.</span><span class="n">scale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span>
+<span class="n">build</span><span class="p">.</span><span class="n">particles</span><span class="p">.</span><span class="n">spacing</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.05</span><span class="p">;</span>
+<span class="n">build</span><span class="p">.</span><span class="n">particles</span><span class="p">.</span><span class="n">maxFillParticles</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">50000</span><span class="p">;</span>
+
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">softBody</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addDeformableObject</span><span class="p">(</span><span class="s">&quot;closed_cube.obj&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">material</span><span class="p">,</span><span class="w"> </span><span class="n">build</span><span class="p">);</span>
+<span class="n">softBody</span><span class="o">-&gt;</span><span class="n">setPositionOffset</span><span class="p">({</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">});</span>
+</pre></div>
+</div>
+<p>Filled mode requires a closed triangle mesh. It is intended for feasible,
+watertight meshes with a meaningful inside/outside volume. If the mesh is not
+closed, construction fails instead of guessing an interior.</p>
+<p>When using filled mode, tune <code class="docutils literal notranslate"><span class="pre">spacing</span></code> and <code class="docutils literal notranslate"><span class="pre">maxFillParticles</span></code> together.
+Smaller spacing increases particle count and usually improves shape support,
+but it also increases contact and constraint cost. <code class="docutils literal notranslate"><span class="pre">maxFillParticles</span></code> is a
+safety cap; if the requested spacing would generate too many particles, use a
+larger spacing or a simpler mesh instead of silently accepting an unexpectedly
+large model.</p>
+</section>
+<section id="internal-struts">
+<h3>Internal struts<a class="headerlink" href="#internal-struts" title="Link to this heading"></a></h3>
+<p>Internal struts are additional distance constraints used to preserve a rest
+shape and provide bounce/recovery for soft shells or filled objects.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">DeformableObject</span><span class="o">::</span><span class="n">MeshBuildOptions</span><span class="w"> </span><span class="n">build</span><span class="p">;</span>
+<span class="n">build</span><span class="p">.</span><span class="n">particles</span><span class="p">.</span><span class="n">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">DeformableObject</span><span class="o">::</span><span class="n">MeshParticleOptions</span><span class="o">::</span><span class="n">Mode</span><span class="o">::</span><span class="n">Filled</span><span class="p">;</span>
+<span class="n">build</span><span class="p">.</span><span class="n">particles</span><span class="p">.</span><span class="n">spacing</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.05</span><span class="p">;</span>
+<span class="n">build</span><span class="p">.</span><span class="n">internalStruts</span><span class="p">.</span><span class="n">mode</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="n">raisim</span><span class="o">::</span><span class="n">DeformableObject</span><span class="o">::</span><span class="n">InternalStrutOptions</span><span class="o">::</span><span class="n">Mode</span><span class="o">::</span><span class="n">PairsWithinRadius</span><span class="p">;</span>
+<span class="n">build</span><span class="p">.</span><span class="n">internalStruts</span><span class="p">.</span><span class="n">radius</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.09</span><span class="p">;</span>
+
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">softBody</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addDeformableObject</span><span class="p">(</span><span class="s">&quot;closed_cube.obj&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">material</span><span class="p">,</span><span class="w"> </span><span class="n">build</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>You can also add constraints after construction:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">softBody</span><span class="o">-&gt;</span><span class="n">addDistanceConstraint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">);</span>
+<span class="n">softBody</span><span class="o">-&gt;</span><span class="n">addDistanceConstraints</span><span class="p">({{</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">}});</span>
+<span class="n">softBody</span><span class="o">-&gt;</span><span class="n">addInternalStruts</span><span class="p">(</span><span class="n">build</span><span class="p">.</span><span class="n">internalStruts</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Manual constraints are useful for adding diagonal support to coarse shells.
+They use current particle positions as the rest configuration, so add them
+immediately after construction or after intentionally placing the object in its
+desired rest pose.</p>
+</section>
+</section>
+<section id="material-parameters">
+<h2>Material Parameters<a class="headerlink" href="#material-parameters" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">DeformableObject::Material</span></code> controls mass, solver behavior, collision proxy
+size, and elastic response:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">totalMass</span></code>: total mass distributed uniformly over all particles.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">distanceCompliance</span></code>: XPBD distance compliance. <code class="docutils literal notranslate"><span class="pre">0</span></code> is rigid; larger
+values are softer. Negative values preserve legacy behavior by using
+<code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">/</span> <span class="pre">distanceStiffness</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">distanceStiffness</span></code>: legacy stiffness parameter. Prefer
+<code class="docutils literal notranslate"><span class="pre">distanceCompliance</span></code> for new code.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bendCompliance</span></code>: XPBD isometric bending compliance for adjacent triangle
+pairs. <code class="docutils literal notranslate"><span class="pre">0</span></code> is rigid; larger values allow easier folding. Negative values
+disable bending unless <code class="docutils literal notranslate"><span class="pre">bendStiffness</span></code> is positive.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bendStiffness</span></code>: legacy bending stiffness parameter. Prefer
+<code class="docutils literal notranslate"><span class="pre">bendCompliance</span></code> for new code.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">youngsModulus</span></code>: Young’s modulus in Pa. If positive, per-edge XPBD
+compliance is derived from rest length and effective area.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">poissonRatio</span></code>: stored and validated for elastic material definitions.
+The current distance-constraint model does not implement a volumetric
+shear/Poisson model.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">thickness</span></code>: surface thickness used to derive an effective area from each
+edge length when <code class="docutils literal notranslate"><span class="pre">youngsModulus</span></code> is positive and <code class="docutils literal notranslate"><span class="pre">crossSectionArea</span></code> is not
+set.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">crossSectionArea</span></code>: effective area for each distance constraint. If
+positive, this overrides the thickness-based estimate.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">damping</span></code>: per-step velocity damping in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">collisionRadius</span></code>: radius of each internal particle collision proxy.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">iterations</span></code>: number of constraint projection iterations per substep.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">substeps</span></code>: number of deformable substeps per RaiSim world step.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">solverMode</span></code>: <code class="docutils literal notranslate"><span class="pre">XPBD</span></code> by default; <code class="docutils literal notranslate"><span class="pre">PBD</span></code> is also available.</p></li>
+</ul>
+</section>
+<section id="elastic-modulus">
+<h2>Elastic Modulus<a class="headerlink" href="#elastic-modulus" title="Link to this heading"></a></h2>
+<p>For engineering-style material input, set <code class="docutils literal notranslate"><span class="pre">youngsModulus</span></code> instead of
+<code class="docutils literal notranslate"><span class="pre">distanceCompliance</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">DeformableObject</span><span class="o">::</span><span class="n">Material</span><span class="w"> </span><span class="n">material</span><span class="p">;</span>
+<span class="n">material</span><span class="p">.</span><span class="n">totalMass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span>
+<span class="n">material</span><span class="p">.</span><span class="n">youngsModulus</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">5.0e4</span><span class="p">;</span>
+<span class="n">material</span><span class="p">.</span><span class="n">poissonRatio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.3</span><span class="p">;</span>
+<span class="n">material</span><span class="p">.</span><span class="n">thickness</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.02</span><span class="p">;</span>
+<span class="n">material</span><span class="p">.</span><span class="n">collisionRadius</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.01</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>When <code class="docutils literal notranslate"><span class="pre">youngsModulus</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>, RaiSim computes each distance-constraint compliance
+as:</p>
+<div class="math notranslate nohighlight">
+\[\alpha = \frac{L}{E A}\]</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">L</span></code> is the rest length, <code class="docutils literal notranslate"><span class="pre">E</span></code> is <code class="docutils literal notranslate"><span class="pre">youngsModulus</span></code>, and <code class="docutils literal notranslate"><span class="pre">A</span></code> is either
+<code class="docutils literal notranslate"><span class="pre">crossSectionArea</span></code> or the thickness-derived area. Larger <code class="docutils literal notranslate"><span class="pre">youngsModulus</span></code>
+therefore produces a stiffer object.</p>
+</section>
+<section id="pinned-vertices-and-forces">
+<h2>Pinned Vertices And Forces<a class="headerlink" href="#pinned-vertices-and-forces" title="Link to this heading"></a></h2>
+<p>Pinned vertices are fixed in world coordinates and are exposed to collision as
+static proxies. They can be specified at construction time or changed later:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">cloth</span><span class="o">-&gt;</span><span class="n">pinVertex</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="n">cloth</span><span class="o">-&gt;</span><span class="n">unpinVertex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.01</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>External forces can be applied per particle with the standard <code class="docutils literal notranslate"><span class="pre">Object</span></code>
+interface:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">softBody</span><span class="o">-&gt;</span><span class="n">setExternalForce</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">});</span>
+<span class="n">softBody</span><span class="o">-&gt;</span><span class="n">clearExternalForcesAndTorques</span><span class="p">();</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">unpinVertex(idx,</span> <span class="pre">mass)</span></code> restores a finite mass for that particle. Use a
+positive mass that is consistent with the surrounding particles; an extremely
+small mass makes the particle hard to move, while a very large mass can make
+the local constraints dominate the rest of the object.</p>
+</section>
+<section id="solver-tuning">
+<h2>Solver Tuning<a class="headerlink" href="#solver-tuning" title="Link to this heading"></a></h2>
+<p>Start with the largest stable time step your application needs, then tune in
+this order:</p>
+<ol class="arabic simple">
+<li><p>Choose a particle spacing that resolves the shape at the level your task
+actually observes.</p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">collisionRadius</span></code> so neighboring particle proxies cover the surface
+without making the visual mesh appear inflated.</p></li>
+<li><p>Increase <code class="docutils literal notranslate"><span class="pre">iterations</span></code> until distance constraints converge enough for the
+task.</p></li>
+<li><p>Increase <code class="docutils literal notranslate"><span class="pre">substeps</span></code> when contacts are jittery or high-speed impacts create
+excessive penetration.</p></li>
+<li><p>Reduce <code class="docutils literal notranslate"><span class="pre">distanceCompliance</span></code> or increase <code class="docutils literal notranslate"><span class="pre">youngsModulus</span></code> only after the
+discretization and solver budget are reasonable.</p></li>
+</ol>
+<p><code class="docutils literal notranslate"><span class="pre">XPBD</span></code> is the recommended default because compliance is less dependent on the
+number of iterations than legacy PBD stiffness. Use <code class="docutils literal notranslate"><span class="pre">PBD</span></code> mainly for
+backward-compatible behavior or controlled comparisons.</p>
+<p>Common failure modes:</p>
+<ul class="simple">
+<li><p>Exploding or jittering contacts usually mean the time step is too large for
+the stiffness/contact radius combination.</p></li>
+<li><p>A cloth that stretches too much needs lower <code class="docutils literal notranslate"><span class="pre">distanceCompliance</span></code> or more
+iterations.</p></li>
+<li><p>A cloth that folds too easily needs lower <code class="docutils literal notranslate"><span class="pre">bendCompliance</span></code> or a positive
+legacy <code class="docutils literal notranslate"><span class="pre">bendStiffness</span></code>.</p></li>
+<li><p>Filled objects that collapse need more internal struts, smaller spacing, or
+higher elastic stiffness.</p></li>
+</ul>
+<p>Validation</p>
+</section>
+<section id="rayrai-visualization">
+<h2>Rayrai Visualization<a class="headerlink" href="#rayrai-visualization" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> serializes deformable objects as dynamic <code class="docutils literal notranslate"><span class="pre">Shape::Mesh</span></code>
+visuals for <code class="docutils literal notranslate"><span class="pre">visualizer/rayrai</span></code>. The first visualizer packet sends the object
+name, triangle topology, and current vertex positions. Later packets keep the
+same topology and stream updated vertex positions only. Rayrai rebuilds the
+custom OpenGL mesh, recomputes normals from the triangle list, and renders the
+deformable surface in world coordinates.</p>
+<p>The particle collision proxies are an internal physics representation and are
+not rendered as one sphere per vertex. The visible mesh can therefore be smaller
+or larger than the collision proxy envelope by approximately <code class="docutils literal notranslate"><span class="pre">collisionRadius</span></code>.
+For stacked soft cubes or other closed shapes, choose particle spacing and
+<code class="docutils literal notranslate"><span class="pre">collisionRadius</span></code> together: neighboring particle spheres should cover the
+surface without leaving gaps, but the radius should not be so large that the
+visual mesh appears to float far outside the collision envelope.</p>
+</section>
+<section id="limitations">
+<h2>Limitations<a class="headerlink" href="#limitations" title="Link to this heading"></a></h2>
+<p>This is still an experimental implementation. It does not yet include
+tetrahedral finite elements, deformable self-collision, or topology-changing
+visual mesh updates in <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code>. Swept CCD is available for rigid body
+contact settings, but deformable particle contacts use the discrete collision
+path described above.</p>
+</section>
+<section id="api-reference">
+<h2>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h2>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16DeformableObjectE">
+<span id="_CPPv3N6raisim16DeformableObjectE"></span><span id="_CPPv2N6raisim16DeformableObjectE"></span><span id="raisim::DeformableObject"></span><span class="target" id="classraisim_1_1DeformableObject"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DeformableObject</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="Object.html#_CPPv4N6raisim6ObjectE" title="raisim::Object"><span class="n"><span class="pre">Object</span></span></a><a class="headerlink" href="#_CPPv4N6raisim16DeformableObjectE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16DeformableObject13getObjectTypeEv">
+<span id="_CPPv3NK6raisim16DeformableObject13getObjectTypeEv"></span><span id="_CPPv2NK6raisim16DeformableObject13getObjectTypeEv"></span><span id="raisim::DeformableObject::getObjectTypeC"></span><span class="target" id="classraisim_1_1DeformableObject_1a07883d05827e581d292e441c80542aec"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">ObjectType</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getObjectType</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4NK6raisim16DeformableObject13getObjectTypeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>get the object type. Possible types are SPHERE, BOX, CYLINDER, CONE, CAPSULE, MESH, HALFSPACE, COMPOUND, HEIGHTMAP, ARTICULATED_SYSTEM </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the object type </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16DeformableObject11getBodyTypeE6size_t">
+<span id="_CPPv3NK6raisim16DeformableObject11getBodyTypeE6size_t"></span><span id="_CPPv2NK6raisim16DeformableObject11getBodyTypeE6size_t"></span><span id="raisim::DeformableObject::getBodyType__sC"></span><span class="target" id="classraisim_1_1DeformableObject_1a8dd4c43c020615078ef496365187e0bb"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">BodyType</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getBodyType</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">localIdx</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4NK6raisim16DeformableObject11getBodyTypeE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>get the object body type. Available types are: DYNAMIC (movable and finite mass), STATIC (not movable and infinite mass), KINETIC (movable and infinite mass) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the body type </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16DeformableObject16setExternalForceE6size_tRK3VecIXL3EEE">
+<span id="_CPPv3N6raisim16DeformableObject16setExternalForceE6size_tRK3VecIXL3EEE"></span><span id="_CPPv2N6raisim16DeformableObject16setExternalForceE6size_tRK3VecIX3EE"></span><span id="raisim::DeformableObject::setExternalForce__s.Vec:3:CR"></span><span class="target" id="classraisim_1_1DeformableObject_1a112c9e1c476ff1d962dca2a0fe475d3e"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setExternalForce</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">localIdx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">force</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim16DeformableObject16setExternalForceE6size_tRK3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
+<dd><p>apply forces at the Center of Mass </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16DeformableObject17setExternalTorqueE6size_tRK3VecIXL3EEE">
+<span id="_CPPv3N6raisim16DeformableObject17setExternalTorqueE6size_tRK3VecIXL3EEE"></span><span id="_CPPv2N6raisim16DeformableObject17setExternalTorqueE6size_tRK3VecIX3EE"></span><span id="raisim::DeformableObject::setExternalTorque__s.Vec:3:CR"></span><span class="target" id="classraisim_1_1DeformableObject_1a04d8d59fdb59d3a7ce5d1c886fd0a889"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setExternalTorque</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">localIdx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">torque</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim16DeformableObject17setExternalTorqueE6size_tRK3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
+<dd><p>apply torque on a body </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16DeformableObject16setExternalForceE6size_tRK3VecIXL3EEERK3VecIXL3EEE">
+<span id="_CPPv3N6raisim16DeformableObject16setExternalForceE6size_tRK3VecIXL3EEERK3VecIXL3EEE"></span><span id="_CPPv2N6raisim16DeformableObject16setExternalForceE6size_tRK3VecIX3EERK3VecIX3EE"></span><span id="raisim::DeformableObject::setExternalForce__s.Vec:3:CR.Vec:3:CR"></span><span class="target" id="classraisim_1_1DeformableObject_1ab052a0edfdb6790453ef2ed248621f1f"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setExternalForce</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">localIdx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pos</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">force</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim16DeformableObject16setExternalForceE6size_tRK3VecIXL3EEERK3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
+<dd><p>apply force (expressed in the world frame) at specific location of the body (expressed in the body frame) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16DeformableObject18setConstraintForceE6size_tRK3VecIXL3EEERK3VecIXL3EEE">
+<span id="_CPPv3N6raisim16DeformableObject18setConstraintForceE6size_tRK3VecIXL3EEERK3VecIXL3EEE"></span><span id="_CPPv2N6raisim16DeformableObject18setConstraintForceE6size_tRK3VecIX3EERK3VecIX3EE"></span><span id="raisim::DeformableObject::setConstraintForce__s.Vec:3:CR.Vec:3:CR"></span><span class="target" id="classraisim_1_1DeformableObject_1af80a4f2e0bc4d1d1fd6610140e0d36a0"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setConstraintForce</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">localIdx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pos</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">force</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim16DeformableObject18setConstraintForceE6size_tRK3VecIXL3EEERK3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
+<dd><p>apply spring force (expressed in the world frame) at specific location of the body (expressed in the body frame) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16DeformableObject18getContactPointVelE6size_tR3VecIXL3EEE">
+<span id="_CPPv3NK6raisim16DeformableObject18getContactPointVelE6size_tR3VecIXL3EEE"></span><span id="_CPPv2NK6raisim16DeformableObject18getContactPointVelE6size_tR3VecIX3EE"></span><span id="raisim::DeformableObject::getContactPointVel__s.Vec:3:RC"></span><span class="target" id="classraisim_1_1DeformableObject_1a59e764df28d4d609461fa7dc496a46b4"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getContactPointVel</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pointId</span></span>, <span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">vel</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4NK6raisim16DeformableObject18getContactPointVelE6size_tR3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
+<dd><p>get the contact point velocity in the world frame. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pointId</strong> – <strong>[in]</strong> the contact index. This is an index of a contact in the contact vector that you can retrieve from getContacts(). </p></li>
+<li><p><strong>vel</strong> – <strong>[out]</strong> the contact point velocity in the world frame </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16DeformableObject20InternalStrutOptionsE">
+<span id="_CPPv3N6raisim16DeformableObject20InternalStrutOptionsE"></span><span id="_CPPv2N6raisim16DeformableObject20InternalStrutOptionsE"></span><span id="raisim::DeformableObject::InternalStrutOptions"></span><span class="target" id="structraisim_1_1DeformableObject_1_1InternalStrutOptions"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InternalStrutOptions</span></span></span><a class="headerlink" href="#_CPPv4N6raisim16DeformableObject20InternalStrutOptionsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16DeformableObject8MaterialE">
+<span id="_CPPv3N6raisim16DeformableObject8MaterialE"></span><span id="_CPPv2N6raisim16DeformableObject8MaterialE"></span><span id="raisim::DeformableObject::Material"></span><span class="target" id="structraisim_1_1DeformableObject_1_1Material"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Material</span></span></span><a class="headerlink" href="#_CPPv4N6raisim16DeformableObject8MaterialE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16DeformableObject8Material18distanceComplianceE">
+<span id="_CPPv3N6raisim16DeformableObject8Material18distanceComplianceE"></span><span id="_CPPv2N6raisim16DeformableObject8Material18distanceComplianceE"></span><span id="raisim::DeformableObject::Material::distanceCompliance__double"></span><span class="target" id="structraisim_1_1DeformableObject_1_1Material_1a8f228ad3fe4b13d693095ccbe3b802e3"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">distanceCompliance</span></span></span><a class="headerlink" href="#_CPPv4N6raisim16DeformableObject8Material18distanceComplianceE" title="Link to this definition"></a><br /></dt>
+<dd><p>XPBD distance compliance. 0 is rigid, larger values are softer. Negative keeps backwards compatibility by using 1 / distanceStiffness. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16DeformableObject8Material17distanceStiffnessE">
+<span id="_CPPv3N6raisim16DeformableObject8Material17distanceStiffnessE"></span><span id="_CPPv2N6raisim16DeformableObject8Material17distanceStiffnessE"></span><span id="raisim::DeformableObject::Material::distanceStiffness__double"></span><span class="target" id="structraisim_1_1DeformableObject_1_1Material_1aa0666d9c3c2bcf0e2c9b4fa439e34c41"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">distanceStiffness</span></span></span><a class="headerlink" href="#_CPPv4N6raisim16DeformableObject8Material17distanceStiffnessE" title="Link to this definition"></a><br /></dt>
+<dd><p>Legacy stiffness parameter. Prefer distanceCompliance for new code. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16DeformableObject8Material14bendComplianceE">
+<span id="_CPPv3N6raisim16DeformableObject8Material14bendComplianceE"></span><span id="_CPPv2N6raisim16DeformableObject8Material14bendComplianceE"></span><span id="raisim::DeformableObject::Material::bendCompliance__double"></span><span class="target" id="structraisim_1_1DeformableObject_1_1Material_1a06c1e6d741928af1a60d51d833d86832"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bendCompliance</span></span></span><a class="headerlink" href="#_CPPv4N6raisim16DeformableObject8Material14bendComplianceE" title="Link to this definition"></a><br /></dt>
+<dd><p>XPBD cloth bending compliance. 0 is rigid, larger values are softer. Negative disables bending unless bendStiffness is positive. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16DeformableObject8Material13bendStiffnessE">
+<span id="_CPPv3N6raisim16DeformableObject8Material13bendStiffnessE"></span><span id="_CPPv2N6raisim16DeformableObject8Material13bendStiffnessE"></span><span id="raisim::DeformableObject::Material::bendStiffness__double"></span><span class="target" id="structraisim_1_1DeformableObject_1_1Material_1aae25d87c48e72ca284c3382c38213fce"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bendStiffness</span></span></span><a class="headerlink" href="#_CPPv4N6raisim16DeformableObject8Material13bendStiffnessE" title="Link to this definition"></a><br /></dt>
+<dd><p>Legacy bending stiffness parameter. Prefer bendCompliance for new code. A positive value enables automatic adjacent-triangle bending constraints. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16DeformableObject8Material13youngsModulusE">
+<span id="_CPPv3N6raisim16DeformableObject8Material13youngsModulusE"></span><span id="_CPPv2N6raisim16DeformableObject8Material13youngsModulusE"></span><span id="raisim::DeformableObject::Material::youngsModulus__double"></span><span class="target" id="structraisim_1_1DeformableObject_1_1Material_1afa5cb146a62bc5cafec129a6638a53fb"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">youngsModulus</span></span></span><a class="headerlink" href="#_CPPv4N6raisim16DeformableObject8Material13youngsModulusE" title="Link to this definition"></a><br /></dt>
+<dd><p>Young’s modulus in Pa. If positive, per-edge XPBD compliance is derived from rest length and effective cross-sectional area. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16DeformableObject8Material12poissonRatioE">
+<span id="_CPPv3N6raisim16DeformableObject8Material12poissonRatioE"></span><span id="_CPPv2N6raisim16DeformableObject8Material12poissonRatioE"></span><span id="raisim::DeformableObject::Material::poissonRatio__double"></span><span class="target" id="structraisim_1_1DeformableObject_1_1Material_1a9ee4027f929f08c665716abc139c2a24"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">poissonRatio</span></span></span><a class="headerlink" href="#_CPPv4N6raisim16DeformableObject8Material12poissonRatioE" title="Link to this definition"></a><br /></dt>
+<dd><p>Poisson’s ratio for elastic material definitions. The current distance constraint model stores and validates it; volume/shear models can use it. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16DeformableObject8Material9thicknessE">
+<span id="_CPPv3N6raisim16DeformableObject8Material9thicknessE"></span><span id="_CPPv2N6raisim16DeformableObject8Material9thicknessE"></span><span id="raisim::DeformableObject::Material::thickness__double"></span><span class="target" id="structraisim_1_1DeformableObject_1_1Material_1a2c63d56e40d8425070921ebc4ed61a84"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">thickness</span></span></span><a class="headerlink" href="#_CPPv4N6raisim16DeformableObject8Material9thicknessE" title="Link to this definition"></a><br /></dt>
+<dd><p>Surface thickness used when deriving effective area from edge length. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16DeformableObject8Material16crossSectionAreaE">
+<span id="_CPPv3N6raisim16DeformableObject8Material16crossSectionAreaE"></span><span id="_CPPv2N6raisim16DeformableObject8Material16crossSectionAreaE"></span><span id="raisim::DeformableObject::Material::crossSectionArea__double"></span><span class="target" id="structraisim_1_1DeformableObject_1_1Material_1a654e4939f878b7bd69d5734960955c0d"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">crossSectionArea</span></span></span><a class="headerlink" href="#_CPPv4N6raisim16DeformableObject8Material16crossSectionAreaE" title="Link to this definition"></a><br /></dt>
+<dd><p>Effective cross-sectional area for each distance constraint. If positive, this overrides the thickness-based estimate. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16DeformableObject16MeshBuildOptionsE">
+<span id="_CPPv3N6raisim16DeformableObject16MeshBuildOptionsE"></span><span id="_CPPv2N6raisim16DeformableObject16MeshBuildOptionsE"></span><span id="raisim::DeformableObject::MeshBuildOptions"></span><span class="target" id="structraisim_1_1DeformableObject_1_1MeshBuildOptions"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MeshBuildOptions</span></span></span><a class="headerlink" href="#_CPPv4N6raisim16DeformableObject16MeshBuildOptionsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16DeformableObject19MeshParticleOptionsE">
+<span id="_CPPv3N6raisim16DeformableObject19MeshParticleOptionsE"></span><span id="_CPPv2N6raisim16DeformableObject19MeshParticleOptionsE"></span><span id="raisim::DeformableObject::MeshParticleOptions"></span><span class="target" id="structraisim_1_1DeformableObject_1_1MeshParticleOptions"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MeshParticleOptions</span></span></span><a class="headerlink" href="#_CPPv4N6raisim16DeformableObject19MeshParticleOptionsE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16DeformableObject19MeshParticleOptions7spacingE">
+<span id="_CPPv3N6raisim16DeformableObject19MeshParticleOptions7spacingE"></span><span id="_CPPv2N6raisim16DeformableObject19MeshParticleOptions7spacingE"></span><span id="raisim::DeformableObject::MeshParticleOptions::spacing__double"></span><span class="target" id="structraisim_1_1DeformableObject_1_1MeshParticleOptions_1ad74a60b3fbb36a1179e23b17136de7b0"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">spacing</span></span></span><a class="headerlink" href="#_CPPv4N6raisim16DeformableObject19MeshParticleOptions7spacingE" title="Link to this definition"></a><br /></dt>
+<dd><p>Target spacing for generated interior particles. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="SingleBodyObjects.html" class="btn btn-neutral float-left" title="Single-Body Objects" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="GranularMedia.html" class="btn btn-neutral float-right" title="Granular Media" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

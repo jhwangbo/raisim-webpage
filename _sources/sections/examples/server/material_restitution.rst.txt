@@ -8,23 +8,24 @@ Drops spheres with different material labels (steel, rubber, copper) and configu
 
 Screenshot
 ==========
-.. image:: ../../../image/materials.gif
+.. image:: ../../../image/material_restitution.png
+   :alt: material_restitution example
+   :width: 100%
 
 Binary
 ======
-CMake target and executable name: ``material_restitution``.
+Installed executable: ``material_restitution``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target material_restitution
-   ./material_restitution
+   <raisim-install>/bin/material_restitution
 
 On Windows, run ``material_restitution.exe`` instead.
-This example uses RaisimServer. Start a visualizer client (RaisimUnity, RaisimUnreal, or the rayrai TCP viewer) and connect to port 8080.
+This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.
 
 
 Details
@@ -33,7 +34,3 @@ Details
 - Sets per-material restitution to compare bounce behavior.
 - Reference for ``World::setMaterialPairProp`` restitution settings.
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/server/material_restitution.cpp
-   :language: cpp

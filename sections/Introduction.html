@@ -6,21 +6,21 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Introduction &mdash; raisim 2.0.0 documentation</title>
+  <title>Introduction &mdash; raisim 2.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=51b770b3"></script>
+      <script src="../_static/documentation_options.js?v=b21de401"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Installation" href="Installation.html" />
-    <link rel="prev" title="Performance" href="Performance.html" /> 
+    <link rel="next" title="Conventions and Notations" href="ConventionsAndNotations.html" />
+    <link rel="prev" title="Acknowledgement" href="Acknowledgement.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -45,10 +45,15 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog: v2.2.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Support.html">Support</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
 <ul class="current">
@@ -57,9 +62,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#example-code">Example Code</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Visualizers.html">Visualizers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ConventionsAndNotations.html">Conventions and Notations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Determinism.html">Determinism</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Math.html">Math Classes</a></li>
@@ -76,14 +78,13 @@
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Related Software</span></p>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="Rayrai.html">rayrai Visualizer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Rayrai.html">rayrai Visualizer</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RaisimUnity.html">RaiSimUnity</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RaisimUnreal.html">RaisimUnreal</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LegacyIntegrations.html">Legacy Integrations</a></li>
 </ul>
 
         </div>
@@ -111,83 +112,73 @@
              
   <section id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h1>
-<p>RaiSim is a high-performance physics engine developed by Jemin Hwangbo, KAIST.
-It is engineered to deliver both accuracy and computational efficiency for simulating robotic systems.
-It serves as a general-purpose rigid-body simulator capable of efficiently simulating diverse rigid-body dynamics.</p>
+<p>RaiSim is a high-performance physics engine developed for robotics and AI. It
+is designed for deterministic, single-process simulation of rigid bodies,
+articulated systems, contacts, sensors, deformable bodies, and granular
+particles.</p>
 <p><strong>Why RaiSim?</strong></p>
 <ul class="simple">
-<li><p>Its performance is benchmarked against other popular physics engines (<a class="reference external" href="https://github.com/leggedrobotics/SimBenchmark">[1]</a>).</p></li>
+<li><p>RaiSim is optimized for high-throughput robotics simulation.</p></li>
 <li><p>The accuracy of RaiSim has been validated in numerous academic publications (<a class="reference external" href="https://robotics.sciencemag.org/content/4/26/eaau5872/tab-article-info">[2]</a>, <a class="reference external" href="https://arxiv.org/pdf/1901.07517.pdf">[3]</a>, <a class="reference external" href="https://robotics.sciencemag.org/content/5/47/eabc5986">[4]</a>,  <a class="reference external" href="https://arxiv.org/abs/1909.08399">[5]</a>,  <a class="reference external" href="https://arxiv.org/abs/2011.08811">[6]</a>)</p></li>
-<li><p>A C++ simulation library designed for ease of learning and use.</p></li>
-<li><p>Minimal external dependencies (requires only STL and Eigen).</p></li>
+<li><p>The C++ API is organized around explicit worlds, objects, materials, sensors,
+and visualizer integration.</p></li>
+<li><p>The binary distribution ships headers, libraries, examples, rayrai tools, and
+documentation.</p></li>
 </ul>
 <section id="system-requirements">
 <h2>System Requirements<a class="headerlink" href="#system-requirements" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><dl class="simple">
-<dt><strong>Linux</strong></dt><dd><ul>
-<li><p>Ubuntu 22.04 or higher is recommended, though RaiSim may function on other distributions. Compatibility is limited to x86 CPUs with the AVX2 instruction set (Intel Haswell or higher).</p></li>
+<li><p><strong>Linux</strong>: Ubuntu 22.04 or newer is recommended. x86 builds require AVX2.</p></li>
+<li><p><strong>Windows</strong>: Windows 10 or newer with Visual Studio 2019 or newer.</p></li>
+<li><p><strong>macOS</strong>: current macOS releases. Apple silicon is supported; Intel systems
+require AVX2.</p></li>
 </ul>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><strong>Windows 10</strong></dt><dd><ul>
-<li><p>Visual Studio 2019 or higher. x86 CPU only.</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><strong>macOS</strong></dt><dd><ul>
-<li><p>Latest version. Intel systems require AVX2 support. Only apple silicon (M1 and higher) is supported.</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ul>
+<p>See <a class="reference internal" href="Installation.html"><span class="doc">Installation</span></a> for dependency and activation details.</p>
 </section>
 <section id="example-code">
 <h2>Example Code<a class="headerlink" href="#example-code" title="Link to this heading"></a></h2>
-<p>The following is an example of a RaiSim application. Visualization is supported via either RaisimUnity or RaisimUnreal.</p>
+<p>The following is the shape of a simple RaiSim application. It creates a world,
+adds objects, publishes the scene through <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code>, and steps the world
+through the server’s thread-safe helper. Use the rayrai TCP viewer for current
+visualization.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;raisim/World.hpp&quot;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;raisim/RaisimServer.hpp&quot;</span>
 
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">::</span><span class="n">setActivationKey</span><span class="p">(</span><span class="s">&quot;PATH_TO_THE_ACTIVATION_KEY&quot;</span><span class="p">);</span>
+
 <span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">anymal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addArticulatedSystem</span><span class="p">(</span><span class="n">PATH_TO_URDF</span><span class="p">);</span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">ball</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">ground</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addGround</span><span class="p">();</span>
+<span class="w">  </span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">anymal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addArticulatedSystem</span><span class="p">(</span><span class="n">PATH_TO_URDF</span><span class="p">);</span>
+<span class="w">  </span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">ball</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="w">  </span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">ground</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addGround</span><span class="p">();</span>
 <span class="w">  </span><span class="n">world</span><span class="p">.</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.002</span><span class="p">);</span>
 
-<span class="w">  </span><span class="c1">/// Launch the RaiSim server for visualization. Visualize in RaisimUnity.</span>
 <span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">RaisimServer</span><span class="w"> </span><span class="n">server</span><span class="p">(</span><span class="o">&amp;</span><span class="n">world</span><span class="p">);</span>
 <span class="w">  </span><span class="n">server</span><span class="p">.</span><span class="n">launchServer</span><span class="p">();</span>
 
-<span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="nb">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="n">raisim</span><span class="o">::</span><span class="n">MSLEEP</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
 <span class="w">    </span><span class="n">server</span><span class="p">.</span><span class="n">integrateWorldThreadSafe</span><span class="p">();</span>
 <span class="w">  </span><span class="p">}</span>
-
-<span class="w">  </span><span class="n">server</span><span class="p">.</span><span class="n">killServer</span><span class="p">();</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Below is a CMake file for compiling the aforementioned application.</p>
-<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.10</span><span class="p">)</span>
+<p>Below is a minimal downstream CMake file for an installed RaiSim package.</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.16</span><span class="p">)</span>
 <span class="nb">project</span><span class="p">(</span><span class="s">raisim_examples</span><span class="w"> </span><span class="s">LANGUAGES</span><span class="w"> </span><span class="s">CXX</span><span class="p">)</span>
 
 <span class="nb">find_package</span><span class="p">(</span><span class="s">raisim</span><span class="w"> </span><span class="s">CONFIG</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
 <span class="nb">find_package</span><span class="p">(</span><span class="s">Eigen3</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
 
-<span class="nb">include_directories</span><span class="w"> </span><span class="p">(</span><span class="o">${</span><span class="nv">EIGEN3_INCLUDE_DIRS</span><span class="o">}</span><span class="p">)</span>
-
-<span class="nb">add_executable</span><span class="p">(</span><span class="s">APP_NAME</span><span class="w"> </span><span class="o">${</span><span class="nv">file_name</span><span class="o">}</span><span class="p">)</span>
-<span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">APP_NAME</span><span class="w"> </span><span class="s">PUBLIC</span><span class="w"> </span><span class="s">raisim::raisim</span><span class="w"> </span><span class="s">pthread</span><span class="p">)</span>
+<span class="nb">add_executable</span><span class="p">(</span><span class="s">app</span><span class="w"> </span><span class="s">main.cpp</span><span class="p">)</span>
+<span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">app</span><span class="w"> </span><span class="s">PUBLIC</span><span class="w"> </span><span class="s">raisim::raisim</span><span class="p">)</span>
+<span class="nb">if</span><span class="w"> </span><span class="p">(</span><span class="s">UNIX</span><span class="p">)</span>
+<span class="w">  </span><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">app</span><span class="w"> </span><span class="s">PUBLIC</span><span class="w"> </span><span class="s">pthread</span><span class="p">)</span>
+<span class="nb">endif</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>A functional version is available here (<a class="reference external" href="https://github.com/raisimTech/raisimExample">RAISIM_EXAMPLE</a>).</p>
+<p>For installed examples and visualization workflows, see <a class="reference internal" href="QuickStart.html"><span class="doc">Quick Start</span></a> and
+<a class="reference internal" href="Examples.html"><span class="doc">Examples</span></a>.</p>
 </section>
 </section>
 
@@ -195,8 +186,8 @@ It serves as a general-purpose rigid-body simulator capable of efficiently simul
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="Performance.html" class="btn btn-neutral float-left" title="Performance" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="Installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Acknowledgement.html" class="btn btn-neutral float-left" title="Acknowledgement" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ConventionsAndNotations.html" class="btn btn-neutral float-right" title="Conventions and Notations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -17,7 +17,8 @@ The following graphs illustrate the effects of these material properties.
 
 .. image:: ../image/materials.png
 
-Examples are available in the `restitution example <https://github.com/raisimTech/raisim2Lib/blob/master/examples/src/server/material_restitution.cpp>`_ and the `static friction example <https://github.com/raisimTech/raisim2Lib/blob/master/examples/src/server/material_static_friction.cpp>`_.
+Current runnable examples are listed in the examples index. The material API
+below is unchanged and can be applied to any world object material name.
 
 A material name is assigned upon creation.
 For instance:
@@ -181,5 +182,4 @@ Material Manager
 
 .. doxygenclass:: raisim::MaterialManager
    :members:
-
 

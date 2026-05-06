@@ -9,22 +9,23 @@ Loads URDFs with spring and damper joints (cartpole and chain) to visualize join
 Screenshot
 ==========
 .. image:: ../../../image/spring_damper_joints.png
+   :alt: spring_damper_joints example
+   :width: 100%
 
 Binary
 ======
-CMake target and executable name: ``spring_damper_joints``.
+Installed executable: ``spring_damper_joints``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target spring_damper_joints
-   ./spring_damper_joints
+   <raisim-install>/bin/spring_damper_joints
 
 On Windows, run ``spring_damper_joints.exe`` instead.
-This example uses RaisimServer. Start a visualizer client (RaisimUnity, RaisimUnreal, or the rayrai TCP viewer) and connect to port 8080.
+This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.
 
 
 Details
@@ -33,7 +34,3 @@ Details
 - Demonstrates URDF-based joint spring/damper behavior.
 - Focuses on the ball-joint chain for clarity.
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/server/spring_damper_joints.cpp
-   :language: cpp

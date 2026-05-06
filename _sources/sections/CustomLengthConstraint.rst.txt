@@ -15,7 +15,8 @@ The following code results in:
 
 .. image:: ../image/customWire.gif
 
-You can find a runnable example `here <https://github.com/raisimTech/raisim2Lib/blob/master/examples/src/server/length_constraints_newtons_cradle.cpp>`__.
+Use the current examples index for runnable source targets; the snippet above
+shows the core custom-wire API.
 
 
 API

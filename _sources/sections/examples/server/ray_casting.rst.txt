@@ -8,23 +8,24 @@ Performs a ray test from a fixed origin, then visualizes the hit point with a po
 
 Screenshot
 ==========
-.. image:: ../../../image/raytest.gif
+.. image:: ../../../image/ray_casting.png
+   :alt: ray_casting example
+   :width: 100%
 
 Binary
 ======
-CMake target and executable name: ``ray_casting``.
+Installed executable: ``ray_casting``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target ray_casting
-   ./ray_casting
+   <raisim-install>/bin/ray_casting
 
 On Windows, run ``ray_casting.exe`` instead.
-This example uses RaisimServer. Start a visualizer client (RaisimUnity, RaisimUnreal, or the rayrai TCP viewer) and connect to port 8080.
+This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.
 
 
 Details
@@ -33,7 +34,3 @@ Details
 - Visualizes the hit point with a polyline and marker sphere.
 - Uses ``World::rayTest`` against terrain and primitives.
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/server/ray_casting.cpp
-   :language: cpp

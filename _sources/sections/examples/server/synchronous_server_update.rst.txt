@@ -4,7 +4,9 @@ Server Example: Synchronous Server Update
 
 Overview
 ========
-Runs the RaisimServer in a manual socket loop and updates sensors only when the client requests them. This shows how to drive synchronous visualization and sensor updates.
+Runs the RaisimServer in a manual socket loop. This shows how to drive
+synchronous TCP visualization updates. RaiSim does not support sensor
+measurement updates from the visualizer.
 
 Binary
 ======
@@ -20,16 +22,17 @@ Build and run from your build directory:
    ./synchronous_server_update
 
 On Windows, run ``synchronous_server_update.exe`` instead.
-This example uses RaisimServer. Start a visualizer client (RaisimUnity, RaisimUnreal, or the rayrai TCP viewer) and connect to port 8080.
+This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.
 
 
 Details
 =======
 - Runs RaisimServer in synchronous request/response mode.
-- Manually accepts a TCP connection and processes sensor update requests.
-- Uses VISUALIZER RGB/depth sensors with ``needsSensorUpdate()``.
+- Manually accepts a TCP connection and processes world-state update requests.
+- ``needsSensorUpdate()`` always returns false because RaiSim does not request
+  RGB/depth sensor frames from TCP visualizers.
 
 Source
 ======
-.. literalinclude:: ../../../../examples/src/server/synchronous_server_update.cpp
+.. literalinclude:: ../../../../examples/src/server/visualization/synchronous_server_update.cpp
    :language: cpp

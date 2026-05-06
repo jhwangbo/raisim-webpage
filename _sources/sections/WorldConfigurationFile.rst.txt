@@ -24,7 +24,7 @@ Tags marked (multiple) indicate that multiple instances of the element may exist
             5. <attribute> ``restitution_threshold`` [float]
     3. <child> (optional) ``gravity``
         1. <attribute> ``value`` [Vec<3>]: default={0, 0, -9.81}
-    4. <child> (optional) ``timestep``
+    4. <child> (optional) ``timeStep``
         1. <attribute> ``value`` [float]: default = 0.005
     5. <child> (optional) ``erp`` : (Advanced) Defines spring and damping terms for error dynamics.
         1. <attribute> ``erp`` : spring term [float]
@@ -43,6 +43,8 @@ Tags marked (multiple) indicate that multiple instances of the element may exist
 
 Object XML Description
 ----------------------------
+
+The XML reader accepts both the snake_case names documented below and the camelCase aliases used by older examples for common attributes, such as ``collisionGroup``, ``collisionMask``, ``xSample``, ``ySample``, ``xSize``, ``ySize``, ``centerX``, ``centerY``, ``resDir``, ``urdfPath``, ``linVel``, and ``angVel``.
 
 Collision groups and masks can be specified as ``collision[1]`` or ``collision[1|4|6]``.
 The former represents collision group 1.
@@ -155,16 +157,27 @@ heightmap
 
 4. **attributes**: (optional, default=-1) ``collision_mask`` [uint64_t], (optional) ``appearance`` [string], (optional, default=default) ``material`` [string], (optional) ``name`` [string], ``x_sample`` [size_t], ``y_sample`` [size_t], ``x_size`` [float], ``y_size`` [float], ``center_x`` [float], ``center_y`` [float]
     1. <child> ``terrain_properties``
-        **attributes**: ``z_scale`` [float], ``fractal_octaves`` [size_t], ``fractal_lacunarity`` [float], ``fractal_gain`` [float], ``step_size`` [float], ``frequency`` [float], ``seed`` [size_t]
+        **attributes**: ``z_scale`` [float], ``fractal_octaves`` [size_t], ``fractal_lacunarity`` [float], ``fractal_gain`` [float], ``step_size`` [float], (optional, default=0) ``height_offset`` [float], ``frequency`` [float], ``seed`` [size_t]
 
-articulated_system
-^^^^^^^^^^^^^^^^^^^^^
+articulatedSystem / articulated_system
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 `EXAMPLES <https://github.com/raisimTech/raisim2Lib/blob/master/rsc/xmlScripts/heightMaps/heightMapUsingPng.xml>`__
 
-**attributes**: (optional, default=1) ``collision_group`` [uint64_t], (optional, default=-1) ``collision_mask`` [uint64_t], (optional) ``name`` [string], (optional, default=URDF directory) ``res_dir`` [string], ``urdf_path`` [string]
+Both tag names are accepted by the XML reader. ``articulatedSystem`` is the canonical exported form.
+
+**attributes**: (optional, default=1) ``collision_group`` [uint64_t], (optional, default=-1) ``collision_mask`` [uint64_t], (optional) ``name`` [string], (optional, default=URDF directory) ``res_dir`` [string], ``urdf_path`` [string], (optional) ``modules`` [space-separated string list]
 
 1. <child> ``state``
     **attributes**: ``qpos`` [VecDyn], (optional, default=zeros) ``qvel`` [VecDyn]
+
+object_class
+^^^^^^^^^^^^^^^^^^^^^
+
+``object_class`` defines reusable object templates under the top-level ``raisim`` node. Each child node name becomes a class name that can be used as an object tag under ``objects``.
+
+Common class attributes are ``type`` [string], (required for movable single bodies) ``mass`` [float], (optional) ``material`` [string], (optional) ``com`` [Vec<3>], and optional child ``inertia`` with attributes ``xx``, ``xy``, ``xz``, ``yy``, ``yz``, and ``zz``.
+
+Primitive classes use child ``dimension`` with the same shape parameters as ``dim``. Mesh classes use child ``file`` with attribute ``name`` and child ``scale`` with attributes ``x``, ``y``, and ``z``. Articulated-system classes use attributes ``urdf_path`` and optional ``res_dir``. Compound classes use child ``children``; each child uses ``object_param`` [VecDyn], ``pos`` [VecDyn], optional ``quat`` [Vec<4>], optional ``material``, and optional ``appearance``.
 
 
 Configuration Template

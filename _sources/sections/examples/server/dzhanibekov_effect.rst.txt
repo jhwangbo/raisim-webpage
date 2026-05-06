@@ -9,22 +9,23 @@ Demonstrates the Dzhanibekov effect by spinning a box in zero gravity and visual
 Screenshot
 ==========
 .. image:: ../../../image/dzhanibekov_effect.png
+   :alt: dzhanibekov_effect example
+   :width: 100%
 
 Binary
 ======
-CMake target and executable name: ``dzhanibekov_effect``.
+Installed executable: ``dzhanibekov_effect``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target dzhanibekov_effect
-   ./dzhanibekov_effect
+   <raisim-install>/bin/dzhanibekov_effect
 
 On Windows, run ``dzhanibekov_effect.exe`` instead.
-This example uses RaisimServer. Start a visualizer client (RaisimUnity, RaisimUnreal, or the rayrai TCP viewer) and connect to port 8080.
+This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.
 
 
 Details
@@ -33,7 +34,3 @@ Details
 - Shows the intermediate-axis (Dzhanibekov) flipping behavior.
 - Focuses the camera on the box for clear visualization.
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/server/dzhanibekov_effect.cpp
-   :language: cpp

@@ -20,9 +20,8 @@ All length constraints offer three stretch types: ``STRETCH_RESISTANT_ONLY``,
 (i.e., acting in both directions). The stretch types are explained in
 `StiffLengthConstraint <http://raisim.com/sections/StiffLengthConstraint.html>`_.
 
-You can find a short example in
-`examples/src/server/length_constraints_newtons_cradle.cpp <https://github.com/raisimTech/raisim2Lib/blob/master/examples/src/server/length_constraints_newtons_cradle.cpp>`_.
-This code simulates the following behavior:
+The following animation shows the behavior of a Newton's-cradle style length
+constraint setup:
 
 .. image:: ../image/constraints.gif
 
@@ -49,4 +48,3 @@ LengthConstraint
 
 .. doxygenclass:: raisim::LengthConstraint
    :members:
-

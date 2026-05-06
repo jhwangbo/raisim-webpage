@@ -6,14 +6,17 @@ Overview
 ========
 rayrai is an in-process C++ renderer for RaiSim. It renders into an offscreen OpenGL
 texture and is designed to embed in custom UIs (ImGui, Qt, etc.) or headless pipelines.
-Unlike RaisimUnity or RaisimUnreal, rayrai runs inside the simulation process and exposes
-direct access to render targets, picking, and custom visuals.
+RaisimUnity and RaisimUnreal are no longer supported; rayrai is the supported
+visualization path. It runs inside the simulation process and exposes direct
+access to render targets, picking, and custom visuals.
 
 Key characteristics:
 
 * In-process rendering (no server required)
 * Offscreen textures for UI embedding or sensor simulation
 * Lightweight scene management for RaiSim objects and custom visuals
+* glTF/GLB visual-scene import with PBR materials, normal maps, and lights
+* HDR image-based lighting, reflection probes, and real-time shadow maps
 * Support for point clouds, coordinate frames, and picking
 * Direct ImGui/SDL2 integration patterns and headless/offscreen workflows
 
@@ -43,6 +46,11 @@ Run it with ``--help`` to see available options. On Windows, use the ``.exe``
 binary.
 If you are running a RaisimServer-based example, start the example first so the
 server is listening (by default on port 8080), then launch the viewer to connect.
+
+The TCP viewer overlay has two compact panels: the left ``Raisim TCP`` control/object
+panel and the right selected-object details panel. Both panels have a small ``-``/``+``
+button in the header to minimize or restore the panel. The left panel also auto-minimizes
+when you click elsewhere in the viewer, leaving only the compact header visible.
 
 Build and link
 ==============
@@ -96,8 +104,8 @@ If you are integrating with an existing OpenGL context, you can use
 Example: custom visuals + background color
 ==========================================
 This example adds a custom box, renders an RGB texture each frame, and reads the
-image texture handle for UI integration. ``setBackgroundColor`` expects RGBA in
-0..255 space (matching the example sources).
+image texture handle for UI integration. New code should prefer explicit color-range
+APIs such as ``setBackgroundColorRgb255`` or ``setBackgroundColorLinear``.
 
 .. code-block:: cpp
 
@@ -111,7 +119,7 @@ image texture handle for UI integration. ``setBackgroundColor`` expects RGBA in
       world->addGround();
 
       raisin::RayraiWindow viewer(world, 1280, 720);
-      viewer.setBackgroundColor({40, 45, 55, 255});
+      viewer.setBackgroundColorRgb255({40, 45, 55, 255});
 
       auto box = viewer.addVisualBox("marker", 0.4, 0.2, 0.1, 0.9f, 0.6f, 0.1f, 1.0f);
       box->setPosition(1.0, 0.0, 0.3);
@@ -124,11 +132,31 @@ image texture handle for UI integration. ``setBackgroundColor`` expects RGBA in
       }
     }
 
-Shadows
-=======
-rayrai uses a directional light for shadows. By default, the shadow center tracks a
-point in front of the camera and the shadow box is fixed in size. You can customize
-both via ``RayraiWindow``:
+Color and gamma semantics
+=========================
+rayrai uses explicit color ranges for new APIs:
+
+* ``Visuals::setColor`` and most object/material color factors use linear ``0..1`` RGBA.
+* ``Camera::setBackgroundColorRgb255`` and ``RayraiWindow::setBackgroundColorRgb255``
+  use legacy ``0..255`` RGBA. ``setBackgroundColor`` is kept as a compatibility wrapper
+  for the same ``0..255`` range.
+* ``setBackgroundColorLinear`` accepts linear ``0..1`` RGBA and converts it internally.
+* Texture uploads distinguish color maps and data maps. Use ``loadColorTextureWithTiling``
+  for sRGB albedo/emissive maps, and ``loadDataTextureWithTiling`` for normal,
+  metallic-roughness, AO, depth, mask, or other linear data textures.
+
+The renderer applies display gamma at the shader/output stage. Do not pre-gamma-correct
+linear object colors before passing them to rayrai.
+
+Shadows and lights
+==================
+rayrai has a fast single-main-light path for robotics workloads and a higher-quality
+multi-light path for authored visual scenes. The main light is a directional light and
+is always the cheapest shadow-casting source. Imported glTF/Blender scenes can also
+use additional directional, point, spot, and area-style lights.
+
+By default, the main shadow center tracks a point in front of the camera and the shadow
+box is fixed in size. You can customize both via ``RayraiWindow``:
 
 .. code-block:: cpp
 
@@ -139,6 +167,131 @@ both via ``RayraiWindow``:
 
 If you need a fully custom shadow view/projection, use the lower-level
 ``raisin::Light`` API directly.
+
+Additional lights are controlled explicitly and capped so the fast path stays fast.
+Rayrai currently supports up to ``RayraiWindow::kMaxAdditionalLights`` additional lights
+and up to ``RayraiWindow::kMaxAdditionalShadowLights`` additional shadow maps. Directional,
+spot, and area-style lights use 2D shadow maps. Point lights use cubemap shadow maps.
+Shadow framebuffer setup validates the current OpenGL context and recreates stale
+framebuffer/texture names when a viewer context is rebuilt; this matters for TCP-viewer
+lifetime, offscreen tests, and applications that create/destroy render contexts.
+For imported scenes, ``RenderQualitySettings::autoSelectImportedShadowLight`` can promote
+the strongest imported light to the main shadow caster, while the remaining shadow budget
+is assigned to additional lights.
+
+.. code-block:: cpp
+
+    raisin::RayraiWindow::AdditionalLight fill;
+    fill.type = raisin::LightType::DIRECTIONAL;
+    fill.direction = glm::normalize(glm::vec3(0.4f, -0.2f, -0.8f));
+    fill.diffuse = glm::vec3(0.10f, 0.12f, 0.16f);
+    viewer.addAdditionalLight(fill);
+
+    raisin::RayraiWindow::AdditionalLight spot;
+    spot.type = raisin::LightType::SPOT;
+    spot.position = glm::vec3(1.8f, -1.6f, 2.6f);
+    spot.direction = glm::normalize(glm::vec3(-1.4f, 1.0f, -1.8f));
+    spot.diffuse = glm::vec3(0.18f, 0.42f, 1.0f);
+    spot.spotInnerCos = std::cos(glm::radians(14.0f));
+    spot.spotOuterCos = std::cos(glm::radians(28.0f));
+    viewer.addAdditionalLight(spot);
+
+    raisin::RayraiWindow::AdditionalLight area;
+    area.type = raisin::LightType::AREA;
+    area.position = glm::vec3(0.0f, 1.8f, 2.1f);
+    area.diffuse = glm::vec3(0.55f, 0.65f, 0.42f);
+    area.radius = 1.4f;
+    area.areaSize = glm::vec2(1.8f, 0.9f);
+    viewer.addAdditionalLight(area);
+
+    viewer.clearAdditionalLights();
+
+Shadow update cost is configurable. Dynamic scenes can update shadows every frame; static
+visual scenes can bake shadow maps at startup or refresh them only when light/object
+placement changes.
+
+.. code-block:: cpp
+
+    auto quality = raisin::RayraiWindow::defaultRenderQualitySettings(
+      raisin::RayraiWindow::RenderQualityPreset::Ultra);
+    quality.updateShadowsEveryFrame = false;       // startup/on-demand shadow bake
+    quality.maxAdditionalLightsPerFrame = 12;      // light evaluation budget
+    quality.maxAdditionalShadowLights = 4;         // 2D shadow-map budget
+    quality.maxPointShadowLights = 2;              // cubemap shadow budget
+    quality.additionalShadowResolutionScale = 0.5f;
+    quality.pointShadowResolutionScale = 0.5f;
+    viewer.setRenderQualitySettings(quality);
+
+Use lower budgets for interactive editing or RL throughput. Use higher budgets for
+offline screenshots, inspection, or demos where visual fidelity is more important than
+frame time.
+
+HDR, image-based lighting, and reflections
+==========================================
+rayrai supports HDR equirectangular environments for real-time PBR preview and
+inspection. The HDR path is not a ray tracer; it precomputes cubemap data for
+environment background, diffuse irradiance, specular prefiltering, and a split-sum BRDF
+lookup table, then samples those textures in the PBR shader.
+
+The typical setup is:
+
+.. code-block:: cpp
+
+    const char* hdr = "/path/to/small_harbour_sunset_1k.hdr";
+    unsigned int env = raisin::RayraiWindow::loadHdrEquirectangularCubemap(hdr, 128, true);
+    unsigned int irradiance = raisin::RayraiWindow::createHdrIrradianceCubemap(hdr, 32, 64);
+    unsigned int prefiltered =
+      raisin::RayraiWindow::createHdrPrefilteredEnvironmentCubemap(hdr, 128, 5, 64);
+    unsigned int brdf = raisin::RayraiWindow::createSplitSumBrdfLut(128, 128);
+
+    visual->setPbrEnvironment(env, irradiance, prefiltered, brdf, 1.0f);
+
+Use HDR environments with visible features when inspecting reflective materials. A
+featureless sky or uniform studio HDR can make it hard to tell whether reflections are
+working. ``example_rayrai_pbr_asset_inspector`` and
+``example_polyhaven_blue_wall`` use HDR/image-based lighting so metallic and
+glossy surfaces show visible reflections while non-metallic assets remain
+mostly diffuse.
+
+For scene-wide reflections, rayrai also has static reflection probe capture and planar
+ground reflection support. These are real-time approximation tools: they improve visual
+fidelity without enabling path tracing or other slow offline rendering mechanisms.
+Choose lower environment resolution, fewer prefilter samples, and fewer reflection
+updates for fast interactive runs; increase those values for screenshots or inspection.
+
+
+Render-quality controls
+=======================
+rayrai keeps RL throughput and visual fidelity separate. The ``Fast`` preset keeps
+reflections, high-fidelity PBR, FXAA, and extra expensive viewer effects off by default.
+``High`` and ``Ultra`` enable the quality-oriented path, including high-fidelity PBR,
+reflective ground, planar reflection sampling, stronger shadow filtering, FXAA, and
+depth-of-field postprocessing.
+
+Use presets for common cases:
+
+.. code-block:: cpp
+
+    viewer.setRenderQualityPreset(raisin::RayraiWindow::RenderQualityPreset::Fast);
+    viewer.setRenderQualityPreset(raisin::RayraiWindow::RenderQualityPreset::Ultra);
+
+Use explicit settings when you need runtime control:
+
+.. code-block:: cpp
+
+    auto quality = raisin::RayraiWindow::defaultRenderQualitySettings(
+      raisin::RayraiWindow::RenderQualityPreset::Ultra);
+    quality.fxaaEnabled = true;
+    quality.depthOfFieldEnabled = true;
+    quality.depthOfFieldFocusDistance = 5.0f;
+    quality.depthOfFieldFocusRange = 8.0f;
+    quality.depthOfFieldMaxRadius = 1.25f;
+    quality.reflectiveGround = true;
+    quality.addViewerFillLights = false;
+    viewer.setRenderQualitySettings(quality);
+
+The shipped ``rayrai_feature_showcase`` target exercises these controls and
+writes offscreen images and reports.
 
 PBR materials
 =============
@@ -156,20 +309,74 @@ Supported material inputs include:
 * occlusion texture
 * emissive factor and emissive texture
 
-Lighting is currently based on rayrai's directional light and shadow pass. The PBR path
-uses direct lighting and material response suitable for preview, data generation, and
-asset inspection; it is not an offline path tracer.
+Lighting is based on rayrai's main light, optional additional lights, shadow maps,
+HDR/image-based lighting when configured, and optional reflection probes. Color textures
+are uploaded as sRGB; data maps such as normal, metallic-roughness, and AO remain
+linear. Normal maps require tangent data; glTF assets usually provide it, and rayrai
+generates or imports tangent data where possible. The PBR path is suitable for preview,
+data generation, and asset inspection; it is not an offline path tracer.
 
-The shipped PBR examples are:
+The shipped PBR examples and tools are:
 
-* ``rayrai_pbr_material_grid``: Khronos MetalRoughSpheres material grid.
-* ``rayrai_pbr_texture_maps``: Khronos BoomBox textured PBR asset.
+* ``example_rayrai_pbr_asset_inspector``: interactive 8-asset Khronos glTF
+  Sample Assets inspector with base-color, normal, emissive,
+  metallic-roughness, roughness-only, occlusion, and HDR reflection coverage.
+  The sample assets are CC0 and free for commercial use.
+* ``example_polyhaven_blue_wall``: imported Poly Haven glTF scene with PBR
+  materials, HDR lighting, additional lights, and quality controls.
+* ``KHR_lights_punctual`` from the glTF/GLB file for directional, point, and spot lights.
+* ``*.rayrai_lights.json`` for Blender area lights with size, direction, color, and energy.
+
+For best results, keep the authored scene in metric scale, keep Z as up, and prefer
+glTF/GLB over OBJ. OBJ is useful for simple geometry interchange, but it loses too much
+of the scene-level material and light data needed for high-quality rendering.
+
+Material import details
+=======================
+The Assimp/glTF importer is asset-agnostic. It does not special-case the blue-wall
+scene or material names. It follows this priority:
+
+* Use explicit material texture slots from the source asset when present.
+* Treat base-color and emissive maps as color textures.
+* Treat normal, metallic-roughness, occlusion, masks, and other data maps as linear data.
+* Preserve normal-map scale and detect common OpenGL-vs-DirectX normal-map naming.
+* Use embedded glTF textures when available.
+* Search sibling texture files for common PBR map names when the source material omits
+  a slot but the files are packaged next to the asset.
+* Keep simple solid-color materials on the simple path unless normal maps or PBR features
+  require the PBR shader.
+
+This fallback behavior is meant to support real downloadable assets whose Blender,
+glTF, FBX, DAE, and OBJ exports often disagree about how texture slots are authored.
+If an asset renders white or flat, first check the import report/debug output for which
+texture slots were found and whether the file paths exist next to the scene.
+
+Visual assets and collision assets
+==================================
+rayrai visual meshes are renderer assets. URDF models can define separate
+``visual`` and ``collision`` meshes, and standalone rayrai visuals can use glTF
+material and texture data for inspection or presentation without becoming
+collision geometry in ``raisim::World``. Keep this separation when an asset has
+high-detail visual triangles, PBR materials, or texture maps.
+
+Use this pattern when you want realistic visuals with collision meshes tuned for
+physics:
+
+.. code-block:: cpp
+
+    auto* robot = world.addArticulatedSystem("anymal_c/urdf/anymal.urdf");
+    auto* object = world.addArticulatedSystem("ycb/002_master_chef_can.urdf");
+
+Only call ``World::addMesh`` for collision when the mesh is intentionally part
+of the physics model. The current textured glTF and imported scene examples keep
+renderer assets separate from collision geometry; the physics model still comes
+from the URDF or explicit collision objects.
 
 CoACD mesh approximation visualization
 ======================================
-``rayrai_coacd_mesh_approximation`` visualizes collision convexification. It shows the
-source mesh and the generated convex parts side by side. The decomposition side uses
-per-part colors so individual convex bodies can be inspected.
+The ``rayrai_coacd_mesh_approximation`` example visualizes collision convexification. It shows the source mesh and
+the generated convex parts side by side. The decomposition side uses per-part
+colors so individual convex bodies can be inspected.
 
 This example uses real meshes from ``rsc`` such as YCB and Minitaur assets. Some robot
 visual meshes are intentionally not used because they are non-manifold visual shells and
@@ -177,23 +384,19 @@ are rejected by the minimal CoACD integration.
 
 Examples
 ========
-Rayrai examples are documented in :doc:`Examples <Examples>`. Each example page
-includes a short explanation and the full source code, along with build and
-run notes.
+Rayrai examples are documented in :doc:`Examples <Examples>`. Each example page includes a short explanation and installed executable usage.
 
-Quick map to the shipped examples (``examples/src/rayrai``):
+Quick map to the current rayrai-related targets:
 
-* ``rayrai_custom_visuals.cpp``: custom visuals (sphere/box/cylinder/capsule/mesh).
-* ``rayrai_instancing_grid.cpp``: instanced visuals and per-instance updates.
-* ``rayrai_pointcloud_animation.cpp``: point cloud updates and GPU uploads.
-* ``rayrai_rgb_camera.cpp``: RGBCamera rendering and ImGui preview.
-* ``rayrai_depth_camera.cpp``: DepthCamera rendering + linear depth preview.
-* ``rayrai_lidar_pointcloud.cpp``: LiDAR scan to point cloud visualization.
-* ``rayrai_pbr_material_grid.cpp``: metallic-roughness glTF material grid.
-* ``rayrai_pbr_texture_maps.cpp``: textured PBR glTF asset import.
-* ``rayrai_coacd_mesh_approximation.cpp``: visual comparison of original meshes and COACD convex parts.
-* ``rayrai_complete_showcase.cpp``: end-to-end demo with sensors, UI, and overlays.
-* ``rayrai_tcp_viewer.cpp``: TCP viewer for RaisimServer scenes.
+* ``example_rayrai_pbr_asset_inspector``: interactive glTF PBR sample-asset
+  inspector with HDR environment lighting, SSAO, bloom, and screenshot output.
+* ``example_polyhaven_blue_wall``: Poly Haven glTF scene import with imported
+  lights, HDR IBL, optional reflection probes, and screenshots.
+* ``example_rayrai_usd_importer``: OpenUSD visual mesh loading in an offscreen
+  rayrai context.
+* ``rayrai_coacd_mesh_approximation``: visual comparison of original meshes and CoACD convex parts generated through
+  ``World::addMesh``.
+* ``rayrai_raisim_tcp_viewer``: TCP viewer for ``raisim::RaisimServer`` scenes.
 
 ImGui integration (SDL2 + OpenGL)
 =================================
@@ -225,8 +428,8 @@ Minimal pattern (trimmed from the examples):
     }
 
 The ``renderViewer`` helper uses ``ImGui::IsItemHovered()`` and mouse positions
-to drive camera interaction and picking. See ``rayrai_rgb_camera.cpp`` and
-``rayrai_depth_camera.cpp`` for overlay windows showing camera outputs.
+to drive camera interaction and picking. Current offscreen examples exercise
+the camera paths used by rayrai rendering and validation.
 
 Headless/offscreen OpenGL context
 =================================
@@ -242,6 +445,11 @@ helpers to create and bind a hidden SDL window context:
 
     auto world = std::make_shared<raisim::World>();
     raisin::RayraiWindow viewer(world, 640, 480);
+
+The offscreen path does not require an ImGui context. If an application embeds rayrai
+without ImGui, pass ``false`` for hover/click arguments to ``RayraiWindow::update`` or
+drive camera state explicitly. The renderer guards ImGui input access so headless tests
+and batch image generation can run without creating ImGui state.
 
 Custom visuals and instancing
 =============================
@@ -315,10 +523,23 @@ Sensor alignment
 ================
 rayrai can align rendering to RaiSim camera sensors. Use
 ``syncRaisimCameraPose`` and ``renderWithExternalCamera`` to ensure the
-render camera matches the sensor pose and intrinsics.
+render camera matches the sensor pose and intrinsics. RaiSim sensor rendering is
+world-object-only: custom visuals, instanced visuals, point clouds, coordinate
+frames, and other viewer-only helpers are excluded from RGB, depth, and LiDAR
+data-generation passes. Use generic external-camera rendering only when you
+intentionally want a viewer render that includes visualization objects.
 Note: ``syncRaisimCameraPose`` updates ``Camera::position/front/up`` directly;
 avoid calling ``Camera::update()`` immediately afterward unless you also update
 ``yaw``/``pitch``.
+
+For complete runnable examples, see
+:doc:`Rayrai RGB camera <examples/rayrai/rayrai_rgb_camera>`,
+:doc:`Rayrai depth camera <examples/rayrai/rayrai_depth_camera>`, and
+:doc:`Rayrai LiDAR point cloud <examples/rayrai/rayrai_lidar_pointcloud>`.
+The broader ``examples/src/rayrai/getting_started/rayrai_complete_showcase.cpp``
+source combines RGB, depth, raw buffer readback, LiDAR visualization, and camera
+frustums in one scene. The sensor overview in :doc:`Sensors <Sensors>` includes
+a longer RGB/depth readback example.
 
 RGB/Depth camera workflow (manual source + external camera):
 
@@ -350,9 +571,23 @@ You can read back the camera buffers on CPU:
 
 Depth uses a ``float`` buffer with ``width * height`` entries.
 
+TCP viewer protocol
+===================
+The rayrai TCP viewer protocol is explicitly versioned. The current viewer sends a
+protocol header with feature bits before each request, and the server replies with the
+negotiated feature set. A viewer rejects newer unsupported protocol versions with a clear
+error instead of attempting to parse an incompatible stream.
+
+Current feature bits cover the explicit header and deformable delta streaming. Deformable
+objects send mesh topology during initialization or topology changes; ordinary update
+frames send vertex positions only. This keeps dynamic cloth/cube streaming cheaper while
+avoiding binary compression until network bandwidth is measured as a bottleneck.
+
 Depth and LiDAR
 ===============
-The renderer supports a linear depth plane and a GPU-assisted LiDAR pass:
+The renderer supports a linear depth plane and a GPU-assisted LiDAR pass. These sensor
+passes render RaiSim world objects only; visualization-only objects are intentionally
+ignored so they cannot leak into training observations.
 
 * ``renderDepthPlaneDistance`` renders a linear depth texture.
 * ``measureSpinningLidarSingleDrawGPU`` renders a LiDAR slice using a
@@ -360,10 +595,13 @@ The renderer supports a linear depth plane and a GPU-assisted LiDAR pass:
 
 You can retrieve the depth texture via ``getDepthPlaneTexture()``.
 
-LiDAR usage has two paths:
+LiDAR usage has two paths. Prefer the rayrai GPU path when rayrai is available:
 
-1) CPU-based scan via RaiSim (``SpinningLidar::update``), then visualize with a point cloud.
-2) GPU slice rendering via ``measureSpinningLidarSingleDrawGPU`` for fast incremental updates.
+1) GPU slice rendering via ``measureSpinningLidarSingleDrawGPU`` for fast
+   incremental updates.
+2) CPU-based scan via RaiSim (``SpinningLidar::update``), then visualize with a
+   point cloud, only when rayrai is unavailable or deterministic CPU ray-query
+   behavior is required.
 
 GPU slice example:
 
@@ -373,6 +611,38 @@ GPU slice example:
     const glm::dvec3 posW = raisin::toGlm(lidar->getPosition());
     const glm::dmat3 rotW = raisin::toGlm(lidar->getOrientation());
     viewer.measureSpinningLidarSingleDrawGPU(*lidar, posW, rotW);
+
+Performance notes
+=================
+
+rayrai is intended to stay single-threaded so it can be embedded in
+simulation, replay, and data-generation tools without adding renderer worker
+synchronization. The renderer keeps the main performance controls explicit:
+
+* Disable shadows for high-throughput camera observations when shadows are not part
+  of the desired output. Use ``RenderOverrides::doShadows = false`` or disable the
+  light's shadow map globally.
+* Prefer ``addInstancedVisuals`` for repeated primitives or meshes. A single
+  instanced visual renders many copies with one instance buffer instead of many
+  separate visual objects.
+* Opaque RaiSim single-body primitives are internally batched on non-shadowed color
+  renders. This helps high-throughput observation rendering while keeping shadowed
+  rendering on the conservative per-object path.
+* Use ``InstancedVisuals::setMaxRenderedInstances`` and
+  ``PointCloud::setMaxRenderedPoints`` as simple LOD caps for debug overlays,
+  particles, scans, or dense markers that do not need full density in every frame.
+* Keep non-visible debug geometry outside the camera frustum when possible. rayrai
+  performs coarse frustum culling for RaiSim objects, custom visuals, instanced
+  visuals, and point clouds, so off-camera content is skipped before draw submission.
+* If the world topology is stable, repeated ``updateObjectLists()`` calls are cheap:
+  rayrai refreshes appearances without rebuilding the object cache unless objects
+  were added or removed.
+* RGB/depth CPU readback supports an optional PBO-backed asynchronous path. The
+  synchronous path remains the deterministic default for simple RL loops.
+* Dynamic point clouds and instanced visuals support partial buffer updates for
+  streaming changes.
+* Deformable TCP streaming sends topology/indices only during initialization or topology
+  changes; normal frames send vertex positions only.
 
 Additional tips
 ===============

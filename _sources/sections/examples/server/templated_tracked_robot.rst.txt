@@ -8,23 +8,24 @@ Loads a templated tracked robot URDF with parameter overrides and drives wheels/
 
 Screenshot
 ==========
-.. image:: ../../../image/trackedRobot.gif
+.. image:: ../../../image/templated_tracked_robot.png
+   :alt: templated_tracked_robot example
+   :width: 100%
 
 Binary
 ======
-CMake target and executable name: ``templated_tracked_robot``.
+Installed executable: ``templated_tracked_robot``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target templated_tracked_robot
-   ./templated_tracked_robot
+   <raisim-install>/bin/templated_tracked_robot
 
 On Windows, run ``templated_tracked_robot.exe`` instead.
-This example uses RaisimServer. Start a visualizer client (RaisimUnity, RaisimUnreal, or the rayrai TCP viewer) and connect to port 8080.
+This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.
 
 
 Details
@@ -33,7 +34,3 @@ Details
 - Applies PD control to wheels and flippers while resetting track joints.
 - Adds a sequence of box obstacles in front of the robot.
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/server/templated_tracked_robot.cpp
-   :language: cpp

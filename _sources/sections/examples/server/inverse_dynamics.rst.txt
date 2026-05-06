@@ -2,25 +2,29 @@
 Server Example: Inverse Dynamics
 ################################
 
+.. image:: ../../../image/inverse_dynamics.png
+   :alt: inverse_dynamics example
+   :width: 100%
+
+
 Overview
 ========
 Enables inverse dynamics on ANYmal and prints the resulting joint forces and torques. It compares inverse dynamics outputs to the applied generalized forces.
 
 Binary
 ======
-CMake target and executable name: ``inverse_dynamics``.
+Installed executable: ``inverse_dynamics``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target inverse_dynamics
-   ./inverse_dynamics
+   <raisim-install>/bin/inverse_dynamics
 
 On Windows, run ``inverse_dynamics.exe`` instead.
-This example uses RaisimServer. Start a visualizer client (RaisimUnity, RaisimUnreal, or the rayrai TCP viewer) and connect to port 8080.
+This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.
 
 
 Details
@@ -29,7 +33,3 @@ Details
 - Reads joint forces/torques in the world frame after integration.
 - Prints inverse-dynamics results alongside commanded torques.
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/server/inverse_dynamics.cpp
-   :language: cpp

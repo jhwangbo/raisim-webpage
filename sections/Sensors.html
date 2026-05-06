@@ -6,20 +6,20 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sensors &mdash; raisim 2.0.0 documentation</title>
+  <title>Sensors &mdash; raisim 2.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=51b770b3"></script>
+      <script src="../_static/documentation_options.js?v=b21de401"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="RaisimGymTorch" href="RaisimGymTorch.html" />
+    <link rel="next" title="rayrai Visualizer" href="Rayrai.html" />
     <link rel="prev" title="Ray Test" href="RayTest.html" /> 
 </head>
 
@@ -45,17 +45,19 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog: v2.2.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Support.html">Support</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Visualizers.html">Visualizers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ConventionsAndNotations.html">Conventions and Notations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Determinism.html">Determinism</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Math.html">Math Classes</a></li>
@@ -71,10 +73,23 @@
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Sensors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sensor-frames-and-camera-convention">Sensor frames and camera convention</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#how-to-attach-a-sensor-to-a-link">How to attach a sensor to a link</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#update">Update</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#measurement-source-and-update-modes">Measurement source and update modes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#depth-camera">Depth camera</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rgb-camera">RGB camera</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spinning-lidar">Spinning LiDAR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#imu">IMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cpu-depth-camera-fallback">CPU depth camera fallback</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#depth-image">Depth image</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#segmentation-object-id">Segmentation object id</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#optional-hit-point-per-pixel">Optional hit point per pixel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#timestamp">Timestamp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#optional-deterministic-depth-noise">Optional deterministic depth noise</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#using-sensors-with-rayrai">Using sensors with rayrai</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#parent-class-api">Parent Class API</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6raisim6SensorE"><code class="docutils literal notranslate"><span class="pre">raisim::Sensor</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim6Sensor11getPositionEv"><code class="docutils literal notranslate"><span class="pre">getPosition()</span></code></a></li>
@@ -154,14 +169,13 @@
 </ul>
 </li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Related Software</span></p>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="Rayrai.html">rayrai Visualizer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Rayrai.html">rayrai Visualizer</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RaisimUnity.html">RaiSimUnity</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RaisimUnreal.html">RaisimUnreal</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LegacyIntegrations.html">Legacy Integrations</a></li>
 </ul>
 
         </div>
@@ -189,132 +203,442 @@
              
   <section id="sensors">
 <h1>Sensors<a class="headerlink" href="#sensors" title="Link to this heading"></a></h1>
-<p>This module provides a way to specify sensor properties using a URDF-like format.
-We provide a few implementation examples for depth camera, RGB camera, and IMU.</p>
-<p>We use RaiSim to interface with the real hardware.
-This makes sense because we want to use the same code to control both the simulated and real robot.
-This sensor package is also designed for real robots.
-This might be confusing, but it keeps the code simpler and shorter.</p>
+<p>RaiSim supports these sensor workflows:</p>
+<ul class="simple">
+<li><p><strong>URDF-attached sensors</strong> for robots. Sensor metadata is loaded from a sensor
+XML file attached to a URDF link. This is the right workflow for IMU, RGB,
+depth, and spinning LiDAR sensors that should move with an articulated system.</p></li>
+<li><p><strong>rayrai-rendered RGB/depth sensors</strong> for camera observations. When rayrai is
+available, use in-process rayrai rendering with
+<code class="docutils literal notranslate"><span class="pre">Sensor::MeasurementSource::MANUAL</span></code> for RGB/depth sensor buffers. This is
+the recommended path for rendered images, screenshots, and dataset generation.</p></li>
+<li><p><strong>World-level CPU depth-camera capture</strong> only as a deterministic headless
+fallback. <code class="docutils literal notranslate"><span class="pre">World::captureDepthCamera</span></code> casts CPU rays from an arbitrary camera
+pose and returns depth, object segmentation, optional hit points, and a
+timestamp without requiring a renderer.</p></li>
+</ul>
+<p>The CPU ray-query paths are single-threaded and deterministic, but they are not
+the recommended RGB/depth image path when rayrai sensors are available. RaiSim
+itself does not support sensor measurement updates from the TCP visualizer.
+Renderer-produced images must be consumed in the rayrai process or copied into a
+sensor buffer by user code with <code class="docutils literal notranslate"><span class="pre">MeasurementSource::MANUAL</span></code>.</p>
+<section id="sensor-frames-and-camera-convention">
+<h2>Sensor frames and camera convention<a class="headerlink" href="#sensor-frames-and-camera-convention" title="Link to this heading"></a></h2>
+<p>Camera and LiDAR sensors use the RaiSim sensor-frame convention:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">+X</span></code>: forward</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">+Y</span></code>: left</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">+Z</span></code>: up</p></li>
+</ul>
+<p>Camera depth is the distance along the camera <code class="docutils literal notranslate"><span class="pre">+X</span></code> axis, not the Euclidean ray
+length. This matches the existing <code class="docutils literal notranslate"><span class="pre">DepthCamera</span></code> convention and is convenient for
+pinhole camera models.</p>
+</section>
 <section id="how-to-attach-a-sensor-to-a-link">
 <h2>How to attach a sensor to a link<a class="headerlink" href="#how-to-attach-a-sensor-to-a-link" title="Link to this heading"></a></h2>
-<p>Before further explanations, we clarify some terms that will be used throughout this documentation.
-<strong>“sensor”</strong> is a part that outputs a single type of information. For example, RGB cameras, depth cameras, gyroscopes, etc.
-<strong>“sensor_set”</strong> is a set of sensors contained in a single link.
-For example, Intel RealSense (it contains IMU+RGB+depth) and IMU (gyro and accelerometer) are “sensor_set”.
-A sensor_set can contain only a single sensor.</p>
-<p>Create a link for a sensor_set and give it a <code class="docutils literal notranslate"><span class="pre">sensor</span></code> attribute as</p>
+<p>Before further explanations, we clarify some terms used throughout this page.
+<strong>sensor</strong> means one measurement stream, such as an RGB camera, depth camera,
+gyroscope, accelerometer, or LiDAR scan. <strong>sensor_set</strong> means a set of sensors
+contained in one link. For example, an Intel RealSense-like link can contain RGB,
+depth, and IMU sensors.</p>
+<p>Create a link for a sensor set and give it a <code class="docutils literal notranslate"><span class="pre">sensor</span></code> attribute:</p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;link</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;realsense_d435&quot;</span><span class="w"> </span><span class="na">sensor=</span><span class="s">&quot;realsense435.xml&quot;</span><span class="nt">/&gt;</span>
 </pre></div>
 </div>
-<p>The <a class="reference external" href="https://github.com/raisimTech/raisim2Lib/blob/master/rsc/anymal_c/sensors/realsense435.xml">realsense435.xml</a> file should specify all necessary details of the sensor.
-It should be stored in the same directory as the URDF file.
-If it is not found, RaiSim will search the following directories in order: <code class="docutils literal notranslate"><span class="pre">[urdf_dir]/sensor</span></code>, <code class="docutils literal notranslate"><span class="pre">[urdf_dir]/sensors</span></code>, <code class="docutils literal notranslate"><span class="pre">[urdf_dir]/..</span></code>, and <code class="docutils literal notranslate"><span class="pre">[urdf_dir]/../sensors</span></code>.
-An example URDF file can be found <a class="reference external" href="https://github.com/raisimTech/raisim2Lib/blob/master/rsc/anymal_c/urdf/anymal_sensored.urdf">here</a>.</p>
+<p>The sensor XML file should be stored in the same directory as the URDF file. If
+it is not found, RaiSim searches <code class="docutils literal notranslate"><span class="pre">[urdf_dir]/sensor</span></code>, <code class="docutils literal notranslate"><span class="pre">[urdf_dir]/sensors</span></code>,
+<code class="docutils literal notranslate"><span class="pre">[urdf_dir]/..</span></code>, and <code class="docutils literal notranslate"><span class="pre">[urdf_dir]/../sensors</span></code>. An example sensor file is
+<a class="reference external" href="https://github.com/raisimTech/raisim2Lib/blob/master/rsc/anymal_c/sensors/realsense435.xml">realsense435.xml</a>.
+An example URDF is
+<a class="reference external" href="https://github.com/raisimTech/raisim2Lib/blob/master/rsc/anymal_c/urdf/anymal_sensored.urdf">anymal_sensored.urdf</a>.</p>
 </section>
-<section id="update">
-<h2>Update<a class="headerlink" href="#update" title="Link to this heading"></a></h2>
-<p>The sensor update method can be set using <code class="docutils literal notranslate"><span class="pre">raisim::Sensor::setMeasurementSource</span></code>.
-Available sources are:</p>
+<section id="measurement-source-and-update-modes">
+<h2>Measurement source and update modes<a class="headerlink" href="#measurement-source-and-update-modes" title="Link to this heading"></a></h2>
+<p>The update method is selected with <code class="docutils literal notranslate"><span class="pre">raisim::Sensor::setMeasurementSource</span></code>:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">RAISIM</span></code>: measurement is updated from the simulation side. This is the default
-for IMU and spinning LiDAR sensors, and can be invoked manually via
-<code class="docutils literal notranslate"><span class="pre">sensor-&gt;update(*world)</span></code> where supported.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">VISUALIZER</span></code>: a visualizer fills the camera buffers (RaisimUnity/Unreal or the
-rayrai TCP viewer).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">MANUAL</span></code>: user code is responsible for writing the buffers (recommended for
-in-process rayrai rendering or real hardware integration).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RAISIM</span></code>: measurement is computed by RaiSim. This is the default for IMU and
+spinning LiDAR sensors. <code class="docutils literal notranslate"><span class="pre">DepthCamera</span></code> supports RaiSim-side CPU ray updates,
+but use this for headless fallback rather than for rendered camera images when
+rayrai is available.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MANUAL</span></code>: user code writes the buffers. Use this for in-process rayrai
+RGB/depth rendering or real hardware integration.</p></li>
 </ul>
-<p>Notes by sensor type (per the public headers):</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">RGBCamera</span></code> does not implement a RaiSim-side update. Use a visualizer or
-manual updates (rayrai + <code class="docutils literal notranslate"><span class="pre">raisin::Camera::getRawImage</span></code>).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">DepthCamera</span></code> can be updated by RaiSim (<code class="docutils literal notranslate"><span class="pre">DepthCamera::update(*world)</span></code>) or by
-visualizers/manual updates.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">InertialMeasurementUnit</span></code> is updated by RaiSim and rejects visualizer updates.</p></li>
-</ul>
-<p>The update is performed at the specified frequency (i.e., <code class="docutils literal notranslate"><span class="pre">update_rate</span></code> in the sensor XML).
-When reading sensor data from another thread, use RAII locking via the built-in
-<code class="docutils literal notranslate"><span class="pre">lock()</span></code>/<code class="docutils literal notranslate"><span class="pre">unlock()</span></code> hooks:</p>
+<p>There is no <code class="docutils literal notranslate"><span class="pre">VISUALIZER</span></code> measurement source in the RaiSim API. RaiSim does not
+request RGB or depth frames from a TCP visualizer and does not update sensor
+buffers from the visualizer.</p>
+<p>Recommended RGB/depth usage with rayrai sets camera sensors to <code class="docutils literal notranslate"><span class="pre">MANUAL</span></code> and
+lets the renderer fill or read back the buffers. See <a class="reference internal" href="#using-sensors-with-rayrai">Using sensors with rayrai</a>
+for a complete example. Use <code class="docutils literal notranslate"><span class="pre">RAISIM</span></code> CPU depth updates only when rayrai is not
+available or when a deterministic headless ray-query fallback is required.</p>
+<p>For RGB sensors, RaiSim does not synthesize color in the physics engine. Write
+the buffer manually, preferably from in-process rayrai rendering when it is
+available, or from real hardware:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">rgb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sensorSet</span><span class="o">-&gt;</span><span class="n">getSensor</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">RGBCamera</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;color&quot;</span><span class="p">);</span>
+<span class="n">rgb</span><span class="o">-&gt;</span><span class="n">setMeasurementSource</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">Sensor</span><span class="o">::</span><span class="n">MeasurementSource</span><span class="o">::</span><span class="n">MANUAL</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span><span class="w"> </span><span class="n">rgba</span><span class="p">(</span><span class="kt">size_t</span><span class="p">(</span><span class="n">rgb</span><span class="o">-&gt;</span><span class="n">getProperties</span><span class="p">().</span><span class="n">width</span><span class="p">)</span><span class="w"> </span><span class="o">*</span>
+<span class="w">                       </span><span class="kt">size_t</span><span class="p">(</span><span class="n">rgb</span><span class="o">-&gt;</span><span class="n">getProperties</span><span class="p">().</span><span class="n">height</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+<span class="n">rgb</span><span class="o">-&gt;</span><span class="n">setImageBuffer</span><span class="p">(</span><span class="n">rgba</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>When reading sensor buffers from another user-managed thread, use
+<code class="docutils literal notranslate"><span class="pre">std::scoped_lock</span></code>:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">lock_guard</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">Sensor</span><span class="o">&gt;</span><span class="w"> </span><span class="n">lock</span><span class="p">(</span><span class="o">*</span><span class="n">depthSensor</span><span class="p">);</span>
-<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="o">&amp;</span><span class="n">depth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">depthSensor</span><span class="o">-&gt;</span><span class="n">getDepthArray</span><span class="p">();</span>
-<span class="w">  </span><span class="c1">// use depth here</span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">scoped_lock</span><span class="w"> </span><span class="nf">lock</span><span class="p">(</span><span class="o">*</span><span class="n">depth</span><span class="p">);</span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">image</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">depth</span><span class="o">-&gt;</span><span class="n">getDepthArray</span><span class="p">();</span>
+<span class="w">  </span><span class="c1">// read image here</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 </section>
-<section id="example">
-<h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
-<p>Example: <a class="reference external" href="https://github.com/raisimTech/raisim2Lib/blob/master/examples/src/server/sensor_suite.cpp">https://github.com/raisimTech/raisim2Lib/blob/master/examples/src/server/sensor_suite.cpp</a></p>
+<section id="depth-camera">
+<h2>Depth camera<a class="headerlink" href="#depth-camera" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">raisim::DepthCamera</span></code> stores a float array with <code class="docutils literal notranslate"><span class="pre">width</span> <span class="pre">*</span> <span class="pre">height</span></code> entries.
+Finite values are plane depth in meters. Missing pixels are <code class="docutils literal notranslate"><span class="pre">NaN</span></code>.</p>
+<p>CPU-only fallback update:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">depth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getSensorSet</span><span class="p">(</span><span class="s">&quot;depth_camera_front_camera_parent&quot;</span><span class="p">)</span>
+<span class="w">                </span><span class="o">-&gt;</span><span class="n">getSensor</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">DepthCamera</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;depth&quot;</span><span class="p">);</span>
+<span class="n">depth</span><span class="o">-&gt;</span><span class="n">setMeasurementSource</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">Sensor</span><span class="o">::</span><span class="n">MeasurementSource</span><span class="o">::</span><span class="n">RAISIM</span><span class="p">);</span>
+
+<span class="n">world</span><span class="p">.</span><span class="n">integrate</span><span class="p">();</span>
+<span class="n">depth</span><span class="o">-&gt;</span><span class="n">update</span><span class="p">(</span><span class="n">world</span><span class="p">);</span>
+
+<span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">depth</span><span class="o">-&gt;</span><span class="n">getDepthArray</span><span class="p">();</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">depth</span><span class="o">-&gt;</span><span class="n">getProperties</span><span class="p">().</span><span class="n">width</span><span class="p">;</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">depth</span><span class="o">-&gt;</span><span class="n">getProperties</span><span class="p">().</span><span class="n">height</span><span class="p">;</span>
+<span class="kt">float</span><span class="w"> </span><span class="n">centerDepth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">z</span><span class="p">[(</span><span class="n">h</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">w</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">w</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">)];</span>
+</pre></div>
+</div>
+<p>Convert depth to a point cloud:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">pointsWorld</span><span class="p">;</span>
+<span class="n">depth</span><span class="o">-&gt;</span><span class="n">depthToPointCloud</span><span class="p">(</span><span class="n">depth</span><span class="o">-&gt;</span><span class="n">getDepthArray</span><span class="p">(),</span><span class="w"> </span><span class="n">pointsWorld</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">pointsSensor</span><span class="p">;</span>
+<span class="n">depth</span><span class="o">-&gt;</span><span class="n">depthToPointCloud</span><span class="p">(</span><span class="n">depth</span><span class="o">-&gt;</span><span class="n">getDepthArray</span><span class="p">(),</span><span class="w"> </span><span class="n">pointsSensor</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The camera intrinsics are defined by width, height, horizontal field of view
+(<code class="docutils literal notranslate"><span class="pre">hFOV</span></code>), and optional pixel offsets. If you modify camera properties after
+loading, call <code class="docutils literal notranslate"><span class="pre">updateRayDirections()</span></code> before the next update.</p>
+</section>
+<section id="rgb-camera">
+<h2>RGB camera<a class="headerlink" href="#rgb-camera" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">raisim::RGBCamera</span></code> stores an RGBA8 buffer with <code class="docutils literal notranslate"><span class="pre">width</span> <span class="pre">*</span> <span class="pre">height</span> <span class="pre">*</span> <span class="pre">4</span></code> bytes.
+RaiSim itself does not render RGB. Use rayrai or manual hardware input.</p>
+<p>Manual buffer update:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">rgb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getSensorSet</span><span class="p">(</span><span class="s">&quot;depth_camera_front_camera_parent&quot;</span><span class="p">)</span>
+<span class="w">              </span><span class="o">-&gt;</span><span class="n">getSensor</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">RGBCamera</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;color&quot;</span><span class="p">);</span>
+
+<span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">prop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rgb</span><span class="o">-&gt;</span><span class="n">getProperties</span><span class="p">();</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span><span class="w"> </span><span class="n">rgba</span><span class="p">(</span><span class="kt">size_t</span><span class="p">(</span><span class="n">prop</span><span class="p">.</span><span class="n">width</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kt">size_t</span><span class="p">(</span><span class="n">prop</span><span class="p">.</span><span class="n">height</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+
+<span class="c1">// Fill rgba as R, G, B, A bytes.</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">prop</span><span class="p">.</span><span class="n">height</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">prop</span><span class="p">.</span><span class="n">width</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kt">size_t</span><span class="p">(</span><span class="n">prop</span><span class="p">.</span><span class="n">width</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="kt">size_t</span><span class="p">(</span><span class="n">x</span><span class="p">));</span>
+<span class="w">    </span><span class="n">rgba</span><span class="p">[</span><span class="n">k</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">char</span><span class="p">(</span><span class="mi">255</span><span class="p">);</span>
+<span class="w">    </span><span class="n">rgba</span><span class="p">[</span><span class="n">k</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">char</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="w">    </span><span class="n">rgba</span><span class="p">[</span><span class="n">k</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">char</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="w">    </span><span class="n">rgba</span><span class="p">[</span><span class="n">k</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">char</span><span class="p">(</span><span class="mi">255</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">rgb</span><span class="o">-&gt;</span><span class="n">setImageBuffer</span><span class="p">(</span><span class="n">rgba</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="spinning-lidar">
+<h2>Spinning LiDAR<a class="headerlink" href="#spinning-lidar" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">raisim::SpinningLidar</span></code> uses RaiSim ray casting and returns hit points in the
+sensor frame. The world helper <code class="docutils literal notranslate"><span class="pre">rayTestLidar</span></code> performs one frustum-style
+broadphase for the scan, then raycasts only the candidate bodies.</p>
+<p>Typical robot-attached LiDAR update:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">lidar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getSensorSet</span><span class="p">(</span><span class="s">&quot;lidar_link&quot;</span><span class="p">)</span>
+<span class="w">                </span><span class="o">-&gt;</span><span class="n">getSensor</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">SpinningLidar</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;lidar&quot;</span><span class="p">);</span>
+<span class="n">lidar</span><span class="o">-&gt;</span><span class="n">setMeasurementSource</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">Sensor</span><span class="o">::</span><span class="n">MeasurementSource</span><span class="o">::</span><span class="n">RAISIM</span><span class="p">);</span>
+
+<span class="n">world</span><span class="p">.</span><span class="n">integrate</span><span class="p">();</span>
+<span class="n">lidar</span><span class="o">-&gt;</span><span class="n">update</span><span class="p">(</span><span class="n">world</span><span class="p">);</span>
+
+<span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">scanS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lidar</span><span class="o">-&gt;</span><span class="n">getScan</span><span class="p">();</span><span class="w"> </span><span class="c1">// points in sensor frame</span>
+<span class="n">lidar</span><span class="o">-&gt;</span><span class="n">updatePose</span><span class="p">();</span>
+<span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">p_WS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lidar</span><span class="o">-&gt;</span><span class="n">getPosition</span><span class="p">();</span>
+<span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">R_WS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lidar</span><span class="o">-&gt;</span><span class="n">getOrientation</span><span class="p">();</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">scanW</span><span class="p">;</span>
+<span class="n">scanW</span><span class="p">.</span><span class="n">reserve</span><span class="p">(</span><span class="n">scanS</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">p_S</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">scanS</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">scanW</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">p_WS</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">R_WS</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">p_S</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>For custom scanning patterns, use <code class="docutils literal notranslate"><span class="pre">World::rayTestLidar</span></code> directly. See
+<a class="reference internal" href="RayTest.html"><span class="doc">Ray Test</span></a> for the full argument list.</p>
+</section>
+<section id="imu">
+<h2>IMU<a class="headerlink" href="#imu" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">raisim::InertialMeasurementUnit</span></code> is updated by RaiSim and rejects visualizer
+updates. The IMU is intended for robot-attached sensor sets loaded from URDF
+sensor XML. Set the measurement source to <code class="docutils literal notranslate"><span class="pre">RAISIM</span></code> and read the sensor values
+after stepping the world.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">imu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getSensorSet</span><span class="p">(</span><span class="s">&quot;imu_link&quot;</span><span class="p">)</span>
+<span class="w">              </span><span class="o">-&gt;</span><span class="n">getSensor</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">InertialMeasurementUnit</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;imu&quot;</span><span class="p">);</span>
+<span class="n">imu</span><span class="o">-&gt;</span><span class="n">setMeasurementSource</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">Sensor</span><span class="o">::</span><span class="n">MeasurementSource</span><span class="o">::</span><span class="n">RAISIM</span><span class="p">);</span>
+
+<span class="n">world</span><span class="p">.</span><span class="n">integrate</span><span class="p">();</span>
+<span class="n">imu</span><span class="o">-&gt;</span><span class="n">update</span><span class="p">(</span><span class="n">world</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Use the public <code class="docutils literal notranslate"><span class="pre">InertialMeasurementUnit</span></code> API below for the exact measurement
+accessors available in the installed header.</p>
+</section>
+<section id="cpu-depth-camera-fallback">
+<h2>CPU depth camera fallback<a class="headerlink" href="#cpu-depth-camera-fallback" title="Link to this heading"></a></h2>
+<p>Prefer rayrai sensor rendering for RGB/depth observations when rayrai is
+available. <code class="docutils literal notranslate"><span class="pre">World::captureDepthCamera</span></code> is a world-level CPU depth camera for
+deterministic headless fallback and ray-query validation. It does not require a
+robot-mounted sensor, renderer, or visualizer.
+It casts one ray per pixel and can return:</p>
+<ul class="simple">
+<li><p>depth image as <code class="docutils literal notranslate"><span class="pre">std::vector&lt;float&gt;</span></code></p></li>
+<li><p>object segmentation ids as <code class="docutils literal notranslate"><span class="pre">std::vector&lt;int&gt;</span></code></p></li>
+<li><p>optional world-frame hit points</p></li>
+<li><p>capture timestamp from <code class="docutils literal notranslate"><span class="pre">World::getWorldTime()</span></code></p></li>
+<li><p>optional deterministic Gaussian or uniform depth noise</p></li>
+</ul>
+<p>The segmentation value is the hit object’s <code class="docutils literal notranslate"><span class="pre">getIndexInWorld()</span></code>. Background is
+<code class="docutils literal notranslate"><span class="pre">-1</span></code>. Depth and points are <code class="docutils literal notranslate"><span class="pre">NaN</span></code> for background pixels.</p>
+<p>The camera frame follows the same convention as RaiSim depth sensors:
+<code class="docutils literal notranslate"><span class="pre">+X</span></code> is forward, <code class="docutils literal notranslate"><span class="pre">+Y</span></code> is left, and <code class="docutils literal notranslate"><span class="pre">+Z</span></code> is up. The rotation passed to
+<code class="docutils literal notranslate"><span class="pre">captureDepthCamera</span></code> maps camera-frame vectors into the world frame.</p>
+<p>CPU fallback scene and capture setup:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setWorldTime</span><span class="p">(</span><span class="mf">1.25</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">addGround</span><span class="p">(</span><span class="mf">0.0</span><span class="p">);</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">sphere</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="n">sphere</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">);</span>
+
+<span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">::</span><span class="n">DepthCameraProperties</span><span class="w"> </span><span class="n">prop</span><span class="p">;</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">width</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">64</span><span class="p">;</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">height</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">48</span><span class="p">;</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">clipNear</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.01</span><span class="p">;</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">clipFar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">10.0</span><span class="p">;</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">hFOV</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">M_PI</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">2.0</span><span class="p">;</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">captureDepth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">captureSegmentation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">capturePoints</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+
+<span class="c1">// Camera at z=2 looking down. Columns are camera axes in world frame:</span>
+<span class="c1">// camera +X -&gt; world -Z, camera +Y -&gt; world +Y, camera +Z -&gt; world +X.</span>
+<span class="n">raisim</span><span class="o">::</span><span class="n">Mat</span><span class="o">&lt;</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="n">R_WC</span><span class="p">;</span>
+<span class="n">R_WC</span><span class="p">.</span><span class="n">setZero</span><span class="p">();</span>
+<span class="n">R_WC</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span>
+<span class="n">R_WC</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span>
+<span class="n">R_WC</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">-1.0</span><span class="p">;</span>
+
+<span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">::</span><span class="n">DepthCameraFrame</span><span class="w"> </span><span class="n">frame</span><span class="p">;</span>
+<span class="n">world</span><span class="p">.</span><span class="n">captureDepthCamera</span><span class="p">({</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">},</span><span class="w"> </span><span class="n">R_WC</span><span class="p">,</span><span class="w"> </span><span class="n">prop</span><span class="p">,</span><span class="w"> </span><span class="n">frame</span><span class="p">);</span>
+</pre></div>
+</div>
+<section id="depth-image">
+<h3>Depth image<a class="headerlink" href="#depth-image" title="Link to this heading"></a></h3>
+<p>Enable <code class="docutils literal notranslate"><span class="pre">captureDepth</span></code> and read <code class="docutils literal notranslate"><span class="pre">frame.depth</span></code>. The vector has
+<code class="docutils literal notranslate"><span class="pre">frame.width</span> <span class="pre">*</span> <span class="pre">frame.height</span></code> entries in row-major order. Each value is the
+distance along the camera forward axis, not the Euclidean ray length. Pixels
+with no hit or hits outside <code class="docutils literal notranslate"><span class="pre">[clipNear,</span> <span class="pre">clipFar]</span></code> are <code class="docutils literal notranslate"><span class="pre">NaN</span></code>.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">center</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">prop</span><span class="p">.</span><span class="n">height</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">prop</span><span class="p">.</span><span class="n">width</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">prop</span><span class="p">.</span><span class="n">width</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">isfinite</span><span class="p">(</span><span class="n">frame</span><span class="p">.</span><span class="n">depth</span><span class="p">[</span><span class="n">center</span><span class="p">]))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kt">float</span><span class="w"> </span><span class="n">centerDepthMeters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">frame</span><span class="p">.</span><span class="n">depth</span><span class="p">[</span><span class="n">center</span><span class="p">];</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="segmentation-object-id">
+<h3>Segmentation object id<a class="headerlink" href="#segmentation-object-id" title="Link to this heading"></a></h3>
+<p>Enable <code class="docutils literal notranslate"><span class="pre">captureSegmentation</span></code> and read <code class="docutils literal notranslate"><span class="pre">frame.segmentation</span></code>. A valid pixel
+stores the hit object’s <code class="docutils literal notranslate"><span class="pre">getIndexInWorld()</span></code>. Background pixels store <code class="docutils literal notranslate"><span class="pre">-1</span></code>.
+You can compare this value to object ids kept by the application.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">prop</span><span class="p">.</span><span class="n">captureSegmentation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">::</span><span class="n">DepthCameraFrame</span><span class="w"> </span><span class="n">frame</span><span class="p">;</span>
+<span class="n">world</span><span class="p">.</span><span class="n">captureDepthCamera</span><span class="p">(</span><span class="n">cameraPos</span><span class="p">,</span><span class="w"> </span><span class="n">cameraRot</span><span class="p">,</span><span class="w"> </span><span class="n">prop</span><span class="p">,</span><span class="w"> </span><span class="n">frame</span><span class="p">);</span>
+
+<span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">center</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">frame</span><span class="p">.</span><span class="n">height</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">frame</span><span class="p">.</span><span class="n">width</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">frame</span><span class="p">.</span><span class="n">width</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">objectId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">frame</span><span class="p">.</span><span class="n">segmentation</span><span class="p">[</span><span class="n">center</span><span class="p">];</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">objectId</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">sphere</span><span class="o">-&gt;</span><span class="n">getIndexInWorld</span><span class="p">()))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// The center pixel hit the sphere.</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="optional-hit-point-per-pixel">
+<h3>Optional hit point per pixel<a class="headerlink" href="#optional-hit-point-per-pixel" title="Link to this heading"></a></h3>
+<p>Set <code class="docutils literal notranslate"><span class="pre">capturePoints</span></code> to <code class="docutils literal notranslate"><span class="pre">true</span></code> to fill <code class="docutils literal notranslate"><span class="pre">frame.points</span></code>. Each entry is the
+world-frame hit point for the corresponding pixel. This is optional because it
+uses more memory than depth-only or segmentation-only capture.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">prop</span><span class="p">.</span><span class="n">capturePoints</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">::</span><span class="n">DepthCameraFrame</span><span class="w"> </span><span class="n">frame</span><span class="p">;</span>
+<span class="n">world</span><span class="p">.</span><span class="n">captureDepthCamera</span><span class="p">(</span><span class="n">cameraPos</span><span class="p">,</span><span class="w"> </span><span class="n">cameraRot</span><span class="p">,</span><span class="w"> </span><span class="n">prop</span><span class="p">,</span><span class="w"> </span><span class="n">frame</span><span class="p">);</span>
+
+<span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">center</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">frame</span><span class="p">.</span><span class="n">height</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">frame</span><span class="p">.</span><span class="n">width</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">frame</span><span class="p">.</span><span class="n">width</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<span class="k">const</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">hitPointW</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">frame</span><span class="p">.</span><span class="n">points</span><span class="p">[</span><span class="n">center</span><span class="p">];</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">isfinite</span><span class="p">(</span><span class="n">hitPointW</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;hit point in world: &quot;</span>
+<span class="w">            </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">hitPointW</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;, &quot;</span>
+<span class="w">            </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">hitPointW</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;, &quot;</span>
+<span class="w">            </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">hitPointW</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="timestamp">
+<h3>Timestamp<a class="headerlink" href="#timestamp" title="Link to this heading"></a></h3>
+<p>Each frame stores the current <code class="docutils literal notranslate"><span class="pre">World</span></code> time in <code class="docutils literal notranslate"><span class="pre">frame.timeStamp</span></code>. This is
+useful when camera captures are interleaved with control, logging, or dataset
+generation.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">world</span><span class="p">.</span><span class="n">setWorldTime</span><span class="p">(</span><span class="mf">1.25</span><span class="p">);</span>
+
+<span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">::</span><span class="n">DepthCameraFrame</span><span class="w"> </span><span class="n">frame</span><span class="p">;</span>
+<span class="n">world</span><span class="p">.</span><span class="n">captureDepthCamera</span><span class="p">(</span><span class="n">cameraPos</span><span class="p">,</span><span class="w"> </span><span class="n">cameraRot</span><span class="p">,</span><span class="w"> </span><span class="n">prop</span><span class="p">,</span><span class="w"> </span><span class="n">frame</span><span class="p">);</span>
+
+<span class="kt">double</span><span class="w"> </span><span class="n">captureTimeSeconds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">frame</span><span class="p">.</span><span class="n">timeStamp</span><span class="p">;</span><span class="w">  </span><span class="c1">// 1.25 in this example.</span>
+</pre></div>
+</div>
+</section>
+<section id="optional-deterministic-depth-noise">
+<h3>Optional deterministic depth noise<a class="headerlink" href="#optional-deterministic-depth-noise" title="Link to this heading"></a></h3>
+<p>Depth noise is disabled by default. To add reproducible noise, set
+<code class="docutils literal notranslate"><span class="pre">depthNoiseType</span></code>, <code class="docutils literal notranslate"><span class="pre">depthNoiseMean</span></code>, <code class="docutils literal notranslate"><span class="pre">depthNoiseStd</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">depthNoiseSeed</span></code>. The same world state, camera pose, properties, and seed
+produce the same noisy depth image.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">prop</span><span class="p">.</span><span class="n">depthNoiseType</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">::</span><span class="n">DepthCameraProperties</span><span class="o">::</span><span class="n">DepthNoiseType</span><span class="o">::</span><span class="n">GAUSSIAN</span><span class="p">;</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">depthNoiseMean</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">depthNoiseStd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.002</span><span class="p">;</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">depthNoiseSeed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">42</span><span class="p">;</span>
+
+<span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">::</span><span class="n">DepthCameraFrame</span><span class="w"> </span><span class="n">noisyA</span><span class="p">;</span>
+<span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">::</span><span class="n">DepthCameraFrame</span><span class="w"> </span><span class="n">noisyB</span><span class="p">;</span>
+<span class="n">world</span><span class="p">.</span><span class="n">captureDepthCamera</span><span class="p">(</span><span class="n">cameraPos</span><span class="p">,</span><span class="w"> </span><span class="n">cameraRot</span><span class="p">,</span><span class="w"> </span><span class="n">prop</span><span class="p">,</span><span class="w"> </span><span class="n">noisyA</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">captureDepthCamera</span><span class="p">(</span><span class="n">cameraPos</span><span class="p">,</span><span class="w"> </span><span class="n">cameraRot</span><span class="p">,</span><span class="w"> </span><span class="n">prop</span><span class="p">,</span><span class="w"> </span><span class="n">noisyB</span><span class="p">);</span>
+
+<span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">center</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">prop</span><span class="p">.</span><span class="n">height</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">prop</span><span class="p">.</span><span class="n">width</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">prop</span><span class="p">.</span><span class="n">width</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">noisyA</span><span class="p">.</span><span class="n">depth</span><span class="p">[</span><span class="n">center</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">noisyB</span><span class="p">.</span><span class="n">depth</span><span class="p">[</span><span class="n">center</span><span class="p">]);</span>
+</pre></div>
+</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">DepthNoiseType::UNIFORM</span></code> for bounded uniform noise in
+<code class="docutils literal notranslate"><span class="pre">[mean</span> <span class="pre">-</span> <span class="pre">std,</span> <span class="pre">mean</span> <span class="pre">+</span> <span class="pre">std]</span></code>.</p>
+<p>Self-filtering uses the same <code class="docutils literal notranslate"><span class="pre">objectId</span></code> and <code class="docutils literal notranslate"><span class="pre">localId</span></code> convention as
+<code class="docutils literal notranslate"><span class="pre">rayTest</span></code>. This is useful for cameras mounted on a robot:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">world</span><span class="p">.</span><span class="n">captureDepthCamera</span><span class="p">(</span><span class="n">cameraPos</span><span class="p">,</span>
+<span class="w">                         </span><span class="n">cameraRot</span><span class="p">,</span>
+<span class="w">                         </span><span class="n">prop</span><span class="p">,</span>
+<span class="w">                         </span><span class="n">frame</span><span class="p">,</span>
+<span class="w">                         </span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getIndexInWorld</span><span class="p">(),</span>
+<span class="w">                         </span><span class="n">cameraParentLocalBodyId</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
 </section>
 <section id="using-sensors-with-rayrai">
 <h2>Using sensors with rayrai<a class="headerlink" href="#using-sensors-with-rayrai" title="Link to this heading"></a></h2>
-<p>rayrai can render RaiSim camera sensors in-process. The rayrai complete showcase
-(<code class="docutils literal notranslate"><span class="pre">examples/src/rayrai/rayrai_complete_showcase.cpp</span></code>) demonstrates how to wire RGB, depth,
-and LiDAR sensors together. The key steps are:</p>
-<ol class="arabic simple">
-<li><p>Load a sensored URDF and fetch the sensors by name:</p></li>
-</ol>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">anymal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">addArticulatedSystem</span><span class="p">(</span><span class="n">anymalUrdf</span><span class="p">);</span>
-<span class="k">auto</span><span class="w"> </span><span class="n">lidar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getSensorSet</span><span class="p">(</span><span class="s">&quot;lidar_link&quot;</span><span class="p">)</span>
-<span class="w">               </span><span class="o">-&gt;</span><span class="n">getSensor</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">SpinningLidar</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;lidar&quot;</span><span class="p">);</span>
-<span class="k">auto</span><span class="w"> </span><span class="n">rgbCam</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getSensorSet</span><span class="p">(</span><span class="s">&quot;depth_camera_front_camera_parent&quot;</span><span class="p">)</span>
+<p>rayrai can render RaiSim camera sensors in process. This is the recommended
+RGB/depth sensor path when rayrai is available because it uses the same sensor
+pose and intrinsics while producing renderer-backed color and depth buffers.
+Use the CPU camera capture API only when rayrai is unavailable or when a
+CPU-only deterministic ray-query result is specifically required.</p>
+<p>Runnable examples:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="examples/rayrai/rayrai_rgb_camera.html"><span class="doc">Rayrai RGB camera</span></a> uses the Go1
+<code class="docutils literal notranslate"><span class="pre">d455_front/color</span></code> RGB sensor and renders it through <code class="docutils literal notranslate"><span class="pre">raisin::Camera</span></code>.
+Source: <code class="docutils literal notranslate"><span class="pre">examples/src/rayrai/sensors/rayrai_rgb_camera.cpp</span></code>.</p></li>
+<li><p><a class="reference internal" href="examples/rayrai/rayrai_depth_camera.html"><span class="doc">Rayrai depth camera</span></a> uses the Go1
+<code class="docutils literal notranslate"><span class="pre">d455_front/depth</span></code> depth sensor, renders the linear depth plane, and reads
+a <code class="docutils literal notranslate"><span class="pre">float</span></code> depth buffer back to the CPU. Source:
+<code class="docutils literal notranslate"><span class="pre">examples/src/rayrai/sensors/rayrai_depth_camera.cpp</span></code>.</p></li>
+<li><p><a class="reference internal" href="examples/rayrai/rayrai_lidar_pointcloud.html"><span class="doc">Rayrai LiDAR point cloud</span></a>
+shows a robot-mounted <code class="docutils literal notranslate"><span class="pre">SpinningLidar</span></code> and visualizes its scan as a rayrai
+point cloud. Source: <code class="docutils literal notranslate"><span class="pre">examples/src/rayrai/sensors/rayrai_lidar_pointcloud.cpp</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">examples/src/rayrai/getting_started/rayrai_complete_showcase.cpp</span></code> combines
+RGB, depth, LiDAR, camera frustums, and raw RGB/depth buffer previews in one
+scene.</p></li>
+</ul>
+<p>A typical RGB/depth setup has four parts: load a URDF with sensors, switch the
+camera sensors to manual measurements, create rayrai camera objects from those
+sensors, and render the sensor views every frame.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">world</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="n">world</span><span class="o">-&gt;</span><span class="n">addGround</span><span class="p">();</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="w"> </span><span class="n">modules</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;d455&quot;</span><span class="p">};</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">robot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">addArticulatedSystem</span><span class="p">(</span><span class="n">go1Urdf</span><span class="p">,</span><span class="w"> </span><span class="n">modules</span><span class="p">,</span><span class="w"> </span><span class="n">go1ResourceDir</span><span class="p">);</span>
+
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">rgbCam</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getSensorSet</span><span class="p">(</span><span class="s">&quot;d455_front&quot;</span><span class="p">)</span>
 <span class="w">               </span><span class="o">-&gt;</span><span class="n">getSensor</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">RGBCamera</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;color&quot;</span><span class="p">);</span>
-<span class="k">auto</span><span class="w"> </span><span class="n">depthCam</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getSensorSet</span><span class="p">(</span><span class="s">&quot;depth_camera_front_camera_parent&quot;</span><span class="p">)</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">depthCam</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getSensorSet</span><span class="p">(</span><span class="s">&quot;d455_front&quot;</span><span class="p">)</span>
 <span class="w">                 </span><span class="o">-&gt;</span><span class="n">getSensor</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">DepthCamera</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;depth&quot;</span><span class="p">);</span>
-</pre></div>
-</div>
-<ol class="arabic simple" start="2">
-<li><p>Let rayrai control sensor updates by setting the measurement source to MANUAL:</p></li>
-</ol>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">lidar</span><span class="o">-&gt;</span><span class="n">setMeasurementSource</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">Sensor</span><span class="o">::</span><span class="n">MeasurementSource</span><span class="o">::</span><span class="n">MANUAL</span><span class="p">);</span>
+
 <span class="n">rgbCam</span><span class="o">-&gt;</span><span class="n">setMeasurementSource</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">Sensor</span><span class="o">::</span><span class="n">MeasurementSource</span><span class="o">::</span><span class="n">MANUAL</span><span class="p">);</span>
 <span class="n">depthCam</span><span class="o">-&gt;</span><span class="n">setMeasurementSource</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">Sensor</span><span class="o">::</span><span class="n">MeasurementSource</span><span class="o">::</span><span class="n">MANUAL</span><span class="p">);</span>
-</pre></div>
-</div>
-<ol class="arabic simple" start="3">
-<li><p>For RGB/depth cameras, render with rayrai every frame:</p></li>
-</ol>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">viewer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">1280</span><span class="p">,</span><span class="w"> </span><span class="mi">720</span><span class="p">);</span>
+
+<span class="k">auto</span><span class="w"> </span><span class="n">viewer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">1280</span><span class="p">,</span><span class="w"> </span><span class="mi">720</span><span class="p">);</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">rgbCamera</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">raisin</span><span class="o">::</span><span class="n">Camera</span><span class="o">&gt;</span><span class="p">(</span><span class="o">*</span><span class="n">rgbCam</span><span class="p">);</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">depthCamera</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">raisin</span><span class="o">::</span><span class="n">Camera</span><span class="o">&gt;</span><span class="p">(</span><span class="o">*</span><span class="n">depthCam</span><span class="p">);</span>
 
-<span class="n">viewer</span><span class="o">-&gt;</span><span class="n">renderWithExternalCamera</span><span class="p">(</span><span class="o">*</span><span class="n">rgbCam</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">rgbCamera</span><span class="p">,</span><span class="w"> </span><span class="p">{});</span>
-<span class="n">viewer</span><span class="o">-&gt;</span><span class="n">renderWithExternalCamera</span><span class="p">(</span><span class="o">*</span><span class="n">depthCam</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">depthCamera</span><span class="p">,</span><span class="w"> </span><span class="p">{});</span>
-<span class="n">viewer</span><span class="o">-&gt;</span><span class="n">renderDepthPlaneDistance</span><span class="p">(</span><span class="o">*</span><span class="n">depthCam</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">depthCamera</span><span class="p">);</span>
+<span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">rgbProp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rgbCam</span><span class="o">-&gt;</span><span class="n">getProperties</span><span class="p">();</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">rgbWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">rgbProp</span><span class="p">.</span><span class="n">width</span><span class="p">);</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">rgbHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">rgbProp</span><span class="p">.</span><span class="n">height</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span><span class="w"> </span><span class="n">rgbBuffer</span><span class="p">(</span><span class="kt">size_t</span><span class="p">(</span><span class="n">rgbWidth</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kt">size_t</span><span class="p">(</span><span class="n">rgbHeight</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+
+<span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">depthProp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">depthCam</span><span class="o">-&gt;</span><span class="n">getProperties</span><span class="p">();</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">depthWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">depthProp</span><span class="p">.</span><span class="n">width</span><span class="p">);</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">depthHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">depthProp</span><span class="p">.</span><span class="n">height</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="w"> </span><span class="n">depthBuffer</span><span class="p">(</span><span class="kt">size_t</span><span class="p">(</span><span class="n">depthWidth</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kt">size_t</span><span class="p">(</span><span class="n">depthHeight</span><span class="p">));</span>
+
+<span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">running</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">integrate</span><span class="p">();</span>
+
+<span class="w">  </span><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">renderWithExternalCamera</span><span class="p">(</span><span class="o">*</span><span class="n">rgbCam</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">rgbCamera</span><span class="p">,</span><span class="w"> </span><span class="p">{});</span>
+<span class="w">  </span><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">renderWithExternalCamera</span><span class="p">(</span><span class="o">*</span><span class="n">depthCam</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">depthCamera</span><span class="p">,</span><span class="w"> </span><span class="p">{});</span>
+<span class="w">  </span><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">renderDepthPlaneDistance</span><span class="p">(</span><span class="o">*</span><span class="n">depthCam</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">depthCamera</span><span class="p">);</span>
+
+<span class="w">  </span><span class="n">rgbCamera</span><span class="o">-&gt;</span><span class="n">getRawImage</span><span class="p">(</span><span class="o">*</span><span class="n">rgbCam</span><span class="p">,</span>
+<span class="w">                         </span><span class="n">raisin</span><span class="o">::</span><span class="n">Camera</span><span class="o">::</span><span class="n">SensorStorageMode</span><span class="o">::</span><span class="n">CUSTOM_BUFFER</span><span class="p">,</span>
+<span class="w">                         </span><span class="n">rgbBuffer</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span>
+<span class="w">                         </span><span class="n">rgbBuffer</span><span class="p">.</span><span class="n">size</span><span class="p">(),</span>
+<span class="w">                         </span><span class="cm">/*flipVertical=*/</span><span class="nb">false</span><span class="p">);</span>
+<span class="w">  </span><span class="n">depthCamera</span><span class="o">-&gt;</span><span class="n">getRawImage</span><span class="p">(</span><span class="o">*</span><span class="n">depthCam</span><span class="p">,</span>
+<span class="w">                           </span><span class="n">raisin</span><span class="o">::</span><span class="n">Camera</span><span class="o">::</span><span class="n">SensorStorageMode</span><span class="o">::</span><span class="n">CUSTOM_BUFFER</span><span class="p">,</span>
+<span class="w">                           </span><span class="n">depthBuffer</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span>
+<span class="w">                           </span><span class="n">depthBuffer</span><span class="p">.</span><span class="n">size</span><span class="p">(),</span>
+<span class="w">                           </span><span class="cm">/*flipVertical=*/</span><span class="nb">false</span><span class="p">);</span>
+<span class="p">}</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">renderWithExternalCamera</span></code> renders with the sensor intrinsics and pose.
-If you need CPU access to the rendered buffers, call <code class="docutils literal notranslate"><span class="pre">raisin::Camera::getRawImage</span></code>
-to populate either the sensor buffers or a custom buffer. <code class="docutils literal notranslate"><span class="pre">renderDepthPlaneDistance</span></code>
-produces a linear depth texture for depth sensors.</p>
-<p>4) To read raw images on the CPU, allocate a buffer using the sensor properties
-and call <code class="docutils literal notranslate"><span class="pre">raisin::Camera::getRawImage</span></code>:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">rgbCam</span><span class="o">-&gt;</span><span class="n">getProperties</span><span class="p">().</span><span class="n">width</span><span class="p">);</span>
-<span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">rgbCam</span><span class="o">-&gt;</span><span class="n">getProperties</span><span class="p">().</span><span class="n">height</span><span class="p">);</span>
-<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span><span class="w"> </span><span class="n">rgbBuffer</span><span class="p">(</span><span class="kt">size_t</span><span class="p">(</span><span class="n">w</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kt">size_t</span><span class="p">(</span><span class="n">h</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
-<span class="n">rgbCamera</span><span class="o">-&gt;</span><span class="n">getRawImage</span><span class="p">(</span><span class="o">*</span><span class="n">rgbCam</span><span class="p">,</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Camera</span><span class="o">::</span><span class="n">SensorStorageMode</span><span class="o">::</span><span class="n">CUSTOM_BUFFER</span><span class="p">,</span>
-<span class="w">  </span><span class="n">rgbBuffer</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">rgbBuffer</span><span class="p">.</span><span class="n">size</span><span class="p">(),</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span>
+<p><code class="docutils literal notranslate"><span class="pre">renderWithExternalCamera</span></code> uses the sensor pose and intrinsics.
+<code class="docutils literal notranslate"><span class="pre">renderDepthPlaneDistance</span></code> converts the depth camera render into a linear
+plane-distance texture and the <code class="docutils literal notranslate"><span class="pre">float</span></code> readback buffer contains one depth
+value per pixel. The RGB readback buffer contains four bytes per pixel.</p>
+<p>For LiDAR, prefer the rayrai GPU slice API when you need renderer-side LiDAR
+measurements. Use the existing point-cloud example to see how to fetch the
+robot-mounted <code class="docutils literal notranslate"><span class="pre">SpinningLidar</span></code>, update its pose, transform sensor-frame points
+to world coordinates, and display the result in rayrai.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">lidar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getSensorSet</span><span class="p">(</span><span class="s">&quot;livox_lidar_0&quot;</span><span class="p">)</span>
+<span class="w">              </span><span class="o">-&gt;</span><span class="n">getSensor</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">SpinningLidar</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;lidar&quot;</span><span class="p">);</span>
+
+<span class="n">lidar</span><span class="o">-&gt;</span><span class="n">updatePose</span><span class="p">();</span>
+<span class="k">const</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">dvec3</span><span class="w"> </span><span class="n">posW</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">toGlm</span><span class="p">(</span><span class="n">lidar</span><span class="o">-&gt;</span><span class="n">getPosition</span><span class="p">());</span>
+<span class="k">const</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">dmat3</span><span class="w"> </span><span class="n">rotW</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">toGlm</span><span class="p">(</span><span class="n">lidar</span><span class="o">-&gt;</span><span class="n">getOrientation</span><span class="p">());</span>
+<span class="n">viewer</span><span class="o">-&gt;</span><span class="n">measureSpinningLidarSingleDrawGPU</span><span class="p">(</span><span class="o">*</span><span class="n">lidar</span><span class="p">,</span><span class="w"> </span><span class="n">posW</span><span class="p">,</span><span class="w"> </span><span class="n">rotW</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Depth uses a <code class="docutils literal notranslate"><span class="pre">float</span></code> buffer with <code class="docutils literal notranslate"><span class="pre">width</span> <span class="pre">*</span> <span class="pre">height</span></code> entries.</p>
-<p>5) For LiDAR, update the pose and request a scan from RaiSim, then transform
-points from the sensor frame to world coordinates:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">lidar</span><span class="o">-&gt;</span><span class="n">updatePose</span><span class="p">();</span>
-<span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">sensorPosW</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lidar</span><span class="o">-&gt;</span><span class="n">getPosition</span><span class="p">();</span>
-<span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">sensorRotW</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lidar</span><span class="o">-&gt;</span><span class="n">getOrientation</span><span class="p">();</span>
-<span class="n">lidar</span><span class="o">-&gt;</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="n">world</span><span class="p">);</span>
-<span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">scanS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lidar</span><span class="o">-&gt;</span><span class="n">getScan</span><span class="p">();</span>
-<span class="c1">// pW = R_W * pS + t_W</span>
-</pre></div>
-</div>
-<p>The example converts the scan into a rayrai <code class="docutils literal notranslate"><span class="pre">PointCloud</span></code> for visualization.</p>
-<p>Notes:</p>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>For camera sensors, use rayrai for updates (manual source) instead of calling
-<code class="docutils literal notranslate"><span class="pre">sensor-&gt;update(*world)</span></code>.</p></li>
-<li><p>The sensor update rate in the XML is still respected by RaiSim sensors; if you
-want to throttle updates in rayrai, skip rendering on frames that are too close.</p></li>
+<li><p>Prefer the rayrai RGB and depth examples above for robot-attached rendered
+camera buffers.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">rayrai_complete_showcase</span></code> when you want one scene that combines sensor
+rendering, camera frustums, raw buffer readback, and LiDAR visualization.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">World::captureDepthCamera</span></code> supports depth, segmentation, optional hit
+points, and timestamps without a visualizer, but it is the CPU fallback path.</p></li>
 </ul>
 </section>
 <section id="parent-class-api">
@@ -328,7 +652,7 @@ want to throttle updates in rayrai, skip rendering on frames that are too close.
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim6Sensor11getPositionEv">
 <span id="_CPPv3N6raisim6Sensor11getPositionEv"></span><span id="_CPPv2N6raisim6Sensor11getPositionEv"></span><span id="raisim::Sensor::getPosition"></span><span class="target" id="classraisim_1_1Sensor_1a30315ada9d51e3093d370660ebd81d9b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getPosition</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim6Sensor11getPositionEv" title="Link to this definition"></a><br /></dt>
-<dd><p>The pose is updated using <a class="reference internal" href="#classraisim_1_1Sensor_1a0d93cc79cf7683bfd907a0f33592c841"><span class="std std-ref">updatePose()</span></a> method. <a class="reference internal" href="#classraisim_1_1Sensor_1a0d93cc79cf7683bfd907a0f33592c841"><span class="std std-ref">updatePose()</span></a> can be called by the user. If the visualizer updates the measurement, the server will call this method before the measurement update. </p>
+<dd><p>The pose is updated using <a class="reference internal" href="#classraisim_1_1Sensor_1a0d93cc79cf7683bfd907a0f33592c841"><span class="std std-ref">updatePose()</span></a> method. <a class="reference internal" href="#classraisim_1_1Sensor_1a0d93cc79cf7683bfd907a0f33592c841"><span class="std std-ref">updatePose()</span></a> can be called by the user. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The position of the sensor frame </p>
@@ -339,7 +663,7 @@ want to throttle updates in rayrai, skip rendering on frames that are too close.
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim6Sensor14getOrientationEv">
 <span id="_CPPv3N6raisim6Sensor14getOrientationEv"></span><span id="_CPPv2N6raisim6Sensor14getOrientationEv"></span><span id="raisim::Sensor::getOrientation"></span><span class="target" id="classraisim_1_1Sensor_1a282ccc14f283670796174292b20e48c4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Mat</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getOrientation</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim6Sensor14getOrientationEv" title="Link to this definition"></a><br /></dt>
-<dd><p>The pose is updated using <a class="reference internal" href="#classraisim_1_1Sensor_1a0d93cc79cf7683bfd907a0f33592c841"><span class="std std-ref">updatePose()</span></a> method. <a class="reference internal" href="#classraisim_1_1Sensor_1a0d93cc79cf7683bfd907a0f33592c841"><span class="std std-ref">updatePose()</span></a> can be called by the user. If the visualizer updates the measurement, the server will call this method before the measurement update. </p>
+<dd><p>The pose is updated using <a class="reference internal" href="#classraisim_1_1Sensor_1a0d93cc79cf7683bfd907a0f33592c841"><span class="std std-ref">updatePose()</span></a> method. <a class="reference internal" href="#classraisim_1_1Sensor_1a0d93cc79cf7683bfd907a0f33592c841"><span class="std std-ref">updatePose()</span></a> can be called by the user. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The orientation of the sensor frame </p>
@@ -838,7 +1162,7 @@ want to throttle updates in rayrai, skip rendering on frames that are too close.
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim9RGBCamera14getImageBufferEv">
 <span id="_CPPv3NK6raisim9RGBCamera14getImageBufferEv"></span><span id="_CPPv2NK6raisim9RGBCamera14getImageBufferEv"></span><span id="raisim::RGBCamera::getImageBufferC"></span><span class="target" id="classraisim_1_1RGBCamera_1aa3876492d2a889fe2b35f0c245a4711d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">char</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getImageBuffer</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim9RGBCamera14getImageBufferEv" title="Link to this definition"></a><br /></dt>
-<dd><p>rgb image in bgra format. It is updated only if the measurement source is the visualizer and raisimUnreal is used </p>
+<dd><p>RGB image in BGRA format. RaiSim does not synthesize RGB images. User code or an in-process renderer must write this buffer manually. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The image data in char vector </p>
@@ -1174,7 +1498,7 @@ want to throttle updates in rayrai, skip rendering on frames that are too close.
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="RayTest.html" class="btn btn-neutral float-left" title="Ray Test" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="RaisimGymTorch.html" class="btn btn-neutral float-right" title="RaisimGymTorch" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Rayrai.html" class="btn btn-neutral float-right" title="rayrai Visualizer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

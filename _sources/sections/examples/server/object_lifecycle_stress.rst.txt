@@ -8,16 +8,15 @@ Stress-tests object lifecycle by creating many primitives, simulating briefly, a
 
 Binary
 ======
-CMake target and executable name: ``object_lifecycle_stress``.
+Installed executable: ``object_lifecycle_stress``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target object_lifecycle_stress
-   ./object_lifecycle_stress
+   <raisim-install>/bin/object_lifecycle_stress
 
 On Windows, run ``object_lifecycle_stress.exe`` instead.
 This example runs headless and does not use RaisimServer.
@@ -29,7 +28,3 @@ Details
 - Intended as a stress test for object lifecycle and memory handling.
 - Runs headless (no RaisimServer rendering).
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/server/object_lifecycle_stress.cpp
-   :language: cpp

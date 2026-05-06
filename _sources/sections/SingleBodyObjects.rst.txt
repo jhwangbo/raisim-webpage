@@ -15,7 +15,8 @@ The following five primitive shapes are supported in RaiSim.
 
 Compound
 ===================================
-An example can be found `here <https://raisim.com/sections/RaisimUnity.html>`__.
+Legacy RaisimUnity examples are no longer supported; use rayrai for current
+visualization examples.
 
 ``raisim::Compound`` has multiple primitive shapes that are rigidly attached to each other to form a single rigid body.
 The shapes do not have to overlap to stay attached.
@@ -134,7 +135,7 @@ non-convex triangle mesh collision for that object. This keeps imported visual m
 robot body panels usable when they are not valid CoACD input. The fallback is a compatibility path,
 not the preferred high-performance collider: it can be slower and less robust than convex hulls or
 CoACD parts, especially for dynamic object stacks or dense contact scenes. For performance-critical
-simulation, use a cleaner manifold mesh, a preprocessed convex collision asset, or the default
+simulation, use a cleaner manifold mesh, a preprocessed convex collision asset, or an explicit
 ``MeshCollisionMode::CONVEX_HULL`` path.
 
 CoACD cache files
@@ -143,19 +144,20 @@ Successful ``MeshCollisionMode::CONVEXIFY`` calls write an OBJ cache beside the 
 keeps repeated runs cheap: the first call pays the CoACD decomposition cost, while later calls with
 the same parameters load the saved convex parts directly.
 
-The file name starts with ``raisim_coacd_`` and includes the source mesh stem, scale, and CoACD
-option values, for example:
+The file name starts with ``raisim_coacd_`` and includes the source mesh stem, a content hash,
+scale, and CoACD option values, for example:
 
 .. code-block:: text
 
-    raisim_coacd_model_scale_1_threshold_0_08_maxhull_8_..._realmetric_0.obj
+    raisim_coacd_model_hash_0123456789abcdef_scale_1_threshold_0_08_maxhull_8_..._realmetric_0.obj
 
 The cache stores each convex part as a separate OBJ group named ``raisim_coacd_part_N``. On later
-``addMesh`` calls with the same source mesh and CoACD parameters, RaiSim loads these groups instead
-of running CoACD again. The loaded convex parts are expected to match the generated parts exactly.
+``addMesh`` calls with the same source mesh contents and CoACD parameters, RaiSim loads these groups
+instead of running CoACD again. The loaded convex parts are expected to match the generated parts
+exactly.
 
-If the source mesh is newer than the cache file, RaiSim recomputes the decomposition and overwrites
-the cache. Different CoACD settings produce different cache file names, so changing options such as
+Changing the source mesh contents changes the hash and therefore produces a different cache file.
+Different CoACD settings also produce different cache file names, so changing options such as
 ``threshold``, ``maxConvexHull``, ``sampleResolution``, or ``mctsIteration`` does not reuse an
 incompatible cache.
 
@@ -181,6 +183,43 @@ When CoACD falls back to original non-convex mesh collision, ``getCoacdConvexPar
 
 The rayrai example ``rayrai_coacd_mesh_approximation`` displays original meshes next to colored
 convex decomposition parts.
+
+Model preprocessing and export
+------------------------------
+``raisim::Mesh::preprocessMesh`` loads any Assimp-supported mesh format, applies a scale, triangulates
+it, and writes a normalized OBJ cache. The output name includes a content hash and scale so repeated
+runs can reuse the cached OBJ safely.
+
+.. code-block:: cpp
+
+    raisim::Mesh::PreprocessOptions options;
+    options.scale = 1.0;
+    options.cacheDirectory = "/tmp/raisim_mesh_cache";
+    auto result = raisim::Mesh::preprocessMesh("asset.glb", options);
+
+    auto* mesh = world.addMesh(result.outputPath,
+                               1.0,
+                               1.0,
+                               "default",
+                               raisim::MeshCollisionMode::CONVEX_HULL);
+
+Use ``World::exportMeshAssetsToObj(directory, prefix)`` to export mesh objects already in a world as
+normalized OBJ files. The function returns the generated paths in world-object order.
+
+.. code-block:: cpp
+
+    std::vector<std::string> exported = world.exportMeshAssetsToObj("/tmp/raisim_export", "scene");
+
+Visual assets and collision assets should remain separate unless you explicitly want to reuse the
+same mesh for both. A high-detail textured glTF visual mesh is often unsuitable as a collision mesh;
+use a simplified convex hull, CoACD decomposition, or authored collision asset for simulation.
+
+USD note
+--------
+USD/USDA/USDC/USDZ mesh loading depends on Assimp being built with its optional USD importer. If the
+installed RaiSim package was configured with ``-DRAISIM_ASSIMP_USD_IMPORTER=OFF``, loading a USD mesh
+fails with a clear error. Rebuild RaiSim with ``-DRAISIM_ASSIMP_USD_IMPORTER=ON`` when USD import is
+required.
 
 Mesh collision is supported for mesh formats handled by Assimp. Keep collision meshes reasonably
 sized for performance.

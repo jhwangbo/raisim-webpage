@@ -8,23 +8,24 @@ Creates a procedural heightmap and places ANYmal on top. Use this to see how to 
 
 Screenshot
 ==========
-.. image:: ../../../image/heightMapUsingTerrainGenerator.gif
+.. image:: ../../../image/procedural_heightmap.png
+   :alt: procedural_heightmap example
+   :width: 100%
 
 Binary
 ======
-CMake target and executable name: ``procedural_heightmap``.
+Installed executable: ``procedural_heightmap``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target procedural_heightmap
-   ./procedural_heightmap
+   <raisim-install>/bin/procedural_heightmap
 
 On Windows, run ``procedural_heightmap.exe`` instead.
-This example uses RaisimServer. Start a visualizer client (RaisimUnity, RaisimUnreal, or the rayrai TCP viewer) and connect to port 8080.
+This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.
 
 
 Details
@@ -33,7 +34,3 @@ Details
 - Spawns ANYmal on the heightmap with PD control.
 - Demonstrates procedural heightmap creation and appearance.
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/server/procedural_heightmap.cpp
-   :language: cpp

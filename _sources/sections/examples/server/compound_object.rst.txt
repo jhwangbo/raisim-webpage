@@ -9,22 +9,23 @@ Builds a compound object from many capsule children with random transforms, then
 Screenshot
 ==========
 .. image:: ../../../image/compound_object.png
+   :alt: compound_object example
+   :width: 100%
 
 Binary
 ======
-CMake target and executable name: ``compound_object``.
+Installed executable: ``compound_object``.
 
 Run
 ====
-Build and run from your build directory:
+Run the installed executable:
 
 .. code-block:: bash
 
-   cmake --build . --target compound_object
-   ./compound_object
+   <raisim-install>/bin/compound_object
 
 On Windows, run ``compound_object.exe`` instead.
-This example uses RaisimServer. Start a visualizer client (RaisimUnity, RaisimUnreal, or the rayrai TCP viewer) and connect to port 8080.
+This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.
 
 
 Details
@@ -33,7 +34,3 @@ Details
 - Adds the compound to the world with custom inertia and appearance.
 - Shows how to assemble compound shapes programmatically.
 
-Source
-======
-.. literalinclude:: ../../../../examples/src/server/compound_object.cpp
-   :language: cpp
