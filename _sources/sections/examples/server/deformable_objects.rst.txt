@@ -97,9 +97,10 @@ This example uses RaisimServer. Start the rayrai TCP viewer before running it:
 .. code-block:: bash
 
 
-   /path/to/raisim2Lib/rayrai/bin/rayrai_raisim_tcp_viewer
-   <raisim-install>/bin/deformable_objects
+   cd $HOME/raisim2Lib
+   source ./raisim_env.sh
+   ./build/examples/rayrai_tcp_viewer
+   ./build/examples/deformable_objects
 
 The visualizer receives dynamic deformable topology and vertex updates through
 the server stream.
-

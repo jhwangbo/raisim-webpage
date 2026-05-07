@@ -2,44 +2,68 @@
 Quick Start
 #############################
 
-This page gets an installed RaiSim binary package to a running example. For
-package layout, environment variables, and activation details, see
+This page gets a RaiSim package from build to a running example. For package
+layout, environment variables, install prefixes, and activation details, see
 :doc:`Installation`.
 
 1. Install and activate RaiSim
 ==============================
 
-Install the binary package for your platform and place the activation file at
-the default location:
+Download the RaiSim2 binary package for your platform from
+``https://github.com/raisimTech/raisim2Lib`` and unpack it to
+``$HOME/raisim2Lib`` on Linux/macOS or ``C:\raisim`` on Windows. RaiSim2 is
+distributed as binary libraries with headers, examples, rayrai tools, and
+documentation.
+
+Place the activation file at the default location:
 
 .. code-block:: text
 
     Linux/macOS: $HOME/.raisim/activation.raisim
     Windows:     C:\Users\<YOUR-USERNAME>\.raisim\activation.raisim
 
-The examples and rayrai tools are distributed as binaries. The commands below
-use ``<raisim-install>/bin`` for the directory containing those executables.
+2. Build examples and raisimPy
+==============================
 
-2. Run a server-based example
-=============================
-
-Start the rayrai TCP viewer in one terminal:
+From the ``raisim2Lib`` root, source the environment and build examples plus the
+Python wrapper:
 
 .. code-block:: bash
 
-    <raisim-install>/bin/rayrai_raisim_tcp_viewer
+    cd $HOME/raisim2Lib
+    source ./raisim_env.sh
+    cmake -S . -B build \
+      -DRAISIM_EXAMPLE=ON \
+      -DRAISIM_PY=ON
+    cmake --build build -j
+
+``RAISIM_EXAMPLE`` is enabled by default. ``RAISIM_PY`` is disabled by default,
+so pass ``-DRAISIM_PY=ON`` when you want ``raisimPy``.
+
+3. Run a server-based example
+=============================
+
+Source the environment in every terminal that runs an example or tool. Start
+the rayrai TCP viewer in one terminal:
+
+.. code-block:: bash
+
+    cd $HOME/raisim2Lib
+    source ./raisim_env.sh
+    ./build/examples/rayrai_tcp_viewer
 
 Run a RaiSim example in another terminal:
 
 .. code-block:: bash
 
-    <raisim-install>/bin/example_anymal_contacts
+    cd $HOME/raisim2Lib
+    source ./raisim_env.sh
+    ./build/examples/primitive_grid
 
-``example_anymal_contacts`` and ``example_atlas_contacts`` create a
-``raisim::RaisimServer`` scene. The viewer connects to the default port
-``8080`` unless the application changes it.
+Server examples create a ``raisim::RaisimServer`` scene. The viewer connects to
+the default port ``8080`` unless the application changes it.
 
-3. Run an in-process rayrai example
+4. Run an in-process rayrai example
 ===================================
 
 Rayrai examples create their own window or offscreen OpenGL context and do not
@@ -47,16 +71,19 @@ need the TCP viewer:
 
 .. code-block:: bash
 
-    <raisim-install>/bin/example_rayrai_pbr_asset_inspector
-    <raisim-install>/bin/example_polyhaven_blue_wall --fast-load
+    cd $HOME/raisim2Lib
+    source ./raisim_env.sh
+    ./build/examples/rayrai_basic_scene
+    ./build/examples/rayrai_complete_showcase
 
-4. Run a non-visual example
+5. Use raisimPy
 ===========================
 
 .. code-block:: bash
 
-    <raisim-install>/bin/example_model_asset_pipeline
-    <raisim-install>/bin/example_usd_importer
+    cd $HOME/raisim2Lib
+    source ./raisim_env.sh
+    python -c "import raisimpy; print('raisimPy import OK')"
 
 Next steps
 ==========

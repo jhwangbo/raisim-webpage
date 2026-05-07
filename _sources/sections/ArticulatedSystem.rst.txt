@@ -415,9 +415,8 @@ Note that the inverse dynamics pipeline will slow down the simulation by about 1
 After a simulation loop, you can call ``raisim::ArticulatedSystem::getForceAtJointInWorldFrame()`` and ``raisim::ArticulatedSystem::getTorqueAtJointInWorldFrame()`` to get forces and torques acting at the specified joint.
 
 Assuming that there are no joint position/velocity limit forces acting at the joint, you can compute the joint actuation as a dot product of the joint axis and the joint torque.
-The current articulated examples, ``example_anymal_contacts`` and
-``example_atlas_contacts``, show the current source layout for loading and
-stepping articulated systems.
+The current articulated examples, such as ``anymal_pair`` and ``atlas``, show
+the current source layout for loading and stepping articulated systems.
 
 PD Controller
 =============================

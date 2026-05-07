@@ -47,9 +47,10 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Quick Start</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#install-and-activate-raisim">1. Install and activate RaiSim</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#run-a-server-based-example">2. Run a server-based example</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#run-an-in-process-rayrai-example">3. Run an in-process rayrai example</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#run-a-non-visual-example">4. Run a non-visual example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#build-examples-and-raisimpy">2. Build examples and raisimPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-a-server-based-example">3. Run a server-based example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-an-in-process-rayrai-example">4. Run an in-process rayrai example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#use-raisimpy">5. Use raisimPy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#next-steps">Next steps</a></li>
 </ul>
 </li>
@@ -115,47 +116,71 @@
              
   <section id="quick-start">
 <h1>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h1>
-<p>This page gets an installed RaiSim binary package to a running example. For
-package layout, environment variables, and activation details, see
+<p>This page gets a RaiSim package from build to a running example. For package
+layout, environment variables, install prefixes, and activation details, see
 <a class="reference internal" href="Installation.html"><span class="doc">Installation</span></a>.</p>
 <section id="install-and-activate-raisim">
 <h2>1. Install and activate RaiSim<a class="headerlink" href="#install-and-activate-raisim" title="Link to this heading"></a></h2>
-<p>Install the binary package for your platform and place the activation file at
-the default location:</p>
+<p>Download the RaiSim2 binary package for your platform from
+<code class="docutils literal notranslate"><span class="pre">https://github.com/raisimTech/raisim2Lib</span></code> and unpack it to
+<code class="docutils literal notranslate"><span class="pre">$HOME/raisim2Lib</span></code> on Linux/macOS or <code class="docutils literal notranslate"><span class="pre">C:\raisim</span></code> on Windows. RaiSim2 is
+distributed as binary libraries with headers, examples, rayrai tools, and
+documentation.</p>
+<p>Place the activation file at the default location:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Linux/macOS: $HOME/.raisim/activation.raisim
 Windows:     C:\Users\&lt;YOUR-USERNAME&gt;\.raisim\activation.raisim
 </pre></div>
 </div>
-<p>The examples and rayrai tools are distributed as binaries. The commands below
-use <code class="docutils literal notranslate"><span class="pre">&lt;raisim-install&gt;/bin</span></code> for the directory containing those executables.</p>
+</section>
+<section id="build-examples-and-raisimpy">
+<h2>2. Build examples and raisimPy<a class="headerlink" href="#build-examples-and-raisimpy" title="Link to this heading"></a></h2>
+<p>From the <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> root, source the environment and build examples plus the
+Python wrapper:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="nv">$HOME</span>/raisim2Lib
+<span class="nb">source</span><span class="w"> </span>./raisim_env.sh
+cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-DRAISIM_EXAMPLE<span class="o">=</span>ON<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-DRAISIM_PY<span class="o">=</span>ON
+cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>-j
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">RAISIM_EXAMPLE</span></code> is enabled by default. <code class="docutils literal notranslate"><span class="pre">RAISIM_PY</span></code> is disabled by default,
+so pass <code class="docutils literal notranslate"><span class="pre">-DRAISIM_PY=ON</span></code> when you want <code class="docutils literal notranslate"><span class="pre">raisimPy</span></code>.</p>
 </section>
 <section id="run-a-server-based-example">
-<h2>2. Run a server-based example<a class="headerlink" href="#run-a-server-based-example" title="Link to this heading"></a></h2>
-<p>Start the rayrai TCP viewer in one terminal:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/rayrai_raisim_tcp_viewer
+<h2>3. Run a server-based example<a class="headerlink" href="#run-a-server-based-example" title="Link to this heading"></a></h2>
+<p>Source the environment in every terminal that runs an example or tool. Start
+the rayrai TCP viewer in one terminal:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="nv">$HOME</span>/raisim2Lib
+<span class="nb">source</span><span class="w"> </span>./raisim_env.sh
+./build/examples/rayrai_tcp_viewer
 </pre></div>
 </div>
 <p>Run a RaiSim example in another terminal:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/example_anymal_contacts
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="nv">$HOME</span>/raisim2Lib
+<span class="nb">source</span><span class="w"> </span>./raisim_env.sh
+./build/examples/primitive_grid
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">example_anymal_contacts</span></code> and <code class="docutils literal notranslate"><span class="pre">example_atlas_contacts</span></code> create a
-<code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code> scene. The viewer connects to the default port
-<code class="docutils literal notranslate"><span class="pre">8080</span></code> unless the application changes it.</p>
+<p>Server examples create a <code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code> scene. The viewer connects to
+the default port <code class="docutils literal notranslate"><span class="pre">8080</span></code> unless the application changes it.</p>
 </section>
 <section id="run-an-in-process-rayrai-example">
-<h2>3. Run an in-process rayrai example<a class="headerlink" href="#run-an-in-process-rayrai-example" title="Link to this heading"></a></h2>
+<h2>4. Run an in-process rayrai example<a class="headerlink" href="#run-an-in-process-rayrai-example" title="Link to this heading"></a></h2>
 <p>Rayrai examples create their own window or offscreen OpenGL context and do not
 need the TCP viewer:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/example_rayrai_pbr_asset_inspector
-&lt;raisim-install&gt;/bin/example_polyhaven_blue_wall<span class="w"> </span>--fast-load
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="nv">$HOME</span>/raisim2Lib
+<span class="nb">source</span><span class="w"> </span>./raisim_env.sh
+./build/examples/rayrai_basic_scene
+./build/examples/rayrai_complete_showcase
 </pre></div>
 </div>
 </section>
-<section id="run-a-non-visual-example">
-<h2>4. Run a non-visual example<a class="headerlink" href="#run-a-non-visual-example" title="Link to this heading"></a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/example_model_asset_pipeline
-&lt;raisim-install&gt;/bin/example_usd_importer
+<section id="use-raisimpy">
+<h2>5. Use raisimPy<a class="headerlink" href="#use-raisimpy" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="nv">$HOME</span>/raisim2Lib
+<span class="nb">source</span><span class="w"> </span>./raisim_env.sh
+python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import raisimpy; print(&#39;raisimPy import OK&#39;)&quot;</span>
 </pre></div>
 </div>
 </section>

@@ -17,7 +17,7 @@ Run:
 
    <raisim-install>/bin/mjcf_gymnasium_humanoid
 
-Start ``rayrai_raisim_tcp_viewer`` in another terminal to visualize the server
+Start ``rayrai_tcp_viewer`` in another terminal to visualize the server
 scene.
 
 What it demonstrates:

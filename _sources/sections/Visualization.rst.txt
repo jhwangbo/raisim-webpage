@@ -15,7 +15,7 @@ where rendering should happen.
    * - ``RaisimServer`` + TCP viewer
      - Your simulation should publish world state and a separate viewer should
        display it.
-     - ``raisim::RaisimServer`` and ``rayrai_raisim_tcp_viewer``
+     - ``raisim::RaisimServer`` and ``rayrai_tcp_viewer``
    * - In-process rayrai
      - Your application needs direct access to OpenGL textures, RGB/depth
        images, screenshots, PBR assets, or custom UI embedding.
@@ -40,17 +40,19 @@ of the simulation process. Your application owns the world and starts a
       server.integrateWorldThreadSafe();
     }
 
-Start the viewer from the same source build:
+Start the viewer from the same source build in one sourced terminal:
 
 .. code-block:: bash
 
-    <raisim-install>/bin/rayrai_raisim_tcp_viewer
+    source ./raisim_env.sh
+    ./build/examples/rayrai_tcp_viewer
 
-Then run a server-based example:
+Then run a server-based example in another sourced terminal:
 
 .. code-block:: bash
 
-    <raisim-install>/bin/example_anymal_contacts
+    source ./raisim_env.sh
+    ./build/examples/primitive_grid
 
 The viewer connects to port ``8080`` by default. Use this workflow for normal
 debug visualization, object inspection, and interactive camera control.
@@ -82,12 +84,13 @@ Examples:
 
 .. code-block:: bash
 
-    <raisim-install>/bin/example_rayrai_pbr_asset_inspector
-    <raisim-install>/bin/example_polyhaven_blue_wall --screenshot /tmp/blue_wall.png
-    <raisim-install>/bin/example_rayrai_usd_importer
+    source ./raisim_env.sh
+    ./build/examples/rayrai_basic_scene
+    ./build/examples/rayrai_pbr_material_grid
+    ./build/examples/rayrai_pbr_texture_maps
 
 Use this workflow for screenshots, offscreen rendering, dataset generation,
-custom ImGui/Qt tools, PBR visual inspection, glTF/USD visual import, picking,
+custom ImGui/Qt tools, PBR visual inspection, glTF visual import, picking,
 and direct RGB/depth readback.
 
 Which Page Next?

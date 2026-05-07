@@ -28,24 +28,23 @@ Dependencies
 rayrai depends on SDL2, OpenGL, glbinding, glm, assimp, stb, and imgui. The installed
 package in ``rayrai/<OS>`` ships the headers and CMake config for these dependencies.
 
-Included binary (recommended)
-=============================
-For most users, the easiest way to use rayrai is the included TCP viewer binary.
-It lives at ``rayrai/<OS>/bin/rayrai_raisim_tcp_viewer`` (Linux packages ship it;
-other platforms may need to build it) and works with RaisimServer-based
-simulations. Run the binary while your simulation is running, and it will connect
-to the server to display the scene.
-
-You can start it directly from the repo:
+TCP Viewer
+==========
+For most users, the easiest way to use rayrai with ``RaisimServer`` examples is
+the TCP viewer. Build it with the rest of the examples, source the environment,
+and run it from the build tree:
 
 .. code-block:: bash
 
-    ./rayrai/<OS>/bin/rayrai_raisim_tcp_viewer
+    source ./raisim_env.sh
+    cmake -S . -B build -DRAISIM_EXAMPLE=ON
+    cmake --build build --target rayrai_tcp_viewer -j
+    ./build/examples/rayrai_tcp_viewer
 
 Run it with ``--help`` to see available options. On Windows, use the ``.exe``
-binary.
-If you are running a RaisimServer-based example, start the example first so the
-server is listening (by default on port 8080), then launch the viewer to connect.
+binary. If you installed the build, run the copy from the configured install
+prefix's ``bin`` directory. Source ``raisim_env.sh`` before running the viewer
+or server example so both RaiSim and rayrai shared libraries are visible.
 
 The TCP viewer overlay has two compact panels: the left ``Raisim TCP`` control/object
 panel and the right selected-object details panel. Both panels have a small ``-``/``+``
@@ -248,10 +247,9 @@ The typical setup is:
 
 Use HDR environments with visible features when inspecting reflective materials. A
 featureless sky or uniform studio HDR can make it hard to tell whether reflections are
-working. ``example_rayrai_pbr_asset_inspector`` and
-``example_polyhaven_blue_wall`` use HDR/image-based lighting so metallic and
-glossy surfaces show visible reflections while non-metallic assets remain
-mostly diffuse.
+working. ``rayrai_pbr_material_grid`` and ``rayrai_pbr_texture_maps`` use
+image-based lighting and PBR texture maps so metallic and glossy surfaces show
+visible reflections while non-metallic assets remain mostly diffuse.
 
 For scene-wide reflections, rayrai also has static reflection probe capture and planar
 ground reflection support. These are real-time approximation tools: they improve visual
@@ -318,12 +316,9 @@ data generation, and asset inspection; it is not an offline path tracer.
 
 The shipped PBR examples and tools are:
 
-* ``example_rayrai_pbr_asset_inspector``: interactive 8-asset Khronos glTF
-  Sample Assets inspector with base-color, normal, emissive,
-  metallic-roughness, roughness-only, occlusion, and HDR reflection coverage.
-  The sample assets are CC0 and free for commercial use.
-* ``example_polyhaven_blue_wall``: imported Poly Haven glTF scene with PBR
-  materials, HDR lighting, additional lights, and quality controls.
+* ``rayrai_pbr_material_grid``: Khronos glTF material-grid asset inspection.
+* ``rayrai_pbr_texture_maps``: base-color, normal, metallic-roughness,
+  occlusion, and emissive texture-map coverage.
 * ``KHR_lights_punctual`` from the glTF/GLB file for directional, point, and spot lights.
 * ``*.rayrai_lights.json`` for Blender area lights with size, direction, color, and energy.
 
@@ -388,15 +383,14 @@ Rayrai examples are documented in :doc:`Examples <Examples>`. Each example page 
 
 Quick map to the current rayrai-related targets:
 
-* ``example_rayrai_pbr_asset_inspector``: interactive glTF PBR sample-asset
-  inspector with HDR environment lighting, SSAO, bloom, and screenshot output.
-* ``example_polyhaven_blue_wall``: Poly Haven glTF scene import with imported
-  lights, HDR IBL, optional reflection probes, and screenshots.
-* ``example_rayrai_usd_importer``: OpenUSD visual mesh loading in an offscreen
-  rayrai context.
+* ``rayrai_basic_scene``: minimal in-process rayrai rendering.
+* ``rayrai_complete_showcase``: broad rayrai feature overview with sensors and
+  visuals.
+* ``rayrai_pbr_material_grid``: glTF material-grid inspection.
+* ``rayrai_pbr_texture_maps``: PBR texture-map import and inspection.
 * ``rayrai_coacd_mesh_approximation``: visual comparison of original meshes and CoACD convex parts generated through
   ``World::addMesh``.
-* ``rayrai_raisim_tcp_viewer``: TCP viewer for ``raisim::RaisimServer`` scenes.
+* ``rayrai_tcp_viewer``: TCP viewer for ``raisim::RaisimServer`` scenes.
 
 ImGui integration (SDL2 + OpenGL)
 =================================

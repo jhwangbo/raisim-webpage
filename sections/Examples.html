@@ -19,7 +19,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="rayrai_raisim_tcp_viewer" href="examples/current/rayrai_raisim_tcp_viewer.html" />
+    <link rel="next" title="Rayrai Example: TCP Viewer" href="examples/rayrai/rayrai_tcp_viewer.html" />
     <link rel="prev" title="Visualization" href="Visualization.html" /> 
 </head>
 
@@ -50,6 +50,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Visualization.html">Visualization</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#build">Build</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#run">Run</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#visualization-modes">Visualization modes</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#raisimserver-examples">RaisimServer examples</a></li>
@@ -61,7 +62,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#choosing-an-example">Choosing an example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#optional-targets">Optional targets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#rayrai-tools">Rayrai Tools</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="examples/current/rayrai_raisim_tcp_viewer.html">rayrai_raisim_tcp_viewer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/rayrai/rayrai_tcp_viewer.html">Rayrai Example: TCP Viewer</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#server-examples">Server Examples</a><ul>
@@ -192,36 +193,48 @@
 <h1>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
-<p>The RaiSim binary distribution ships runnable C++ examples and rayrai tools.
-Use the <code class="docutils literal notranslate"><span class="pre">example_*</span></code> executables to exercise RaiSim physics APIs, mesh
-import/export, OpenUSD mesh loading, and PBR rayrai asset inspection. Use
-<code class="docutils literal notranslate"><span class="pre">rayrai_raisim_tcp_viewer</span></code> to inspect applications that publish a
+<p>The RaiSim source package builds runnable C++ examples and rayrai tools. Use
+server examples such as <code class="docutils literal notranslate"><span class="pre">primitive_grid</span></code> to exercise RaiSim physics APIs and
+<code class="docutils literal notranslate"><span class="pre">rayrai_*</span></code> examples for in-process rendering, sensors, PBR assets, and rayrai
+tools. Use <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> to inspect applications that publish a
 <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> through <code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code>. RaisimUnity and
 RaisimUnreal are no longer supported.</p>
 <a class="reference internal image-reference" href="../_images/examples_overview.png"><img alt="Overview of RaiSim and rayrai examples" src="../_images/examples_overview.png" style="width: 100%;" />
 </a>
 </section>
-<section id="run">
-<h2>Run<a class="headerlink" href="#run" title="Link to this heading"></a></h2>
-<p>Run examples from the installed package <code class="docutils literal notranslate"><span class="pre">bin</span></code> directory:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/example_anymal_contacts
-&lt;raisim-install&gt;/bin/example_rayrai_pbr_asset_inspector
+<section id="build">
+<h2>Build<a class="headerlink" href="#build" title="Link to this heading"></a></h2>
+<p>Build examples from the <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> root. Source the environment first so
+both RaiSim and rayrai shared libraries are visible:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>./raisim_env.sh
+cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-DRAISIM_EXAMPLE<span class="o">=</span>ON<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-DRAISIM_PY<span class="o">=</span>ON
+cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>-j
 </pre></div>
 </div>
-<p>On Windows, use the <code class="docutils literal notranslate"><span class="pre">.exe</span></code> executable from the installed package <code class="docutils literal notranslate"><span class="pre">bin</span></code>
-directory:</p>
-<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="n">C</span><span class="p">:\</span><span class="n">path</span><span class="p">\</span><span class="n">to</span><span class="p">\</span><span class="n">raisim</span><span class="p">\</span><span class="n">bin</span><span class="p">\</span><span class="n">example_anymal_contacts</span><span class="p">.</span><span class="n">exe</span>
+<p><code class="docutils literal notranslate"><span class="pre">RAISIM_EXAMPLE</span></code> is enabled by default. <code class="docutils literal notranslate"><span class="pre">RAISIM_PY</span></code> is disabled by default,
+so enable it when you want <code class="docutils literal notranslate"><span class="pre">raisimPy</span></code>.</p>
+</section>
+<section id="run">
+<h2>Run<a class="headerlink" href="#run" title="Link to this heading"></a></h2>
+<p>Run examples from the build tree:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>./raisim_env.sh
+./build/examples/primitive_grid
+./build/examples/rayrai_basic_scene
+</pre></div>
+</div>
+<p>On Windows, use the <code class="docutils literal notranslate"><span class="pre">.exe</span></code> executable from the build tree:</p>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="p">.\</span><span class="n">build</span><span class="p">\</span><span class="n">examples</span><span class="p">\</span><span class="n">Release</span><span class="p">\</span><span class="n">primitive_grid</span><span class="p">.</span><span class="n">exe</span>
 </pre></div>
 </div>
 <p>If the runtime loader cannot find shared libraries, use the platform-specific
 environment setup before running examples:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>/path/to/raisim2Lib/raisim_env.sh
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="nv">$HOME</span>/raisim2Lib
+<span class="nb">source</span><span class="w"> </span>./raisim_env.sh
 </pre></div>
 </div>
 <p>This script sets <code class="docutils literal notranslate"><span class="pre">LD_LIBRARY_PATH</span></code> on Linux and <code class="docutils literal notranslate"><span class="pre">DYLD_LIBRARY_PATH</span></code> on macOS.</p>
-<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="p">.\</span><span class="n">raisim_env</span><span class="p">.</span><span class="n">ps1</span>
-</pre></div>
-</div>
 <div class="highlight-batch notranslate"><div class="highlight"><pre><span></span>raisim_env.bat
 </pre></div>
 </div>
@@ -232,14 +245,17 @@ environment setup before running examples:</p>
 full workflow comparison.</p>
 <section id="raisimserver-examples">
 <h3>RaisimServer examples<a class="headerlink" href="#raisimserver-examples" title="Link to this heading"></a></h3>
-<p><code class="docutils literal notranslate"><span class="pre">example_anymal_contacts</span></code> and <code class="docutils literal notranslate"><span class="pre">example_atlas_contacts</span></code> create a RaiSim world
+<p>Server examples such as <code class="docutils literal notranslate"><span class="pre">primitive_grid</span></code> and <code class="docutils literal notranslate"><span class="pre">atlas</span></code> create a RaiSim world
 and publish it through <code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code>. They do not open a renderer
-window themselves. Start the rayrai TCP viewer, then run the example:</p>
+window themselves. Start the rayrai TCP viewer in one sourced terminal, then run
+the example in another sourced terminal:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Terminal 1</span>
-&lt;raisim-install&gt;/bin/rayrai_raisim_tcp_viewer
+<span class="nb">source</span><span class="w"> </span>./raisim_env.sh
+./build/examples/rayrai_tcp_viewer
 
 <span class="c1"># Terminal 2</span>
-&lt;raisim-install&gt;/bin/example_anymal_contacts
+<span class="nb">source</span><span class="w"> </span>./raisim_env.sh
+./build/examples/primitive_grid
 </pre></div>
 </div>
 <p>The default server port is <code class="docutils literal notranslate"><span class="pre">8080</span></code> unless the example changes it. Use this
@@ -248,27 +264,28 @@ RaisimServer application publishes.</p>
 </section>
 <section id="rayrai-examples">
 <h3>Rayrai examples<a class="headerlink" href="#rayrai-examples" title="Link to this heading"></a></h3>
-<p>Examples such as <code class="docutils literal notranslate"><span class="pre">example_polyhaven_blue_wall</span></code>,
-<code class="docutils literal notranslate"><span class="pre">example_rayrai_pbr_asset_inspector</span></code>, and <code class="docutils literal notranslate"><span class="pre">example_rayrai_usd_importer</span></code>
-create or use a <code class="docutils literal notranslate"><span class="pre">raisin::RayraiWindow</span></code> directly and render in process. They
-do not need the TCP viewer:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/example_rayrai_pbr_asset_inspector
+<p>Examples such as <code class="docutils literal notranslate"><span class="pre">rayrai_basic_scene</span></code>, <code class="docutils literal notranslate"><span class="pre">rayrai_complete_showcase</span></code>,
+<code class="docutils literal notranslate"><span class="pre">rayrai_pbr_material_grid</span></code>, and <code class="docutils literal notranslate"><span class="pre">rayrai_pbr_texture_maps</span></code> create or use a
+<code class="docutils literal notranslate"><span class="pre">raisin::RayraiWindow</span></code> directly and render in process. They do not need the
+TCP viewer:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>./raisim_env.sh
+./build/examples/rayrai_basic_scene
 </pre></div>
 </div>
 <p>Prefer these examples when you need camera images, GPU/offscreen rendering, PBR
-materials, USD/glTF visual import, or standalone rayrai feature inspection.</p>
+materials, glTF visual import, or standalone rayrai feature inspection.</p>
 </section>
 <section id="non-visual-examples">
 <h3>Non-visual examples<a class="headerlink" href="#non-visual-examples" title="Link to this heading"></a></h3>
 <p>Some examples are intended to print output or create files rather than show a
-window. <code class="docutils literal notranslate"><span class="pre">example_model_asset_pipeline</span></code> writes preprocessed and exported OBJ
-files to <code class="docutils literal notranslate"><span class="pre">/tmp/raisim_model_asset_pipeline_example</span></code>. <code class="docutils literal notranslate"><span class="pre">example_usd_importer</span></code>
-loads OpenUSD mesh assets into a <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> and prints mesh counts.</p>
+window. <code class="docutils literal notranslate"><span class="pre">object_lifecycle_stress</span></code> runs headless, and
+<code class="docutils literal notranslate"><span class="pre">model_asset_pipeline</span></code> writes preprocessed and exported mesh assets when the
+installed RaiSim package exposes the asset-pipeline APIs.</p>
 </section>
 </section>
 <section id="example-layout">
 <h2>Example layout<a class="headerlink" href="#example-layout" title="Link to this heading"></a></h2>
-<p>The installed package groups examples by executable behavior:</p>
+<p>The build groups examples by executable behavior:</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 32.0%" />
@@ -280,16 +297,15 @@ loads OpenUSD mesh assets into a <code class="docutils literal notranslate"><spa
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">example_*</span></code></p></td>
-<td><p>Installed examples for RaiSim physics, mesh import/export, OpenUSD mesh
-loading, and rayrai asset inspection.</p></td>
+<tr class="row-even"><td><p>Server examples</p></td>
+<td><p>Examples that publish a world through <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> and are viewed
+with <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">rayrai_*</span></code></p></td>
 <td><p>rayrai tools and standalone renderer examples.</p></td>
 </tr>
-<tr class="row-even"><td><p>Server examples</p></td>
-<td><p>Examples that publish a world through <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> and are viewed
-with <code class="docutils literal notranslate"><span class="pre">rayrai_raisim_tcp_viewer</span></code>.</p></td>
+<tr class="row-even"><td><p>Benchmarks</p></td>
+<td><p>Timing-oriented examples such as <code class="docutils literal notranslate"><span class="pre">anymal_standing_benchmark</span></code>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -308,40 +324,33 @@ with <code class="docutils literal notranslate"><span class="pre">rayrai_raisim_
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">example_anymal_contacts</span></code></p></td>
-<td><p>ANYmal standing on ground with PD gains and RaisimServer publishing.</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primitive_grid</span></code></p></td>
+<td><p>Basic server-side simulation and visualization.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">example_atlas_contacts</span></code></p></td>
-<td><p>Atlas contact simulation with a small timestep and RaisimServer
-publishing.</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">atlas</span></code></p></td>
+<td><p>Atlas contact simulation with RaisimServer publishing.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">example_model_asset_pipeline</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">model_asset_pipeline</span></code></p></td>
 <td><p>Mesh preprocessing, content-hash cache reuse, <code class="docutils literal notranslate"><span class="pre">addMesh</span></code> with processed
 assets, and OBJ export from a world.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">example_usd_importer</span></code></p></td>
-<td><p>Loading OpenUSD mesh assets into <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> through
-<code class="docutils literal notranslate"><span class="pre">World::addMesh</span></code>.</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">rayrai_basic_scene</span></code></p></td>
+<td><p>Minimal in-process rayrai rendering.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">example_rayrai_usd_importer</span></code></p></td>
-<td><p>Loading the same OpenUSD assets as rayrai visual meshes.</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rayrai_complete_showcase</span></code></p></td>
+<td><p>Broad rayrai feature overview with sensors and visuals.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">example_polyhaven_blue_wall</span></code></p></td>
-<td><p>Importing a Poly Haven glTF scene with HDR IBL, imported lights,
-reflection probes, and screenshot command-line options.</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">rayrai_pbr_material_grid</span></code></p></td>
+<td><p>Inspecting bundled glTF PBR sample assets under rayrai lighting.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">example_rayrai_pbr_asset_inspector</span></code></p></td>
-<td><p>Inspecting bundled glTF PBR sample assets under rayrai quality settings.</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rayrai_pbr_texture_maps</span></code></p></td>
+<td><p>PBR texture-map import and material inspection.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">rayrai_coacd_mesh_approximation</span></code></p></td>
 <td><p>Visually comparing original meshes and convexified collision modes
 generated through <code class="docutils literal notranslate"><span class="pre">World::addMesh</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rayrai_feature_showcase</span></code></p></td>
-<td><p>Offscreen image generation for rayrai features, including full scene,
-depth of field, depth plane, deformables, PBR maps, and HDR IBL.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">rayrai_raisim_tcp_viewer</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code></p></td>
 <td><p>The TCP visualizer used by RaisimServer examples.</p></td>
 </tr>
 </tbody>
@@ -351,13 +360,11 @@ depth of field, depth plane, deformables, PBR maps, and HDR IBL.</p></td>
 <h2>Optional targets<a class="headerlink" href="#optional-targets" title="Link to this heading"></a></h2>
 <p>Some targets depend on optional assets or platform packages:</p>
 <ul class="simple">
-<li><p>OpenUSD examples require the package’s OpenUSD runtime and bundled USD files.</p></li>
 <li><p>Rayrai examples require SDL2/OpenGL and rayrai runtime libraries.</p></li>
-<li><p>Poly Haven and PBR asset examples require the corresponding assets under
-<code class="docutils literal notranslate"><span class="pre">rsc</span></code>.</p></li>
+<li><p>PBR asset examples require the corresponding assets under <code class="docutils literal notranslate"><span class="pre">rsc</span></code>.</p></li>
 </ul>
-<p>List available examples by inspecting the installed package <code class="docutils literal notranslate"><span class="pre">bin</span></code> directory:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ls<span class="w"> </span>&lt;raisim-install&gt;/bin
+<p>List available examples by inspecting the build tree:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ls<span class="w"> </span>build/examples
 </pre></div>
 </div>
 </section>
@@ -365,7 +372,7 @@ depth of field, depth plane, deformables, PBR maps, and HDR IBL.</p></td>
 <h2>Rayrai Tools<a class="headerlink" href="#rayrai-tools" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="examples/current/rayrai_raisim_tcp_viewer.html">rayrai_raisim_tcp_viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/rayrai/rayrai_tcp_viewer.html">Rayrai Example: TCP Viewer</a></li>
 </ul>
 </div>
 </section>
@@ -453,7 +460,7 @@ depth of field, depth plane, deformables, PBR maps, and HDR IBL.</p></td>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="Visualization.html" class="btn btn-neutral float-left" title="Visualization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="examples/current/rayrai_raisim_tcp_viewer.html" class="btn btn-neutral float-right" title="rayrai_raisim_tcp_viewer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="examples/rayrai/rayrai_tcp_viewer.html" class="btn btn-neutral float-right" title="Rayrai Example: TCP Viewer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
