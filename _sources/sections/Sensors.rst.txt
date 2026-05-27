@@ -399,21 +399,27 @@ pose and intrinsics while producing renderer-backed color and depth buffers.
 Use the CPU camera capture API only when rayrai is unavailable or when a
 CPU-only deterministic ray-query result is specifically required.
 
-Runnable examples:
+Current runnable coverage:
 
 * :doc:`Rayrai RGB camera <examples/rayrai/rayrai_rgb_camera>` uses the Go1
   ``d455_front/color`` RGB sensor and renders it through ``raisin::Camera``.
-  Source: ``examples/src/rayrai/sensors/rayrai_rgb_camera.cpp``.
 * :doc:`Rayrai depth camera <examples/rayrai/rayrai_depth_camera>` uses the Go1
   ``d455_front/depth`` depth sensor, renders the linear depth plane, and reads
-  a ``float`` depth buffer back to the CPU. Source:
-  ``examples/src/rayrai/sensors/rayrai_depth_camera.cpp``.
+  a ``float`` depth buffer back to the CPU.
 * :doc:`Rayrai LiDAR point cloud <examples/rayrai/rayrai_lidar_pointcloud>`
   shows a robot-mounted ``SpinningLidar`` and visualizes its scan as a rayrai
-  point cloud. Source: ``examples/src/rayrai/sensors/rayrai_lidar_pointcloud.cpp``.
-* ``examples/src/rayrai/getting_started/rayrai_complete_showcase.cpp`` combines
-  RGB, depth, LiDAR, camera frustums, and raw RGB/depth buffer previews in one
-  scene.
+  point cloud.
+* :doc:`Rayrai ArUco marker <examples/rayrai/rayrai_aruco_marker>` covers
+  marker rendering and camera-facing visual output.
+* :doc:`rayrai_feature_showcase <examples/rayrai/rayrai_feature_showcase>`
+  renders external-camera color outputs, linear depth outputs, sensor-only
+  passes, fisheye camera output, and diagnostic image files.
+* ``rayrai_benchmark`` covers RGB/depth readback, picking, point clouds,
+  scene synchronization, and related renderer paths under benchmark timing.
+* ``rayrai_complete_showcase_benchmark`` times the complete Anymal RGB/depth and
+  LiDAR showcase path, including optional readback and visualization startup.
+* Low-level regression coverage lives under ``visualizer/rayrai/tests``,
+  including fisheye camera, render diagnostics, and visual-frame-cache tests.
 
 A typical RGB/depth setup has four parts: load a URDF with sensors, switch the
 camera sensors to manual measurements, create rayrai camera objects from those
@@ -492,10 +498,16 @@ to world coordinates, and display the result in rayrai.
 Examples
 ====================================
 
-* Prefer the rayrai RGB and depth examples above for robot-attached rendered
-  camera buffers.
-* Use ``rayrai_complete_showcase`` when you want one scene that combines sensor
-  rendering, camera frustums, raw buffer readback, and LiDAR visualization.
+* Use the dedicated rayrai RGB, depth, LiDAR, and ArUco examples above for
+  robot-attached rendered sensor buffers.
+* Use ``rayrai_feature_showcase`` for aggregate coverage of rendered camera
+  buffers, linear depth outputs, sensor-only rendering, and diagnostic image
+  generation.
+* Use ``rayrai_benchmark`` when you need timed coverage for readback, picking,
+  point clouds, scene synchronization, and related renderer paths.
+* Use ``rayrai_complete_showcase_benchmark`` when you need one timed scene that
+  combines Anymal RGB/depth sensors, LiDAR visualization, optional readback, and
+  visualization startup profiling.
 * ``World::captureDepthCamera`` supports depth, segmentation, optional hit
   points, and timestamps without a visualizer, but it is the CPU fallback path.
 

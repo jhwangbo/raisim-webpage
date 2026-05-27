@@ -6,14 +6,15 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Raisim Server &mdash; raisim 2.2.0 documentation</title>
+  <title>Raisim Server &mdash; raisim 2.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b0caeef3" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=b21de401"></script>
+      <script src="../_static/documentation_options.js?v=c3c8ae58"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -50,7 +51,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Visualization.html">Visualization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Troubleshooting.html">Troubleshooting</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog: v2.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Support.html">Support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
@@ -69,14 +70,25 @@
 <li class="toctree-l2"><a class="reference internal" href="#thread-safety-and-lifecycle">Thread safety and lifecycle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#sensor-measurements">Sensor measurements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#synchronous-updates-optional">Synchronous updates (optional)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#protocol-versioning-and-deformable-streaming">Protocol versioning and deformable streaming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interactive-sim-control">Interactive sim control</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#custom-mutation-under-the-world-mutex">Custom mutation under the world mutex</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#default-bind-address">Default bind address</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#raisimserver-api">RaisimServer API</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6raisim12RaisimServerE"><code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim12RaisimServer12RaisimServerEP5World"><code class="docutils literal notranslate"><span class="pre">RaisimServer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim12RaisimServer19setBindLoopbackOnlyEb"><code class="docutils literal notranslate"><span class="pre">setBindLoopbackOnly()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisim12RaisimServer7getPortEv"><code class="docutils literal notranslate"><span class="pre">getPort()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim12RaisimServer15pauseSimulationEv"><code class="docutils literal notranslate"><span class="pre">pauseSimulation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim12RaisimServer14stepSimulationEi"><code class="docutils literal notranslate"><span class="pre">stepSimulation()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim12RaisimServer11setupSocketEi"><code class="docutils literal notranslate"><span class="pre">setupSocket()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim12RaisimServer16acceptConnectionEi"><code class="docutils literal notranslate"><span class="pre">acceptConnection()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisim12RaisimServer15closeConnectionEv"><code class="docutils literal notranslate"><span class="pre">closeConnection()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim12RaisimServer12launchServerEi"><code class="docutils literal notranslate"><span class="pre">launchServer()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim12RaisimServer24integrateWorldThreadSafeEv"><code class="docutils literal notranslate"><span class="pre">integrateWorldThreadSafe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0EN6raisim12RaisimServer24integrateWorldThreadSafeEvRR10BeforeStep"><code class="docutils literal notranslate"><span class="pre">integrateWorldThreadSafe()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim12RaisimServer21applyInteractionForceEv"><code class="docutils literal notranslate"><span class="pre">applyInteractionForce()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim12RaisimServer9hibernateEv"><code class="docutils literal notranslate"><span class="pre">hibernate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim12RaisimServer6wakeupEv"><code class="docutils literal notranslate"><span class="pre">wakeup()</span></code></a></li>
@@ -192,6 +204,8 @@
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimEngine2.html">RaiSim Engine 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
@@ -224,7 +238,7 @@
   <section id="raisim-server">
 <h1>Raisim Server<a class="headerlink" href="#raisim-server" title="Link to this heading"></a></h1>
 <p>RaisimServer serializes <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> and streams the data to clients via TCP/IP.
-Use the rayrai TCP viewer for supported server-side visualization.
+Use <code class="docutils literal notranslate"><span class="pre">rayrai_raisim_tcp_viewer</span></code> for supported server-side visualization.
 For older Unity or Unreal visualization workflows, see <a class="reference internal" href="LegacyIntegrations.html"><span class="doc">Legacy Integrations</span></a>.
 For a workflow-level comparison between server-based visualization and
 in-process rayrai rendering, see <a class="reference internal" href="Visualization.html"><span class="doc">Visualization</span></a>.</p>
@@ -244,9 +258,11 @@ integration helper:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">integrateWorldThreadSafe()</span></code> locks the world mutex, applies any user
-interaction force coming from the visualizer, integrates the world, and
-unlocks the mutex.</p>
+<p><code class="docutils literal notranslate"><span class="pre">integrateWorldThreadSafe()</span></code> locks the world mutex, drains pending
+client requests, decides whether this call is allowed to advance the world
+(pause / step state), applies active client forces only on advancing ticks,
+runs any callback overload, integrates the world when allowed, and unlocks
+the mutex.</p>
 </section>
 <section id="thread-safety-and-lifecycle">
 <h2>Thread safety and lifecycle<a class="headerlink" href="#thread-safety-and-lifecycle" title="Link to this heading"></a></h2>
@@ -274,6 +290,114 @@ in-process renderer writes the sensor buffer.</p>
 clients that explicitly pull world-state updates. It returns <code class="docutils literal notranslate"><span class="pre">false</span></code> if the
 client does not respond or rejects the protocol version.</p>
 </section>
+<section id="protocol-versioning-and-deformable-streaming">
+<h2>Protocol versioning and deformable streaming<a class="headerlink" href="#protocol-versioning-and-deformable-streaming" title="Link to this heading"></a></h2>
+<p>The TCP wire protocol is explicitly versioned. Each request starts with a
+protocol header that advertises the negotiated feature set, and the server
+rejects newer or otherwise unsupported protocol versions with a clear error
+rather than misparsing the stream. The current feature flags are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">PROTOCOL_FEATURE_EXPLICIT_HEADER</span></code>: the client and server exchange the
+explicit version header before each request.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PROTOCOL_FEATURE_DEFORMABLE_DELTA</span></code>: deformable mesh topology is sent only
+during initialization or when the topology changes; normal frames send
+vertex positions only.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PROTOCOL_FEATURE_SIM_CONTROL</span></code>: when both ends advertise this bit, the
+client may pause / resume / step the simulation and push external forces,
+torques, body poses, and articulated-system generalized coordinates over the
+wire. The server applies no authentication — if the connection is open, the
+client can drive it. See <a class="reference internal" href="#interactive-sim-control">Interactive sim control</a> below.</p></li>
+</ul>
+<p>The rayrai TCP viewer negotiates all three flags automatically. Custom clients
+can opt into any flag through the <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> and <code class="docutils literal notranslate"><span class="pre">RaisimTcpCommon</span></code>
+headers.</p>
+</section>
+<section id="interactive-sim-control">
+<span id="id1"></span><h2>Interactive sim control<a class="headerlink" href="#interactive-sim-control" title="Link to this heading"></a></h2>
+<p>When the <code class="docutils literal notranslate"><span class="pre">SIM_CONTROL</span></code> feature is negotiated, a connected client (such as
+<code class="docutils literal notranslate"><span class="pre">rayrai_raisim_tcp_viewer</span></code>) can drive the simulation from its UI rather than
+just observing it. The viewer’s <strong>Control</strong> tab gets a <em>Simulation</em> row with
+icon-text buttons for Pause / Resume / Step / Step 10.</p>
+<p>Client requests added by this feature:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CR_PAUSE</span></code> / <code class="docutils literal notranslate"><span class="pre">CR_RESUME</span></code> — toggle a flag consulted in
+<code class="docutils literal notranslate"><span class="pre">integrateWorldThreadSafe()</span></code>. While paused, <code class="docutils literal notranslate"><span class="pre">world_-&gt;integrate()</span></code> is not
+called even though the network thread keeps streaming state.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CR_STEP_N</span></code> — queue <em>N</em> single-step integrations to advance while paused.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CR_APPLY_FORCE</span></code> — apply an external force at a world-space application
+point on a body. Drained at the next integration tick.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CR_APPLY_TORQUE</span></code> — apply an external torque on a body.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CR_SET_POSE</span></code> — teleport a single-body object to a position + quaternion.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CR_SET_GC</span></code> — set the generalized coordinate of an articulated system.</p></li>
+</ul>
+<p>There is no authentication or capability handshake — if the connection is open,
+the client can issue any of these requests. The bind address is the only
+access control the server provides:</p>
+<p>The same pause / step state is reachable from your own simulation code,
+so a headless server can drive its own loop:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">server</span><span class="p">.</span><span class="n">pauseSimulation</span><span class="p">();</span>
+<span class="c1">// ... do something while the integrator is paused; state streaming keeps running ...</span>
+<span class="n">server</span><span class="p">.</span><span class="n">stepSimulation</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span><span class="w">   </span><span class="c1">// queue 10 single-step integrations</span>
+<span class="c1">// ... or release the brake completely ...</span>
+<span class="n">server</span><span class="p">.</span><span class="n">resumeSimulation</span><span class="p">();</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">isSimulationPaused</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* … */</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Pose and generalized-coordinate requests are applied when the server drains
+client requests under the world mutex. Force and torque requests refresh an
+active client-force slot, held for 0.12 s of simulation time and applied on
+each integration tick until refreshed or expired. While paused, the slot can
+be refreshed but the force is not applied until a step or resume call allows
+<code class="docutils literal notranslate"><span class="pre">integrateWorldThreadSafe()</span></code> to advance. <code class="docutils literal notranslate"><span class="pre">stepSimulation(N)</span></code> queues N
+single-step integrations that drain one per <code class="docutils literal notranslate"><span class="pre">integrateWorldThreadSafe()</span></code>
+call; <code class="docutils literal notranslate"><span class="pre">resumeSimulation()</span></code> clears any queued steps and resumes normal
+integration.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">RaisimServer</span><span class="w"> </span><span class="nf">server</span><span class="p">(</span><span class="o">&amp;</span><span class="n">world</span><span class="p">);</span>
+<span class="n">server</span><span class="p">.</span><span class="n">setBindLoopbackOnly</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span><span class="w">  </span><span class="c1">// expose on all interfaces (off by default)</span>
+<span class="n">server</span><span class="p">.</span><span class="n">launchServer</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>Keep the default (<code class="docutils literal notranslate"><span class="pre">127.0.0.1</span></code>-only) for development. Open the bind to a wider
+network only when you trust every host that can reach the port.</p>
+<section id="custom-mutation-under-the-world-mutex">
+<h3>Custom mutation under the world mutex<a class="headerlink" href="#custom-mutation-under-the-world-mutex" title="Link to this heading"></a></h3>
+<p>Examples that need to spawn / move / modify world objects every tick can pass
+a callback to <code class="docutils literal notranslate"><span class="pre">integrateWorldThreadSafe()</span></code>. The callback runs inside the
+world mutex after pending sim-control requests are drained and active client
+forces are applied for advancing ticks. It runs before <code class="docutils literal notranslate"><span class="pre">world_-&gt;integrate()</span></code>
+when the pause / step state allows the tick to advance:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">server</span><span class="p">.</span><span class="n">integrateWorldThreadSafe</span><span class="p">([</span><span class="o">&amp;</span><span class="p">]()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">600</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">ball</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="w">      </span><span class="n">ball</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">-2</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">);</span>
+<span class="w">      </span><span class="n">ball</span><span class="o">-&gt;</span><span class="n">setVelocity</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">});</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The callback overload preserves all the pause / step / force / pose behavior
+of the no-arg version — the viewer can still drive the simulation even when
+the example mutates the world each tick. See
+<code class="docutils literal notranslate"><span class="pre">examples/src/server/dynamic_object_addition.cpp</span></code> and
+<code class="docutils literal notranslate"><span class="pre">examples/src/server/dynamic_heightmap.cpp</span></code> for working uses, and
+<code class="docutils literal notranslate"><span class="pre">examples/src/server/sim_control_demo.cpp</span></code> for a minimal demo of the
+viewer-facing controls.</p>
+</section>
+</section>
+<section id="default-bind-address">
+<h2>Default bind address<a class="headerlink" href="#default-bind-address" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> binds to <code class="docutils literal notranslate"><span class="pre">127.0.0.1</span></code> by default rather than <code class="docutils literal notranslate"><span class="pre">INADDR_ANY</span></code>.
+This prevents accidental exposure to a shared LAN. Opt back into external
+visibility with:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">server</span><span class="p">.</span><span class="n">setBindLoopbackOnly</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Treat this as a security boundary — once the server is reachable from a wider
+network, every client on that network can pause / step / force-apply /
+spawn-remove. There is no token or capability handshake to fall back on.</p>
+</section>
 <section id="raisimserver-api">
 <h2>RaisimServer API<a class="headerlink" href="#raisimserver-api" title="Link to this heading"></a></h2>
 <dl class="cpp class">
@@ -289,6 +413,30 @@ client does not respond or rejects the protocol version.</p>
 <dd class="field-odd"><p><strong>world</strong> – <strong>[in]</strong> the world to visualize. create a raisimSever for a world. </p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim12RaisimServer19setBindLoopbackOnlyEb">
+<span id="_CPPv3N6raisim12RaisimServer19setBindLoopbackOnlyEb"></span><span id="_CPPv2N6raisim12RaisimServer19setBindLoopbackOnlyEb"></span><span id="raisim::RaisimServer::setBindLoopbackOnly__b"></span><span class="target" id="classraisim_1_1RaisimServer_1ae14ca17e7ce724d03672348449e48c20"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setBindLoopbackOnly</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">loopbackOnly</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim12RaisimServer19setBindLoopbackOnlyEb" title="Link to this definition"></a><br /></dt>
+<dd><p>If true (default), the server only listens on 127.0.0.1. Set to false to listen on all interfaces (INADDR_ANY). The bind address is the only access control the server provides — if you open it to the network, any reachable client can drive the sim. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim12RaisimServer7getPortEv">
+<span id="_CPPv3NK6raisim12RaisimServer7getPortEv"></span><span id="_CPPv2NK6raisim12RaisimServer7getPortEv"></span><span id="raisim::RaisimServer::getPortC"></span><span class="target" id="classraisim_1_1RaisimServer_1a4fe3eef672b97980bf5ce7644fb95bc8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPort</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim12RaisimServer7getPortEv" title="Link to this definition"></a><br /></dt>
+<dd><p>The TCP port the server is actually listening on. If the requested port was already in use, <a class="reference internal" href="#classraisim_1_1RaisimServer_1ab57b5bb3fd55ae95c680509112147c27"><span class="std std-ref">setupSocket()</span></a> walks forward to the next free port — call this after <a class="reference internal" href="#classraisim_1_1RaisimServer_1a60a67d4307f008baafd5e88d921cd4fb"><span class="std std-ref">launchServer()</span></a> to discover which port clients should connect to. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim12RaisimServer15pauseSimulationEv">
+<span id="_CPPv3N6raisim12RaisimServer15pauseSimulationEv"></span><span id="_CPPv2N6raisim12RaisimServer15pauseSimulationEv"></span><span id="raisim::RaisimServer::pauseSimulation"></span><span class="target" id="classraisim_1_1RaisimServer_1a85845edd9b33f90ba18b6cd5314401eb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pauseSimulation</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim12RaisimServer15pauseSimulationEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Pause / resume the simulation. <a class="reference internal" href="#classraisim_1_1RaisimServer_1ab5d84da8f8459fa51fcc83120b9c395a"><span class="std std-ref">integrateWorldThreadSafe()</span></a> will skip world_-&gt;integrate() while paused, unless a step has been queued (see <a class="reference internal" href="#classraisim_1_1RaisimServer_1a6e17370a4dfdf5e9a140e64d8cb8c352"><span class="std std-ref">stepSimulation()</span></a>). Pending external forces and pose-sets are still applied each tick. Thread-safe to call from any thread. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim12RaisimServer14stepSimulationEi">
+<span id="_CPPv3N6raisim12RaisimServer14stepSimulationEi"></span><span id="_CPPv2N6raisim12RaisimServer14stepSimulationEi"></span><span id="raisim::RaisimServer::stepSimulation__i"></span><span class="target" id="classraisim_1_1RaisimServer_1a6e17370a4dfdf5e9a140e64d8cb8c352"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stepSimulation</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim12RaisimServer14stepSimulationEi" title="Link to this definition"></a><br /></dt>
+<dd><p>Queue N single-step integrations while paused. Each tick consumes one. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -330,7 +478,21 @@ client does not respond or rejects the protocol version.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim12RaisimServer24integrateWorldThreadSafeEv">
 <span id="_CPPv3N6raisim12RaisimServer24integrateWorldThreadSafeEv"></span><span id="_CPPv2N6raisim12RaisimServer24integrateWorldThreadSafeEv"></span><span id="raisim::RaisimServer::integrateWorldThreadSafe"></span><span class="target" id="classraisim_1_1RaisimServer_1ab5d84da8f8459fa51fcc83120b9c395a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">integrateWorldThreadSafe</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim12RaisimServer24integrateWorldThreadSafeEv" title="Link to this definition"></a><br /></dt>
-<dd><p>set the world mutex. This will prevent visualization thread reading from the world (otherwise, there can be a segfault). Integrate the world. </p>
+<dd><p>set the world mutex. This will prevent visualization thread reading from the world (otherwise, there can be a segfault). Integrate the world. Honors <a class="reference internal" href="#classraisim_1_1RaisimServer_1a85845edd9b33f90ba18b6cd5314401eb"><span class="std std-ref">pauseSimulation()</span></a> / <a class="reference internal" href="#classraisim_1_1RaisimServer_1a6e17370a4dfdf5e9a140e64d8cb8c352"><span class="std std-ref">stepSimulation()</span></a>: while paused the world is not advanced unless a single-step has been queued. Pending external forces / pose-sets pushed by clients are applied every call. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN6raisim12RaisimServer24integrateWorldThreadSafeEvRR10BeforeStep">
+<span id="_CPPv3I0EN6raisim12RaisimServer24integrateWorldThreadSafeERR10BeforeStep"></span><span id="_CPPv2I0EN6raisim12RaisimServer24integrateWorldThreadSafeERR10BeforeStep"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BeforeStep</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classraisim_1_1RaisimServer_1a0d5c54f4160401760e70bfcb387d8474"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">integrateWorldThreadSafe</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN6raisim12RaisimServer24integrateWorldThreadSafeEvRR10BeforeStep" title="raisim::RaisimServer::integrateWorldThreadSafe::BeforeStep"><span class="n"><span class="pre">BeforeStep</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">beforeStep</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN6raisim12RaisimServer24integrateWorldThreadSafeEvRR10BeforeStep" title="Link to this definition"></a><br /></dt>
+<dd><p>Like <a class="reference internal" href="#classraisim_1_1RaisimServer_1ab5d84da8f8459fa51fcc83120b9c395a"><span class="std std-ref">integrateWorldThreadSafe()</span></a> but invokes the supplied callable under the world mutex after interaction/sim-control requests are applied and before <code class="docutils literal notranslate"><span class="pre">world_-&gt;integrate()</span></code> runs. Use this when you need to spawn / move / modify world objects each tick — it keeps your mutation safely interleaved with the network thread while still honoring viewer pause/step/force/pose commands.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>BeforeStep</strong> – callable with signature <code class="docutils literal notranslate"><span class="pre">void()</span></code></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>beforeStep</strong> – <strong>[in]</strong> callback invoked inside the locked region </p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="cpp function">

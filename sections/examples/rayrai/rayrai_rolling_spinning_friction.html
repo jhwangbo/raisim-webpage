@@ -1,0 +1,561 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rayrai Example: Rolling And Spinning Friction &mdash; raisim 2.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=b0caeef3" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=c3c8ae58"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Rayrai Example: Swept CCD" href="rayrai_swept_ccd.html" />
+    <link rel="prev" title="Rayrai Example: Runtime Scene Editing" href="rayrai_runtime_scene_editing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Visualization.html">Visualization</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../Examples.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#run">Run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#visualization-modes">Visualization modes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#example-layout">Example layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#choosing-an-example">Choosing an example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#optional-targets">Optional targets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#current-package-examples">Current Package Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#benchmark-examples">Benchmark Examples</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../Examples.html#rayrai-tools-and-examples">Rayrai Tools And Examples</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../current/rayrai_raisim_tcp_viewer.html">rayrai_raisim_tcp_viewer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../current/rayrai_quality_comparison.html">rayrai_quality_comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../current/rayrai_benchmark.html">rayrai_benchmark</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../current/rayrai_complete_showcase_benchmark.html">rayrai_complete_showcase_benchmark</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../current/rayrai_pbr_first_draw_benchmark.html">rayrai_pbr_first_draw_benchmark</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_basic_scene.html">Rayrai Example: Basic Scene</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_complete_showcase.html">Rayrai Example: Complete Showcase</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_blender_scene_import.html">rayrai_blender_scene_import</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_rgb_camera.html">Rayrai Example: RGB Camera</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_depth_camera.html">Rayrai Example: Depth Camera</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_lidar_pointcloud.html">Rayrai Example: LiDAR Pointcloud</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_aruco_marker.html">Rayrai Example: Aruco Marker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_custom_visuals.html">Rayrai Example: Custom Visuals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_instancing_grid.html">Rayrai Example: Instancing Grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_pointcloud_animation.html">Rayrai Example: Pointcloud Animation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_pbr_material_grid.html">Rayrai Example: PBR Material Grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_pbr_texture_maps.html">Rayrai Example: PBR Texture Maps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_quality_lighting.html">Rayrai Example: Quality Lighting and FXAA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_visual_asset_support.html">rayrai_visual_asset_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_coacd_mesh_approximation.html">Rayrai Example: CoACD Mesh Approximation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_runtime_scene_editing.html">Rayrai Example: Runtime Scene Editing</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Rayrai Example: Rolling And Spinning Friction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#binary">Binary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#run">Run</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#how-it-works">How it works</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#what-to-look-for">What to look for</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#full-source">Full source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#related">Related</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_swept_ccd.html">Rayrai Example: Swept CCD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_feature_showcase.html">rayrai_feature_showcase</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_tcp_viewer.html">Rayrai Example: TCP Viewer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#server-examples">Server Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#xml-examples">XML Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../RayTest.html">Ray Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Sensors.html">Sensors</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../Examples.html">Examples</a></li>
+      <li class="breadcrumb-item active">Rayrai Example: Rolling And Spinning Friction</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rayrai-example-rolling-and-spinning-friction">
+<h1>Rayrai Example: Rolling And Spinning Friction<a class="headerlink" href="#rayrai-example-rolling-and-spinning-friction" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>This example visualises native rolling and spinning friction on a grid of
+spheres and cylinders, all spawned with initial linear and angular
+velocity. As bodies dissipate energy through the new friction modes they
+slow, come to rest, and are recoloured to indicate sleeping; the demo
+loops on a fixed cadence so the build-up and decay are easy to compare.</p>
+<p>The matching renderer-side reference image (smaller grid, captured
+headlessly) is regenerated as part of the documentation build:</p>
+<a class="reference internal image-reference" href="../../../_images/rayrai_rolling_spinning_friction.gif"><img alt="rolling and spinning friction demo — spheres and cylinders settling on a checkered ground" src="../../../_images/rayrai_rolling_spinning_friction.gif" style="width: 100%;" />
+</a>
+</section>
+<section id="binary">
+<h2>Binary<a class="headerlink" href="#binary" title="Link to this heading"></a></h2>
+<p>Installed executable: <code class="docutils literal notranslate"><span class="pre">rayrai_rolling_spinning_friction</span></code>.</p>
+</section>
+<section id="run">
+<h2>Run<a class="headerlink" href="#run" title="Link to this heading"></a></h2>
+<p>Run the installed executable directly:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/rayrai_rolling_spinning_friction
+</pre></div>
+</div>
+<p>On Windows, use <code class="docutils literal notranslate"><span class="pre">rayrai_rolling_spinning_friction.exe</span></code>. The example uses
+the in-process rayrai renderer and does not need a TCP viewer.</p>
+<p>Command-line knobs:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rayrai_rolling_spinning_friction<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--grid<span class="o">=</span><span class="m">12</span><span class="w">             </span><span class="se">\</span>
+<span class="w">  </span>--steps<span class="o">=</span><span class="m">2500</span><span class="w">          </span><span class="se">\</span>
+<span class="w">  </span>--steps-per-frame<span class="o">=</span><span class="m">16</span><span class="w">  </span><span class="se">\</span>
+<span class="w">  </span>--hold-frames<span class="o">=</span><span class="m">120</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--grid</span></code> — N × N body grid (default <code class="docutils literal notranslate"><span class="pre">10</span></code>). Larger values exercise the
+solver harder; the GIF in this page uses <code class="docutils literal notranslate"><span class="pre">--grid=6</span></code> for clarity.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--steps</span></code> — physics steps per cycle (default <code class="docutils literal notranslate"><span class="pre">2500</span></code>). One cycle is
+one full reset → run-until-rest sequence.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--steps-per-frame</span></code> — physics steps per render frame (default <code class="docutils literal notranslate"><span class="pre">16</span></code>).
+Higher values speed up the visible motion at the cost of frame-to-frame
+smoothness.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--hold-frames</span></code> — frames to wait after each cycle before resetting
+(default <code class="docutils literal notranslate"><span class="pre">120</span></code>).</p></li>
+</ul>
+</section>
+<section id="how-it-works">
+<h2>How it works<a class="headerlink" href="#how-it-works" title="Link to this heading"></a></h2>
+<p>The rolling/spinning friction comes from the material-pair property set
+up in <code class="docutils literal notranslate"><span class="pre">main()</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">world</span><span class="o">-&gt;</span><span class="n">setMaterialPairProp</span><span class="p">(</span><span class="s">&quot;ground&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;body&quot;</span><span class="p">,</span>
+<span class="w">                           </span><span class="mf">1.0</span><span class="p">,</span><span class="w">    </span><span class="c1">// dynamic friction</span>
+<span class="w">                           </span><span class="mf">0.0</span><span class="p">,</span><span class="w">    </span><span class="c1">// restitution</span>
+<span class="w">                           </span><span class="mf">0.0</span><span class="p">,</span><span class="w">    </span><span class="c1">// restitution threshold</span>
+<span class="w">                           </span><span class="mf">1.0</span><span class="p">,</span><span class="w">    </span><span class="c1">// static friction</span>
+<span class="w">                           </span><span class="mf">1e-3</span><span class="p">,</span><span class="w">   </span><span class="c1">// static-friction threshold velocity</span>
+<span class="w">                           </span><span class="mf">0.12</span><span class="p">,</span><span class="w">   </span><span class="c1">// rolling friction (mu_r)</span>
+<span class="w">                           </span><span class="mf">0.08</span><span class="p">);</span><span class="w">  </span><span class="c1">// spinning friction (mu_spin)</span>
+</pre></div>
+</div>
+<p>That seventh and eighth arguments are the new <code class="docutils literal notranslate"><span class="pre">rollingFriction</span></code> and
+<code class="docutils literal notranslate"><span class="pre">spinningFriction</span></code> coefficients introduced in v2.3.0. Both default to
+zero in every other <code class="docutils literal notranslate"><span class="pre">setMaterialPairProp</span></code> overload, so existing scenes
+behave exactly as before; opting into them switches the solver onto the
+extended path for that pair. See <a class="reference internal" href="../../MaterialSystem.html"><span class="doc">Material System</span></a> for the full
+contact-impulse derivation.</p>
+<p>The scene is built once at startup:</p>
+<ul class="simple">
+<li><p>A <code class="docutils literal notranslate"><span class="pre">checkerboard</span></code>-textured ground plane with the <code class="docutils literal notranslate"><span class="pre">ground</span></code> material.</p></li>
+<li><p>An <code class="docutils literal notranslate"><span class="pre">N</span> <span class="pre">×</span> <span class="pre">N</span></code> grid of unit-mass primitives alternating sphere/cylinder
+by checker pattern, all in the <code class="docutils literal notranslate"><span class="pre">body</span></code> material. Cylinders are oriented
+so that the initial angular velocity rolls them along the floor instead
+of spinning in place; spheres receive linear + angular velocity in two
+axes.</p></li>
+<li><p>Sleeping is enabled with mild thresholds (<code class="docutils literal notranslate"><span class="pre">setSleepingParameters(0.012,</span>
+<span class="pre">0.03,</span> <span class="pre">25)</span></code>), so bodies that come to rest stop integrating and switch
+to a blue appearance.</p></li>
+</ul>
+<p>Each rendered frame integrates <code class="docutils literal notranslate"><span class="pre">--steps-per-frame</span></code> physics steps,
+updates the sleep appearance, and prints aggregate statistics:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">app</span><span class="p">.</span><span class="n">quit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">app</span><span class="p">.</span><span class="n">processEvents</span><span class="p">();</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">app</span><span class="p">.</span><span class="n">quit</span><span class="p">)</span><span class="w"> </span><span class="k">break</span><span class="p">;</span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">stepInCycle</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">cycleSteps</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">stepsPerFrame</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">integrate</span><span class="p">();</span>
+<span class="w">      </span><span class="n">lastContacts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">getContactProblem</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">();</span>
+<span class="w">      </span><span class="n">contactTotal</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">lastContacts</span><span class="p">;</span>
+<span class="w">      </span><span class="o">++</span><span class="n">stepInCycle</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">++</span><span class="n">heldFrames</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">holdFrames</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">resetDemo</span><span class="p">(</span><span class="o">*</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="n">bodies</span><span class="p">,</span><span class="w"> </span><span class="n">grid</span><span class="p">);</span><span class="w">   </span><span class="c1">// re-fire the cycle</span>
+<span class="w">    </span><span class="n">stepInCycle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="n">heldFrames</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="n">updateSleepingAppearance</span><span class="p">(</span><span class="o">*</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="n">bodies</span><span class="p">);</span>
+<span class="w">  </span><span class="n">computeMeanSpeeds</span><span class="p">(</span><span class="n">bodies</span><span class="p">,</span><span class="w"> </span><span class="n">meanLinearSpeed</span><span class="p">,</span><span class="w"> </span><span class="n">meanAngularSpeed</span><span class="p">);</span>
+
+<span class="w">  </span><span class="n">app</span><span class="p">.</span><span class="n">beginFrame</span><span class="p">();</span>
+<span class="w">  </span><span class="n">app</span><span class="p">.</span><span class="n">renderViewer</span><span class="p">(</span><span class="o">*</span><span class="n">viewer</span><span class="p">);</span>
+<span class="w">  </span><span class="c1">// ... ImGui overlay with step / contacts / speeds ...</span>
+<span class="w">  </span><span class="n">app</span><span class="p">.</span><span class="n">endFrame</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="what-to-look-for">
+<h2>What to look for<a class="headerlink" href="#what-to-look-for" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Cylinders roll across the floor instead of skidding.</strong> With rolling
+friction off, the cylinders would keep spinning indefinitely after
+their linear motion decayed. Rolling friction couples angular and
+linear energy and brings them down together.</p></li>
+<li><p><strong>Spheres lose spin after stopping translation.</strong> The spin component
+doesn’t decouple from the floor — spinning friction extracts torque
+about the contact normal until the body is fully at rest.</p></li>
+<li><p><strong>Sleeping bodies turn blue.</strong> RaiSim’s sleep detector fires when the
+averaged velocity drops below the configured thresholds; sleeping
+bodies skip integration and stay on the cheaper path until the next
+cycle reset.</p></li>
+<li><p><strong>Average contact count and mean speeds</strong> are shown in the ImGui
+overlay so you can watch energy dissipate over the cycle.</p></li>
+</ul>
+</section>
+<section id="full-source">
+<h2>Full source<a class="headerlink" href="#full-source" title="Link to this heading"></a></h2>
+<p>This is the complete example source, identical to the installed binary:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;algorithm&gt;</span>
+<span class="linenos">  2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdlib&gt;</span>
+<span class="linenos">  3</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;memory&gt;</span>
+<span class="linenos">  4</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span>
+<span class="linenos">  5</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span>
+<span class="linenos">  6</span>
+<span class="linenos">  7</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;glm/glm.hpp&gt;</span>
+<span class="linenos">  8</span>
+<span class="linenos">  9</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;rayrai/example_common.hpp&quot;</span>
+<span class="linenos"> 10</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;rayrai_example_compat.hpp&quot;</span>
+<span class="linenos"> 11</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;raisim/World.hpp&quot;</span>
+<span class="linenos"> 12</span>
+<span class="linenos"> 13</span><span class="k">namespace</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 14</span>
+<span class="linenos"> 15</span><span class="k">struct</span><span class="w"> </span><span class="nc">DemoBody</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 16</span><span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">SingleBodyObject</span><span class="o">*</span><span class="w"> </span><span class="n">object</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">nullptr</span><span class="p">;</span>
+<span class="linenos"> 17</span><span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">activeAppearance</span><span class="p">;</span>
+<span class="linenos"> 18</span><span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">sleeping</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="linenos"> 19</span><span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">sphereShape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="linenos"> 20</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos"> 21</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos"> 22</span><span class="p">};</span>
+<span class="linenos"> 23</span>
+<span class="linenos"> 24</span><span class="kt">int</span><span class="w"> </span><span class="nf">readIntArg</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="o">**</span><span class="w"> </span><span class="n">argv</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">fallback</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 25</span><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">prefix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;=&quot;</span><span class="p">;</span>
+<span class="linenos"> 26</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">argc</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 27</span><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">arg</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+<span class="linenos"> 28</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">arg</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">argc</span><span class="p">)</span>
+<span class="linenos"> 29</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="o">++</span><span class="n">i</span><span class="p">]));</span>
+<span class="linenos"> 30</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">arg</span><span class="p">.</span><span class="n">rfind</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="linenos"> 31</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">atoi</span><span class="p">(</span><span class="n">arg</span><span class="p">.</span><span class="n">c_str</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">prefix</span><span class="p">.</span><span class="n">size</span><span class="p">()));</span>
+<span class="linenos"> 32</span><span class="w">  </span><span class="p">}</span>
+<span class="linenos"> 33</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">fallback</span><span class="p">;</span>
+<span class="linenos"> 34</span><span class="p">}</span>
+<span class="linenos"> 35</span>
+<span class="linenos"> 36</span><span class="kt">void</span><span class="w"> </span><span class="nf">resetBody</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">&amp;</span><span class="w"> </span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="n">DemoBody</span><span class="o">&amp;</span><span class="w"> </span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">grid</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 37</span><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">spacing</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.1</span><span class="p">;</span>
+<span class="linenos"> 38</span><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">origin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">-0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">spacing</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kt">double</span><span class="p">(</span><span class="n">grid</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="linenos"> 39</span><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
+<span class="linenos"> 40</span><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
+<span class="linenos"> 41</span>
+<span class="linenos"> 42</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">body</span><span class="p">.</span><span class="n">sphereShape</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 43</span><span class="w">    </span><span class="n">body</span><span class="p">.</span><span class="n">object</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="n">origin</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">spacing</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">origin</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">spacing</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="mf">0.25</span><span class="p">);</span>
+<span class="linenos"> 44</span><span class="w">    </span><span class="n">body</span><span class="p">.</span><span class="n">object</span><span class="o">-&gt;</span><span class="n">setOrientation</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+<span class="linenos"> 45</span><span class="w">    </span><span class="n">body</span><span class="p">.</span><span class="n">object</span><span class="o">-&gt;</span><span class="n">setVelocity</span><span class="p">(</span><span class="mf">1.7</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.08</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.05</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">-11.0</span><span class="p">,</span><span class="w"> </span><span class="mf">18.0</span><span class="p">);</span>
+<span class="linenos"> 46</span><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="n">x</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 47</span><span class="w">    </span><span class="c1">// Cylinder axis lies along world X, so angular velocity about X visibly rolls it along Y.</span>
+<span class="linenos"> 48</span><span class="w">    </span><span class="n">body</span><span class="p">.</span><span class="n">object</span><span class="o">-&gt;</span><span class="n">setOrientation</span><span class="p">(</span><span class="mf">0.7071067812</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.7071067812</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+<span class="linenos"> 49</span><span class="w">    </span><span class="n">body</span><span class="p">.</span><span class="n">object</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="n">origin</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">spacing</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">origin</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">spacing</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="mf">0.22</span><span class="p">);</span>
+<span class="linenos"> 50</span><span class="w">    </span><span class="n">body</span><span class="p">.</span><span class="n">object</span><span class="o">-&gt;</span><span class="n">setVelocity</span><span class="p">(</span><span class="mf">0.15</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.04</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mf">1.9</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.07</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">14.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+<span class="linenos"> 51</span><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 52</span><span class="w">    </span><span class="c1">// Cylinder axis lies along world Y, so angular velocity about Y visibly rolls it along X.</span>
+<span class="linenos"> 53</span><span class="w">    </span><span class="n">body</span><span class="p">.</span><span class="n">object</span><span class="o">-&gt;</span><span class="n">setOrientation</span><span class="p">(</span><span class="mf">0.7071067812</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.7071067812</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+<span class="linenos"> 54</span><span class="w">    </span><span class="n">body</span><span class="p">.</span><span class="n">object</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="n">origin</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">spacing</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">origin</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">spacing</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="mf">0.22</span><span class="p">);</span>
+<span class="linenos"> 55</span><span class="w">    </span><span class="n">body</span><span class="p">.</span><span class="n">object</span><span class="o">-&gt;</span><span class="n">setVelocity</span><span class="p">(</span><span class="mf">1.9</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.07</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mf">0.15</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.04</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">-14.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+<span class="linenos"> 56</span><span class="w">  </span><span class="p">}</span>
+<span class="linenos"> 57</span>
+<span class="linenos"> 58</span><span class="w">  </span><span class="n">body</span><span class="p">.</span><span class="n">sleeping</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="linenos"> 59</span><span class="w">  </span><span class="n">body</span><span class="p">.</span><span class="n">object</span><span class="o">-&gt;</span><span class="n">setAppearance</span><span class="p">(</span><span class="n">body</span><span class="p">.</span><span class="n">activeAppearance</span><span class="p">);</span>
+<span class="linenos"> 60</span><span class="w">  </span><span class="n">world</span><span class="p">.</span><span class="n">wakeObject</span><span class="p">(</span><span class="n">body</span><span class="p">.</span><span class="n">object</span><span class="p">);</span>
+<span class="linenos"> 61</span><span class="p">}</span>
+<span class="linenos"> 62</span>
+<span class="linenos"> 63</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">DemoBody</span><span class="o">&gt;</span><span class="w"> </span><span class="n">createBodies</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">&amp;</span><span class="w"> </span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">grid</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 64</span><span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">DemoBody</span><span class="o">&gt;</span><span class="w"> </span><span class="n">bodies</span><span class="p">;</span>
+<span class="linenos"> 65</span><span class="w">  </span><span class="n">bodies</span><span class="p">.</span><span class="n">reserve</span><span class="p">(</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">size_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">grid</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">grid</span><span class="p">));</span>
+<span class="linenos"> 66</span>
+<span class="linenos"> 67</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">grid</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 68</span><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">grid</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 69</span><span class="w">      </span><span class="k">const</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">sphereShape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">((</span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos"> 70</span><span class="w">      </span><span class="n">DemoBody</span><span class="w"> </span><span class="n">body</span><span class="p">;</span>
+<span class="linenos"> 71</span><span class="w">      </span><span class="n">body</span><span class="p">.</span><span class="n">sphereShape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sphereShape</span><span class="p">;</span>
+<span class="linenos"> 72</span><span class="w">      </span><span class="n">body</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<span class="linenos"> 73</span><span class="w">      </span><span class="n">body</span><span class="p">.</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
+<span class="linenos"> 74</span><span class="w">      </span><span class="n">body</span><span class="p">.</span><span class="n">activeAppearance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sphereShape</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;0.95, 0.42, 0.12, 1.0&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">&quot;0.15, 0.70, 0.28, 1.0&quot;</span><span class="p">;</span>
+<span class="linenos"> 75</span><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">sphereShape</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 76</span><span class="w">        </span><span class="n">body</span><span class="p">.</span><span class="n">object</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;body&quot;</span><span class="p">);</span>
+<span class="linenos"> 77</span><span class="w">      </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 78</span><span class="w">        </span><span class="n">body</span><span class="p">.</span><span class="n">object</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addCylinder</span><span class="p">(</span><span class="mf">0.22</span><span class="p">,</span><span class="w"> </span><span class="mf">0.55</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;body&quot;</span><span class="p">);</span>
+<span class="linenos"> 79</span><span class="w">      </span><span class="p">}</span>
+<span class="linenos"> 80</span><span class="w">      </span><span class="n">body</span><span class="p">.</span><span class="n">object</span><span class="o">-&gt;</span><span class="n">setAppearance</span><span class="p">(</span><span class="n">body</span><span class="p">.</span><span class="n">activeAppearance</span><span class="p">);</span>
+<span class="linenos"> 81</span><span class="w">      </span><span class="n">bodies</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">body</span><span class="p">);</span>
+<span class="linenos"> 82</span><span class="w">      </span><span class="n">resetBody</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="n">bodies</span><span class="p">.</span><span class="n">back</span><span class="p">(),</span><span class="w"> </span><span class="n">grid</span><span class="p">);</span>
+<span class="linenos"> 83</span><span class="w">    </span><span class="p">}</span>
+<span class="linenos"> 84</span><span class="w">  </span><span class="p">}</span>
+<span class="linenos"> 85</span>
+<span class="linenos"> 86</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">bodies</span><span class="p">;</span>
+<span class="linenos"> 87</span><span class="p">}</span>
+<span class="linenos"> 88</span>
+<span class="linenos"> 89</span><span class="kt">void</span><span class="w"> </span><span class="n">resetDemo</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">&amp;</span><span class="w"> </span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">DemoBody</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">bodies</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">grid</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 90</span><span class="w">  </span><span class="n">world</span><span class="p">.</span><span class="n">setWorldTime</span><span class="p">(</span><span class="mf">0.0</span><span class="p">);</span>
+<span class="linenos"> 91</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">bodies</span><span class="p">)</span>
+<span class="linenos"> 92</span><span class="w">    </span><span class="n">resetBody</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">grid</span><span class="p">);</span>
+<span class="linenos"> 93</span><span class="w">  </span><span class="n">world</span><span class="p">.</span><span class="n">wakeAll</span><span class="p">();</span>
+<span class="linenos"> 94</span><span class="p">}</span>
+<span class="linenos"> 95</span>
+<span class="linenos"> 96</span><span class="kt">void</span><span class="w"> </span><span class="n">updateSleepingAppearance</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">&amp;</span><span class="w"> </span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">DemoBody</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">bodies</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 97</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">bodies</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 98</span><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">sleeping</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">isObjectSleeping</span><span class="p">(</span><span class="n">body</span><span class="p">.</span><span class="n">object</span><span class="p">);</span>
+<span class="linenos"> 99</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">sleeping</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">sleeping</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">100</span><span class="w">      </span><span class="n">body</span><span class="p">.</span><span class="n">object</span><span class="o">-&gt;</span><span class="n">setAppearance</span><span class="p">(</span><span class="n">sleeping</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;0.20, 0.55, 1.00, 1.0&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">activeAppearance</span><span class="p">);</span>
+<span class="linenos">101</span><span class="w">      </span><span class="n">body</span><span class="p">.</span><span class="n">sleeping</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sleeping</span><span class="p">;</span>
+<span class="linenos">102</span><span class="w">    </span><span class="p">}</span>
+<span class="linenos">103</span><span class="w">  </span><span class="p">}</span>
+<span class="linenos">104</span><span class="p">}</span>
+<span class="linenos">105</span>
+<span class="linenos">106</span><span class="kt">void</span><span class="w"> </span><span class="n">computeMeanSpeeds</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">DemoBody</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">bodies</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="o">&amp;</span><span class="w"> </span><span class="n">linearSpeed</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="o">&amp;</span><span class="w"> </span><span class="n">angularSpeed</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">107</span><span class="w">  </span><span class="n">linearSpeed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span>
+<span class="linenos">108</span><span class="w">  </span><span class="n">angularSpeed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span>
+<span class="linenos">109</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">bodies</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span>
+<span class="linenos">110</span><span class="w">    </span><span class="k">return</span><span class="p">;</span>
+<span class="linenos">111</span>
+<span class="linenos">112</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">bodies</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">113</span><span class="w">    </span><span class="n">linearSpeed</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">object</span><span class="o">-&gt;</span><span class="n">getLinearVelocity</span><span class="p">().</span><span class="n">norm</span><span class="p">();</span>
+<span class="linenos">114</span><span class="w">    </span><span class="n">angularSpeed</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">object</span><span class="o">-&gt;</span><span class="n">getAngularVelocity</span><span class="p">().</span><span class="n">norm</span><span class="p">();</span>
+<span class="linenos">115</span><span class="w">  </span><span class="p">}</span>
+<span class="linenos">116</span>
+<span class="linenos">117</span><span class="w">  </span><span class="n">linearSpeed</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="kt">double</span><span class="p">(</span><span class="n">bodies</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+<span class="linenos">118</span><span class="w">  </span><span class="n">angularSpeed</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="kt">double</span><span class="p">(</span><span class="n">bodies</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+<span class="linenos">119</span><span class="p">}</span>
+<span class="linenos">120</span>
+<span class="linenos">121</span><span class="p">}</span><span class="w">  </span><span class="c1">// namespace</span>
+<span class="linenos">122</span>
+<span class="linenos">123</span><span class="kt">int</span><span class="w"> </span><span class="n">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">124</span><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">grid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">readIntArg</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;--grid&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span>
+<span class="linenos">125</span><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">cycleSteps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">readIntArg</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;--steps&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">2500</span><span class="p">);</span>
+<span class="linenos">126</span><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">stepsPerFrame</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">readIntArg</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;--steps-per-frame&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">);</span>
+<span class="linenos">127</span><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">holdFrames</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">readIntArg</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;--hold-frames&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">120</span><span class="p">);</span>
+<span class="linenos">128</span>
+<span class="linenos">129</span><span class="w">  </span><span class="n">ExampleApp</span><span class="w"> </span><span class="n">app</span><span class="p">;</span>
+<span class="linenos">130</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">app</span><span class="p">.</span><span class="n">init</span><span class="p">(</span><span class="s">&quot;rayrai_rolling_spinning_friction&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1280</span><span class="p">,</span><span class="w"> </span><span class="mi">720</span><span class="p">))</span>
+<span class="linenos">131</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos">132</span>
+<span class="linenos">133</span><span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">world</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="linenos">134</span><span class="w">  </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">);</span>
+<span class="linenos">135</span><span class="w">  </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">setERP</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+<span class="linenos">136</span><span class="w">  </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">setContactSolverParam</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mi">120</span><span class="p">,</span><span class="w"> </span><span class="mf">1e-10</span><span class="p">);</span>
+<span class="linenos">137</span><span class="w">  </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">setGravity</span><span class="p">({</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">-9.81</span><span class="p">});</span>
+<span class="linenos">138</span><span class="w">  </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">setSleepingEnabled</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+<span class="linenos">139</span><span class="w">  </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">setSleepingParameters</span><span class="p">(</span><span class="mf">0.012</span><span class="p">,</span><span class="w"> </span><span class="mf">0.03</span><span class="p">,</span><span class="w"> </span><span class="mi">25</span><span class="p">);</span>
+<span class="linenos">140</span><span class="w">  </span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">ground</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">addGround</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ground&quot;</span><span class="p">);</span>
+<span class="linenos">141</span><span class="w">  </span><span class="n">ground</span><span class="o">-&gt;</span><span class="n">setAppearance</span><span class="p">(</span><span class="s">&quot;checkerboard&quot;</span><span class="p">);</span>
+<span class="linenos">142</span><span class="w">  </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">setMaterialPairProp</span><span class="p">(</span><span class="s">&quot;ground&quot;</span><span class="p">,</span>
+<span class="linenos">143</span><span class="w">                             </span><span class="s">&quot;body&quot;</span><span class="p">,</span>
+<span class="linenos">144</span><span class="w">                             </span><span class="mf">1.0</span><span class="p">,</span>
+<span class="linenos">145</span><span class="w">                             </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="linenos">146</span><span class="w">                             </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="linenos">147</span><span class="w">                             </span><span class="mf">1.0</span><span class="p">,</span>
+<span class="linenos">148</span><span class="w">                             </span><span class="mf">1e-3</span><span class="p">,</span>
+<span class="linenos">149</span><span class="w">                             </span><span class="mf">0.12</span><span class="p">,</span>
+<span class="linenos">150</span><span class="w">                             </span><span class="mf">0.08</span><span class="p">);</span>
+<span class="linenos">151</span>
+<span class="linenos">152</span><span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">DemoBody</span><span class="o">&gt;</span><span class="w"> </span><span class="n">bodies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">createBodies</span><span class="p">(</span><span class="o">*</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="n">grid</span><span class="p">);</span>
+<span class="linenos">153</span>
+<span class="linenos">154</span><span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">viewer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">1280</span><span class="p">,</span><span class="w"> </span><span class="mi">720</span><span class="p">);</span>
+<span class="linenos">155</span><span class="w">  </span><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">defaultRenderQualitySettings</span><span class="p">(</span>
+<span class="linenos">156</span><span class="w">    </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">RenderQualityPreset</span><span class="o">::</span><span class="n">Balanced</span><span class="p">));</span>
+<span class="linenos">157</span><span class="w">  </span><span class="n">raisim_examples</span><span class="o">::</span><span class="n">setRayraiBackgroundColorRgb255</span><span class="p">(</span><span class="o">*</span><span class="n">viewer</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mi">24</span><span class="p">,</span><span class="w"> </span><span class="mi">26</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">});</span>
+<span class="linenos">158</span><span class="w">  </span><span class="n">raisim_examples</span><span class="o">::</span><span class="n">addRayraiBasicSceneLights</span><span class="p">(</span><span class="o">*</span><span class="n">viewer</span><span class="p">);</span>
+<span class="linenos">159</span>
+<span class="linenos">160</span><span class="w">  </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">camera</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">getCamera</span><span class="p">();</span>
+<span class="linenos">161</span><span class="w">  </span><span class="n">camera</span><span class="p">.</span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">6.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">-8.5f</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0f</span><span class="p">);</span>
+<span class="linenos">162</span><span class="w">  </span><span class="n">camera</span><span class="p">.</span><span class="n">target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.25f</span><span class="p">);</span>
+<span class="linenos">163</span><span class="w">  </span><span class="n">camera</span><span class="p">.</span><span class="n">yaw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">125.0f</span><span class="p">;</span>
+<span class="linenos">164</span><span class="w">  </span><span class="n">camera</span><span class="p">.</span><span class="n">pitch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">-31.0f</span><span class="p">;</span>
+<span class="linenos">165</span><span class="w">  </span><span class="n">camera</span><span class="p">.</span><span class="n">zoom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">42.0f</span><span class="p">;</span>
+<span class="linenos">166</span><span class="w">  </span><span class="n">camera</span><span class="p">.</span><span class="n">zNear</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.03f</span><span class="p">;</span>
+<span class="linenos">167</span><span class="w">  </span><span class="n">camera</span><span class="p">.</span><span class="n">zFar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">35.0f</span><span class="p">;</span>
+<span class="linenos">168</span><span class="w">  </span><span class="n">camera</span><span class="p">.</span><span class="n">setCameraFixedTarget</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+<span class="linenos">169</span><span class="w">  </span><span class="n">camera</span><span class="p">.</span><span class="n">setCameraFixedDistance</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+<span class="linenos">170</span><span class="w">  </span><span class="n">camera</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span>
+<span class="linenos">171</span>
+<span class="linenos">172</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">stepInCycle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">173</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">heldFrames</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">174</span><span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span><span class="w"> </span><span class="n">contactTotal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">175</span><span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span><span class="w"> </span><span class="n">lastContacts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">176</span><span class="w">  </span><span class="kt">double</span><span class="w"> </span><span class="n">meanLinearSpeed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span>
+<span class="linenos">177</span><span class="w">  </span><span class="kt">double</span><span class="w"> </span><span class="n">meanAngularSpeed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span>
+<span class="linenos">178</span>
+<span class="linenos">179</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">app</span><span class="p">.</span><span class="n">quit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">180</span><span class="w">    </span><span class="n">app</span><span class="p">.</span><span class="n">processEvents</span><span class="p">();</span>
+<span class="linenos">181</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">app</span><span class="p">.</span><span class="n">quit</span><span class="p">)</span>
+<span class="linenos">182</span><span class="w">      </span><span class="k">break</span><span class="p">;</span>
+<span class="linenos">183</span>
+<span class="linenos">184</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">stepInCycle</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">cycleSteps</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">185</span><span class="w">      </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">frameSteps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">min</span><span class="p">(</span><span class="n">stepsPerFrame</span><span class="p">,</span><span class="w"> </span><span class="n">cycleSteps</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">stepInCycle</span><span class="p">);</span>
+<span class="linenos">186</span><span class="w">      </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">frameSteps</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">187</span><span class="w">        </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">integrate</span><span class="p">();</span>
+<span class="linenos">188</span><span class="w">        </span><span class="n">lastContacts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">getContactProblem</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">();</span>
+<span class="linenos">189</span><span class="w">        </span><span class="n">contactTotal</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">lastContacts</span><span class="p">;</span>
+<span class="linenos">190</span><span class="w">        </span><span class="o">++</span><span class="n">stepInCycle</span><span class="p">;</span>
+<span class="linenos">191</span><span class="w">      </span><span class="p">}</span>
+<span class="linenos">192</span><span class="w">      </span><span class="n">heldFrames</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">193</span><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">++</span><span class="n">heldFrames</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">holdFrames</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">194</span><span class="w">      </span><span class="n">resetDemo</span><span class="p">(</span><span class="o">*</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="n">bodies</span><span class="p">,</span><span class="w"> </span><span class="n">grid</span><span class="p">);</span>
+<span class="linenos">195</span><span class="w">      </span><span class="n">stepInCycle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">196</span><span class="w">      </span><span class="n">heldFrames</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">197</span><span class="w">      </span><span class="n">contactTotal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">198</span><span class="w">      </span><span class="n">lastContacts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">199</span><span class="w">    </span><span class="p">}</span>
+<span class="linenos">200</span>
+<span class="linenos">201</span><span class="w">    </span><span class="n">updateSleepingAppearance</span><span class="p">(</span><span class="o">*</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="n">bodies</span><span class="p">);</span>
+<span class="linenos">202</span><span class="w">    </span><span class="n">computeMeanSpeeds</span><span class="p">(</span><span class="n">bodies</span><span class="p">,</span><span class="w"> </span><span class="n">meanLinearSpeed</span><span class="p">,</span><span class="w"> </span><span class="n">meanAngularSpeed</span><span class="p">);</span>
+<span class="linenos">203</span>
+<span class="linenos">204</span><span class="w">    </span><span class="n">app</span><span class="p">.</span><span class="n">beginFrame</span><span class="p">();</span>
+<span class="linenos">205</span><span class="w">    </span><span class="n">app</span><span class="p">.</span><span class="n">renderViewer</span><span class="p">(</span><span class="o">*</span><span class="n">viewer</span><span class="p">);</span>
+<span class="linenos">206</span>
+<span class="linenos">207</span><span class="w">    </span><span class="n">ImGui</span><span class="o">::</span><span class="n">SetNextWindowPos</span><span class="p">(</span><span class="n">ImVec2</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="mi">12</span><span class="p">),</span><span class="w"> </span><span class="n">ImGuiCond_Always</span><span class="p">);</span>
+<span class="linenos">208</span><span class="w">    </span><span class="n">ImGui</span><span class="o">::</span><span class="n">SetNextWindowBgAlpha</span><span class="p">(</span><span class="mf">0.72f</span><span class="p">);</span>
+<span class="linenos">209</span><span class="w">    </span><span class="n">ImGui</span><span class="o">::</span><span class="n">Begin</span><span class="p">(</span><span class="s">&quot;Rolling friction&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">nullptr</span><span class="p">,</span>
+<span class="linenos">210</span><span class="w">                 </span><span class="n">ImGuiWindowFlags_NoResize</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">ImGuiWindowFlags_AlwaysAutoResize</span><span class="w"> </span><span class="o">|</span>
+<span class="linenos">211</span><span class="w">                   </span><span class="n">ImGuiWindowFlags_NoCollapse</span><span class="p">);</span>
+<span class="linenos">212</span><span class="w">    </span><span class="n">ImGui</span><span class="o">::</span><span class="n">Text</span><span class="p">(</span><span class="s">&quot;step %d / %d&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">stepInCycle</span><span class="p">,</span><span class="w"> </span><span class="n">cycleSteps</span><span class="p">);</span>
+<span class="linenos">213</span><span class="w">    </span><span class="n">ImGui</span><span class="o">::</span><span class="n">Text</span><span class="p">(</span><span class="s">&quot;bodies: %zu&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bodies</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+<span class="linenos">214</span><span class="w">    </span><span class="n">ImGui</span><span class="o">::</span><span class="n">Text</span><span class="p">(</span><span class="s">&quot;contacts: %zu&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">lastContacts</span><span class="p">);</span>
+<span class="linenos">215</span><span class="w">    </span><span class="n">ImGui</span><span class="o">::</span><span class="n">Text</span><span class="p">(</span><span class="s">&quot;average contacts: %.2f&quot;</span><span class="p">,</span>
+<span class="linenos">216</span><span class="w">                </span><span class="n">stepInCycle</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="kt">double</span><span class="p">(</span><span class="n">contactTotal</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="kt">double</span><span class="p">(</span><span class="n">stepInCycle</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+<span class="linenos">217</span><span class="w">    </span><span class="n">ImGui</span><span class="o">::</span><span class="n">Text</span><span class="p">(</span><span class="s">&quot;mean linear speed: %.3f m/s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">meanLinearSpeed</span><span class="p">);</span>
+<span class="linenos">218</span><span class="w">    </span><span class="n">ImGui</span><span class="o">::</span><span class="n">Text</span><span class="p">(</span><span class="s">&quot;mean angular speed: %.3f rad/s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">meanAngularSpeed</span><span class="p">);</span>
+<span class="linenos">219</span><span class="w">    </span><span class="n">ImGui</span><span class="o">::</span><span class="n">End</span><span class="p">();</span>
+<span class="linenos">220</span>
+<span class="linenos">221</span><span class="w">    </span><span class="n">app</span><span class="p">.</span><span class="n">endFrame</span><span class="p">();</span>
+<span class="linenos">222</span><span class="w">  </span><span class="p">}</span>
+<span class="linenos">223</span>
+<span class="linenos">224</span><span class="w">  </span><span class="n">viewer</span><span class="p">.</span><span class="n">reset</span><span class="p">();</span>
+<span class="linenos">225</span><span class="w">  </span><span class="n">app</span><span class="p">.</span><span class="n">shutdown</span><span class="p">();</span>
+<span class="linenos">226</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">227</span><span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="related">
+<h2>Related<a class="headerlink" href="#related" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../../MaterialSystem.html"><span class="doc">Material System</span></a> — the friction model and all
+<code class="docutils literal notranslate"><span class="pre">setMaterialPairProp</span></code> overloads.</p></li>
+<li><p><a class="reference internal" href="../../Contact.html"><span class="doc">Contact and Collision</span></a> — contact iteration and per-pair body type.</p></li>
+<li><p><a class="reference internal" href="../../changelog/v2.3.0.html"><span class="doc">Changelog: v2.3.0</span></a> — release notes that introduce rolling /
+spinning friction.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rayrai_runtime_scene_editing.html" class="btn btn-neutral float-left" title="Rayrai Example: Runtime Scene Editing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rayrai_swept_ccd.html" class="btn btn-neutral float-right" title="Rayrai Example: Swept CCD" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

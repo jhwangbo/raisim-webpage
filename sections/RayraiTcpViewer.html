@@ -1,0 +1,1137 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rayrai TCP Viewer &mdash; raisim 2.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b0caeef3" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=c3c8ae58"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="RaiSim Engine 2" href="RaisimEngine2.html" />
+    <link rel="prev" title="Performance notes and the C++ API reference" href="rayrai/Performance.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Rayrai TCP Viewer</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#quick-start">Quick start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#command-line-options">Command-line options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ui-layout">UI layout</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#control-tab-widget-reference">Control tab — widget reference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#options-tab">Options tab</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#render-tab">Render tab</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#objects-tab">Objects tab</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#diagnostics-tab">Diagnostics tab</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#right-side-inspector">Right-side inspector</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#sim-control-workflow">Sim control workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#force-pose-application">Force / pose application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#access-control">Access control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#screenshots-and-recording">Screenshots and recording</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#articulated-system-inspector-mode">Articulated-system inspector mode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#objects-and-selection">Objects and selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rendering-settings">Rendering settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#diagnostics">Diagnostics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wire-format">Wire format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#headless-screenshot-recipe">Headless screenshot recipe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#embedding-the-server-in-your-application">Embedding the server in your application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#writing-a-custom-client">Writing a custom client</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#driving-the-simulation-from-a-custom-client">Driving the simulation from a custom client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#feature-negotiation">Feature negotiation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#see-also">See also</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#api">API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6raisin10tcp_viewer12BufferReaderE"><code class="docutils literal notranslate"><span class="pre">raisin::tcp_viewer::BufferReader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisin10tcp_viewer12BufferReader12BufferReaderERKNSt6vectorIcEE"><code class="docutils literal notranslate"><span class="pre">BufferReader()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisin10tcp_viewer12BufferReader6offsetEv"><code class="docutils literal notranslate"><span class="pre">offset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisin10tcp_viewer12BufferReader4sizeEv"><code class="docutils literal notranslate"><span class="pre">size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisin10tcp_viewer12BufferReader9remainingEv"><code class="docutils literal notranslate"><span class="pre">remaining()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0EN6raisin10tcp_viewer12BufferReader4readE1Tv"><code class="docutils literal notranslate"><span class="pre">read()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0ENK6raisin10tcp_viewer12BufferReader4peekEb6size_tR1T"><code class="docutils literal notranslate"><span class="pre">peek()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisin10tcp_viewer12BufferReader8readBoolEv"><code class="docutils literal notranslate"><span class="pre">readBool()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisin10tcp_viewer12BufferReader10readStringEv"><code class="docutils literal notranslate"><span class="pre">readString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisin10tcp_viewer12BufferReader9readVec3fEv"><code class="docutils literal notranslate"><span class="pre">readVec3f()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisin10tcp_viewer12BufferReader9readVec4fEv"><code class="docutils literal notranslate"><span class="pre">readVec4f()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisin10tcp_viewer12BufferReader12readQuatWxyzEv"><code class="docutils literal notranslate"><span class="pre">readQuatWxyz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisin10tcp_viewer12BufferReader15readFloatVectorEv"><code class="docutils literal notranslate"><span class="pre">readFloatVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisin10tcp_viewer12BufferReader13readIntVectorEv"><code class="docutils literal notranslate"><span class="pre">readIntVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisin10tcp_viewer12BufferReader14readByteVectorEv"><code class="docutils literal notranslate"><span class="pre">readByteVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisin10tcp_viewer12BufferReader9skipBytesE6size_t"><code class="docutils literal notranslate"><span class="pre">skipBytes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisin10tcp_viewer12BufferReader12readColorMapEv"><code class="docutils literal notranslate"><span class="pre">readColorMap()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisin10tcp_viewer12BufferReader12skipColorMapEv"><code class="docutils literal notranslate"><span class="pre">skipColorMap()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Rayrai TCP Viewer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rayrai-tcp-viewer">
+<h1>Rayrai TCP Viewer<a class="headerlink" href="#rayrai-tcp-viewer" title="Link to this heading"></a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">rayrai_raisim_tcp_viewer</span></code> binary is the recommended visualizer for
+<code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> simulations. It connects to a running server over TCP, renders
+the world with the full rayrai pipeline (PBR + IBL + post-process), and lets
+you interactively pause, step, force-poke, and reposition objects without
+touching the simulation code.</p>
+<p>This page covers the viewer application — its panels, controls, command-line
+options — plus the underlying wire format for writing custom clients. For
+applications that embed the renderer directly with
+<code class="docutils literal notranslate"><span class="pre">raisin::RayraiWindow</span></code>, this binary is not used; see <a class="reference internal" href="Rayrai.html"><span class="doc">rayrai Visualizer</span></a>
+for the in-process path. For the server-side API the viewer talks to,
+see <a class="reference internal" href="RaisimServer.html"><span class="doc">Raisim Server</span></a>.</p>
+<figure class="align-default" id="id1">
+<a class="reference internal image-reference" href="../_images/tcp_viewer_primitives.png"><img alt="rayrai TCP viewer connected to primitive_grid" src="../_images/tcp_viewer_primitives.png" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The viewer connected to the <code class="docutils literal notranslate"><span class="pre">primitive_grid</span></code> example. The same rayrai
+PBR pipeline is used as the in-process <code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code>: procedural sky,
+directional shadows, and the reflective checker ground used by the
+Balanced, High, and Ultra presets.</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#quick-start" id="id5">Quick start</a></p></li>
+<li><p><a class="reference internal" href="#command-line-options" id="id6">Command-line options</a></p></li>
+<li><p><a class="reference internal" href="#ui-layout" id="id7">UI layout</a></p>
+<ul>
+<li><p><a class="reference internal" href="#control-tab-widget-reference" id="id8">Control tab — widget reference</a></p></li>
+<li><p><a class="reference internal" href="#options-tab" id="id9">Options tab</a></p></li>
+<li><p><a class="reference internal" href="#render-tab" id="id10">Render tab</a></p></li>
+<li><p><a class="reference internal" href="#objects-tab" id="id11">Objects tab</a></p></li>
+<li><p><a class="reference internal" href="#diagnostics-tab" id="id12">Diagnostics tab</a></p></li>
+<li><p><a class="reference internal" href="#right-side-inspector" id="id13">Right-side inspector</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#sim-control-workflow" id="id14">Sim control workflow</a></p></li>
+<li><p><a class="reference internal" href="#force-pose-application" id="id15">Force / pose application</a></p></li>
+<li><p><a class="reference internal" href="#access-control" id="id16">Access control</a></p></li>
+<li><p><a class="reference internal" href="#screenshots-and-recording" id="id17">Screenshots and recording</a></p></li>
+<li><p><a class="reference internal" href="#articulated-system-inspector-mode" id="id18">Articulated-system inspector mode</a></p></li>
+<li><p><a class="reference internal" href="#objects-and-selection" id="id19">Objects and selection</a></p></li>
+<li><p><a class="reference internal" href="#rendering-settings" id="id20">Rendering settings</a></p></li>
+<li><p><a class="reference internal" href="#diagnostics" id="id21">Diagnostics</a></p></li>
+<li><p><a class="reference internal" href="#wire-format" id="id22">Wire format</a></p></li>
+<li><p><a class="reference internal" href="#headless-screenshot-recipe" id="id23">Headless screenshot recipe</a></p></li>
+<li><p><a class="reference internal" href="#embedding-the-server-in-your-application" id="id24">Embedding the server in your application</a></p></li>
+<li><p><a class="reference internal" href="#writing-a-custom-client" id="id25">Writing a custom client</a></p>
+<ul>
+<li><p><a class="reference internal" href="#driving-the-simulation-from-a-custom-client" id="id26">Driving the simulation from a custom client</a></p></li>
+<li><p><a class="reference internal" href="#feature-negotiation" id="id27">Feature negotiation</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#see-also" id="id28">See also</a></p></li>
+<li><p><a class="reference internal" href="#api" id="id29">API</a></p></li>
+</ul>
+</nav>
+<section id="quick-start">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Quick start</a><a class="headerlink" href="#quick-start" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p>Start any <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> example. The server listens on <code class="docutils literal notranslate"><span class="pre">127.0.0.1:8080</span></code>
+by default.</p></li>
+<li><p>Launch the viewer:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./rayrai/&lt;OS&gt;/bin/rayrai_raisim_tcp_viewer
+</pre></div>
+</div>
+</li>
+<li><p>The viewer auto-connects to <code class="docutils literal notranslate"><span class="pre">localhost:8080</span></code>. To point it at a different
+endpoint, pass <code class="docutils literal notranslate"><span class="pre">--connect</span> <span class="pre">host:port</span></code> or type into the host / port fields
+under the <strong>Control</strong> tab.</p></li>
+</ol>
+<p>Run <code class="docutils literal notranslate"><span class="pre">rayrai_raisim_tcp_viewer</span> <span class="pre">--help</span></code> for the full option list. On Windows
+use the <code class="docutils literal notranslate"><span class="pre">.exe</span></code> binary.</p>
+</section>
+<section id="command-line-options">
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Command-line options</a><a class="headerlink" href="#command-line-options" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.0%" />
+<col style="width: 72.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Effect</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--connect</span> <span class="pre">HOST:PORT</span></code></p></td>
+<td><p>Override the default <code class="docutils literal notranslate"><span class="pre">127.0.0.1:8080</span></code> endpoint.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--auto-connect</span></code> / <code class="docutils literal notranslate"><span class="pre">--no-auto-connect</span></code></p></td>
+<td><p>Whether to dial the server on launch. Also controlled by env var
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_TCP_VIEWER_AUTO_CONNECT</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--no-pre-warm</span></code></p></td>
+<td><p>Skip the targeted shader prewarm pass. Startup is shorter, but the
+first content frame may pay shader compile cost.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--warm-at-startup</span></code></p></td>
+<td><p>Also run the heavier renderer content-frame warmup at startup. This is
+intended for demos or drag/drop inspection where the first loaded model
+should appear immediately.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--minimize-panels</span></code></p></td>
+<td><p>Start with both side panels collapsed (full-screen scene). Also via
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_TCP_VIEWER_MINIMIZE_PANELS</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--keep-overlay-open</span></code></p></td>
+<td><p>Disable auto-collapse of the left overlay. Useful for documentation
+screenshots and recorded demos.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--auto-frame</span></code></p></td>
+<td><p>Automatically frame the scene after the first state update.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--screenshot</span> <span class="pre">PATH</span></code></p></td>
+<td><p>Save a single PNG to <code class="docutils literal notranslate"><span class="pre">PATH</span></code> and exit. Useful for headless rendering.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--screenshot-dir</span> <span class="pre">PATH</span></code></p></td>
+<td><p>Directory used by the F12 hotkey and PNG sequence recording.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--record-session</span> <span class="pre">PATH.rrtcs</span></code></p></td>
+<td><p>Record the raw TCP stream to a session file for later replay.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--update-rate</span> <span class="pre">HZ</span></code></p></td>
+<td><p>Target TCP scene-update request rate. Values are clamped to the
+supported 15-120 Hz range; the default is 60 Hz.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--replay-session</span> <span class="pre">PATH.rrtcs</span></code></p></td>
+<td><p>Replay a recorded session instead of opening a TCP connection.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--replay-speed</span> <span class="pre">N</span></code></p></td>
+<td><p>Playback rate multiplier (1.0 = real time).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--replay-loop</span></code></p></td>
+<td><p>Loop the recorded session when replay reaches the end.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--export-scene</span> <span class="pre">PATH.json</span></code></p></td>
+<td><p>Dump the parsed scene graph as JSON and exit.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--trajectory-csv</span> <span class="pre">PATH</span></code></p></td>
+<td><p>Log object poses to CSV while updates arrive.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--server-list</span> <span class="pre">PATH</span></code></p></td>
+<td><p>Load additional <code class="docutils literal notranslate"><span class="pre">host:port</span></code> endpoints from a text file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--wait-for-server</span> <span class="pre">SECONDS</span></code></p></td>
+<td><p>In batch runs, exit if the initial connection does not succeed within
+this wall-clock limit.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--exit-after</span> <span class="pre">SECONDS</span></code></p></td>
+<td><p>Exit after the given wall-clock duration.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="ui-layout">
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">UI layout</a><a class="headerlink" href="#ui-layout" title="Link to this heading"></a></h2>
+<figure class="align-default" id="id2">
+<a class="reference internal image-reference" href="../_images/tcp_viewer_overview.png"><img alt="rayrai TCP viewer with the Control tab expanded" src="../_images/tcp_viewer_overview.png" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The viewer’s left overlay opened on the <strong>Control</strong> tab while attached to
+<code class="docutils literal notranslate"><span class="pre">sim_control_demo</span></code>. The right side of the window is the rayrai-rendered
+scene; the overlay floats above it with translucent background so the
+scene stays visible. The overlay auto-collapses to a small icon after
+3.5 s without hover — pass <code class="docutils literal notranslate"><span class="pre">--keep-overlay-open</span></code> to disable that
+behaviour for screenshots or demos.</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>The viewer overlay has two compact panels:</p>
+<ul class="simple">
+<li><p><strong>Left panel</strong> — tabbed UI: <strong>Control / Options / Render / Objects /
+Diagnostics</strong>. This is where every TCP-client setting lives.</p></li>
+<li><p><strong>Right panel — Selected object inspector</strong>. Appears when you click an
+object in the scene or in the <strong>Objects</strong> tab. Shows read-only pose, body
+type, mesh/resource metadata, estimated velocity, and per-joint angles for
+articulated systems. Editing controls live in the <strong>Control</strong> tab’s
+selected-control section.</p></li>
+</ul>
+<p>Both panels are independently collapsible. Click the small chevron in the
+header, or pass <code class="docutils literal notranslate"><span class="pre">--minimize-panels</span></code> to start with both panels minimized.</p>
+<section id="control-tab-widget-reference">
+<h3><a class="toc-backref" href="#id8" role="doc-backlink">Control tab — widget reference</a><a class="headerlink" href="#control-tab-widget-reference" title="Link to this heading"></a></h3>
+<figure class="align-default" id="id3">
+<a class="reference internal image-reference" href="../_images/tcp_viewer_control_panel.png"><img alt="detail of the Control tab" src="../_images/tcp_viewer_control_panel.png" style="width: 60%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Detail crop of the Control tab. Widget walkthrough below mirrors the
+layout top-to-bottom.</span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p><strong>Connection row.</strong></p>
+<ul class="simple">
+<li><p><strong>Host / port field</strong> — type <code class="docutils literal notranslate"><span class="pre">host:port</span></code> directly, or pick a recent
+entry from the dropdown chevron. Persisted in
+<code class="docutils literal notranslate"><span class="pre">$XDG_CONFIG_HOME/raisim/rayrai_tcp_viewer.json</span></code>.</p></li>
+<li><p><strong>Connect / Disconnect</strong> button — toggles the TCP socket. Greyed out
+while a session is replaying (<code class="docutils literal notranslate"><span class="pre">--replay-session</span></code>).</p></li>
+<li><p><strong>Auto-connect</strong> checkbox — when on, the viewer dials the server on
+launch and re-dials after a clean disconnect. Off means <em>manual connect</em>
+only, which is the right default for offline scene inspection.</p></li>
+</ul>
+<p><strong>Status block (read-only).</strong> Coloured text — green <code class="docutils literal notranslate"><span class="pre">Connected</span></code>, amber
+<code class="docutils literal notranslate"><span class="pre">Connecting…</span></code>, red <code class="docutils literal notranslate"><span class="pre">Disconnected:</span> <span class="pre">&lt;reason&gt;</span></code> — followed by:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">World</span> <span class="pre">&lt;t&gt;</span> <span class="pre">s</span></code> — the server-side <code class="docutils literal notranslate"><span class="pre">world.getWorldTime()</span></code> snapshot from
+the most recent frame.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Heightmap</span> <span class="pre">colors:</span> <span class="pre">server</span> <span class="pre">color</span> <span class="pre">map</span></code> — confirms heightmap streaming is
+using the server-side colour table rather than a viewer override.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FPS</span> <span class="pre">X</span> <span class="pre">|</span> <span class="pre">updates</span> <span class="pre">Y</span> <span class="pre">Hz</span></code> — renderer FPS and incoming TCP update rate
+respectively. If FPS drops while updates stay high, the renderer is the
+bottleneck (lower the quality preset on the <strong>Render</strong> tab). If updates
+drop while FPS is fine, the server or network is the bottleneck.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Objects</span> <span class="pre">N</span> <span class="pre">|</span> <span class="pre">visuals</span> <span class="pre">N</span> <span class="pre">|</span> <span class="pre">instanced</span> <span class="pre">N</span> <span class="pre">|</span> <span class="pre">point</span> <span class="pre">clouds</span> <span class="pre">N</span></code> — current scene
+counts as parsed from the latest frame. <code class="docutils literal notranslate"><span class="pre">instanced</span></code> includes ordinary
+streamed instanced visuals plus synthesized TCP mesh batches for repeated
+articulated meshes.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Assets</span> <span class="pre">unresolved</span> <span class="pre">N</span> <span class="pre">|</span> <span class="pre">sensor</span> <span class="pre">requests</span> <span class="pre">N</span> <span class="pre">|</span> <span class="pre">session</span> <span class="pre">live|recording|replay</span></code>
+— <code class="docutils literal notranslate"><span class="pre">unresolved</span></code> is the number of mesh paths that could not be found; fix
+by passing <code class="docutils literal notranslate"><span class="pre">--resource-dir</span> <span class="pre">PATH</span></code> (or the <strong>Options</strong> tab field). The
+session marker reflects <code class="docutils literal notranslate"><span class="pre">--record-session</span></code> / <code class="docutils literal notranslate"><span class="pre">--replay-session</span></code>.</p></li>
+</ul>
+<p><strong>Camera helpers.</strong></p>
+<ul class="simple">
+<li><p><strong>Frame Scene</strong> — fit every selectable object in the camera frustum.
+Same as the keyboard shortcut <code class="docutils literal notranslate"><span class="pre">F</span></code>.</p></li>
+<li><p><strong>Frame Selected</strong> — fit the currently-selected object only.</p></li>
+<li><p><strong>Screenshot</strong> — write a PNG to <code class="docutils literal notranslate"><span class="pre">--screenshot-dir</span></code> (see the <strong>Options</strong>
+tab to change the directory).</p></li>
+</ul>
+<p><strong>Simulation row.</strong> Only enabled when the server has negotiated
+<code class="docutils literal notranslate"><span class="pre">PROTOCOL_FEATURE_SIM_CONTROL</span></code>. The viewer greys the icons out
+automatically against a legacy <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> build; see
+<code class="docutils literal notranslate"><span class="pre">TcpClient::serverSupportsSimControl()</span></code> for the same flag from the client
+side.</p>
+<ul class="simple">
+<li><p><strong>Pause / Resume</strong> (orange ⏸ when running, green ▶ when paused) — sends
+<code class="docutils literal notranslate"><span class="pre">CR_PAUSE</span></code> / <code class="docutils literal notranslate"><span class="pre">CR_RESUME</span></code>. The server skips <code class="docutils literal notranslate"><span class="pre">world_-&gt;integrate()</span></code>
+but state streaming keeps running, so the camera, panels, and inspector
+stay responsive while time is frozen.</p></li>
+<li><p><strong>Step</strong> — sends <code class="docutils literal notranslate"><span class="pre">CR_STEP_N</span></code> with <code class="docutils literal notranslate"><span class="pre">stepCount</span> <span class="pre">=</span> <span class="pre">1</span></code>. Advances one
+<code class="docutils literal notranslate"><span class="pre">world_-&gt;integrate()</span></code> tick.</p></li>
+<li><p><strong>Step 10</strong> — same but <code class="docutils literal notranslate"><span class="pre">stepCount</span> <span class="pre">=</span> <span class="pre">10</span></code>. Hold the button to scrub.</p></li>
+</ul>
+<p><strong>Debug toggles.</strong> Two-column grid of boolean toggles:</p>
+<ul class="simple">
+<li><p><strong>Verbose parsing</strong> — logs every received TCP frame to stderr with field
+offsets. Use when chasing wire-format issues, then turn back off (heavy
+log volume).</p></li>
+<li><p><strong>Show Collision Bodies</strong> — draw the collision shapes the contact solver
+actually sees, instead of the visual meshes. Distinguishes “the visual
+mesh I authored is huge” from “the collision body is right”.</p></li>
+<li><p><strong>X-ray (transparent)</strong> — alpha-blend every opaque object so you can see
+through the scene. Useful for inspecting nested articulated systems or
+hidden constraints.</p></li>
+<li><p><strong>Show World Frame</strong> — draw the X/Y/Z triad at the world origin.</p></li>
+<li><p><strong>Show Body Frames</strong> — draw body-frame axes for selectable streamed bodies.</p></li>
+<li><p><strong>Show COM Markers</strong> — draw markers at streamed center-of-mass positions.</p></li>
+<li><p><strong>Pose Grabber (drag axes)</strong> — show a world-axis pose gizmo on the selected
+object. Drag its translation or rotation handles to queue pose edits.</p></li>
+<li><p><strong>Show Contact Points</strong> — render small spheres at every active contact
+point reported by <code class="docutils literal notranslate"><span class="pre">world.getContacts()</span></code>.</p></li>
+<li><p><strong>Show Contact Forces</strong> — render arrows scaled by the contact impulse
+magnitude at every contact point. Pair with <strong>Contact Pt</strong> and <strong>Contact
+Force</strong> sliders below to scale them so they’re visible.</p></li>
+<li><p><strong>Force Scale: Absolute</strong> — interpret contact-force arrows in absolute
+units instead of normalizing them to the current frame’s largest force.</p></li>
+</ul>
+<p><strong>Light and camera sliders.</strong> Direct overrides of the renderer’s main
+directional light and camera, equivalent to the C++ <code class="docutils literal notranslate"><span class="pre">Light::setRotation</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Light::setStrength</span></code>, and the <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings.mainLightAmbient</span></code>
+fields:</p>
+<ul class="simple">
+<li><p><strong>Camera Speed</strong> — WASD movement multiplier.</p></li>
+<li><p><strong>Light Yaw / Light Pitch</strong> — direction of the main directional light, in
+degrees. <code class="docutils literal notranslate"><span class="pre">-30°</span></code> pitch is the default afternoon sun angle.</p></li>
+<li><p><strong>Light Strength</strong> — scalar multiplier on the directional light’s PBR
+intensity.</p></li>
+<li><p><strong>Ambient Strength</strong> — multiplier on the IBL ambient contribution
+(sky-driven fill). Lowering this darkens shaded sides without dimming the
+sun.</p></li>
+<li><p><strong>Contact Pt</strong> / <strong>Contact Force</strong> — size sliders for the contact debug
+spheres / arrows above.</p></li>
+</ul>
+<p><strong>Resource dirs.</strong> Text field + <code class="docutils literal notranslate"><span class="pre">Add</span></code> button. Each added directory is
+inserted into the renderer’s mesh-search path, applied immediately to the
+next frame’s asset resolution. Use this to fix <code class="docutils literal notranslate"><span class="pre">Assets</span> <span class="pre">unresolved</span></code> for
+URDFs whose mesh paths assume a workspace root that isn’t on the default
+search list. The same list can be passed up-front via <code class="docutils literal notranslate"><span class="pre">--resource-dir</span>
+<span class="pre">PATH</span></code> (repeatable).</p>
+</section>
+<section id="options-tab">
+<h3><a class="toc-backref" href="#id9" role="doc-backlink">Options tab</a><a class="headerlink" href="#options-tab" title="Link to this heading"></a></h3>
+<p>The <strong>Options</strong> tab houses <em>viewer-local</em> preferences — they don’t go over
+the TCP socket, so they apply to every connection:</p>
+<ul class="simple">
+<li><p><strong>UI Scale</strong> — global ImGui font / control scale. Persists across runs.</p></li>
+<li><p><strong>Reset Scale</strong> — restore the auto-detected DPI-derived default.</p></li>
+<li><p><strong>Show collapsed logo</strong> — toggle the small raisim badge that appears in
+the panel header when minimized. Off for a more compact corner.</p></li>
+<li><p><strong>Hover the collapsed header to open the panel</strong> vs the legacy
+click-to-expand behaviour.</p></li>
+<li><p><strong>Frame Scene / Frame Selected / Reset Camera</strong> — camera framing shortcuts
+matching <code class="docutils literal notranslate"><span class="pre">F</span></code>, <code class="docutils literal notranslate"><span class="pre">C</span></code>, and <code class="docutils literal notranslate"><span class="pre">R</span></code>.</p></li>
+<li><p><strong>Orthographic views</strong> — snap to Top / Bottom / Front / Back / Left / Right
+orthographic projections of the current scene bounds, or return to
+Perspective.</p></li>
+<li><p><strong>Camera bookmarks</strong> — save and restore four named camera positions from
+the UI. The keyboard shortcuts use the same camera state.</p></li>
+<li><p><strong>Toggle Fullscreen</strong> — same as <code class="docutils literal notranslate"><span class="pre">F11</span></code>.</p></li>
+<li><p><strong>Screenshot directory</strong> — path used by F12 and the <strong>Screenshot</strong>
+button. Defaults to the current working directory unless
+<code class="docutils literal notranslate"><span class="pre">--screenshot-dir</span></code> overrides it.</p></li>
+<li><p><strong>PNG-sequence record every N frames</strong> — records a frame-numbered PNG
+sequence at the chosen stride. Output goes into the screenshot directory.</p></li>
+<li><p><strong>TCP session recording</strong> — start / stop raw TCP recording from the UI.
+Replay sessions also expose pause, single-step, restart, and speed controls.</p></li>
+</ul>
+</section>
+<section id="render-tab">
+<h3><a class="toc-backref" href="#id10" role="doc-backlink">Render tab</a><a class="headerlink" href="#render-tab" title="Link to this heading"></a></h3>
+<p>The <strong>Render</strong> tab is the rayrai pipeline configuration mirror — every knob
+documented in <a class="reference internal" href="rayrai/RenderQuality.html"><span class="doc">Render quality, tone mapping, color grading</span></a>, <a class="reference internal" href="rayrai/Lighting.html"><span class="doc">Lighting, shadows, and HDR/IBL</span></a>,
+<a class="reference internal" href="rayrai/PostProcess.html"><span class="doc">Post-process effects</span></a>, and <a class="reference internal" href="rayrai/Weather.html"><span class="doc">Weather and atmospherics</span></a>:</p>
+<ul class="simple">
+<li><p><strong>Quality preset</strong> — Fast / Balanced / High / Ultra. Picks one of the
+defaults documented in
+<code class="docutils literal notranslate"><span class="pre">RenderQualitySettings::defaultRenderQualitySettings</span></code>.</p></li>
+<li><p><strong>Custom overrides</strong> — once you tweak any subfield, the preset row
+reads <code class="docutils literal notranslate"><span class="pre">Custom</span></code>; click <strong>Reset to preset</strong> to return to the canonical
+values.</p></li>
+<li><p><strong>FXAA / TAA</strong> — antialiasing mode.</p></li>
+<li><p><strong>Bloom</strong> — enable/disable, with threshold and intensity sliders that
+match <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings.bloomThreshold</span></code> /
+<code class="docutils literal notranslate"><span class="pre">bloomIntensity</span></code>.</p></li>
+<li><p><strong>SSAO</strong> — screen-space ambient occlusion strength + radius.</p></li>
+<li><p><strong>Depth of field</strong> — toggle + aperture / focus-distance / focus-range
+sliders.</p></li>
+<li><p><strong>Tone mapping</strong> — dropdown over <code class="docutils literal notranslate"><span class="pre">ViewerColorMode</span></code> (FastLinear / ACES /
+UnrealPreview / Filmic / AgX).</p></li>
+<li><p><strong>Color grade preset</strong> — dropdown over <code class="docutils literal notranslate"><span class="pre">ColorGradePreset</span></code>.</p></li>
+<li><p><strong>Procedural sky</strong> — toggle + sun-strength + cloud-quality dropdown.</p></li>
+<li><p><strong>Weather</strong> — dropdown over <code class="docutils literal notranslate"><span class="pre">WeatherPreset</span></code> (Clear / Overcast / Rain /
+Storm / Snow) plus rain / fog / wetness sliders. The renderer applies
+these in addition to whatever the server may have authored — set the
+server-side weather to None if you want viewer-only authoring.</p></li>
+<li><p><strong>Reflective ground</strong> + <strong>Planar reflection strength</strong> — match the
+<code class="docutils literal notranslate"><span class="pre">RenderQualitySettings.reflectiveGround*</span></code> fields. On for High and Ultra
+by default.</p></li>
+</ul>
+</section>
+<section id="objects-tab">
+<h3><a class="toc-backref" href="#id11" role="doc-backlink">Objects tab</a><a class="headerlink" href="#objects-tab" title="Link to this heading"></a></h3>
+<p>The <strong>Objects</strong> tab lists every selectable object the server has sent so
+far, with:</p>
+<ul class="simple">
+<li><p><strong>Filter</strong> field — case-insensitive substring match on the object name.</p></li>
+<li><p><strong>Group by type</strong> — fold the list into per-type sections
+(single-body / articulated / heightmap / instanced visuals / point cloud).</p></li>
+<li><p><strong>Hide collision shapes for all</strong> — global toggle that propagates the
+per-object <strong>Show collision bodies</strong> state across every entry. Useful when
+you want a uniform x-ray view without ticking every object.</p></li>
+<li><p><strong>Per-row click</strong> — selects the object (same as clicking it in the scene).</p></li>
+<li><p><strong>Per-row eye icon</strong> — toggle visibility without removing the object.</p></li>
+</ul>
+</section>
+<section id="diagnostics-tab">
+<h3><a class="toc-backref" href="#id12" role="doc-backlink">Diagnostics tab</a><a class="headerlink" href="#diagnostics-tab" title="Link to this heading"></a></h3>
+<p>The <strong>Diagnostics</strong> tab is the field for <em>debugging</em> a connection rather
+than driving one:</p>
+<ul class="simple">
+<li><p><strong>Packet history</strong> — circular buffer of recent TCP frames with sizes,
+feature bits, and parse status.</p></li>
+<li><p><strong>Asset resolution log</strong> — every mesh / texture path the renderer asked
+for, with the directory it was found in or the error if not. Mirror of
+the <code class="docutils literal notranslate"><span class="pre">Assets</span> <span class="pre">unresolved</span></code> count on the Control tab.</p></li>
+<li><p><strong>Parse error log</strong> — last N parse-error messages from
+<code class="docutils literal notranslate"><span class="pre">raisin_tcp_window</span></code>, including the byte offset where the parser gave up
+and the message size in flight. Pair with <strong>Verbose parsing</strong> to
+reproduce.</p></li>
+<li><p><strong>Cache stats</strong> — shader binary cache hits / misses / stores for the
+current process. See <a class="reference internal" href="rayrai/Performance.html"><span class="doc">Performance notes and the C++ API reference</span></a> for the underlying
+<code class="docutils literal notranslate"><span class="pre">Shader::binaryCacheStats()</span></code> API.</p></li>
+<li><p><strong>Data transfer target</strong> — graph recent receive bandwidth and set the
+target TCP update request rate between 15 and 120 Hz. This is the runtime
+equivalent of <code class="docutils literal notranslate"><span class="pre">--update-rate</span></code>.</p></li>
+<li><p><strong>Security note</strong> — the viewer reminds you that TCP traffic is plain and
+unauthenticated; use loopback, SSH/VPN, or a trusted network.</p></li>
+</ul>
+</section>
+<section id="right-side-inspector">
+<h3><a class="toc-backref" href="#id13" role="doc-backlink">Right-side inspector</a><a class="headerlink" href="#right-side-inspector" title="Link to this heading"></a></h3>
+<p>The right-side panel only appears when an object is selected. Top-to-bottom:</p>
+<ul class="simple">
+<li><p><strong>Object name and stable id</strong> (<code class="docutils literal notranslate"><span class="pre">Object::Id</span></code> from the world).</p></li>
+<li><p><strong>Body type</strong> — Static / Kinematic / Dynamic.</p></li>
+<li><p><strong>Position / Orientation</strong> — current streamed pose in world coordinates.</p></li>
+<li><p><strong>Velocity</strong> — estimated linear speed and angular speed when enough samples
+are available.</p></li>
+<li><p><strong>Joint angles</strong> (articulated systems only) — read-only angle table from the
+selected articulated body. Use the <strong>Control</strong> tab’s generalized-coordinate
+editor when you want to send <code class="docutils literal notranslate"><span class="pre">CR_SET_GC</span></code>.</p></li>
+<li><p><strong>Mesh / resource metadata</strong> — mesh file and resolved resource directory when
+available.</p></li>
+</ul>
+</section>
+</section>
+<section id="sim-control-workflow">
+<h2><a class="toc-backref" href="#id14" role="doc-backlink">Sim control workflow</a><a class="headerlink" href="#sim-control-workflow" title="Link to this heading"></a></h2>
+<figure class="align-default" id="id4">
+<a class="reference internal image-reference" href="../_images/tcp_viewer_anymal.png"><img alt="rayrai TCP viewer with sim_control_demo" src="../_images/tcp_viewer_anymal.png" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The viewer attached to the <code class="docutils literal notranslate"><span class="pre">sim_control_demo</span></code> example. Clicking
+<em>Pause</em> in the Control tab sends a <code class="docutils literal notranslate"><span class="pre">CR_PAUSE</span></code> request to the server;
+the next <code class="docutils literal notranslate"><span class="pre">world_-&gt;integrate()</span></code> is skipped while state streaming keeps
+running. <em>Step</em> and <em>Step 10</em> push one or ten single-tick advances.</span><a class="headerlink" href="#id4" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>The Pause / Step buttons send <code class="docutils literal notranslate"><span class="pre">CR_PAUSE</span></code> / <code class="docutils literal notranslate"><span class="pre">CR_RESUME</span></code> / <code class="docutils literal notranslate"><span class="pre">CR_STEP_N</span></code>
+messages over the existing update channel. The server consumes them inside
+<code class="docutils literal notranslate"><span class="pre">integrateWorldThreadSafe()</span></code>: paused means <code class="docutils literal notranslate"><span class="pre">world_-&gt;integrate()</span></code> is
+skipped, but state streaming, sensor reads, and the scene mutex all keep
+working — you can still pan the camera, screenshot, and inspect objects
+while time is frozen.</p>
+<p>Stepping while paused enqueues <code class="docutils literal notranslate"><span class="pre">N</span></code> single-step integrations that drain one
+per tick. This means you can hold <em>Step</em> (or click <em>Step 10</em>) to advance the
+simulation deterministically, frame by frame, with the camera tracking what
+just happened.</p>
+<p>For programmatic control without the UI, the same messages can be sent by
+any client that speaks <code class="docutils literal notranslate"><span class="pre">PROTOCOL_FEATURE_SIM_CONTROL</span></code> — see
+<code class="docutils literal notranslate"><span class="pre">raisin::tcp_viewer::sendUpdateRequest</span></code> and the <code class="docutils literal notranslate"><span class="pre">SimControlRequest</span></code> struct
+in <code class="docutils literal notranslate"><span class="pre">rayrai/RaisimTcpCommon.hpp</span></code>.</p>
+</section>
+<section id="force-pose-application">
+<h2><a class="toc-backref" href="#id15" role="doc-backlink">Force / pose application</a><a class="headerlink" href="#force-pose-application" title="Link to this heading"></a></h2>
+<p>Shift + left-drag on the selected object sends <code class="docutils literal notranslate"><span class="pre">CR_APPLY_FORCE</span></code> for the
+duration of the drag. The drag anchor is stored in the selected body’s local
+frame, so the force application point follows the body as it moves. The
+selected-control panel can also send explicit <code class="docutils literal notranslate"><span class="pre">CR_APPLY_FORCE</span></code> /
+<code class="docutils literal notranslate"><span class="pre">CR_APPLY_TORQUE</span></code> requests.</p>
+<p>Pose widgets and the pose grabber emit <code class="docutils literal notranslate"><span class="pre">CR_SET_POSE</span></code> for single bodies and
+<code class="docutils literal notranslate"><span class="pre">CR_SET_GC</span></code> for articulated systems. Pose and generalized-coordinate edits
+are applied under the world mutex as soon as the server drains client
+requests. Force and torque requests are converted into active client forces
+with a short hold window (0.12 s of simulation time) and are applied on each
+subsequent integration tick until they are refreshed or expire. While the
+server is paused, a queued force is refreshed but is not applied until a
+step or resume tick actually integrates the world.</p>
+</section>
+<section id="access-control">
+<h2><a class="toc-backref" href="#id16" role="doc-backlink">Access control</a><a class="headerlink" href="#access-control" title="Link to this heading"></a></h2>
+<p>There is no authentication or capability handshake — if the TCP connection
+is open, the client can issue any sim-control request the server supports.
+The bind address is the only access control: <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> binds to
+<code class="docutils literal notranslate"><span class="pre">127.0.0.1</span></code> by default. Call <code class="docutils literal notranslate"><span class="pre">server.setBindLoopbackOnly(false)</span></code> only on
+trusted networks (see <a class="reference internal" href="RaisimServer.html"><span class="doc">Raisim Server</span></a> for details).</p>
+</section>
+<section id="screenshots-and-recording">
+<h2><a class="toc-backref" href="#id17" role="doc-backlink">Screenshots and recording</a><a class="headerlink" href="#screenshots-and-recording" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>F12</strong> — capture a PNG to the configured screenshot directory.</p></li>
+<li><p><strong>F11</strong> — toggle fullscreen desktop mode.</p></li>
+<li><p><strong>PNG sequence</strong> — enable the Options-tab checkbox and choose the frame
+stride to record numbered PNGs into the screenshot directory.</p></li>
+<li><p><strong>Camera bookmarks</strong> — save and restore four camera positions from the
+Options tab.</p></li>
+<li><p><strong>H / ?</strong> — show or hide the keyboard shortcut overlay.</p></li>
+<li><p><strong>M</strong> — cycle the measure tool through off, 2-point ruler, and 3-point
+angle measurement. Left-click places measurement points.</p></li>
+<li><p><strong>G</strong> — toggle the pose grabber for the selected object.</p></li>
+<li><p><strong>Session recording</strong> — see <code class="docutils literal notranslate"><span class="pre">--record-session</span></code> / <code class="docutils literal notranslate"><span class="pre">--replay-session</span></code>.
+Recorded sessions store the raw TCP frames, so you can re-render a run
+later at any quality preset.</p></li>
+</ul>
+</section>
+<section id="articulated-system-inspector-mode">
+<h2><a class="toc-backref" href="#id18" role="doc-backlink">Articulated-system inspector mode</a><a class="headerlink" href="#articulated-system-inspector-mode" title="Link to this heading"></a></h2>
+<p>While the viewer is <em>not</em> connected to a server, you can drag a URDF (<code class="docutils literal notranslate"><span class="pre">.urdf</span></code>)
+or MuJoCo XML (<code class="docutils literal notranslate"><span class="pre">.xml</span></code>/<code class="docutils literal notranslate"><span class="pre">.mjcf</span></code>) file from your file manager onto the viewer
+window. The file content is sniffed for a <code class="docutils literal notranslate"><span class="pre">&lt;mujoco</span></code> root marker; if present
+the model is loaded through the MJCF path (<code class="docutils literal notranslate"><span class="pre">World::loadMjcfFile</span></code>), otherwise
+it goes through the URDF path (<code class="docutils literal notranslate"><span class="pre">World::addArticulatedSystem</span></code>). MJCF loads
+may bring in extras declared in the <code class="docutils literal notranslate"><span class="pre">&lt;worldbody&gt;</span></code> (ground plane, lights,
+mocap bodies) — they’re tracked and removed together with the robot when you
+close the inspector.</p>
+<p>The viewer then opens a <strong>Joint Inspector</strong> panel:</p>
+<ul class="simple">
+<li><p>Per-joint sliders for revolute and prismatic joints (bounded by the URDF’s
+<code class="docutils literal notranslate"><span class="pre">&lt;limit</span> <span class="pre">lower=&quot;...&quot;</span> <span class="pre">upper=&quot;...&quot;&gt;</span></code> when present, free-form otherwise).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DragFloat3</span></code>/<code class="docutils literal notranslate"><span class="pre">DragFloat4</span></code> widgets for spherical joints and floating
+bases.</p></li>
+<li><p><strong>Reset pose</strong> sets all joint values to zero (identity quaternions).</p></li>
+<li><p><strong>Close inspector</strong> removes the local robot and returns the viewer to
+normal TCP-client mode (Connect / Auto-connect become re-enabled).</p></li>
+</ul>
+<p>The inspector is kinematic-only — there is no integration, no contact
+resolution, no physics. It’s intended for quickly inspecting URDF / MJCF
+authoring (joint axes, limits, mesh paths) before plugging the model into a
+running <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code>. Drops are ignored while a server connection is
+active so that the streamed scene and the local robot don’t fight over the
+same renderer; disconnect first if you want to inspect a file.</p>
+</section>
+<section id="objects-and-selection">
+<h2><a class="toc-backref" href="#id19" role="doc-backlink">Objects and selection</a><a class="headerlink" href="#objects-and-selection" title="Link to this heading"></a></h2>
+<p>Click any object in the scene or in the <strong>Objects</strong> tab list to select it.
+The right-side inspector shows:</p>
+<ul class="simple">
+<li><p>Object name, tag, body type</p></li>
+<li><p>World-space position and orientation</p></li>
+<li><p>For articulated systems: joint names and current joint angles</p></li>
+<li><p>Toggleable collision-body visibility per-object</p></li>
+</ul>
+<p>The <strong>Objects</strong> tab supports group-by-type, name filtering, and a
+collision-hide toggle that propagates to every selectable object at once.</p>
+</section>
+<section id="rendering-settings">
+<h2><a class="toc-backref" href="#id20" role="doc-backlink">Rendering settings</a><a class="headerlink" href="#rendering-settings" title="Link to this heading"></a></h2>
+<p>The <strong>Render</strong> tab exposes the rayrai pipeline controls covered in detail in
+<a class="reference internal" href="rayrai/RenderQuality.html"><span class="doc">Render quality, tone mapping, color grading</span></a>, <a class="reference internal" href="rayrai/Lighting.html"><span class="doc">Lighting, shadows, and HDR/IBL</span></a>,
+<a class="reference internal" href="rayrai/PostProcess.html"><span class="doc">Post-process effects</span></a>, and <a class="reference internal" href="rayrai/Weather.html"><span class="doc">Weather and atmospherics</span></a>: quality preset, FXAA,
+bloom, screen-space AO, depth of field, OIT, sky + weather,
+reflection-probe / planar-reflection toggles, and PBR material/tone-mapping
+options.</p>
+</section>
+<section id="diagnostics">
+<h2><a class="toc-backref" href="#id21" role="doc-backlink">Diagnostics</a><a class="headerlink" href="#diagnostics" title="Link to this heading"></a></h2>
+<p>The <strong>Diagnostics</strong> tab shows live packet history, asset resolution status
+(useful when meshes can’t be found), and per-frame parse-error logs. Useful
+when developing custom clients or chasing mesh-path issues.</p>
+</section>
+<section id="wire-format">
+<h2><a class="toc-backref" href="#id22" role="doc-backlink">Wire format</a><a class="headerlink" href="#wire-format" title="Link to this heading"></a></h2>
+<p>The Rayrai TCP viewer protocol is explicitly versioned. The current viewer
+sends a protocol header with feature bits before each request, and the
+server replies with the negotiated feature set. A viewer rejects newer
+unsupported protocol versions with a clear error instead of attempting to
+parse an incompatible stream.</p>
+<p>Current feature bits cover the explicit header, deformable delta streaming,
+and sim control. Deformable objects send mesh topology during initialization
+or topology changes; ordinary update frames send vertex positions only. This
+keeps dynamic cloth/cube streaming cheaper while avoiding binary compression
+until network bandwidth is measured as a bottleneck.</p>
+<p>The protocol constants live in <code class="docutils literal notranslate"><span class="pre">rayrai/RaisimTcpCommon.hpp</span></code> (namespace
+<code class="docutils literal notranslate"><span class="pre">raisin::tcp_viewer</span></code>):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">kDefaultPort</span></code> — default <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> port the viewer connects to.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kProtocolVersion</span></code> — the current wire version. Mismatched versions cause
+the viewer to disconnect with a versioned-protocol error.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kProtocolFeatureExplicitHeader</span></code>, <code class="docutils literal notranslate"><span class="pre">kProtocolFeatureDeformableDelta</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">kProtocolFeatureSimControl</span></code> — the currently-negotiated feature bits;
+<code class="docutils literal notranslate"><span class="pre">kProtocolFeaturesSupported</span></code> is the OR of all bits this build understands.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kMaxMessageBytes</span></code> — maximum accepted message size (default 64 MiB),
+overridable at build time via the
+<code class="docutils literal notranslate"><span class="pre">RAISIM_TCP_VIEWER_MAX_MESSAGE_BYTES</span></code> preprocessor define when very large
+scenes need a larger frame budget.</p></li>
+</ul>
+<p>The wire format is a native-endian binary stream. Each TCP frame begins with
+an <code class="docutils literal notranslate"><span class="pre">int32_t</span></code> total-frame-size header (including the 4-byte header itself).
+Scene strings use <code class="docutils literal notranslate"><span class="pre">int32_t</span></code> lengths; sensor-response names use <code class="docutils literal notranslate"><span class="pre">uint64_t</span></code>
+lengths to remain ABI-compatible with the legacy <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> protocol.</p>
+</section>
+<section id="headless-screenshot-recipe">
+<h2><a class="toc-backref" href="#id23" role="doc-backlink">Headless screenshot recipe</a><a class="headerlink" href="#headless-screenshot-recipe" title="Link to this heading"></a></h2>
+<p>The same binary runs without a window manager when invoked with
+<code class="docutils literal notranslate"><span class="pre">--screenshot</span></code>. The viewer connects, waits for the first valid scene
+update, captures one PNG, and exits — useful for CI smoke tests, doc
+builds, and dataset preview generation:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1) Start any RaisimServer example in the background.</span>
+<span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$RAISIM_DIR</span>/lib<span class="w"> </span>./primitive_grid<span class="w"> </span><span class="p">&amp;</span>
+
+<span class="c1"># 2) Capture a 1280x720 PNG framed on the scene, then exit.</span>
+<span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$RAYRAI_DIR</span>/lib:<span class="nv">$RAISIM_DIR</span>/lib<span class="w"> </span><span class="se">\\</span>
+<span class="w">  </span>./rayrai_raisim_tcp_viewer<span class="w"> </span><span class="se">\\</span>
+<span class="w">    </span>--connect<span class="w"> </span><span class="m">127</span>.0.0.1:8080<span class="w"> </span><span class="se">\\</span>
+<span class="w">    </span>--camera-lookat<span class="w"> </span><span class="m">14</span>,-14,6,-1,-1,3<span class="w"> </span><span class="se">\\</span>
+<span class="w">    </span>--screenshot<span class="w"> </span>out.png<span class="w"> </span><span class="se">\\</span>
+<span class="w">    </span>--window-size<span class="w"> </span>1280x720<span class="w"> </span><span class="se">\\</span>
+<span class="w">    </span>--wait-for-server<span class="w"> </span><span class="m">8</span><span class="w"> </span><span class="se">\\</span>
+<span class="w">    </span>--exit-after<span class="w"> </span><span class="m">5</span>
+</pre></div>
+</div>
+<p>The two screenshots on this page were generated exactly this way. Combine
+<code class="docutils literal notranslate"><span class="pre">--minimize-panels</span></code> for clean shots, or omit it to capture the overlay
+panels.</p>
+</section>
+<section id="embedding-the-server-in-your-application">
+<h2><a class="toc-backref" href="#id24" role="doc-backlink">Embedding the server in your application</a><a class="headerlink" href="#embedding-the-server-in-your-application" title="Link to this heading"></a></h2>
+<p>Wire the server up on the simulation side with three lines and a tick
+callback that runs under the world mutex:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;raisim/RaisimServer.hpp&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;raisim/World.hpp&quot;</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
+<span class="w">  </span><span class="n">world</span><span class="p">.</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.005</span><span class="p">);</span>
+<span class="w">  </span><span class="n">world</span><span class="p">.</span><span class="n">addGround</span><span class="p">();</span>
+<span class="w">  </span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">ball</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="w">  </span><span class="n">ball</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+
+<span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">RaisimServer</span><span class="w"> </span><span class="n">server</span><span class="p">(</span><span class="o">&amp;</span><span class="n">world</span><span class="p">);</span>
+<span class="w">  </span><span class="c1">// Default bind is 127.0.0.1. Only open the bind on trusted networks.</span>
+<span class="w">  </span><span class="c1">// server.setBindLoopbackOnly(false);</span>
+<span class="w">  </span><span class="n">server</span><span class="p">.</span><span class="n">launchServer</span><span class="p">(</span><span class="mi">8080</span><span class="p">);</span>
+
+<span class="w">  </span><span class="c1">// Optional: drive your own work inside the locked region, after</span>
+<span class="w">  </span><span class="c1">// client requests are drained and before world.integrate() when</span>
+<span class="w">  </span><span class="c1">// this tick is allowed to step.</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">server</span><span class="p">.</span><span class="n">integrateWorldThreadSafe</span><span class="p">([</span><span class="o">&amp;</span><span class="p">]</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">600</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="n">ball</span><span class="o">-&gt;</span><span class="n">setLinearVelocity</span><span class="p">({</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">});</span>
+<span class="w">    </span><span class="p">});</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The callback overload preserves the full pause / step / force / pose
+behaviour of the no-arg version, so the viewer can still pause time even
+while the example mutates the world every tick. See <code class="docutils literal notranslate"><span class="pre">examples/src/server/</span></code>
+for a runnable showcase (<code class="docutils literal notranslate"><span class="pre">sim_control_demo</span></code> exercises the sim-control
+surface end-to-end).</p>
+</section>
+<section id="writing-a-custom-client">
+<h2><a class="toc-backref" href="#id25" role="doc-backlink">Writing a custom client</a><a class="headerlink" href="#writing-a-custom-client" title="Link to this heading"></a></h2>
+<p>The header <code class="docutils literal notranslate"><span class="pre">rayrai/RaisimTcpCommon.hpp</span></code> exposes everything a custom client
+needs: the <code class="docutils literal notranslate"><span class="pre">TcpClient</span></code> socket helper, <code class="docutils literal notranslate"><span class="pre">BufferReader</span></code> for parsing, the
+<code class="docutils literal notranslate"><span class="pre">ClientRequestType</span></code> enum (CR_PAUSE / CR_RESUME / CR_STEP_N / CR_APPLY_FORCE
+/ CR_APPLY_TORQUE / CR_SET_POSE / CR_SET_GC), and <code class="docutils literal notranslate"><span class="pre">sendUpdateRequest</span></code> for
+batching sim-control requests onto an ordinary update.</p>
+<p>A minimal frame-pulling loop:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;rayrai/RaisimTcpCommon.hpp&quot;</span>
+<span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">raisin</span><span class="o">::</span><span class="nn">tcp_viewer</span><span class="p">;</span>
+
+<span class="n">TcpClient</span><span class="w"> </span><span class="n">client</span><span class="p">;</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">client</span><span class="p">.</span><span class="n">connectTo</span><span class="p">(</span><span class="s">&quot;127.0.0.1&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">8080</span><span class="p">,</span><span class="w"> </span><span class="cm">/*verbose=*/</span><span class="nb">true</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;connect failed: %s</span><span class="se">\\</span><span class="s">n&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">lastError</span><span class="p">().</span><span class="n">c_str</span><span class="p">());</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span><span class="w"> </span><span class="n">payload</span><span class="p">;</span>
+<span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">client</span><span class="p">.</span><span class="n">isConnected</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// Ask for one fresh state frame. objectId=0 means &quot;all objects&quot;.</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">sendUpdateRequest</span><span class="p">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="cm">/*objectId=*/</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="cm">/*controlRequests=*/</span><span class="p">{}))</span><span class="w"> </span><span class="k">break</span><span class="p">;</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">client</span><span class="p">.</span><span class="n">recvMessage</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">client</span><span class="p">.</span><span class="n">lastIoWouldBlock</span><span class="p">())</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span>
+<span class="w">    </span><span class="k">break</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="n">BufferReader</span><span class="w"> </span><span class="n">reader</span><span class="p">(</span><span class="n">payload</span><span class="p">);</span>
+<span class="w">  </span><span class="c1">// First two values in every server frame are the negotiated</span>
+<span class="w">  </span><span class="c1">// protocol version and feature bits — see kProtocolFeature*.</span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">protocolVersion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reader</span><span class="p">.</span><span class="n">read</span><span class="o">&lt;</span><span class="kt">int32_t</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">featureBits</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">reader</span><span class="p">.</span><span class="n">read</span><span class="o">&lt;</span><span class="kt">uint64_t</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="w">  </span><span class="c1">// …decode the rest using BufferReader::read&lt;T&gt;() / readString() /</span>
+<span class="w">  </span><span class="c1">// readVector&lt;T&gt;() until reader.ok flips false.</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Each read advances <code class="docutils literal notranslate"><span class="pre">reader.offset()</span></code> and sets <code class="docutils literal notranslate"><span class="pre">reader.ok</span> <span class="pre">=</span> <span class="pre">false</span></code> if
+there is not enough data left, so callers can decode an entire frame and
+check <code class="docutils literal notranslate"><span class="pre">ok</span></code> at the end rather than after every field. Mismatched protocol
+versions or unsupported feature bits are reported via <code class="docutils literal notranslate"><span class="pre">reader.ok</span></code> plus
+the bytes at offset 0; the server will not send a payload it knows the
+client cannot parse.</p>
+<section id="driving-the-simulation-from-a-custom-client">
+<h3><a class="toc-backref" href="#id26" role="doc-backlink">Driving the simulation from a custom client</a><a class="headerlink" href="#driving-the-simulation-from-a-custom-client" title="Link to this heading"></a></h3>
+<p>Pause / step / force / pose are batched onto the same update frame the
+viewer normally pulls. Each <code class="docutils literal notranslate"><span class="pre">SimControlRequest</span></code> is a tagged union — only
+the fields relevant to <code class="docutils literal notranslate"><span class="pre">type</span></code> are read by the encoder:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">R</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">tcp_viewer</span><span class="o">::</span><span class="n">SimControlRequest</span><span class="p">;</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">R</span><span class="o">&gt;</span><span class="w"> </span><span class="n">requests</span><span class="p">;</span>
+
+<span class="c1">// Pause the integrator on the server.</span>
+<span class="n">requests</span><span class="p">.</span><span class="n">push_back</span><span class="p">({.</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ClientRequestType</span><span class="o">::</span><span class="n">CR_PAUSE</span><span class="p">});</span>
+
+<span class="c1">// Advance 10 ticks while paused.</span>
+<span class="n">requests</span><span class="p">.</span><span class="n">push_back</span><span class="p">({.</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ClientRequestType</span><span class="o">::</span><span class="n">CR_STEP_N</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">stepCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">});</span>
+
+<span class="c1">// Push a 30 N force on object with visual tag 42, at the body&#39;s COM.</span>
+<span class="n">R</span><span class="w"> </span><span class="n">force</span><span class="p">;</span>
+<span class="n">force</span><span class="p">.</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ClientRequestType</span><span class="o">::</span><span class="n">CR_APPLY_FORCE</span><span class="p">;</span>
+<span class="n">force</span><span class="p">.</span><span class="n">visTag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">42</span><span class="p">;</span>
+<span class="n">force</span><span class="p">.</span><span class="n">localBodyIdx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="n">force</span><span class="p">.</span><span class="n">vec3a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.0f</span><span class="p">);</span><span class="w">        </span><span class="c1">// application point (world)</span>
+<span class="n">force</span><span class="p">.</span><span class="n">vec3b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mf">30.0f</span><span class="p">);</span><span class="w"> </span><span class="c1">// force vector (world)</span>
+<span class="n">requests</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">force</span><span class="p">);</span>
+
+<span class="c1">// Teleport a single-body object to a new pose.</span>
+<span class="n">R</span><span class="w"> </span><span class="n">pose</span><span class="p">;</span>
+<span class="n">pose</span><span class="p">.</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ClientRequestType</span><span class="o">::</span><span class="n">CR_SET_POSE</span><span class="p">;</span>
+<span class="n">pose</span><span class="p">.</span><span class="n">visTag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">42</span><span class="p">;</span>
+<span class="n">pose</span><span class="p">.</span><span class="n">vec3a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8f</span><span class="p">);</span><span class="w">   </span><span class="c1">// position</span>
+<span class="n">pose</span><span class="p">.</span><span class="n">quat</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">);</span><span class="w"> </span><span class="c1">// (w, x, y, z)</span>
+<span class="n">requests</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">pose</span><span class="p">);</span>
+
+<span class="c1">// Set an articulated system&#39;s generalized coordinate.</span>
+<span class="n">R</span><span class="w"> </span><span class="n">gc</span><span class="p">;</span>
+<span class="n">gc</span><span class="p">.</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ClientRequestType</span><span class="o">::</span><span class="n">CR_SET_GC</span><span class="p">;</span>
+<span class="n">gc</span><span class="p">.</span><span class="n">visTag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">99</span><span class="p">;</span>
+<span class="n">gc</span><span class="p">.</span><span class="n">gc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.54f</span><span class="p">,</span><span class="w">  </span><span class="cm">/*quat*/</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">         </span><span class="mf">0.03f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4f</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.8f</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.03f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4f</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.8f</span><span class="p">,</span>
+<span class="w">         </span><span class="mf">0.03f</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.4f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8f</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.03f</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.4f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8f</span><span class="p">};</span>
+<span class="n">requests</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">gc</span><span class="p">);</span>
+
+<span class="n">sendUpdateRequest</span><span class="p">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="cm">/*objectId=*/</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">requests</span><span class="p">);</span>
+<span class="c1">// The server drains requests inside integrateWorldThreadSafe().</span>
+<span class="c1">// Pose/GC edits apply under the mutex; forces are held briefly and</span>
+<span class="c1">// applied on integration ticks until refreshed or expired.</span>
+</pre></div>
+</div>
+<p>The same enum and <code class="docutils literal notranslate"><span class="pre">SimControlRequest</span></code> struct are what the viewer’s UI
+populates internally, so a custom Python or C# client built on top of
+<code class="docutils literal notranslate"><span class="pre">BufferReader</span></code> and these request structs has feature parity with the
+shipped viewer’s Pause / Step / force / pose surface.</p>
+</section>
+<section id="feature-negotiation">
+<h3><a class="toc-backref" href="#id27" role="doc-backlink">Feature negotiation</a><a class="headerlink" href="#feature-negotiation" title="Link to this heading"></a></h3>
+<p>After connecting, the first server frame carries the negotiated feature
+bits. A custom client should AND those bits with <code class="docutils literal notranslate"><span class="pre">kProtocolFeatureSimControl</span></code>
+once at startup, and grey out sim-control surfaces if the bit is not set —
+exactly what <code class="docutils literal notranslate"><span class="pre">rayrai_raisim_tcp_viewer</span></code> does internally via
+<code class="docutils literal notranslate"><span class="pre">TcpClient::serverSupportsSimControl()</span></code>.</p>
+</section>
+</section>
+<section id="see-also">
+<h2><a class="toc-backref" href="#id28" role="doc-backlink">See also</a><a class="headerlink" href="#see-also" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="Rayrai.html"><span class="doc">rayrai Visualizer</span></a> — in-process rayrai renderer and visualization APIs.</p></li>
+<li><p><a class="reference internal" href="RaisimServer.html"><span class="doc">Raisim Server</span></a> — server-side API including the sim-control surface.</p></li>
+<li><p><a class="reference internal" href="rayrai/Capture.html"><span class="doc">Capture, diagnostics, and headless rendering</span></a> — programmatic screenshot / capture APIs from
+in-process rayrai.</p></li>
+<li><p><a class="reference internal" href="rayrai/Examples.html"><span class="doc">Example targets</span></a> — rayrai example matrix.</p></li>
+</ul>
+</section>
+<section id="api">
+<h2><a class="toc-backref" href="#id29" role="doc-backlink">API</a><a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin10tcp_viewer12BufferReaderE">
+<span id="_CPPv3N6raisin10tcp_viewer12BufferReaderE"></span><span id="_CPPv2N6raisin10tcp_viewer12BufferReaderE"></span><span id="raisin::tcp_viewer::BufferReader"></span><span class="target" id="structraisin_1_1tcp__viewer_1_1BufferReader"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BufferReader</span></span></span><a class="headerlink" href="#_CPPv4N6raisin10tcp_viewer12BufferReaderE" title="Link to this definition"></a><br /></dt>
+<dd><p>Lightweight reader for binary message buffers. </p>
+<p>The reader maintains a cursor into a byte buffer and provides helpers for reading typed values, strings, and vectors. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin10tcp_viewer12BufferReader12BufferReaderERKNSt6vectorIcEE">
+<span id="_CPPv3N6raisin10tcp_viewer12BufferReader12BufferReaderERKNSt6vectorIcEE"></span><span id="_CPPv2N6raisin10tcp_viewer12BufferReader12BufferReaderERKNSt6vectorIcEE"></span><span id="raisin::tcp_viewer::BufferReader::BufferReader__std::vector:c:CR"></span><span class="target" id="structraisin_1_1tcp__viewer_1_1BufferReader_1a2edbfb7baf67f82829bdb2b8ff6d983f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BufferReader</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">char</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin10tcp_viewer12BufferReader12BufferReaderERKNSt6vectorIcEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a reader over an existing byte buffer. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> – Message payload. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisin10tcp_viewer12BufferReader6offsetEv">
+<span id="_CPPv3NK6raisin10tcp_viewer12BufferReader6offsetEv"></span><span id="_CPPv2NK6raisin10tcp_viewer12BufferReader6offsetEv"></span><span id="raisin::tcp_viewer::BufferReader::offsetC"></span><span class="target" id="structraisin_1_1tcp__viewer_1_1BufferReader_1a6289d03b9e602a47ad4cf3e8ec578170"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">offset</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin10tcp_viewer12BufferReader6offsetEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Current offset from the start of the buffer. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Offset in bytes. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisin10tcp_viewer12BufferReader4sizeEv">
+<span id="_CPPv3NK6raisin10tcp_viewer12BufferReader4sizeEv"></span><span id="_CPPv2NK6raisin10tcp_viewer12BufferReader4sizeEv"></span><span id="raisin::tcp_viewer::BufferReader::sizeC"></span><span class="target" id="structraisin_1_1tcp__viewer_1_1BufferReader_1aeda99cabe1bd998c24240fa7a58ca9f9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin10tcp_viewer12BufferReader4sizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Total size of the buffer. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Size in bytes. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisin10tcp_viewer12BufferReader9remainingEv">
+<span id="_CPPv3NK6raisin10tcp_viewer12BufferReader9remainingEv"></span><span id="_CPPv2NK6raisin10tcp_viewer12BufferReader9remainingEv"></span><span id="raisin::tcp_viewer::BufferReader::remainingC"></span><span class="target" id="structraisin_1_1tcp__viewer_1_1BufferReader_1a97dcc8dd7eb4cf7b44269b8009080af7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">remaining</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin10tcp_viewer12BufferReader9remainingEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Remaining unread bytes. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Remaining byte count. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN6raisin10tcp_viewer12BufferReader4readE1Tv">
+<span id="_CPPv3I0EN6raisin10tcp_viewer12BufferReader4readEv"></span><span id="_CPPv2I0EN6raisin10tcp_viewer12BufferReader4readEv"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structraisin_1_1tcp__viewer_1_1BufferReader_1aaed7e3bc72ef34e1a5aae883a51ef501"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN6raisin10tcp_viewer12BufferReader4readE1Tv" title="raisin::tcp_viewer::BufferReader::read::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">read</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN6raisin10tcp_viewer12BufferReader4readE1Tv" title="Link to this definition"></a><br /></dt>
+<dd><p>Read a trivially copyable value from the buffer. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>T</strong> – Value type. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Parsed value or default-constructed value on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK6raisin10tcp_viewer12BufferReader4peekEb6size_tR1T">
+<span id="_CPPv3I0ENK6raisin10tcp_viewer12BufferReader4peekE6size_tR1T"></span><span id="_CPPv2I0ENK6raisin10tcp_viewer12BufferReader4peekE6size_tR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structraisin_1_1tcp__viewer_1_1BufferReader_1a29e12f1ec47527a7564997b134abcaee"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">peek</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">offset</span></span>, <a class="reference internal" href="#_CPPv4I0ENK6raisin10tcp_viewer12BufferReader4peekEb6size_tR1T" title="raisin::tcp_viewer::BufferReader::peek::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK6raisin10tcp_viewer12BufferReader4peekEb6size_tR1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Peek a value at a byte offset without advancing the cursor. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>T</strong> – Value type. </p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>offset</strong> – Byte offset from current cursor. </p></li>
+<li><p><strong>out</strong> – Output value. </p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if the value could be read. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin10tcp_viewer12BufferReader8readBoolEv">
+<span id="_CPPv3N6raisin10tcp_viewer12BufferReader8readBoolEv"></span><span id="_CPPv2N6raisin10tcp_viewer12BufferReader8readBoolEv"></span><span id="raisin::tcp_viewer::BufferReader::readBool"></span><span class="target" id="structraisin_1_1tcp__viewer_1_1BufferReader_1a521df46e89d6cc1fa81987587e42d9a7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">readBool</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin10tcp_viewer12BufferReader8readBoolEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Read a boolean value. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Boolean value (false on failure). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin10tcp_viewer12BufferReader10readStringEv">
+<span id="_CPPv3N6raisin10tcp_viewer12BufferReader10readStringEv"></span><span id="_CPPv2N6raisin10tcp_viewer12BufferReader10readStringEv"></span><span id="raisin::tcp_viewer::BufferReader::readString"></span><span class="target" id="structraisin_1_1tcp__viewer_1_1BufferReader_1a51b3a6000b82fca0231c24e022106296"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">readString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin10tcp_viewer12BufferReader10readStringEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Read a length-prefixed string. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Parsed string (empty on failure). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin10tcp_viewer12BufferReader9readVec3fEv">
+<span id="_CPPv3N6raisin10tcp_viewer12BufferReader9readVec3fEv"></span><span id="_CPPv2N6raisin10tcp_viewer12BufferReader9readVec3fEv"></span><span id="raisin::tcp_viewer::BufferReader::readVec3f"></span><span class="target" id="structraisin_1_1tcp__viewer_1_1BufferReader_1a4cd935c15c3659db576a5105b8ab5c50"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec3</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">readVec3f</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin10tcp_viewer12BufferReader9readVec3fEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Read a vec3 of floats. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector value. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin10tcp_viewer12BufferReader9readVec4fEv">
+<span id="_CPPv3N6raisin10tcp_viewer12BufferReader9readVec4fEv"></span><span id="_CPPv2N6raisin10tcp_viewer12BufferReader9readVec4fEv"></span><span id="raisin::tcp_viewer::BufferReader::readVec4f"></span><span class="target" id="structraisin_1_1tcp__viewer_1_1BufferReader_1a2d0ee01d4be4b9dd68b9e109acf25f19"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec4</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">readVec4f</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin10tcp_viewer12BufferReader9readVec4fEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Read a vec4 of floats. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector value. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin10tcp_viewer12BufferReader12readQuatWxyzEv">
+<span id="_CPPv3N6raisin10tcp_viewer12BufferReader12readQuatWxyzEv"></span><span id="_CPPv2N6raisin10tcp_viewer12BufferReader12readQuatWxyzEv"></span><span id="raisin::tcp_viewer::BufferReader::readQuatWxyz"></span><span class="target" id="structraisin_1_1tcp__viewer_1_1BufferReader_1a887461642ddfa14a3d9bcb59aaaa20f8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec4</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">readQuatWxyz</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin10tcp_viewer12BufferReader12readQuatWxyzEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Read a quaternion encoded as wxyz floats. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Quaternion vector (wxyz). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin10tcp_viewer12BufferReader15readFloatVectorEv">
+<span id="_CPPv3N6raisin10tcp_viewer12BufferReader15readFloatVectorEv"></span><span id="_CPPv2N6raisin10tcp_viewer12BufferReader15readFloatVectorEv"></span><span id="raisin::tcp_viewer::BufferReader::readFloatVector"></span><span class="target" id="structraisin_1_1tcp__viewer_1_1BufferReader_1a219cc846ea43367a7a874f2661e4c48a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">float</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">readFloatVector</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin10tcp_viewer12BufferReader15readFloatVectorEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Read a vector of floats with a 32-bit length prefix. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Parsed float vector. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin10tcp_viewer12BufferReader13readIntVectorEv">
+<span id="_CPPv3N6raisin10tcp_viewer12BufferReader13readIntVectorEv"></span><span id="_CPPv2N6raisin10tcp_viewer12BufferReader13readIntVectorEv"></span><span id="raisin::tcp_viewer::BufferReader::readIntVector"></span><span class="target" id="structraisin_1_1tcp__viewer_1_1BufferReader_1a31980ac81d95ad61d1f324e7866aa7b8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">readIntVector</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin10tcp_viewer12BufferReader13readIntVectorEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Read a vector of int32 with a 32-bit length prefix. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Parsed int vector. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin10tcp_viewer12BufferReader14readByteVectorEv">
+<span id="_CPPv3N6raisin10tcp_viewer12BufferReader14readByteVectorEv"></span><span id="_CPPv2N6raisin10tcp_viewer12BufferReader14readByteVectorEv"></span><span id="raisin::tcp_viewer::BufferReader::readByteVector"></span><span class="target" id="structraisin_1_1tcp__viewer_1_1BufferReader_1ac0ef4de19d08406930b90841bd4e5364"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">uint8_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">readByteVector</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin10tcp_viewer12BufferReader14readByteVectorEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Read a vector of bytes with a 32-bit length prefix. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Parsed byte vector. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin10tcp_viewer12BufferReader9skipBytesE6size_t">
+<span id="_CPPv3N6raisin10tcp_viewer12BufferReader9skipBytesE6size_t"></span><span id="_CPPv2N6raisin10tcp_viewer12BufferReader9skipBytesE6size_t"></span><span id="raisin::tcp_viewer::BufferReader::skipBytes__s"></span><span class="target" id="structraisin_1_1tcp__viewer_1_1BufferReader_1a0226f842a5064a5553834edfb99acebf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">skipBytes</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin10tcp_viewer12BufferReader9skipBytesE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Skip a number of bytes. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>count</strong> – Number of bytes to skip. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin10tcp_viewer12BufferReader12readColorMapEv">
+<span id="_CPPv3N6raisin10tcp_viewer12BufferReader12readColorMapEv"></span><span id="_CPPv2N6raisin10tcp_viewer12BufferReader12readColorMapEv"></span><span id="raisin::tcp_viewer::BufferReader::readColorMap"></span><span class="target" id="structraisin_1_1tcp__viewer_1_1BufferReader_1acd00bc3562a167ec3b65d2ebf15264a7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ColorRGB</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">readColorMap</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin10tcp_viewer12BufferReader12readColorMapEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Read a color map (length-prefixed array of raisim::ColorRGB). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Parsed color map. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin10tcp_viewer12BufferReader12skipColorMapEv">
+<span id="_CPPv3N6raisin10tcp_viewer12BufferReader12skipColorMapEv"></span><span id="_CPPv2N6raisin10tcp_viewer12BufferReader12skipColorMapEv"></span><span id="raisin::tcp_viewer::BufferReader::skipColorMap"></span><span class="target" id="structraisin_1_1tcp__viewer_1_1BufferReader_1aff1bc42e1c55d020095b91ff279ac34d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">skipColorMap</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin10tcp_viewer12BufferReader12skipColorMapEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Skip a color map payload (length-prefixed). </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rayrai/Performance.html" class="btn btn-neutral float-left" title="Performance notes and the C++ API reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RaisimEngine2.html" class="btn btn-neutral float-right" title="RaiSim Engine 2" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

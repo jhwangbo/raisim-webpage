@@ -22,6 +22,10 @@ Tags marked (multiple) indicate that multiple instances of the element may exist
             3. <attribute> ``friction`` [float]
             4. <attribute> ``restitution`` [float]
             5. <attribute> ``restitution_threshold`` [float]
+            6. <attribute> (optional, default = ``friction``) ``static_friction`` [float]
+            7. <attribute> (required when ``static_friction`` is present) ``static_friction_velocity_threshold`` [float]
+            8. <attribute> (optional, default = 0) ``rolling_friction`` [float]
+            9. <attribute> (optional, default = 0) ``spinning_friction`` [float]
     3. <child> (optional) ``gravity``
         1. <attribute> ``value`` [Vec<3>]: default={0, 0, -9.81}
     4. <child> (optional) ``timeStep``

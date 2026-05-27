@@ -17,7 +17,7 @@ Run:
 
    <raisim-install>/bin/mjcf_gymnasium_walker2d
 
-Start ``rayrai_raisim_tcp_viewer`` in another terminal to visualize the server
+Start ``rayrai_tcp_viewer`` in another terminal to visualize the server
 scene.
 
 What it demonstrates:
@@ -25,4 +25,3 @@ What it demonstrates:
 - Loading ``rsc/mjcf/gymnasium/walker2d.xml`` with ``raisim::World``.
 - Handling a multi-link MJCF articulated system with contact-enabled geoms.
 - Applying a small procedural torque pattern to the non-root joints.
-

@@ -6,21 +6,22 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Troubleshooting &mdash; raisim 2.2.0 documentation</title>
+  <title>Troubleshooting &mdash; raisim 2.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b0caeef3" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=b21de401"></script>
+      <script src="../_static/documentation_options.js?v=c3c8ae58"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Changelog: v2.2.0" href="Changelog.html" />
-    <link rel="prev" title="rayrai_visual_asset_support" href="examples/rayrai/rayrai_visual_asset_support.html" /> 
+    <link rel="next" title="Changelog" href="Changelog.html" />
+    <link rel="prev" title="XML Example: World Loader" href="examples/xml/xml_world_loader.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -58,7 +59,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#example-asset-missing">Example Asset Missing</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog: v2.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Support.html">Support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
@@ -85,6 +86,8 @@
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimEngine2.html">RaiSim Engine 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
@@ -119,22 +122,27 @@
 <p>This page covers common issues when using the binary RaiSim distribution.</p>
 <section id="executable-not-found">
 <h2>Executable Not Found<a class="headerlink" href="#executable-not-found" title="Link to this heading"></a></h2>
-<p>Binary packages place tools and examples in the package <code class="docutils literal notranslate"><span class="pre">bin</span></code> directory:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/example_anymal_contacts
-&lt;raisim-install&gt;/bin/rayrai_raisim_tcp_viewer
+<p>When you build examples from the <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> source tree, CMake places them
+under the build directory:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build/examples/primitive_grid
+./build/examples/rayrai_tcp_viewer
 </pre></div>
 </div>
-<p>If a command from old docs uses a build directory, replace it with the installed
-package <code class="docutils literal notranslate"><span class="pre">bin</span></code> directory.</p>
+<p>If a command from old docs uses an <code class="docutils literal notranslate"><span class="pre">example_</span></code> prefix, check <a class="reference internal" href="Examples.html"><span class="doc">Examples</span></a>
+for the current target name.</p>
 </section>
 <section id="missing-shared-libraries">
 <h2>Missing Shared Libraries<a class="headerlink" href="#missing-shared-libraries" title="Link to this heading"></a></h2>
-<p>For installed packages, ensure the runtime loader can find RaiSim:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">RAISIM_LOCAL_INSTALL_ROOT</span><span class="o">=</span><span class="nv">$HOME</span>/raisim2Lib
-<span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$LD_LIBRARY_PATH</span>:<span class="nv">$RAISIM_LOCAL_INSTALL_ROOT</span>/raisim/lib
+<p>For installed packages and local builds, source the environment script before
+running examples, rayrai tools, applications, or importing <code class="docutils literal notranslate"><span class="pre">raisimPy</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="nv">$HOME</span>/raisim2Lib
+<span class="nb">source</span><span class="w"> </span>./raisim_env.sh
 </pre></div>
 </div>
-<p>On macOS, use <code class="docutils literal notranslate"><span class="pre">DYLD_LIBRARY_PATH</span></code>.</p>
+<p>The script adds both RaiSim and rayrai libraries to the platform loader path.
+On macOS this is <code class="docutils literal notranslate"><span class="pre">DYLD_LIBRARY_PATH</span></code>. On Linux this is <code class="docutils literal notranslate"><span class="pre">LD_LIBRARY_PATH</span></code>.
+Because this is a per-terminal shell setting, source the script again in every
+new terminal before starting a viewer, an example, or Python with <code class="docutils literal notranslate"><span class="pre">raisimPy</span></code>.</p>
 </section>
 <section id="activation-key-not-found">
 <h2>Activation Key Not Found<a class="headerlink" href="#activation-key-not-found" title="Link to this heading"></a></h2>
@@ -153,7 +161,7 @@ package <code class="docutils literal notranslate"><span class="pre">bin</span><
 <ul class="simple">
 <li><p>The simulation must create <code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code> and call
 <code class="docutils literal notranslate"><span class="pre">launchServer</span></code>.</p></li>
-<li><p>The server-based example and <code class="docutils literal notranslate"><span class="pre">rayrai_raisim_tcp_viewer</span></code> must use the same
+<li><p>The server-based example and <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> must use the same
 port. The default is <code class="docutils literal notranslate"><span class="pre">8080</span></code>.</p></li>
 <li><p>Start the simulation and viewer from the same installed RaiSim version.</p></li>
 </ul>
@@ -180,8 +188,8 @@ that the package <code class="docutils literal notranslate"><span class="pre">rs
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="examples/rayrai/rayrai_visual_asset_support.html" class="btn btn-neutral float-left" title="rayrai_visual_asset_support" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="Changelog.html" class="btn btn-neutral float-right" title="Changelog: v2.2.0" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="examples/xml/xml_world_loader.html" class="btn btn-neutral float-left" title="XML Example: World Loader" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Changelog.html" class="btn btn-neutral float-right" title="Changelog" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

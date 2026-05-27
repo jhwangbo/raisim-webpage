@@ -6,14 +6,15 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>World &mdash; raisim 2.2.0 documentation</title>
+  <title>World &mdash; raisim 2.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b0caeef3" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=b21de401"></script>
+      <script src="../_static/documentation_options.js?v=c3c8ae58"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -50,7 +51,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Visualization.html">Visualization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Troubleshooting.html">Troubleshooting</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog: v2.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Support.html">Support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
@@ -63,7 +64,11 @@
 <li class="toctree-l1"><a class="reference internal" href="Math.html">Math Classes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="LoggingSystem.html">Logging System</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">World</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#adding-new-objects">Adding New Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#adding-new-objects">Adding New Objects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stable-object-identifiers">Stable object identifiers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#snapshots-and-cloning">Snapshots and cloning</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#saving-the-world-to-an-xml-file">Saving the World to an XML File</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#stepping-and-time">Stepping and time</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#collision-detection-and-broadphase">Collision Detection and Broadphase</a></li>
@@ -136,6 +141,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim5World18updateMaterialPropERK15MaterialManager"><code class="docutils literal notranslate"><span class="pre">updateMaterialProp()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim5World19setMaterialPairPropERKNSt6stringERKNSt6stringEddd"><code class="docutils literal notranslate"><span class="pre">setMaterialPairProp()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim5World19setMaterialPairPropERKNSt6stringERKNSt6stringEddddd"><code class="docutils literal notranslate"><span class="pre">setMaterialPairProp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim5World19setMaterialPairPropERKNSt6stringERKNSt6stringEddddddd"><code class="docutils literal notranslate"><span class="pre">setMaterialPairProp()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim5World18setDefaultMaterialEddd"><code class="docutils literal notranslate"><span class="pre">setDefaultMaterial()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim5World18setDefaultMaterialEddddd"><code class="docutils literal notranslate"><span class="pre">setDefaultMaterial()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisim5World10getGravityEv"><code class="docutils literal notranslate"><span class="pre">getGravity()</span></code></a></li>
@@ -164,6 +170,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim5World9lockMutexEv"><code class="docutils literal notranslate"><span class="pre">lockMutex()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim5World11unlockMutexEv"><code class="docutils literal notranslate"><span class="pre">unlockMutex()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim5World24updateSelfCollisionCacheEv"><code class="docutils literal notranslate"><span class="pre">updateSelfCollisionCache()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim5World12loadMjcfFileERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">loadMjcfFile()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim5World16setActivationKeyERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">setActivationKey()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim5World17CollisionCountersE"><code class="docutils literal notranslate"><span class="pre">raisim::World::CollisionCounters</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim5World16DepthCameraFrameE"><code class="docutils literal notranslate"><span class="pre">raisim::World::DepthCameraFrame</span></code></a></li>
@@ -191,6 +198,8 @@
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimEngine2.html">RaiSim Engine 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
@@ -254,6 +263,19 @@ examples, and full simulator options should be validated before relying on them.
 <li><p><code class="docutils literal notranslate"><span class="pre">mjcf_gymnasium_humanoid</span></code> loads Gymnasium’s Humanoid model and drops it
 from a raised arbitrary configuration.</p></li>
 </ul>
+<p>For callers that already hold a constructed <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> and want to
+populate it from an MJCF file at runtime (instead of constructing the world
+from the file path), use <code class="docutils literal notranslate"><span class="pre">World::loadMjcfFile</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
+<span class="n">world</span><span class="p">.</span><span class="n">loadMjcfFile</span><span class="p">(</span><span class="s">&quot;rsc/mjcf/gymnasium/hopper.xml&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This is the same dispatch that <code class="docutils literal notranslate"><span class="pre">World(configFile)</span></code> does internally when
+the file’s root is <code class="docutils literal notranslate"><span class="pre">&lt;mujoco&gt;</span></code>. The world should normally be empty before
+calling — MJCF files often declare ground planes, <code class="docutils literal notranslate"><span class="pre">worldbody</span></code> lights, and
+option blocks that overwrite world-level state. The rayrai TCP viewer uses
+this entry point in its drag-drop <strong>Joint Inspector</strong> mode (see
+<a class="reference internal" href="RayraiTcpViewer.html"><span class="doc">Rayrai TCP Viewer</span></a>).</p>
 <section id="adding-new-objects">
 <h2>Adding New Objects<a class="headerlink" href="#adding-new-objects" title="Link to this heading"></a></h2>
 <p>To add a new object of type X, utilize the <code class="code docutils literal notranslate"><span class="pre">addX</span></code> method.
@@ -281,6 +303,38 @@ The <code class="code docutils literal notranslate"><span class="pre">material</
 A <strong>local index</strong> is used to designate individual bodies.
 To maintain API consistency, many methods require the local index argument even for single-body objects.
 For single-body objects, the local index is ignored, and users may pass 0 to comply with the API.</p>
+<section id="stable-object-identifiers">
+<h3>Stable object identifiers<a class="headerlink" href="#stable-object-identifiers" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">Object::Id</span></code> (a <code class="docutils literal notranslate"><span class="pre">uint64_t</span></code>) is assigned when an object is added to a world
+and remains valid for the lifetime of that object even when other objects are
+removed. <code class="docutils literal notranslate"><span class="pre">World::getObjectById(id)</span></code> returns a pointer or <code class="docutils literal notranslate"><span class="pre">nullptr</span></code> when the
+object has been removed; <code class="docutils literal notranslate"><span class="pre">isObjectAlive(id)</span></code> returns the same information
+without dereferencing. <code class="docutils literal notranslate"><span class="pre">getIndexInWorld()</span></code> is fine for steady-state lookups,
+but in code that adds and removes objects (RL resets, asset streaming) prefer
+the stable id because indices shift after every removal.</p>
+</section>
+<section id="snapshots-and-cloning">
+<h3>Snapshots and cloning<a class="headerlink" href="#snapshots-and-cloning" title="Link to this heading"></a></h3>
+<p>Single-body objects support a fast capture/restore workflow for RL resets and
+rollback debugging. <code class="docutils literal notranslate"><span class="pre">captureSingleBodySnapshot(obj,</span> <span class="pre">snapshotOut)</span></code> fills a
+<code class="docutils literal notranslate"><span class="pre">SingleBodySnapshot</span></code> (object id, type, body type, pose, linear/angular
+velocity, material, and collision group/mask). <code class="docutils literal notranslate"><span class="pre">restoreSingleBodySnapshot</span></code>
+reapplies it later, either by pointer to the same object or by stable
+<code class="docutils literal notranslate"><span class="pre">ObjectId</span></code>; pass <code class="docutils literal notranslate"><span class="pre">restoreCollisionProperties=false</span></code> to skip material and
+collision filter restoration. The snapshot is plain data and cheap to copy and
+reuse. <code class="docutils literal notranslate"><span class="pre">cloneSingleBodyObject(source,</span> <span class="pre">name)</span></code> produces a new single-body
+object with the same primitive shape, mass, pose, velocity, body type,
+material, collision filter, and appearance; it returns <code class="docutils literal notranslate"><span class="pre">nullptr</span></code> for
+non-primitive single-body types.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">::</span><span class="n">SingleBodySnapshot</span><span class="w"> </span><span class="n">snapshot</span><span class="p">;</span>
+<span class="n">world</span><span class="p">.</span><span class="n">captureSingleBodySnapshot</span><span class="p">(</span><span class="n">sphere</span><span class="p">,</span><span class="w"> </span><span class="n">snapshot</span><span class="p">);</span>
+<span class="c1">// ... simulate, then reset:</span>
+<span class="n">world</span><span class="p">.</span><span class="n">restoreSingleBodySnapshot</span><span class="p">(</span><span class="n">sphere</span><span class="p">,</span><span class="w"> </span><span class="n">snapshot</span><span class="p">);</span>
+
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">twin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">cloneSingleBodyObject</span><span class="p">(</span><span class="n">sphere</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sphere_copy&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
 </section>
 <section id="saving-the-world-to-an-xml-file">
 <h2>Saving the World to an XML File<a class="headerlink" href="#saving-the-world-to-an-xml-file" title="Link to this heading"></a></h2>
@@ -1393,6 +1447,12 @@ on the next step.</p></li>
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim5World19setMaterialPairPropERKNSt6stringERKNSt6stringEddddddd">
+<span id="_CPPv3N6raisim5World19setMaterialPairPropERKNSt6stringERKNSt6stringEddddddd"></span><span id="_CPPv2N6raisim5World19setMaterialPairPropERKNSt6stringERKNSt6stringEddddddd"></span><span id="raisim::World::setMaterialPairProp__ssCR.ssCR.double.double.double.double.double.double.double"></span><span class="target" id="classraisim_1_1World_1a1290e8ff5cf89afc9f6d84a265e8e36e"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setMaterialPairProp</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">mat1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">mat2</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">friction</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">restitution</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">resThreshold</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">staticFriction</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">staticFrictionThresholdVelocity</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">rollingFriction</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">spinningFriction</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim5World19setMaterialPairPropERKNSt6stringERKNSt6stringEddddddd" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a material pair property with rolling and spinning friction. The rolling and spinning coefficients are zero by default in existing overloads, which keeps the standard contact solver path unchanged. </p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim5World18setDefaultMaterialEddd">
 <span id="_CPPv3N6raisim5World18setDefaultMaterialEddd"></span><span id="_CPPv2N6raisim5World18setDefaultMaterialEddd"></span><span id="raisim::World::setDefaultMaterial__double.double.double"></span><span class="target" id="classraisim_1_1World_1ac91b2303e43b842638ab4ae88e3a193d"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setDefaultMaterial</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">friction</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">restitution</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">resThreshold</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim5World18setDefaultMaterialEddd" title="Link to this definition"></a><br /></dt>
 <dd><p>this default material property is used if a material pair property is not defined for the specific collision </p>
@@ -1662,6 +1722,12 @@ on the next step.</p></li>
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim5World24updateSelfCollisionCacheEv">
 <span id="_CPPv3N6raisim5World24updateSelfCollisionCacheEv"></span><span id="_CPPv2N6raisim5World24updateSelfCollisionCacheEv"></span><span id="raisim::World::updateSelfCollisionCache"></span><span class="target" id="classraisim_1_1World_1a23736b7b35cda689e49a323ec703662f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">updateSelfCollisionCache</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim5World24updateSelfCollisionCacheEv" title="Link to this definition"></a><br /></dt>
 <dd><p>Refresh contact body metadata after collision filter changes. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim5World12loadMjcfFileERKNSt6stringE">
+<span id="_CPPv3N6raisim5World12loadMjcfFileERKNSt6stringE"></span><span id="_CPPv2N6raisim5World12loadMjcfFileERKNSt6stringE"></span><span id="raisim::World::loadMjcfFile__ssCR"></span><span class="target" id="classraisim_1_1World_1a582ddca99c7ed7db844ee3b4813b8658"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">loadMjcfFile</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">configFile</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim5World12loadMjcfFileERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Load a single self-contained MuJoCo XML file into this world. Equivalent to the dispatch that World(configFile) does internally when the file’s root is &lt;mujoco&gt;; intended for callers (e.g. the rayrai TCP viewer’s drag-drop inspector) that already have a constructed <a class="reference internal" href="#classraisim_1_1World"><span class="std std-ref">World</span></a> and want to populate it from an MJCF path. The world should normally be empty before calling — MJCF files often declare ground planes, worldbody lights, and option blocks that overwrite world-level state. </p>
 </dd></dl>
 
 </div>

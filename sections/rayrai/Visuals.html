@@ -1,0 +1,486 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Custom visuals, instancing, and scene helpers &mdash; raisim 2.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b0caeef3" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=c3c8ae58"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Post-process effects" href="PostProcess.html" />
+    <link rel="prev" title="PBR materials" href="Materials.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../Rayrai.html">rayrai Visualizer</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../Rayrai.html#overview">Overview</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="RenderQuality.html">Render quality, tone mapping, color grading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Lighting.html">Lighting, shadows, and HDR/IBL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Materials.html">PBR materials</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Custom visuals, instancing, and scene helpers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#coacd-mesh-approximation-visualization">CoACD mesh approximation visualization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#custom-visuals-and-instancing">Custom visuals and instancing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#visual-shadow-casting-visibility-range-and-material-overrides">Visual shadow casting, visibility range, and material overrides</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#point-clouds-and-coordinate-frames">Point clouds and coordinate frames</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="PostProcess.html">Post-process effects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Weather.html">Weather and atmospherics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Capture.html">Capture, diagnostics, and headless rendering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Sensors.html">Sensors and depth/LiDAR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Examples.html">Example targets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Performance.html">Performance notes and the C++ API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#included-binary-recommended">Included binary (recommended)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#build-and-link">Build and link</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#minimal-usage">Minimal usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#threading-contract">Threading contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#lifetime-and-error-model">Lifetime and error model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#example-custom-visuals-background-color">Example: custom visuals + background color</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#where-to-go-next">Where to go next</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../Rayrai.html">rayrai Visualizer</a></li>
+      <li class="breadcrumb-item active">Custom visuals, instancing, and scene helpers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="custom-visuals-instancing-and-scene-helpers">
+<h1>Custom visuals, instancing, and scene helpers<a class="headerlink" href="#custom-visuals-instancing-and-scene-helpers" title="Link to this heading"></a></h1>
+<p>The renderer mirrors RaiSim objects automatically; this page covers the
+<em>extra</em> viewer-only entities you can add — visual primitives, instanced
+visuals, custom meshes, point clouds, coordinate frames, and the per-visual
+controls for visibility range, material override/overlay, and shadow casting
+modes. CoACD mesh approximation is also covered here.</p>
+<section id="coacd-mesh-approximation-visualization">
+<h2>CoACD mesh approximation visualization<a class="headerlink" href="#coacd-mesh-approximation-visualization" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">rayrai_coacd_mesh_approximation</span></code> example visualizes CoACD collision
+mesh approximation. It shows the source mesh and generated convex parts side by
+side. The decomposition side uses per-part colors so individual convex bodies
+can be inspected. The example is registered as the
+<code class="docutils literal notranslate"><span class="pre">rayrai_coacd_mesh_approximation</span></code> target. Package examples keep its source
+under <code class="docutils literal notranslate"><span class="pre">examples/src/rayrai/assets</span></code>; the current source checkout also registers
+the same target from <code class="docutils literal notranslate"><span class="pre">examples/src/rayrai</span></code>.</p>
+<p>This example uses real meshes from <code class="docutils literal notranslate"><span class="pre">rsc</span></code> such as YCB and Minitaur assets. Some robot
+visual meshes are intentionally not used because they are non-manifold visual shells and
+are rejected by the minimal CoACD integration.</p>
+<p>The typical pattern is to load the source mesh as a viewer-only <code class="docutils literal notranslate"><span class="pre">Visual</span></code>
+and the CoACD decomposition output as a second <code class="docutils literal notranslate"><span class="pre">Visual</span></code> rendered with a
+per-part palette:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Source mesh (left-side view).</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">sourceMesh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addVisualMesh</span><span class="p">(</span><span class="s">&quot;coacd_source&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/path/asset.obj&quot;</span><span class="p">,</span>
+<span class="w">                                       </span><span class="n">glm</span><span class="o">::</span><span class="n">dvec3</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span>
+<span class="w">                                       </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.85f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.85f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.85f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">));</span>
+<span class="n">sourceMesh</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">-0.6</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+
+<span class="c1">// CoACD decomposition output (right-side view), one Visual per part with</span>
+<span class="c1">// distinct colours from a small palette.</span>
+<span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="o">&gt;</span><span class="w"> </span><span class="n">palette</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="p">{</span><span class="mf">0.95f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.30f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.30f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mf">0.30f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.85f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.55f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span><span class="mf">0.30f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.60f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.95f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mf">0.95f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.85f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.30f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">},</span>
+<span class="p">};</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">parts</span><span class="p">.</span><span class="n">size</span><span class="p">();</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addVisualCustomMesh</span><span class="p">(</span><span class="s">&quot;coacd_part_&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">to_string</span><span class="p">(</span><span class="n">i</span><span class="p">),</span>
+<span class="w">                                      </span><span class="n">parts</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">meshes</span><span class="p">,</span>
+<span class="w">                                      </span><span class="n">palette</span><span class="p">[</span><span class="n">i</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">palette</span><span class="p">.</span><span class="n">size</span><span class="p">()]);</span>
+<span class="w">  </span><span class="n">p</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.6</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<p>Rayrai examples are documented in <a class="reference internal" href="Examples.html"><span class="doc">Examples</span></a>. Each example page includes a short explanation and installed executable usage.</p>
+<p>Quick map to the current rayrai-related targets:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_raisim_tcp_viewer</span></code>: supported packaged TCP viewer for
+<code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code> scenes.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code>: source-tree TCP viewer example target.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_basic_scene</span></code>: minimal ImGui + SDL2 app showing the standard update
+loop, custom visuals, and the offscreen render texture.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_complete_showcase</span></code>: broad in-process scene that combines RGB/depth
+cameras, raw buffer readback, LiDAR visualization, camera frustums, and
+custom visuals.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_rgb_camera</span></code> / <code class="docutils literal notranslate"><span class="pre">rayrai_depth_camera</span></code> /
+<code class="docutils literal notranslate"><span class="pre">rayrai_lidar_pointcloud</span></code> / <code class="docutils literal notranslate"><span class="pre">rayrai_aruco_marker</span></code>: robot-attached sensor
+rendering, depth readback, point-cloud visualization, and marker rendering.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_custom_visuals</span></code> / <code class="docutils literal notranslate"><span class="pre">rayrai_instancing_grid</span></code> /
+<code class="docutils literal notranslate"><span class="pre">rayrai_pointcloud_animation</span></code>: visual primitives, instancing, and dynamic
+point-cloud streaming.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_pbr_material_grid</span></code> / <code class="docutils literal notranslate"><span class="pre">rayrai_pbr_texture_maps</span></code> /
+<code class="docutils literal notranslate"><span class="pre">rayrai_quality_lighting</span></code>: PBR materials, texture slots, quality presets,
+and additional-light configurations.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_visual_asset_support</span></code>: authored glTF/GLB scene import with PBR
+materials, embedded lights, and reflection-probe sidecars.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_coacd_mesh_approximation</span></code>: in-process comparison of source meshes
+and CoACD convex approximation parts generated through <code class="docutils literal notranslate"><span class="pre">World::addMesh</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_runtime_scene_editing</span></code>: runtime add/remove of RaiSim objects and
+rayrai visuals with stable ids, snapshots, collision filters, and cloning.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_rolling_spinning_friction</span></code> / <code class="docutils literal notranslate"><span class="pre">rayrai_swept_ccd</span></code>: physics-focused
+scenes that visualize rolling/spinning friction and swept CCD.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_feature_showcase</span></code>: offscreen image and metrics generation for the
+current rayrai feature set.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_quality_comparison</span></code>: preset comparison images and quality report.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_benchmark</span></code>: rendering, readback, scene-sync, and TCP serialization
+benchmark coverage.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_complete_showcase_benchmark</span></code>: timed version of the complete sensor
+showcase with optional readback, visualization startup, and startup profiling.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_pbr_first_draw_benchmark</span></code>: isolated first-draw and warm-frame timing
+for full PBR and core-eligible PBR material paths.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">example_rayrai_pbr_asset_inspector</span></code>: bundled glTF PBR sample assets under
+rayrai quality settings.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">example_rayrai_usd_importer</span></code>: OpenUSD visual mesh loading in an offscreen
+rayrai context.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">example_polyhaven_blue_wall</span></code>: Poly Haven glTF scene import with imported
+lights, HDR IBL, optional reflection probes, and screenshots.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">raisim_engine2_editor</span></code>: source-tree authoring editor that uses rayrai as
+its 3D viewport and scene-preview renderer. See <a class="reference internal" href="../RaisimEngine2.html"><span class="doc">RaiSim Engine 2</span></a>.</p></li>
+</ul>
+</section>
+<section id="custom-visuals-and-instancing">
+<h2>Custom visuals and instancing<a class="headerlink" href="#custom-visuals-and-instancing" title="Link to this heading"></a></h2>
+<p>rayrai renders two categories of content:</p>
+<ul class="simple">
+<li><p><strong>RaiSim objects</strong>: The renderer mirrors the objects already in the world.</p></li>
+<li><p><strong>Custom visuals</strong>: Extra visuals you add explicitly (spheres, boxes, meshes, etc.).</p></li>
+</ul>
+<p>Custom visuals are created through <code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> and returned as <code class="docutils literal notranslate"><span class="pre">Visuals</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">box</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addVisualBox</span><span class="p">(</span><span class="s">&quot;marker&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="p">,</span>
+<span class="w">  </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.2f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.6f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">));</span>
+<span class="n">box</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The float-per-channel signatures (<code class="docutils literal notranslate"><span class="pre">addVisualSphere(name,</span> <span class="pre">radius,</span> <span class="pre">r,</span> <span class="pre">g,</span> <span class="pre">b,</span> <span class="pre">a)</span></code>
+etc.) still exist for compatibility, but the <code class="docutils literal notranslate"><span class="pre">glm::vec4</span></code> colour overloads
+are preferred in new code. <code class="docutils literal notranslate"><span class="pre">addVisualMesh</span></code> similarly accepts a
+<code class="docutils literal notranslate"><span class="pre">glm::dvec3</span></code> scale + <code class="docutils literal notranslate"><span class="pre">glm::vec4</span></code> colour overload.</p>
+<p>For repeated geometry, use <code class="docutils literal notranslate"><span class="pre">InstancedVisuals</span></code> to reduce draw overhead:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">instanced</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addInstancedVisuals</span><span class="p">(</span>
+<span class="w">  </span><span class="s">&quot;boxes&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">Shape</span><span class="o">::</span><span class="n">Box</span><span class="p">,</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.1f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1f</span><span class="p">),</span>
+<span class="w">  </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">1.f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.2f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.2f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.f</span><span class="p">),</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.2f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.2f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.f</span><span class="p">));</span>
+<span class="n">instanced</span><span class="o">-&gt;</span><span class="n">addInstance</span><span class="p">(</span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1f</span><span class="p">),</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">);</span>
+<span class="n">instanced</span><span class="o">-&gt;</span><span class="n">addInstance</span><span class="p">(</span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.2f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1f</span><span class="p">),</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>If you want to load meshes once and share them across visuals, use
+<code class="docutils literal notranslate"><span class="pre">raisin::RayraiGlobalAsset</span></code> and <code class="docutils literal notranslate"><span class="pre">addVisualCustomMesh</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">assets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiGlobalAsset</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">meshes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">assets</span><span class="o">-&gt;</span><span class="n">getMeshes</span><span class="p">(</span><span class="s">&quot;/path/to/model.obj&quot;</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">custom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addVisualCustomMesh</span><span class="p">(</span><span class="s">&quot;custom&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">meshes</span><span class="p">,</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.9f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.9f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">));</span>
+<span class="n">custom</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The shared mesh handle returned by <code class="docutils literal notranslate"><span class="pre">RayraiGlobalAsset::getMeshes</span></code> and the
+<code class="docutils literal notranslate"><span class="pre">raisin::GenMesh*</span></code> helpers in <code class="docutils literal notranslate"><span class="pre">rayrai/helper.hpp</span></code> (<code class="docutils literal notranslate"><span class="pre">GenMeshCube</span></code>,
+<code class="docutils literal notranslate"><span class="pre">GenMeshPlane</span></code>, <code class="docutils literal notranslate"><span class="pre">GenMeshSphere</span></code>, <code class="docutils literal notranslate"><span class="pre">GenMeshCylinder</span></code>, <code class="docutils literal notranslate"><span class="pre">GenMeshCapsule</span></code>,
+<code class="docutils literal notranslate"><span class="pre">GenMeshHeightmapRaisim</span></code>) all use the type alias
+<code class="docutils literal notranslate"><span class="pre">raisin::MeshList</span> <span class="pre">=</span> <span class="pre">std::shared_ptr&lt;std::vector&lt;std::shared_ptr&lt;OpenGLMesh&gt;&gt;&gt;</span></code>.
+Prefer <code class="docutils literal notranslate"><span class="pre">MeshList</span></code> over the long nested type in new code.</p>
+<p><code class="docutils literal notranslate"><span class="pre">Visuals::approximateBounds(center,</span> <span class="pre">radius)</span></code> and
+<code class="docutils literal notranslate"><span class="pre">InstancedVisuals::approximateBounds(center,</span> <span class="pre">radius)</span></code> expose the conservative
+world-space bounds that the renderer uses for culling, picking, shadow planning,
+and camera framing. Unlike <code class="docutils literal notranslate"><span class="pre">approximateRadius()</span></code>, the center can differ from
+<code class="docutils literal notranslate"><span class="pre">getPosition()</span></code> for offset meshes, generated heightmaps, articulated links,
+and deformables. Use <code class="docutils literal notranslate"><span class="pre">setCustomBounds(localCenter,</span> <span class="pre">localRadius)</span></code> when a
+programmatically deformed visual needs a tighter or more stable bound than its
+source mesh provides.</p>
+</section>
+<section id="visual-shadow-casting-visibility-range-and-material-overrides">
+<h2>Visual shadow casting, visibility range, and material overrides<a class="headerlink" href="#visual-shadow-casting-visibility-range-and-material-overrides" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">raisin::Visuals</span></code> exposes per-visual controls that go beyond position/colour
+and are useful for authoring polished scenes:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">setShadowCastingMode</span></code> (<code class="docutils literal notranslate"><span class="pre">ShadowCastingMode::Off</span></code> / <code class="docutils literal notranslate"><span class="pre">On</span></code> /
+<code class="docutils literal notranslate"><span class="pre">DoubleSided</span></code> / <code class="docutils literal notranslate"><span class="pre">ShadowsOnly</span></code>) — <code class="docutils literal notranslate"><span class="pre">ShadowsOnly</span></code> is useful for invisible
+proxy meshes that cast shadows for off-screen geometry; <code class="docutils literal notranslate"><span class="pre">DoubleSided</span></code> is
+intended for thin foliage cards.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setColorPassVisible(false)</span></code> — hide a visual from color rendering without
+changing the rest of its state. This is lower-level than <code class="docutils literal notranslate"><span class="pre">ShadowsOnly</span></code> and
+is used internally for TCP mesh-batch proxy visuals.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setVisibilityRange(begin,</span> <span class="pre">end,</span> <span class="pre">beginMargin,</span> <span class="pre">endMargin,</span>
+<span class="pre">VisibilityRangeFadeMode)</span></code> — <code class="docutils literal notranslate"><span class="pre">Self</span></code> fades the visual itself near the
+range bounds; <code class="docutils literal notranslate"><span class="pre">Dependencies</span></code> fades dependent LOD pairs at the same time.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setMaterialOverride(material)</span></code> — replace all materials on this visual.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setMaterialRemap(sourceName,</span> <span class="pre">material)</span></code> — remap a specific imported
+material slot by name without touching the rest.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setMaterialOverlay(material)</span></code> — additional draw pass on top of the base
+material (selection outlines, x-ray decals, ghost previews).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setTwoSided</span></code> / <code class="docutils literal notranslate"><span class="pre">setFlatShading</span></code> / <code class="docutils literal notranslate"><span class="pre">setUseMeshColor</span></code> — quick toggles
+for inspection visuals.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setCategory</span></code> / <code class="docutils literal notranslate"><span class="pre">setDetectable</span></code> — assign a <code class="docutils literal notranslate"><span class="pre">VisualCategory</span></code> and toggle
+inclusion in RaiSim sensor passes (off by default for viewer-only helpers).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setPbrEnvironment(envMap,</span> <span class="pre">brdfLut)</span></code> / <code class="docutils literal notranslate"><span class="pre">setPbrEnvironment(envMap,</span>
+<span class="pre">irradianceMap,</span> <span class="pre">prefilteredMap,</span> <span class="pre">brdfLut,</span> <span class="pre">intensity)</span></code> — attach an HDR
+environment to a single visual when global IBL is not appropriate.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setTransparency</span></code>, <code class="docutils literal notranslate"><span class="pre">setTransparentSortOffset</span></code>,
+<code class="docutils literal notranslate"><span class="pre">setTransparentSortUsesBoundsCenter</span></code> — fine control of transparent draw
+order without enabling full OIT.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setAutomaticMeshLodEnabled</span></code> / <code class="docutils literal notranslate"><span class="pre">setAutomaticMeshLodBias</span></code> — generated LOD
+selection for imported meshes.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setCustomBounds(localCenter,</span> <span class="pre">localRadius)</span></code> — override the bounds used by
+frustum culling and shadow planning for skinned or programmatically-deformed
+meshes.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">raisin::InstancedVisuals</span></code> mirrors many of these (<code class="docutils literal notranslate"><span class="pre">setCastsShadows</span></code>,
+<code class="docutils literal notranslate"><span class="pre">setUseMeshColor</span></code>, <code class="docutils literal notranslate"><span class="pre">setMaxRenderedInstances</span></code>,
+<code class="docutils literal notranslate"><span class="pre">setRenderedInstanceStride</span></code>, <code class="docutils literal notranslate"><span class="pre">setProjectedLodPolicy</span></code>,
+<code class="docutils literal notranslate"><span class="pre">setDoubleBufferedInstanceUploads</span></code>, <code class="docutils literal notranslate"><span class="pre">setSortTransparentInstances</span></code>) so
+high-instance-count visuals can be tuned without affecting unrelated draws.
+For mesh instances, <code class="docutils literal notranslate"><span class="pre">setUseMeshColor(true)</span></code> preserves mesh-authored base
+colors or texture colors instead of forcing the per-instance blend colors.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Two LODs of the same prop: high-detail near, low-poly far.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">highLod</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addVisualMesh</span><span class="p">(</span><span class="s">&quot;crate_hi&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/path/crate_hi.glb&quot;</span><span class="p">,</span>
+<span class="w">                                    </span><span class="n">glm</span><span class="o">::</span><span class="n">dvec3</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">));</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">lowLod</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addVisualMesh</span><span class="p">(</span><span class="s">&quot;crate_lo&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/path/crate_lo.glb&quot;</span><span class="p">,</span>
+<span class="w">                                    </span><span class="n">glm</span><span class="o">::</span><span class="n">dvec3</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">));</span>
+
+<span class="c1">// High-detail visible 0..10 m, soft fade-out over the last 1 m.</span>
+<span class="n">highLod</span><span class="o">-&gt;</span><span class="n">setVisibilityRange</span><span class="p">(</span><span class="cm">/*begin=*/</span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*end=*/</span><span class="mf">10.0f</span><span class="p">,</span>
+<span class="w">                            </span><span class="cm">/*beginMargin=*/</span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*endMargin=*/</span><span class="mf">1.0f</span><span class="p">,</span>
+<span class="w">                            </span><span class="n">raisin</span><span class="o">::</span><span class="n">Visuals</span><span class="o">::</span><span class="n">VisibilityRangeFadeMode</span><span class="o">::</span><span class="n">Self</span><span class="p">);</span>
+<span class="c1">// Low-detail visible 10..80 m, soft fade-in over the first 1 m.</span>
+<span class="n">lowLod</span><span class="o">-&gt;</span><span class="n">setVisibilityRange</span><span class="p">(</span><span class="cm">/*begin=*/</span><span class="mf">10.0f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*end=*/</span><span class="mf">80.0f</span><span class="p">,</span>
+<span class="w">                           </span><span class="cm">/*beginMargin=*/</span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*endMargin=*/</span><span class="mf">0.0f</span><span class="p">,</span>
+<span class="w">                           </span><span class="n">raisin</span><span class="o">::</span><span class="n">Visuals</span><span class="o">::</span><span class="n">VisibilityRangeFadeMode</span><span class="o">::</span><span class="n">Self</span><span class="p">);</span>
+
+<span class="c1">// Stand-in proxy that casts shadows but never draws colour.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">proxy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addVisualBox</span><span class="p">(</span><span class="s">&quot;offscreen_shadow_proxy&quot;</span><span class="p">,</span>
+<span class="w">                                 </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">,</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.0f</span><span class="p">));</span>
+<span class="n">proxy</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">8.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.5</span><span class="p">);</span>
+<span class="n">proxy</span><span class="o">-&gt;</span><span class="n">setShadowCastingMode</span><span class="p">(</span><span class="n">raisin</span><span class="o">::</span><span class="n">Visuals</span><span class="o">::</span><span class="n">ShadowCastingMode</span><span class="o">::</span><span class="n">ShadowsOnly</span><span class="p">);</span>
+
+<span class="c1">// Material override for inspection, plus an outline overlay for selection.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">ghost</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Material</span><span class="o">::</span><span class="n">unlitColor</span><span class="p">(</span><span class="s">&quot;inspect&quot;</span><span class="p">,</span>
+<span class="w">              </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.85f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.95f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.55f</span><span class="p">));</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">outline</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Material</span><span class="o">::</span><span class="n">unlitColor</span><span class="p">(</span><span class="s">&quot;outline&quot;</span><span class="p">,</span>
+<span class="w">              </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">));</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">inspect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addVisualMesh</span><span class="p">(</span><span class="s">&quot;inspect_target&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/path/asset.glb&quot;</span><span class="p">,</span>
+<span class="w">                                    </span><span class="n">glm</span><span class="o">::</span><span class="n">dvec3</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">));</span>
+<span class="n">inspect</span><span class="o">-&gt;</span><span class="n">setMaterialOverride</span><span class="p">(</span><span class="n">ghost</span><span class="p">);</span>
+<span class="n">inspect</span><span class="o">-&gt;</span><span class="n">setMaterialOverlay</span><span class="p">(</span><span class="n">outline</span><span class="p">);</span>
+
+<span class="c1">// Remap a single material slot on a multi-material imported asset.</span>
+<span class="n">inspect</span><span class="o">-&gt;</span><span class="n">setMaterialRemap</span><span class="p">(</span><span class="cm">/*sourceName=*/</span><span class="s">&quot;GlassPanes&quot;</span><span class="p">,</span>
+<span class="w">                          </span><span class="n">raisin</span><span class="o">::</span><span class="n">Material</span><span class="o">::</span><span class="n">pbr</span><span class="p">(</span><span class="s">&quot;tinted_glass&quot;</span><span class="p">,</span>
+<span class="w">                                                </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.1f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4f</span><span class="p">)));</span>
+</pre></div>
+</div>
+</section>
+<section id="point-clouds-and-coordinate-frames">
+<h2>Point clouds and coordinate frames<a class="headerlink" href="#point-clouds-and-coordinate-frames" title="Link to this heading"></a></h2>
+<p>Point clouds and coordinate frames are lightweight debug aids:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">cloud</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addPointCloud</span><span class="p">(</span><span class="s">&quot;scan&quot;</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">frame</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addCoordinateFrame</span><span class="p">(</span><span class="s">&quot;robot_frame&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>These objects are rendered alongside the world and can be updated every frame.
+Call <code class="docutils literal notranslate"><span class="pre">updatePointBuffer()</span></code> after changing point cloud data.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">cloud</span><span class="o">-&gt;</span><span class="n">positions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.2f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.1f</span><span class="p">)};</span>
+<span class="n">cloud</span><span class="o">-&gt;</span><span class="n">colors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)};</span>
+<span class="n">cloud</span><span class="o">-&gt;</span><span class="n">updatePointBuffer</span><span class="p">();</span>
+</pre></div>
+</div>
+<section id="per-visual-and-per-light-gallery">
+<h3>Per-visual and per-light gallery<a class="headerlink" href="#per-visual-and-per-light-gallery" title="Link to this heading"></a></h3>
+<p>Each additional light exposes optional projector cookies, colour temperature,
+distance fade for both lighting and shadows, and a per-light shadow toggle.
+The renderer also supports <em>negative</em> lights that subtract instead of add —
+useful for cooling shadowed regions or carving artistic dark spots — and
+arbitrary projector textures (gobos) that mask a spotlight’s contribution.
+See <a class="reference internal" href="Lighting.html"><span class="doc">Lighting, shadows, and HDR/IBL</span></a> for the full <code class="docutils literal notranslate"><span class="pre">AdditionalLight</span></code> API; this gallery
+focuses on the per-visual treatment side.</p>
+<p>The visibility-range / material override / shadow-casting-mode controls on
+<code class="docutils literal notranslate"><span class="pre">Visuals</span></code> give per-visual treatment for the same authored mesh: a high-LOD
+near visual fades into a low-LOD far one, an override material swaps the look
+for inspection, and shadows-only proxies cast occlusion for off-screen
+geometry without rendering colour.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Coloured spotlight with a temperature-driven warm tint and gobo cookie.</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">AdditionalLight</span><span class="w"> </span><span class="n">gobo</span><span class="p">;</span>
+<span class="n">gobo</span><span class="p">.</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">LightType</span><span class="o">::</span><span class="n">SPOT</span><span class="p">;</span>
+<span class="n">gobo</span><span class="p">.</span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">1.5f</span><span class="p">,</span><span class="w"> </span><span class="mf">-1.5f</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0f</span><span class="p">);</span>
+<span class="n">gobo</span><span class="p">.</span><span class="n">direction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">normalize</span><span class="p">(</span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">-1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">-1.5f</span><span class="p">));</span>
+<span class="n">gobo</span><span class="p">.</span><span class="n">diffuse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">1.6f</span><span class="p">);</span>
+<span class="n">gobo</span><span class="p">.</span><span class="n">spotInnerCos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">cos</span><span class="p">(</span><span class="n">glm</span><span class="o">::</span><span class="n">radians</span><span class="p">(</span><span class="mf">12.0f</span><span class="p">));</span>
+<span class="n">gobo</span><span class="p">.</span><span class="n">spotOuterCos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">cos</span><span class="p">(</span><span class="n">glm</span><span class="o">::</span><span class="n">radians</span><span class="p">(</span><span class="mf">28.0f</span><span class="p">));</span>
+<span class="n">gobo</span><span class="p">.</span><span class="n">temperatureEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">gobo</span><span class="p">.</span><span class="n">temperatureKelvin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3200.0f</span><span class="p">;</span><span class="w">        </span><span class="c1">// warm tungsten</span>
+<span class="n">gobo</span><span class="p">.</span><span class="n">projectorMap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">goboTextureId</span><span class="p">;</span><span class="w">       </span><span class="c1">// RGBA8 cookie</span>
+<span class="n">gobo</span><span class="p">.</span><span class="n">projectorStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">;</span>
+<span class="n">gobo</span><span class="p">.</span><span class="n">distanceFadeEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">gobo</span><span class="p">.</span><span class="n">distanceFadeBegin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">12.0f</span><span class="p">;</span>
+<span class="n">gobo</span><span class="p">.</span><span class="n">distanceFadeLength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">4.0f</span><span class="p">;</span>
+<span class="n">gobo</span><span class="p">.</span><span class="n">castsShadows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">addAdditionalLight</span><span class="p">(</span><span class="n">gobo</span><span class="p">);</span>
+
+<span class="c1">// A subtractive (negative) fill light to cool down a shadowed region.</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">AdditionalLight</span><span class="w"> </span><span class="n">cool</span><span class="p">;</span>
+<span class="n">cool</span><span class="p">.</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">LightType</span><span class="o">::</span><span class="n">POINT</span><span class="p">;</span>
+<span class="n">cool</span><span class="p">.</span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">-2.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.8f</span><span class="p">);</span>
+<span class="n">cool</span><span class="p">.</span><span class="n">diffuse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.10f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.16f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.32f</span><span class="p">);</span>
+<span class="n">cool</span><span class="p">.</span><span class="n">negative</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">cool</span><span class="p">.</span><span class="n">constant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">;</span><span class="w"> </span><span class="n">cool</span><span class="p">.</span><span class="n">linear</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5f</span><span class="p">;</span><span class="w"> </span><span class="n">cool</span><span class="p">.</span><span class="n">quadratic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.20f</span><span class="p">;</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">addAdditionalLight</span><span class="p">(</span><span class="n">cool</span><span class="p">);</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Light colour temperature + distance fade</p></th>
+<th class="head"><p>Negative lights</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><img alt="Multiple lights at different colour temperatures" src="../../_images/122_light_temperature_distance_fade.png" />
+</td>
+<td><img alt="Subtractive negative lights" src="../../_images/120_light_negative.png" />
+</td>
+</tr>
+<tr class="row-odd"><td><p>Spotlight projectors (gobos)</p></td>
+<td><p>Shadow casting modes</p></td>
+</tr>
+<tr class="row-even"><td><img alt="Spotlight cookie projector textures" src="../../_images/96_light_projectors.png" />
+</td>
+<td><img alt="Off / On / DoubleSided / ShadowsOnly compared" src="../../_images/127_visual_shadow_casting_modes.png" />
+</td>
+</tr>
+<tr class="row-odd"><td><p>Visibility range</p></td>
+<td><p>Material override / overlay</p></td>
+</tr>
+<tr class="row-even"><td><img alt="Visuals fading at near and far range" src="../../_images/124_visual_visibility_range.png" />
+</td>
+<td><img alt="Material override and material overlay on a single visual" src="../../_images/125_visual_material_override_overlay.png" />
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Materials.html" class="btn btn-neutral float-left" title="PBR materials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="PostProcess.html" class="btn btn-neutral float-right" title="Post-process effects" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

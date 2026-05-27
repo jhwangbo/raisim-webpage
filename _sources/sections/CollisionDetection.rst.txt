@@ -26,7 +26,7 @@ Global contact limits and merging
 Shape categories
 ================
 * **Primitive**: sphere, box, capsule, cylinder, plane.
-* **ConvexMesh**: convexified mesh (convex hull or convex decomposition).
+* **ConvexMesh**: convex mesh representation (convex hull or convex decomposition).
 * **Mesh**: triangle mesh (non-convex).
 * **Heightmap**: grid terrain represented by triangles (rotation is not
   supported in collision).

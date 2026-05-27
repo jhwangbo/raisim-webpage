@@ -1,0 +1,600 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post-process effects &mdash; raisim 2.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b0caeef3" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=c3c8ae58"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Weather and atmospherics" href="Weather.html" />
+    <link rel="prev" title="Custom visuals, instancing, and scene helpers" href="Visuals.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../Rayrai.html">rayrai Visualizer</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../Rayrai.html#overview">Overview</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="RenderQuality.html">Render quality, tone mapping, color grading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Lighting.html">Lighting, shadows, and HDR/IBL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Materials.html">PBR materials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Visuals.html">Custom visuals, instancing, and scene helpers</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Post-process effects</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#cinematic-post-process-effects">Cinematic post-process effects</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Weather.html">Weather and atmospherics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Capture.html">Capture, diagnostics, and headless rendering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Sensors.html">Sensors and depth/LiDAR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Examples.html">Example targets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Performance.html">Performance notes and the C++ API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#included-binary-recommended">Included binary (recommended)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#build-and-link">Build and link</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#minimal-usage">Minimal usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#threading-contract">Threading contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#lifetime-and-error-model">Lifetime and error model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#example-custom-visuals-background-color">Example: custom visuals + background color</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#where-to-go-next">Where to go next</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../Rayrai.html">rayrai Visualizer</a></li>
+      <li class="breadcrumb-item active">Post-process effects</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="post-process-effects">
+<h1>Post-process effects<a class="headerlink" href="#post-process-effects" title="Link to this heading"></a></h1>
+<p>This page covers cinematic and screen-space effects driven by
+<code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code> — DoF, lens flares, vignette, motion blur, SSR,
+SSAO, SSIL, contact shadows, refraction, and stylized looks plus the debug
+visualisation passes. <code class="docutils literal notranslate"><span class="pre">WeatherSettings</span></code> overrides atmospheric state (fog,
+wetness, sky) and is documented in <a class="reference internal" href="Weather.html"><span class="doc">Weather and atmospherics</span></a>. Bloom, HDR/IBL, and PBR
+materials live in <a class="reference internal" href="Materials.html"><span class="doc">PBR materials</span></a> and <a class="reference internal" href="Lighting.html"><span class="doc">Lighting, shadows, and HDR/IBL</span></a>.</p>
+<section id="cinematic-post-process-effects">
+<h2>Cinematic post-process effects<a class="headerlink" href="#cinematic-post-process-effects" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code> exposes a large set of optional screen-space effects.
+Each one is gated by an <code class="docutils literal notranslate"><span class="pre">*Enabled</span></code> flag so the fast frame path stays cheap;
+turn them on per-shot for screenshots, asset inspection, or demo captures.</p>
+<p>Cinematic lens and image effects:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">viewerVignetteStrength</span></code> — radial darkening.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">viewerChromaticAberrationStrength</span></code> — RGB channel offset.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">viewerFilmGrainStrength</span></code> — luma-noise overlay.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lensFlareGhostStrength</span></code>, <code class="docutils literal notranslate"><span class="pre">lensFlareStreakStrength</span></code>, <code class="docutils literal notranslate"><span class="pre">lensFlareTint</span></code> —
+cinematic lens flares around bright lights.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lensDistortionEnabled</span></code> / <code class="docutils literal notranslate"><span class="pre">lensDistortionStrength</span></code> /
+<code class="docutils literal notranslate"><span class="pre">lensDistortionCenter</span></code> — signed barrel or pincushion distortion.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">letterboxEnabled</span></code> / <code class="docutils literal notranslate"><span class="pre">letterboxAspect</span></code> / <code class="docutils literal notranslate"><span class="pre">letterboxColor</span></code> —
+cinematic letterboxing.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">starburstEnabled</span></code> / <code class="docutils literal notranslate"><span class="pre">starburstStrength</span></code> / <code class="docutils literal notranslate"><span class="pre">starburstSpikes</span></code> /
+<code class="docutils literal notranslate"><span class="pre">starburstAngleOffset</span></code> / <code class="docutils literal notranslate"><span class="pre">starburstRadius</span></code> / <code class="docutils literal notranslate"><span class="pre">starburstTint</span></code> —
+aperture-shaped highlights.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zoomBlurEnabled</span></code> / <code class="docutils literal notranslate"><span class="pre">zoomBlurStrength</span></code> / <code class="docutils literal notranslate"><span class="pre">zoomBlurCenter</span></code> /
+<code class="docutils literal notranslate"><span class="pre">zoomBlurInnerRadius</span></code> — radial focus blur for sprint and dash effects.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">motionBlurEnabled</span></code> / <code class="docutils literal notranslate"><span class="pre">motionBlurDirection</span></code> / <code class="docutils literal notranslate"><span class="pre">motionBlurStrength</span></code> —
+directional motion blur.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">depthOfFieldEnabled</span></code> / <code class="docutils literal notranslate"><span class="pre">depthOfFieldFocusDistance</span></code> /
+<code class="docutils literal notranslate"><span class="pre">depthOfFieldFocusRange</span></code> / <code class="docutils literal notranslate"><span class="pre">depthOfFieldMaxRadius</span></code>.</p></li>
+</ul>
+<p>Stylized and diagnostic looks:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pixelateEnabled</span></code> / <code class="docutils literal notranslate"><span class="pre">pixelateBlockSize</span></code> — retro pixelation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">posterizeEnabled</span></code> / <code class="docutils literal notranslate"><span class="pre">posterizeLevels</span></code> — color quantization.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">scanlineEnabled</span></code> / <code class="docutils literal notranslate"><span class="pre">scanlineStrength</span></code> / <code class="docutils literal notranslate"><span class="pre">scanlineFrequency</span></code> —
+CRT-style scanlines.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nightVisionEnabled</span></code> / <code class="docutils literal notranslate"><span class="pre">nightVisionStrength</span></code> / <code class="docutils literal notranslate"><span class="pre">nightVisionGain</span></code> —
+monochrome green amplification.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">thermalEnabled</span></code> / <code class="docutils literal notranslate"><span class="pre">thermalStrength</span></code> / <code class="docutils literal notranslate"><span class="pre">thermalGain</span></code> — heatmap LUT.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ditherEnabled</span></code> / <code class="docutils literal notranslate"><span class="pre">ditherStrength</span></code> — banding-control dither.</p></li>
+</ul>
+<p>Atmospheric and water effects:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">underwaterEnabled</span></code> / <code class="docutils literal notranslate"><span class="pre">underwaterTint</span></code> / <code class="docutils literal notranslate"><span class="pre">underwaterCausticStrength</span></code> /
+<code class="docutils literal notranslate"><span class="pre">underwaterCausticScale</span></code> / <code class="docutils literal notranslate"><span class="pre">underwaterDepthExtinction</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">heatHazeEnabled</span></code> / <code class="docutils literal notranslate"><span class="pre">heatHazeStrength</span></code> / <code class="docutils literal notranslate"><span class="pre">heatHazeFrequency</span></code> /
+<code class="docutils literal notranslate"><span class="pre">heatHazeSpeed</span></code> / <code class="docutils literal notranslate"><span class="pre">heatHazeMaxY</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lightShaftsEnabled</span></code> / <code class="docutils literal notranslate"><span class="pre">lightShaftsStrength</span></code> / <code class="docutils literal notranslate"><span class="pre">lightShaftsDecay</span></code> /
+<code class="docutils literal notranslate"><span class="pre">lightShaftsDensity</span></code> — god rays from the main light.</p></li>
+</ul>
+<p>Screen-space reflections and refraction:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ssrEnabled</span></code>, <code class="docutils literal notranslate"><span class="pre">ssrStrength</span></code>, <code class="docutils literal notranslate"><span class="pre">ssrSteps</span></code>, <code class="docutils literal notranslate"><span class="pre">ssrMaxDistance</span></code>,
+<code class="docutils literal notranslate"><span class="pre">ssrThickness</span></code> — depth-only screen-space reflections.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">screenSpaceRefraction</span></code>, <code class="docutils literal notranslate"><span class="pre">screenSpaceRefractionStrength</span></code>,
+<code class="docutils literal notranslate"><span class="pre">screenSpaceRefractionMaxPixels</span></code> — IOR-aware refraction for transparent
+meshes.</p></li>
+</ul>
+<p>Indirect lighting and contact effects:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">screenSpaceAoEnabled</span></code>, <code class="docutils literal notranslate"><span class="pre">screenSpaceAoRadius</span></code>, <code class="docutils literal notranslate"><span class="pre">screenSpaceAoStrength</span></code>,
+<code class="docutils literal notranslate"><span class="pre">screenSpaceAoBias</span></code>, <code class="docutils literal notranslate"><span class="pre">screenSpaceAoSamples</span></code>, <code class="docutils literal notranslate"><span class="pre">screenSpaceAoFalloff</span></code>,
+<code class="docutils literal notranslate"><span class="pre">screenSpaceAoRadiusWorldSpace</span></code>, <code class="docutils literal notranslate"><span class="pre">screenSpaceAoMaxPixelRadius</span></code>,
+<code class="docutils literal notranslate"><span class="pre">screenSpaceAoGeometryAware</span></code> — SSAO controls.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">screenSpaceAoDenoiseEnabled</span></code>, <code class="docutils literal notranslate"><span class="pre">screenSpaceAoDenoiseStrength</span></code>,
+<code class="docutils literal notranslate"><span class="pre">screenSpaceAoDenoiseRadius</span></code>, <code class="docutils literal notranslate"><span class="pre">screenSpaceAoDenoiseDepthSigma</span></code> —
+geometry-aware AO denoise.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">contactShadowsEnabled</span></code>, <code class="docutils literal notranslate"><span class="pre">contactShadowsLength</span></code>, <code class="docutils literal notranslate"><span class="pre">contactShadowsStrength</span></code>,
+<code class="docutils literal notranslate"><span class="pre">contactShadowsThickness</span></code> — short-range raymarched contact shadows.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">contactAoRadius</span></code> / <code class="docutils literal notranslate"><span class="pre">contactAoStrength</span></code> / <code class="docutils literal notranslate"><span class="pre">contactAoSamples</span></code> /
+<code class="docutils literal notranslate"><span class="pre">contactAoFalloff</span></code> — tight contact AO on top of SSAO.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">screenSpaceIndirectLightingEnabled</span></code> and friends
+(<code class="docutils literal notranslate"><span class="pre">screenSpaceIndirectLightingRadius</span></code>, <code class="docutils literal notranslate"><span class="pre">Strength</span></code>, <code class="docutils literal notranslate"><span class="pre">Samples</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Falloff</span></code>, <code class="docutils literal notranslate"><span class="pre">NormalRejection</span></code>, <code class="docutils literal notranslate"><span class="pre">Saturation</span></code>) — single-bounce SSIL.</p></li>
+</ul>
+<p>Specular AA, aerial perspective, and detail normals:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">specularAntiAliasing</span></code> / <code class="docutils literal notranslate"><span class="pre">specularAntiAliasingStrength</span></code> — geometry-aware
+specular filtering on high-frequency surfaces.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">aerialPerspectiveEnabled</span></code> / <code class="docutils literal notranslate"><span class="pre">aerialPerspectiveStrength</span></code> — distance-based
+atmospheric tinting driven by the sky LUTs.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">detailNormalEnabled</span></code> / <code class="docutils literal notranslate"><span class="pre">detailNormalScale</span></code> / <code class="docutils literal notranslate"><span class="pre">detailNormalStrength</span></code> —
+high-frequency normal detail for close-up shots.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">viewerSubsurfaceWrap</span></code> / <code class="docutils literal notranslate"><span class="pre">viewerSubsurfaceTint</span></code> — wrap-light approximation
+for soft subsurface response on skin and foliage.</p></li>
+</ul>
+<p>Bloom controls (<code class="docutils literal notranslate"><span class="pre">bloomEnabled</span></code>, <code class="docutils literal notranslate"><span class="pre">bloomThreshold</span></code>, <code class="docutils literal notranslate"><span class="pre">bloomStrength</span></code>,
+<code class="docutils literal notranslate"><span class="pre">bloomRadius</span></code>, <code class="docutils literal notranslate"><span class="pre">bloomKnee</span></code>, <code class="docutils literal notranslate"><span class="pre">bloomQuality</span></code>, <code class="docutils literal notranslate"><span class="pre">bloomSourceClamp</span></code>,
+<code class="docutils literal notranslate"><span class="pre">bloomAnamorphic</span></code>, <code class="docutils literal notranslate"><span class="pre">bloomDirtStrength</span></code>, <code class="docutils literal notranslate"><span class="pre">bloomDirtScale</span></code>,
+<code class="docutils literal notranslate"><span class="pre">bloomDirtTexture</span></code>, <code class="docutils literal notranslate"><span class="pre">bloomMix</span></code>) cover both clean and lens-dirt looks.</p>
+<p>Diagnostics: <code class="docutils literal notranslate"><span class="pre">PostProcessDebugMode</span></code> (<code class="docutils literal notranslate"><span class="pre">Final</span></code>, <code class="docutils literal notranslate"><span class="pre">BloomSource</span></code>,
+<code class="docutils literal notranslate"><span class="pre">AmbientOcclusion</span></code>, <code class="docutils literal notranslate"><span class="pre">AmbientOcclusionRaw</span></code>, <code class="docutils literal notranslate"><span class="pre">FogTransmittance</span></code>,
+<code class="docutils literal notranslate"><span class="pre">FogDensity</span></code>, <code class="docutils literal notranslate"><span class="pre">FogScattering</span></code>, <code class="docutils literal notranslate"><span class="pre">WorldNormal</span></code>, <code class="docutils literal notranslate"><span class="pre">DepthHeatmap</span></code>,
+<code class="docutils literal notranslate"><span class="pre">ScreenSpaceIndirectLighting</span></code>) routes a debug pass to the final image so the
+underlying buffers can be inspected without leaving the normal render path.</p>
+<p>A full cinematic frame typically enables several of these together. The
+snippet below pairs bloom + DoF + vignette + chromatic aberration + film
+grain + lens flare + a slight letterbox for a film-shot look:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">quality</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">defaultRenderQualitySettings</span><span class="p">(</span>
+<span class="w">  </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">RenderQualityPreset</span><span class="o">::</span><span class="n">Ultra</span><span class="p">);</span>
+
+<span class="n">quality</span><span class="p">.</span><span class="n">colorMode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">ViewerColorMode</span><span class="o">::</span><span class="n">AcesApprox</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">pbrToneMapping</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">viewerColorGradePreset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">ColorGradePreset</span><span class="o">::</span><span class="n">Cinematic</span><span class="p">;</span>
+
+<span class="n">quality</span><span class="p">.</span><span class="n">bloomEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">bloomThreshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.10f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">bloomStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.22f</span><span class="p">;</span>
+
+<span class="n">quality</span><span class="p">.</span><span class="n">depthOfFieldEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">depthOfFieldFocusDistance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">5.0f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">depthOfFieldFocusRange</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.5f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">depthOfFieldMaxRadius</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.4f</span><span class="p">;</span>
+
+<span class="n">quality</span><span class="p">.</span><span class="n">viewerVignetteStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.40f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">viewerChromaticAberrationStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.08f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">viewerFilmGrainStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.05f</span><span class="p">;</span>
+
+<span class="n">quality</span><span class="p">.</span><span class="n">lensFlareGhostStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.45f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">lensFlareStreakStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.30f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">lensFlareTint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.55f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.78f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.10f</span><span class="p">);</span>
+
+<span class="n">quality</span><span class="p">.</span><span class="n">letterboxEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">letterboxAspect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.35f</span><span class="p">;</span>
+
+<span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">quality</span><span class="p">);</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../../_images/rayrai_cinematic.png"><img alt="Three props at different depths with DoF, bloom, vignette, lens flare, letterbox" src="../../_images/rayrai_cinematic.png" style="width: 100%;" />
+</a>
+<p>For inspection, route a debug mode to the final image:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">();</span>
+<span class="n">q</span><span class="p">.</span><span class="n">postProcessDebugMode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">PostProcessDebugMode</span><span class="o">::</span><span class="n">AmbientOcclusion</span><span class="p">;</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">q</span><span class="p">);</span>
+</pre></div>
+</div>
+<section id="screen-space-reflections-ao-and-indirect-lighting">
+<h3>Screen-space reflections, AO, and indirect lighting<a class="headerlink" href="#screen-space-reflections-ao-and-indirect-lighting" title="Link to this heading"></a></h3>
+<p>Screen-space reflections (<code class="docutils literal notranslate"><span class="pre">ssrEnabled</span></code>) march the depth buffer along each
+reflected ray and sample the colour buffer at the first hit. The result is a
+cheap, depth-only approximation that captures puddle reflections, glossy
+floors, and glass-like mirror surfaces without authoring a reflection probe.
+Tune the trade-off with <code class="docutils literal notranslate"><span class="pre">ssrStrength</span></code>, <code class="docutils literal notranslate"><span class="pre">ssrSteps</span></code>, <code class="docutils literal notranslate"><span class="pre">ssrMaxDistance</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">ssrThickness</span></code>.</p>
+<p>Screen-space ambient occlusion (<code class="docutils literal notranslate"><span class="pre">screenSpaceAoEnabled</span></code>) darkens crevices,
+corners, and tight contacts using <code class="docutils literal notranslate"><span class="pre">screenSpaceAoRadius</span></code> (with
+<code class="docutils literal notranslate"><span class="pre">screenSpaceAoRadiusWorldSpace</span></code> to switch from pixel to metres),
+<code class="docutils literal notranslate"><span class="pre">screenSpaceAoSamples</span></code>, <code class="docutils literal notranslate"><span class="pre">screenSpaceAoFalloff</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">screenSpaceAoStrength</span></code>. The denoise pass
+(<code class="docutils literal notranslate"><span class="pre">screenSpaceAoDenoiseEnabled</span></code>) is geometry-aware and preserves edges.
+<code class="docutils literal notranslate"><span class="pre">contactAoRadius</span></code> / <code class="docutils literal notranslate"><span class="pre">contactAoStrength</span></code> add a separate tight contact-AO
+pass on top of SSAO for surfaces that touch.</p>
+<p>Screen-space indirect lighting (<code class="docutils literal notranslate"><span class="pre">screenSpaceIndirectLightingEnabled</span></code>)
+bounces one indirect ray per pixel against the colour buffer to add coloured
+fill light from nearby diffuse surfaces; <code class="docutils literal notranslate"><span class="pre">Radius</span></code>, <code class="docutils literal notranslate"><span class="pre">Strength</span></code>, <code class="docutils literal notranslate"><span class="pre">Samples</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Falloff</span></code>, <code class="docutils literal notranslate"><span class="pre">NormalRejection</span></code>, and <code class="docutils literal notranslate"><span class="pre">Saturation</span></code> control quality and bias.</p>
+<p>Contact shadows (<code class="docutils literal notranslate"><span class="pre">contactShadowsEnabled</span></code>) ray-march short shadow rays in
+screen space to recover fine occlusion near grazing geometry that a shadow
+map misses; <code class="docutils literal notranslate"><span class="pre">Length</span></code>, <code class="docutils literal notranslate"><span class="pre">Strength</span></code>, and <code class="docutils literal notranslate"><span class="pre">Thickness</span></code> are in metres.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">quality</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">defaultRenderQualitySettings</span><span class="p">(</span>
+<span class="w">  </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">RenderQualityPreset</span><span class="o">::</span><span class="n">High</span><span class="p">);</span>
+
+<span class="c1">// Screen-space reflections.</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">ssrEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">ssrStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.85f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">ssrSteps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">32</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">ssrMaxDistance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">8.0f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">ssrThickness</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.35f</span><span class="p">;</span>
+
+<span class="c1">// SSAO with denoise.</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">screenSpaceAoEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">screenSpaceAoRadius</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.5f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">screenSpaceAoStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.65f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">screenSpaceAoSamples</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">16</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">screenSpaceAoRadiusWorldSpace</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w">  </span><span class="c1">// radius is metres</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">screenSpaceAoDenoiseEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">screenSpaceAoDenoiseStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.75f</span><span class="p">;</span>
+
+<span class="c1">// Tight contact AO on top of SSAO.</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">contactAoRadius</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.04f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">contactAoStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.55f</span><span class="p">;</span>
+
+<span class="c1">// Single-bounce screen-space indirect lighting.</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">screenSpaceIndirectLightingEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">screenSpaceIndirectLightingStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.45f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">screenSpaceIndirectLightingSamples</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">12</span><span class="p">;</span>
+
+<span class="c1">// Short raymarched contact shadows that recover fine creases.</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">contactShadowsEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">contactShadowsLength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.18f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">contactShadowsStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.7f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">contactShadowsThickness</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.06f</span><span class="p">;</span>
+
+<span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">quality</span><span class="p">);</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../../_images/rayrai_ssr_ssao.png"><img alt="Glossy floor with SSR, SSAO, and contact shadows enabled" src="../../_images/rayrai_ssr_ssao.png" style="width: 100%;" />
+</a>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Screen-space reflections (SSR)</p></th>
+<th class="head"><p>Screen-space indirect lighting (SSIL)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><img alt="SSR on glossy floor and puddles" src="../../_images/72_ssr.png" />
+</td>
+<td><img alt="SSIL adds coloured bounce light" src="../../_images/71_screen_space_indirect_lighting.png" />
+</td>
+</tr>
+<tr class="row-odd"><td><p>Contact shadows</p></td>
+<td><p>Screen-space refraction</p></td>
+</tr>
+<tr class="row-even"><td><img alt="Short-range raymarched contact shadows" src="../../_images/69_contact_shadows.png" />
+</td>
+<td><img alt="IOR-driven refraction" src="../../_images/21_screen_space_refraction.png" />
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="depth-of-field-lens-flares-and-lens-character">
+<h3>Depth of field, lens flares, and lens character<a class="headerlink" href="#depth-of-field-lens-flares-and-lens-character" title="Link to this heading"></a></h3>
+<p>Depth of field (<code class="docutils literal notranslate"><span class="pre">depthOfFieldEnabled</span></code>, <code class="docutils literal notranslate"><span class="pre">depthOfFieldFocusDistance</span></code>,
+<code class="docutils literal notranslate"><span class="pre">depthOfFieldFocusRange</span></code>, <code class="docutils literal notranslate"><span class="pre">depthOfFieldMaxRadius</span></code>) uses a hex-bokeh disk
+and a depth-driven circle-of-confusion sample. The hex shape is intentionally
+cinematic; <code class="docutils literal notranslate"><span class="pre">starburstEnabled</span></code> adds an aperture-shaped highlight starburst
+for in-focus bright sources.</p>
+<p>Lens flare uses two layers: ghost reflections projected toward the screen
+centre (<code class="docutils literal notranslate"><span class="pre">lensFlareGhostStrength</span></code>) and an axial streak from very bright
+sources (<code class="docutils literal notranslate"><span class="pre">lensFlareStreakStrength</span></code>). Both share <code class="docutils literal notranslate"><span class="pre">lensFlareTint</span></code> (a cool
+cinematic blue by default).</p>
+<p><code class="docutils literal notranslate"><span class="pre">viewerVignetteStrength</span></code>, <code class="docutils literal notranslate"><span class="pre">viewerChromaticAberrationStrength</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">viewerFilmGrainStrength</span></code> add the rest of the standard photographic camera
+character. <code class="docutils literal notranslate"><span class="pre">lensDistortionEnabled</span></code> applies signed barrel / pincushion
+distortion centred at <code class="docutils literal notranslate"><span class="pre">lensDistortionCenter</span></code>.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">quality</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">();</span>
+
+<span class="c1">// Depth of field with cinematic hex bokeh.</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">depthOfFieldEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">depthOfFieldFocusDistance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">4.5f</span><span class="p">;</span><span class="w">   </span><span class="c1">// metres</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">depthOfFieldFocusRange</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.8f</span><span class="p">;</span><span class="w">      </span><span class="c1">// metres of in-focus band</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">depthOfFieldMaxRadius</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.6f</span><span class="p">;</span><span class="w">       </span><span class="c1">// pixels at far blur</span>
+
+<span class="c1">// Aperture-shaped highlight starburst.</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">starburstEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">starburstStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.6f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">starburstSpikes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
+
+<span class="c1">// Lens flare (ghosts and axial streak).</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">lensFlareGhostStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.55f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">lensFlareStreakStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.35f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">lensFlareTint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.62f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.78f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.10f</span><span class="p">);</span><span class="w">  </span><span class="c1">// cool cinematic</span>
+
+<span class="c1">// Camera character.</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">viewerVignetteStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.35f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">viewerChromaticAberrationStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.08f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">viewerFilmGrainStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.04f</span><span class="p">;</span>
+
+<span class="c1">// Optional barrel distortion.</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">lensDistortionEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">lensDistortionStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.12f</span><span class="p">;</span><span class="w">     </span><span class="c1">// &gt; 0 = barrel, &lt; 0 = pincushion</span>
+
+<span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">quality</span><span class="p">);</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Depth of field</p></th>
+<th class="head"><p>Hex bokeh detail</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><img alt="Focus distance with depth-of-field blur" src="../../_images/02_depth_of_field.png" />
+</td>
+<td><img alt="Hex aperture bokeh on highlights" src="../../_images/68_hex_bokeh.png" />
+</td>
+</tr>
+<tr class="row-odd"><td><p>Lens flare</p></td>
+<td><p>Lens character (vignette + grain + CA)</p></td>
+</tr>
+<tr class="row-even"><td><img alt="Lens flare ghost and streak" src="../../_images/67_lens_flare.png" />
+</td>
+<td><img alt="Vignette + chromatic aberration + film grain" src="../../_images/63_lens_character.png" />
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="motion-blur-and-atmospheric-effects">
+<h3>Motion blur and atmospheric effects<a class="headerlink" href="#motion-blur-and-atmospheric-effects" title="Link to this heading"></a></h3>
+<p>Directional motion blur (<code class="docutils literal notranslate"><span class="pre">motionBlurEnabled</span></code>, <code class="docutils literal notranslate"><span class="pre">motionBlurDirection</span></code>,
+<code class="docutils literal notranslate"><span class="pre">motionBlurStrength</span></code>) smears the colour buffer along a constant screen-space
+vector. Useful for shutter-style captures and stylized motion frames.</p>
+<p>Heat haze (<code class="docutils literal notranslate"><span class="pre">heatHazeEnabled</span></code>) perturbs UVs with a noise field above
+<code class="docutils literal notranslate"><span class="pre">heatHazeMaxY</span></code> in screen space, simulating hot air shimmer. Underwater
+(<code class="docutils literal notranslate"><span class="pre">underwaterEnabled</span></code>, <code class="docutils literal notranslate"><span class="pre">underwaterTint</span></code>, <code class="docutils literal notranslate"><span class="pre">underwaterCausticStrength</span></code>,
+<code class="docutils literal notranslate"><span class="pre">underwaterCausticScale</span></code>, <code class="docutils literal notranslate"><span class="pre">underwaterDepthExtinction</span></code>) tints the image,
+adds animated caustic patterns, and attenuates by depth.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">();</span>
+
+<span class="c1">// Directional motion blur — typical &quot;running camera&quot; look.</span>
+<span class="n">q</span><span class="p">.</span><span class="n">motionBlurEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">motionBlurDirection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec2</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">);</span><span class="w">  </span><span class="c1">// horizontal sweep</span>
+<span class="n">q</span><span class="p">.</span><span class="n">motionBlurStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.45f</span><span class="p">;</span>
+
+<span class="c1">// Hot tarmac shimmer above the horizon line.</span>
+<span class="n">q</span><span class="p">.</span><span class="n">heatHazeEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">heatHazeStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.30f</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">heatHazeFrequency</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">5.0f</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">heatHazeSpeed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.2f</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">heatHazeMaxY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.60f</span><span class="p">;</span>
+
+<span class="c1">// Underwater scene.</span>
+<span class="n">q</span><span class="p">.</span><span class="n">underwaterEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">underwaterTint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.20f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.55f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.85f</span><span class="p">);</span>
+<span class="n">q</span><span class="p">.</span><span class="n">underwaterCausticStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.6f</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">underwaterCausticScale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">underwaterDepthExtinction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.2f</span><span class="p">;</span>
+
+<span class="c1">// High-frequency detail normals on every PBR surface.</span>
+<span class="n">q</span><span class="p">.</span><span class="n">detailNormalEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">detailNormalScale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">30.0f</span><span class="p">;</span><span class="w">    </span><span class="c1">// cycles per metre</span>
+<span class="n">q</span><span class="p">.</span><span class="n">detailNormalStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.18f</span><span class="p">;</span>
+
+<span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">q</span><span class="p">);</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Motion blur</p></th>
+<th class="head"><p>Heat haze</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><img alt="Directional motion blur" src="../../_images/70_motion_blur.png" />
+</td>
+<td><img alt="Heat haze UV displacement" src="../../_images/73_heat_haze.png" />
+</td>
+</tr>
+<tr class="row-odd"><td><p>Underwater</p></td>
+<td><p>Detail normals</p></td>
+</tr>
+<tr class="row-even"><td><img alt="Underwater tint, caustics, extinction" src="../../_images/78_underwater.png" />
+</td>
+<td><img alt="High-frequency detail normal layer" src="../../_images/64_detail_normal.png" />
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="stylized-and-diagnostic-looks">
+<h3>Stylized and diagnostic looks<a class="headerlink" href="#stylized-and-diagnostic-looks" title="Link to this heading"></a></h3>
+<p>The stylized post-process effects on <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code> are useful for
+authoring previews and for inspection of specific buffers without leaving the
+normal render path. Thermal and night vision are typical operator-camera
+looks; the calibration reference is intended to drive
+<code class="docutils literal notranslate"><span class="pre">analyzeRgbaCalibrationPatches</span></code> for capture-pipeline tuning.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">();</span>
+
+<span class="c1">// Thermal LUT (monochrome heat-map).</span>
+<span class="n">q</span><span class="p">.</span><span class="n">thermalEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">thermalStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">thermalGain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.5f</span><span class="p">;</span>
+
+<span class="c1">// Night vision (green amplification with noise).</span>
+<span class="n">q</span><span class="p">.</span><span class="n">nightVisionEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">nightVisionStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">nightVisionGain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.5f</span><span class="p">;</span>
+
+<span class="c1">// CRT scanlines + posterize + lens distortion for an arcade look.</span>
+<span class="n">q</span><span class="p">.</span><span class="n">scanlineEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">scanlineStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.35f</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">scanlineFrequency</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">480.0f</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">posterizeEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">posterizeLevels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">lensDistortionEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">lensDistortionStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">-0.12f</span><span class="p">;</span><span class="w">  </span><span class="c1">// pincushion</span>
+
+<span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">q</span><span class="p">);</span>
+
+<span class="c1">// Pick one debug pass at a time for inspection.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">debug</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">();</span>
+<span class="n">debug</span><span class="p">.</span><span class="n">postProcessDebugMode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">PostProcessDebugMode</span><span class="o">::</span><span class="n">DepthHeatmap</span><span class="p">;</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">debug</span><span class="p">);</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Thermal</p></th>
+<th class="head"><p>Night vision</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><img alt="Thermal LUT" src="../../_images/84_thermal.png" />
+</td>
+<td><img alt="Night vision gain" src="../../_images/80_night_vision.png" />
+</td>
+</tr>
+<tr class="row-odd"><td><p>Auto exposure</p></td>
+<td><p>Calibration reference</p></td>
+</tr>
+<tr class="row-even"><td><img alt="Auto exposure key/speed driving the loop" src="../../_images/62_auto_exposure.png" />
+</td>
+<td><img alt="Calibration patches for output transform tuning" src="../../_images/48_calibration_reference.png" />
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Visuals.html" class="btn btn-neutral float-left" title="Custom visuals, instancing, and scene helpers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Weather.html" class="btn btn-neutral float-right" title="Weather and atmospherics" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

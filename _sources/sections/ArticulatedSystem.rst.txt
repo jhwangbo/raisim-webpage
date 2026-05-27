@@ -245,19 +245,52 @@ For details, check the `URDF protocol <http://wiki.ros.org/urdf/XML>`_.
 
 Mesh collision mode for URDF
 *******************************
-URDF does not provide a tag to choose the mesh collision mode. In RaiSim, the mode is selected at load time via
-``ArticulatedSystemOption::convexifyCollisionMeshes``:
+URDF does not provide a tag to choose the mesh collision mode. In RaiSim, the mode
+is selected at load time with ``ArticulatedSystemOption::collisionMeshMode``. The
+default is ``MeshCollisionMode::CONVEX_HULL``, which builds one convex hull for
+each mesh collision element.
+
+Use ``MeshCollisionMode::CONVEX_APPROXIMATION`` when you want CoACD convex
+decomposition for articulated-system mesh collisions, and pass ``CoacdOptions``
+when the default decomposition parameters are not appropriate:
 
 .. code-block:: cpp
 
   raisim::ArticulatedSystemOption options;
-  options.convexifyCollisionMeshes = true;  // convex hull per collision mesh
+  options.setCollisionMeshMode(raisim::MeshCollisionMode::CONVEX_APPROXIMATION);
   auto* robot = world.addArticulatedSystem(urdfPath, "", {}, 1, -1, options);
 
-Set it to ``false`` to use the original triangle mesh for collision.
-Convex split is not available for URDF collision meshes. If you need a
-decomposed collision shape, pre-decompose the geometry into multiple convex
-meshes and reference them as separate ``<collision>`` elements in the URDF.
+  raisim::CoacdOptions coacd;
+  coacd.threshold = 0.06;
+  coacd.maxConvexHull = 12;
+
+  raisim::ArticulatedSystemOption tunedOptions;
+  tunedOptions.setCollisionMeshMode(raisim::MeshCollisionMode::CONVEX_APPROXIMATION, coacd);
+  auto* tunedRobot = world.addArticulatedSystem(urdfPath, "", {}, 1, -1, tunedOptions);
+
+Use ``MeshCollisionMode::ORIGINAL_MESH`` only when you intentionally want the
+original non-convex triangle mesh for collision:
+
+.. code-block:: cpp
+
+  raisim::ArticulatedSystemOption options;
+  options.setCollisionMeshMode(raisim::MeshCollisionMode::ORIGINAL_MESH);
+  auto* robot = world.addArticulatedSystem(urdfPath, "", {}, 1, -1, options);
+
+The older ``convexifyCollisionMeshes`` switch is kept for compatibility. Setting
+it to ``false`` maps the default hull mode to ``ORIGINAL_MESH``; new code should
+prefer ``setCollisionMeshMode`` so hull, CoACD approximation, and original-mesh
+behavior are explicit.
+
+If ``MeshCollisionMode::CONVEX_APPROXIMATION`` is requested and CoACD cannot
+process a particular collision mesh (for example, the mesh is not 2-manifold),
+RaiSim prints a warning and falls back to a single convex hull for that mesh —
+the same policy as ``raisim::World::addMesh``. Falling back to a convex hull
+rather than the original non-convex mesh avoids deep penetration and contact
+instabilities that the non-convex triangle-mesh collider can exhibit when the
+body has an offset COM or is forced into terrain by another body. Use
+``MeshCollisionMode::ORIGINAL_MESH`` explicitly if you need the non-convex
+triangle mesh.
 
 Templated URDF
 *******************************
@@ -415,9 +448,8 @@ Note that the inverse dynamics pipeline will slow down the simulation by about 1
 After a simulation loop, you can call ``raisim::ArticulatedSystem::getForceAtJointInWorldFrame()`` and ``raisim::ArticulatedSystem::getTorqueAtJointInWorldFrame()`` to get forces and torques acting at the specified joint.
 
 Assuming that there are no joint position/velocity limit forces acting at the joint, you can compute the joint actuation as a dot product of the joint axis and the joint torque.
-The current articulated examples, ``example_anymal_contacts`` and
-``example_atlas_contacts``, show the current source layout for loading and
-stepping articulated systems.
+The current articulated examples, such as ``anymal_pair`` and ``atlas``, show
+the current source layout for loading and stepping articulated systems.
 
 PD Controller
 =============================

@@ -16,7 +16,7 @@ Current replacement paths
    * - Older workflow
      - Current workflow
    * - Launch a Unity or Unreal visualizer for a ``RaisimServer`` application
-     - Start ``rayrai_raisim_tcp_viewer`` and run the same
+     - Start ``rayrai_tcp_viewer`` and run the same
        ``raisim::RaisimServer`` application.
    * - Record visualized policy rollouts
      - Use rayrai screenshot, offscreen, or application-side recording tools.

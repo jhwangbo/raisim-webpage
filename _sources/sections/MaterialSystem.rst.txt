@@ -4,13 +4,15 @@ Material System
 
 **In RaiSim, material properties are defined per material pair.**
 
-RaiSim currently utilizes five material properties:
+RaiSim currently utilizes seven material properties:
 
 * **Coefficient of friction** (:math:`\mu\ge 0`): Defines the frictional force applied between two contacting materials.
 * **Coefficient of restitution** (:math:`c_r\ge 0`): Determines the elasticity of the material pair.
 * **Restitution threshold** (:math:`r_{th}\ge 0`): Objects will not rebound if the impact velocity falls below this threshold.
 * **Coefficient of static friction** (:math:`\mu_{s}\ge \mu`): When specified, this defines the frictional force applied during near-zero relative velocity between contact points. By default, it equals the coefficient of friction.
 * **Velocity threshold for static friction** (:math:`v_s \ge 0`): Required when the coefficient of static friction is defined. If the relative velocity exceeds this value, static friction is disregarded. Otherwise, the effective coefficient of friction is interpolated between the static and dynamic coefficients.
+* **Coefficient of rolling friction** (:math:`\mu_r \ge 0`): Resists rotation that rolls a finite-radius body over a contact patch. It is disabled by default.
+* **Coefficient of spinning friction** (:math:`\mu_s^{spin} \ge 0`): Resists torsional rotation about the contact normal. It is disabled by default.
 
 The bounce velocity is computed as :math:`c_{th}(v_i-c_{th})`, where :math:`v_i` represents the impact velocity.
 The following graphs illustrate the effects of these material properties.
@@ -39,6 +41,211 @@ Material properties for a specific pair can be defined as follows:
 
 The first two arguments specify the material names, followed by the coefficient of friction, coefficient of restitution, and restitution threshold.
 The order of the material names is interchangeable.
+
+For static friction, rolling friction, and spinning friction, use the extended overload:
+
+.. code-block:: cpp
+
+  world.setMaterialPairProp(
+      "rubber", "floor",
+      0.9,    // dynamic friction mu
+      0.0,    // restitution
+      0.0,    // restitution threshold
+      1.1,    // static friction mu_static
+      1e-3,   // static-friction velocity threshold
+      0.05,   // rolling friction mu_r
+      0.02);  // spinning friction mu_spin
+
+Rolling and Spinning Friction
+=============================
+
+Purpose
+-------
+
+Coulomb friction acts on the tangential relative velocity of the two contact
+points. It is enough to oppose sliding, but it does not model all rotational
+losses at a finite contact patch. A sphere or cylinder can therefore keep
+rolling for too long, and an object spinning in place about the contact normal
+can keep rotating even when there is no lateral slip. Rolling and spinning
+friction add bounded angular friction impulses to handle those two effects.
+
+These coefficients are per material pair, just like ordinary friction. They are
+zero by default. If both are zero, RaiSim keeps the normal contact solver path
+and does not run the extra angular-friction path for that material pair.
+
+Coordinate and shape conventions
+--------------------------------
+
+RaiSim uses a **z-up** world convention. For primitive cylinders, the cylinder
+axis is the body's **local z axis**. A default cylinder standing on a flat ground
+plane has its cylinder axis aligned with world z. That configuration is useful
+for spinning-friction tests, but it is not a rolling cylinder. To test or model
+cylinder rolling, rotate the cylinder so its local z axis lies in the horizontal
+world x-y plane.
+
+The contact frame has its local z axis along the contact normal. Angular
+friction is solved in this contact frame:
+
+* contact-frame x and y angular components are rolling components;
+* contact-frame z angular component is the spinning component.
+
+Model
+-----
+
+For a contact with normal impulse :math:`p_n`, effective rolling radius
+:math:`r_e`, rolling coefficient :math:`\mu_r`, and spinning coefficient
+:math:`\mu_{spin}`, RaiSim computes a bounded angular impulse
+:math:`\boldsymbol{\tau}` in the contact frame. The tangential part
+:math:`\boldsymbol{\tau}_{xy}` opposes rolling angular velocity, and the
+normal part :math:`\tau_z` opposes spinning angular velocity:
+
+.. math::
+
+   \|\boldsymbol{\tau}_{xy}\| \le \mu_r p_n r_e
+
+.. math::
+
+   |\tau_z| \le \mu_{spin} p_n r_e
+
+The contact normal impulse :math:`p_n` is the solved normal impulse for the same
+contact during the current contact iteration. The radius :math:`r_e` is estimated
+from the dynamic object's contact point to center-of-mass distance. For a sphere
+on a plane this is the sphere radius. For a cylinder lying on its side it is the
+cylinder radius at the side contact. For two dynamic bodies, RaiSim averages the
+two available contact radii.
+
+The solver forms the relative angular velocity in the contact frame,
+:math:`\boldsymbol{\omega}_{rel}`, and an angular apparent inverse inertia:
+
+.. math::
+
+   \mathbf{K}_\omega = \mathbf{R}_{c}^{T} \mathbf{I}_{A}^{-1} \mathbf{R}_{c}
+      + \mathbf{R}_{c}^{T} \mathbf{I}_{B}^{-1} \mathbf{R}_{c}
+
+where :math:`\mathbf{R}_c` maps contact-frame impulses to world-frame angular
+impulses, and missing/static bodies contribute zero inverse inertia. The
+unconstrained angular impulse is then
+
+.. math::
+
+   \boldsymbol{\tau}^{*} = -\mathbf{K}_\omega^{-1}
+      \boldsymbol{\omega}_{rel}
+
+and is projected onto the rolling/spinning friction bounds above. The impulse
+increment is applied to generalized velocity inside the contact solver iteration.
+This is intentionally not a post-step damping torque: applying torques after the
+contact solve can violate the contact constraints that were just solved and can
+produce penetration or lift-off artifacts.
+
+Solver behavior and performance
+-------------------------------
+
+Rolling/spinning friction is solver-integrated but opt-in:
+
+* Material pairs with :math:`\mu_r = 0` and :math:`\mu_{spin} = 0` use the
+  standard contact path.
+* If any active contact has nonzero rolling or spinning friction, RaiSim uses an
+  extended contact-solver path for that step.
+* The extra work is local to contacts whose material pair requests angular
+  friction. It computes contact-frame angular velocity, angular apparent inertia,
+  and the projected angular impulse.
+
+This keeps existing scenes fast by default while allowing higher-fidelity
+rolling and spinning decay where the material pair needs it.
+
+Choosing coefficients
+---------------------
+
+Rolling and spinning coefficients are not replacements for Coulomb friction.
+Use them for rotational losses at a contact patch:
+
+* Increase :math:`\mu_r` when balls, wheels, barrels, or side-lying cylinders
+  roll for too long despite plausible sliding friction.
+* Increase :math:`\mu_{spin}` when objects spin in place too long about the
+  contact normal.
+* Keep both zero for contacts where rotational loss is not important or where
+  speed is more important than this detail.
+* Start with small values such as ``0.01`` to ``0.05``. Large values can make
+  rolling decay very aggressive and can increase solver coupling.
+
+The spinning-friction case can be tested independently by setting Coulomb/static
+friction to zero and setting only ``spinningFriction``. The object should spin
+down without relying on lateral slip friction.
+
+C++ examples
+------------
+
+Sphere rolling on a z-up ground plane:
+
+.. code-block:: cpp
+
+  raisim::World world;
+  world.setGravity({0.0, 0.0, -9.81});
+  world.addGround(0.0, "ground");
+  world.setMaterialPairProp(
+      "ground", "ball",
+      1.0, 0.0, 0.0,    // dynamic friction, restitution, threshold
+      1.0, 1e-3,        // static friction and transition speed
+      0.05, 0.0);       // rolling friction, spinning friction
+
+  auto* ball = world.addSphere(0.5, 1.0, "ball");
+  ball->setPosition(0.0, 0.0, 0.5);
+  ball->setVelocity(2.0, 0.0, 0.0, 0.0, -4.0, 0.0);
+
+Cylinder rolling on a z-up ground plane. The cylinder local z axis is first
+rotated to world x, so angular velocity about world x rolls it along world y:
+
+.. code-block:: cpp
+
+  auto* cylinder = world.addCylinder(0.3, 0.8, 1.0, "body");
+  cylinder->setOrientation(0.7071067812, 0.0, 0.7071067812, 0.0);
+  cylinder->setPosition(0.0, 0.0, 0.3);
+  cylinder->setVelocity(0.0, 2.4, 0.0, 14.0, 0.0, 0.0);
+
+Spinning friction without Coulomb sliding friction:
+
+.. code-block:: cpp
+
+  world.setMaterialPairProp(
+      "ground", "body",
+      0.0, 0.0, 0.0,    // no Coulomb/static friction contribution
+      0.0, 1e-3,
+      0.0, 0.08);       // spinning friction only
+
+  auto* cylinder = world.addCylinder(0.3, 0.8, 1.0, "body");
+  cylinder->setPosition(0.0, 0.0, 0.4); // upright cylinder on z-up ground
+  cylinder->setVelocity(0.0, 0.0, 0.0, 0.0, 0.0, 12.0);
+
+XML examples
+------------
+
+Rolling and spinning friction can also be set on ``pair_prop`` entries:
+
+.. code-block:: xml
+
+  <material>
+    <default friction="0.8" restitution="0" restitution_threshold="0"/>
+    <pair_prop name1="ground" name2="ball"
+               friction="1.0" restitution="0" restitution_threshold="0"
+               static_friction="1.0" static_friction_velocity_threshold="0.001"
+               rolling_friction="0.05" spinning_friction="0.02"/>
+  </material>
+
+Validation
+----------
+
+RaiSim includes a regression test for the model. It checks that:
+
+* a rolling sphere stops;
+* side-lying cylinders rolling along world x and world y stop;
+* a sphere and upright cylinder spinning about world z stop when only spinning
+  friction is enabled;
+* all objects remain on the z-up ground plane without monotonic sinking or
+  lift-off.
+
+The benchmark ``rolling_spinning_friction`` creates many rolling spheres and
+side-lying cylinders with high initial angular velocity and can record a video
+for visual inspection.
 
 Example - Single Bodies
 =============================
@@ -70,7 +277,7 @@ XML Approach
         </objects>
         <material>
             <default friction="0.8" restitution="0" restitution_threshold="0"/>
-            <pair_prop name1="steel" name2="steel" friction="0.8" restitution="0.95" restitution_threshold="0.001"/>
+            <pair_prop name1="steel" name2="steel" friction="0.8" restitution="0.95" restitution_threshold="0.001" rolling_friction="0.02" spinning_friction="0.01"/>
             <pair_prop name1="steel" name2="rubber" friction="0.8" restitution="0.15" restitution_threshold="0.001"/>
             <pair_prop name1="steel" name2="copper" friction="0.8" restitution="0.65" restitution_threshold="0.001"/>
         </material>

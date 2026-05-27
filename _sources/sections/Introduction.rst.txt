@@ -29,7 +29,7 @@ Example Code
 ===================
 The following is the shape of a simple RaiSim application. It creates a world,
 adds objects, publishes the scene through ``RaisimServer``, and steps the world
-through the server's thread-safe helper. Use the rayrai TCP viewer for current
+through the server's thread-safe helper. Use ``rayrai_raisim_tcp_viewer`` for current
 visualization.
 
 .. code-block:: cpp

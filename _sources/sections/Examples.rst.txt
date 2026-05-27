@@ -15,6 +15,12 @@ RaisimUnreal are no longer supported.
    :alt: Overview of RaiSim and rayrai examples
    :width: 100%
 
+.. toctree::
+   :hidden:
+
+   examples/overview
+   examples/current/rayrai_coacd_mesh_approximation
+
 Run
 ===
 Run examples from the installed package ``bin`` directory:
@@ -57,7 +63,7 @@ RaisimServer examples
 ---------------------
 ``example_anymal_contacts`` and ``example_atlas_contacts`` create a RaiSim world
 and publish it through ``raisim::RaisimServer``. They do not open a renderer
-window themselves. Start the rayrai TCP viewer, then run the example:
+window themselves. Start ``rayrai_raisim_tcp_viewer``, then run the example:
 
 .. code-block:: bash
 
@@ -140,11 +146,21 @@ Start with these targets when learning a specific feature:
    * - ``example_rayrai_pbr_asset_inspector``
      - Inspecting bundled glTF PBR sample assets under rayrai quality settings.
    * - ``rayrai_coacd_mesh_approximation``
-     - Visually comparing original meshes and convexified collision modes
-       generated through ``World::addMesh``.
+     - Visually comparing original meshes and CoACD convex approximation
+       parts generated through ``World::addMesh``.
    * - ``rayrai_feature_showcase``
      - Offscreen image generation for rayrai features, including full scene,
        depth of field, depth plane, deformables, PBR maps, and HDR IBL.
+   * - ``rayrai_quality_comparison``
+     - Preset comparison images and quality reports for rayrai rendering.
+   * - ``rayrai_benchmark``
+     - Rendering, readback, scene-sync, and TCP serialization benchmarks.
+   * - ``rayrai_complete_showcase_benchmark``
+     - Timed Anymal sensor-showcase benchmark with optional readback,
+       visualization startup, startup profiling, and PBR world materials.
+   * - ``rayrai_pbr_first_draw_benchmark``
+     - First-draw and warm-frame benchmark for full PBR and core-eligible PBR
+       shader-material paths.
    * - ``rayrai_raisim_tcp_viewer``
      - The TCP visualizer used by RaisimServer examples.
 
@@ -163,13 +179,61 @@ List available examples by inspecting the installed package ``bin`` directory:
 
     ls <raisim-install>/bin
 
-Rayrai Tools
-============
+Current Package Examples
+========================
+
+.. toctree::
+   :maxdepth: 1
+
+   examples/current/example_anymal_contacts
+   examples/current/example_atlas_contacts
+   examples/current/example_model_asset_pipeline
+   examples/current/example_usd_importer
+   examples/current/granular_media
+
+Benchmark Examples
+==================
+
+.. toctree::
+   :maxdepth: 1
+
+   examples/benchmark/articulated_system_benchmark
+   examples/benchmark/anymal_standing_benchmark
+
+Rayrai Tools And Examples
+=========================
 
 .. toctree::
    :maxdepth: 1
 
    examples/current/rayrai_raisim_tcp_viewer
+   examples/current/rayrai_quality_comparison
+   examples/current/rayrai_benchmark
+   examples/current/rayrai_complete_showcase_benchmark
+   examples/current/rayrai_pbr_first_draw_benchmark
+   examples/current/example_rayrai_pbr_asset_inspector
+   examples/current/example_rayrai_usd_importer
+   examples/current/example_polyhaven_blue_wall
+   examples/rayrai/rayrai_basic_scene
+   examples/rayrai/rayrai_complete_showcase
+   examples/rayrai/rayrai_blender_scene_import
+   examples/rayrai/rayrai_rgb_camera
+   examples/rayrai/rayrai_depth_camera
+   examples/rayrai/rayrai_lidar_pointcloud
+   examples/rayrai/rayrai_aruco_marker
+   examples/rayrai/rayrai_custom_visuals
+   examples/rayrai/rayrai_instancing_grid
+   examples/rayrai/rayrai_pointcloud_animation
+   examples/rayrai/rayrai_pbr_material_grid
+   examples/rayrai/rayrai_pbr_texture_maps
+   examples/rayrai/rayrai_quality_lighting
+   examples/rayrai/rayrai_visual_asset_support
+   examples/rayrai/rayrai_coacd_mesh_approximation
+   examples/rayrai/rayrai_runtime_scene_editing
+   examples/rayrai/rayrai_rolling_spinning_friction
+   examples/rayrai/rayrai_swept_ccd
+   examples/rayrai/rayrai_feature_showcase
+   examples/rayrai/rayrai_tcp_viewer
 
 Server Examples
 ===============
@@ -179,7 +243,7 @@ Server Examples
 
    examples/server/compound_object
    examples/server/deformable_objects
-   examples/server/dynamic_heightmap_unreal
+   examples/server/dynamic_heightmap
    examples/server/dynamic_object_addition
    examples/server/dzhanibekov_effect
    examples/server/granular_media
@@ -200,6 +264,7 @@ Server Examples
    examples/server/procedural_heightmap
    examples/server/ray_casting
    examples/server/ray_scan_lidar
+   examples/server/sphere_drop
    examples/server/spring_damper_joints
    examples/server/templated_tracked_robot
    examples/server/visual_objects_showcase
@@ -221,29 +286,3 @@ XML Examples
 
    examples/xml/xml_templated_world
    examples/xml/xml_world_loader
-
-Rayrai Example Gallery
-======================
-
-.. toctree::
-   :maxdepth: 1
-
-   examples/rayrai/rayrai_aruco_marker
-   examples/rayrai/rayrai_basic_scene
-   examples/rayrai/rayrai_blender_scene_import
-   examples/rayrai/rayrai_coacd_mesh_approximation
-   examples/rayrai/rayrai_complete_showcase
-   examples/rayrai/rayrai_custom_visuals
-   examples/rayrai/rayrai_depth_camera
-   examples/rayrai/rayrai_feature_showcase
-   examples/rayrai/rayrai_instancing_grid
-   examples/rayrai/rayrai_lidar_pointcloud
-   examples/rayrai/rayrai_pbr_material_grid
-   examples/rayrai/rayrai_pbr_texture_maps
-   examples/rayrai/rayrai_pointcloud_animation
-   examples/rayrai/rayrai_quality_lighting
-   examples/rayrai/rayrai_rgb_camera
-   examples/rayrai/rayrai_runtime_scene_editing
-   examples/rayrai/rayrai_swept_ccd
-   examples/rayrai/rayrai_tcp_viewer
-   examples/rayrai/rayrai_visual_asset_support

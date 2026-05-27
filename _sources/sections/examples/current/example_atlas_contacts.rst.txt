@@ -5,7 +5,7 @@ example_atlas_contacts
 adds ground, loads ``rsc/atlas/robot.urdf``, initializes Atlas at a raised
 configuration, and publishes the simulation through ``raisim::RaisimServer``.
 
-Run the rayrai TCP viewer in one terminal, then run the example in another:
+Run ``rayrai_raisim_tcp_viewer`` in one terminal, then run the example in another:
 
 .. code-block:: bash
 

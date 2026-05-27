@@ -1,0 +1,448 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lighting, shadows, and HDR/IBL &mdash; raisim 2.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b0caeef3" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=c3c8ae58"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="PBR materials" href="Materials.html" />
+    <link rel="prev" title="Render quality, tone mapping, color grading" href="RenderQuality.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../Rayrai.html">rayrai Visualizer</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../Rayrai.html#overview">Overview</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="RenderQuality.html">Render quality, tone mapping, color grading</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Lighting, shadows, and HDR/IBL</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#shadows-and-lights">Shadows and lights</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hdr-image-based-lighting-and-reflections">HDR, image-based lighting, and reflections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reflections-decals-irradiance-volumes-and-lightmaps">Reflections, decals, irradiance volumes, and lightmaps</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Materials.html">PBR materials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Visuals.html">Custom visuals, instancing, and scene helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="PostProcess.html">Post-process effects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Weather.html">Weather and atmospherics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Capture.html">Capture, diagnostics, and headless rendering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Sensors.html">Sensors and depth/LiDAR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Examples.html">Example targets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Performance.html">Performance notes and the C++ API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#included-binary-recommended">Included binary (recommended)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#build-and-link">Build and link</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#minimal-usage">Minimal usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#threading-contract">Threading contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#lifetime-and-error-model">Lifetime and error model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#example-custom-visuals-background-color">Example: custom visuals + background color</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#where-to-go-next">Where to go next</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../Rayrai.html">rayrai Visualizer</a></li>
+      <li class="breadcrumb-item active">Lighting, shadows, and HDR/IBL</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="lighting-shadows-and-hdr-ibl">
+<h1>Lighting, shadows, and HDR/IBL<a class="headerlink" href="#lighting-shadows-and-hdr-ibl" title="Link to this heading"></a></h1>
+<p>This page covers the main directional light, additional spot/point/area lights,
+shadow budgets, HDR/image-based lighting, and reflection probes. For the
+overall render-quality preset that controls shadow defaults, see
+<a class="reference internal" href="RenderQuality.html"><span class="doc">Render quality, tone mapping, color grading</span></a>. For weather-driven lighting (sun position over time of
+day, lightning, cloud shadows) see <a class="reference internal" href="Weather.html"><span class="doc">Weather and atmospherics</span></a>.</p>
+<section id="shadows-and-lights">
+<h2>Shadows and lights<a class="headerlink" href="#shadows-and-lights" title="Link to this heading"></a></h2>
+<p>rayrai has a fast single-main-light path for robotics workloads and a higher-quality
+multi-light path for authored visual scenes. The main light is a directional light and
+is always the cheapest shadow-casting source. Imported glTF/Blender scenes can also
+use additional directional, point, spot, and area-style lights.</p>
+<p>Shadow defaults are tuned so a directional shadow is clearly visible without
+any per-application setup. Every preset uses a compact directional shadow
+ortho box (<code class="docutils literal notranslate"><span class="pre">halfSize=12.5</span></code>, <code class="docutils literal notranslate"><span class="pre">near=0.1</span></code>, <code class="docutils literal notranslate"><span class="pre">far=55</span></code>) and a single
+cascade, which keeps each shadow-map texel small enough that the resulting
+shadow stays crisp even with bright IBL fill. Balanced and High use brighter
+ambient/IBL defaults than older releases so smooth metallic surfaces do not
+read black under sky fill; Ultra keeps more contrast through lower direct
+ambient, stronger IBL, and AgX tone mapping. Raise <code class="docutils literal notranslate"><span class="pre">mainLightAmbient</span></code> or
+lower <code class="docutils literal notranslate"><span class="pre">shadowStrength</span></code> for a flatter indoor look; the defaults are aimed at
+outdoor daylight.</p>
+<p>By default, the main shadow center tracks a point in front of the camera and the shadow
+box is fixed in size. You can customize both via <code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// shadow center is N meters ahead of the camera (default: 10.0)</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setShadowCenterOffset</span><span class="p">(</span><span class="mf">12.0f</span><span class="p">);</span>
+<span class="c1">// shadow box (default: halfSize=12.5, near=0.1, far=55.0)</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setShadowOrtho</span><span class="p">(</span><span class="mf">20.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1f</span><span class="p">,</span><span class="w"> </span><span class="mf">80.0f</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>If you need a fully custom shadow view/projection, use the lower-level
+<code class="docutils literal notranslate"><span class="pre">raisin::Light</span></code> API directly.</p>
+<p>Additional lights are controlled explicitly and capped so the fast path stays fast.
+Rayrai currently supports up to <code class="docutils literal notranslate"><span class="pre">RayraiWindow::kMaxAdditionalLights</span></code> additional lights
+and up to <code class="docutils literal notranslate"><span class="pre">RayraiWindow::kMaxAdditionalShadowLights</span></code> additional shadow maps. Directional,
+spot, and area-style lights use 2D shadow maps. Point lights use cubemap shadow maps.
+Shadow framebuffer setup validates the current OpenGL context and recreates stale
+framebuffer/texture names when a viewer context is rebuilt; this matters for TCP-viewer
+lifetime, offscreen tests, and applications that create/destroy render contexts.
+For imported scenes, <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings::autoSelectImportedShadowLight</span></code> can promote
+the strongest imported light to the main shadow caster, while the remaining shadow budget
+is assigned to additional lights.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">AdditionalLight</span><span class="w"> </span><span class="n">fill</span><span class="p">;</span>
+<span class="n">fill</span><span class="p">.</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">LightType</span><span class="o">::</span><span class="n">DIRECTIONAL</span><span class="p">;</span>
+<span class="n">fill</span><span class="p">.</span><span class="n">direction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">normalize</span><span class="p">(</span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.4f</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.2f</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.8f</span><span class="p">));</span>
+<span class="n">fill</span><span class="p">.</span><span class="n">diffuse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.10f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.12f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.16f</span><span class="p">);</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">addAdditionalLight</span><span class="p">(</span><span class="n">fill</span><span class="p">);</span>
+
+<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">AdditionalLight</span><span class="w"> </span><span class="n">spot</span><span class="p">;</span>
+<span class="n">spot</span><span class="p">.</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">LightType</span><span class="o">::</span><span class="n">SPOT</span><span class="p">;</span>
+<span class="n">spot</span><span class="p">.</span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">1.8f</span><span class="p">,</span><span class="w"> </span><span class="mf">-1.6f</span><span class="p">,</span><span class="w"> </span><span class="mf">2.6f</span><span class="p">);</span>
+<span class="n">spot</span><span class="p">.</span><span class="n">direction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">normalize</span><span class="p">(</span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">-1.4f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">-1.8f</span><span class="p">));</span>
+<span class="n">spot</span><span class="p">.</span><span class="n">diffuse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.18f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.42f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">);</span>
+<span class="n">spot</span><span class="p">.</span><span class="n">spotInnerCos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">cos</span><span class="p">(</span><span class="n">glm</span><span class="o">::</span><span class="n">radians</span><span class="p">(</span><span class="mf">14.0f</span><span class="p">));</span>
+<span class="n">spot</span><span class="p">.</span><span class="n">spotOuterCos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">cos</span><span class="p">(</span><span class="n">glm</span><span class="o">::</span><span class="n">radians</span><span class="p">(</span><span class="mf">28.0f</span><span class="p">));</span>
+<span class="c1">// Optional spotlight projector cookie, color temperature, and distance fade.</span>
+<span class="n">spot</span><span class="p">.</span><span class="n">projectorMap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">projectorTextureId</span><span class="p">;</span>
+<span class="n">spot</span><span class="p">.</span><span class="n">temperatureEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">spot</span><span class="p">.</span><span class="n">temperatureKelvin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">4200.0f</span><span class="p">;</span>
+<span class="n">spot</span><span class="p">.</span><span class="n">distanceFadeEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">spot</span><span class="p">.</span><span class="n">distanceFadeBegin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">18.0f</span><span class="p">;</span>
+<span class="n">spot</span><span class="p">.</span><span class="n">distanceFadeLength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">6.0f</span><span class="p">;</span>
+<span class="n">spot</span><span class="p">.</span><span class="n">castsShadows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">addAdditionalLight</span><span class="p">(</span><span class="n">spot</span><span class="p">);</span>
+
+<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">AdditionalLight</span><span class="w"> </span><span class="n">area</span><span class="p">;</span>
+<span class="n">area</span><span class="p">.</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">LightType</span><span class="o">::</span><span class="n">AREA</span><span class="p">;</span>
+<span class="n">area</span><span class="p">.</span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.8f</span><span class="p">,</span><span class="w"> </span><span class="mf">2.1f</span><span class="p">);</span>
+<span class="n">area</span><span class="p">.</span><span class="n">diffuse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.55f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.65f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.42f</span><span class="p">);</span>
+<span class="n">area</span><span class="p">.</span><span class="n">radius</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.4f</span><span class="p">;</span>
+<span class="n">area</span><span class="p">.</span><span class="n">areaSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec2</span><span class="p">(</span><span class="mf">1.8f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.9f</span><span class="p">);</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">addAdditionalLight</span><span class="p">(</span><span class="n">area</span><span class="p">);</span>
+
+<span class="n">viewer</span><span class="p">.</span><span class="n">clearAdditionalLights</span><span class="p">();</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../../_images/rayrai_lights.png"><img alt="Warm spot from the left, cool point fill from the right, soft area light from above" src="../../_images/rayrai_lights.png" style="width: 100%;" />
+</a>
+<p>Each <code class="docutils literal notranslate"><span class="pre">AdditionalLight</span></code> supports the basic attenuation/spot/area parameters above plus
+optional projector cookie texture, color-temperature override (Kelvin), distance fade for
+both lighting and shadow casting, and a per-light shadow toggle. Imported scenes can be
+brought in with <code class="docutils literal notranslate"><span class="pre">importSceneLights(sceneFile,</span> <span class="pre">intensityScale)</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">promoteDominantAdditionalLightToMainShadowCaster()</span></code> reassigns the strongest imported
+light to the main shadow path so the remaining shadow budget covers the rest.</p>
+<p>The main <code class="docutils literal notranslate"><span class="pre">raisin::Light</span></code> (returned by <code class="docutils literal notranslate"><span class="pre">RayraiWindow::getLight()</span></code> /
+<code class="docutils literal notranslate"><span class="pre">getMainLight()</span></code>) exposes ergonomic helpers for spotlight angles and point-light
+range so callers do not have to set raw cosine/attenuation fields by hand:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">main</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getMainLight</span><span class="p">();</span>
+<span class="n">main</span><span class="p">.</span><span class="n">setSpotAngles</span><span class="p">(</span><span class="cm">/*innerDeg=*/</span><span class="mf">14.0f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*outerDeg=*/</span><span class="mf">28.0f</span><span class="p">);</span>
+<span class="n">main</span><span class="p">.</span><span class="n">setRange</span><span class="p">(</span><span class="cm">/*rangeMeters=*/</span><span class="mf">12.0f</span><span class="p">);</span><span class="w">  </span><span class="c1">// picks constant/linear/quadratic so</span>
+<span class="w">                                       </span><span class="c1">// intensity ~1% at 12m, and sets</span>
+<span class="w">                                       </span><span class="c1">// radius=12 as a culling hint.</span>
+</pre></div>
+</div>
+<p>Numeric units used throughout <code class="docutils literal notranslate"><span class="pre">raisin::Light</span></code>: positions and <code class="docutils literal notranslate"><span class="pre">radius</span></code> /
+<code class="docutils literal notranslate"><span class="pre">distanceFade*</span></code> in metres; <code class="docutils literal notranslate"><span class="pre">temperatureKelvin</span></code> in Kelvin; <code class="docutils literal notranslate"><span class="pre">setSpotAngles</span></code>
+takes degrees (and stores the cosines internally so the raw
+<code class="docutils literal notranslate"><span class="pre">spotInnerCos</span></code> / <code class="docutils literal notranslate"><span class="pre">spotOuterCos</span></code> fields are still meaningful). The
+<code class="docutils literal notranslate"><span class="pre">AdditionalLight</span></code> plain-data struct uses the same field conventions, so
+<code class="docutils literal notranslate"><span class="pre">std::cos(glm::radians(deg))</span></code> is still the manual recipe for those.</p>
+<p>Shadow update cost is configurable. Dynamic scenes can update shadows every frame; static
+visual scenes can bake shadow maps at startup or refresh them only when light/object
+placement changes.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">quality</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">defaultRenderQualitySettings</span><span class="p">(</span>
+<span class="w">  </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">RenderQualityPreset</span><span class="o">::</span><span class="n">Ultra</span><span class="p">);</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">updateShadowsEveryFrame</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span><span class="w">       </span><span class="c1">// startup/on-demand shadow bake</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">maxAdditionalLightsPerFrame</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">12</span><span class="p">;</span><span class="w">      </span><span class="c1">// light evaluation budget</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">maxAdditionalShadowLights</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span><span class="w">         </span><span class="c1">// 2D shadow-map budget</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">maxPointShadowLights</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w">              </span><span class="c1">// cubemap shadow budget</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">additionalShadowResolutionScale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">pointShadowResolutionScale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5f</span><span class="p">;</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">quality</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Use lower budgets for interactive editing or RL throughput. Use higher budgets for
+offline screenshots, inspection, or demos where visual fidelity is more important than
+frame time.</p>
+</section>
+<section id="hdr-image-based-lighting-and-reflections">
+<h2>HDR, image-based lighting, and reflections<a class="headerlink" href="#hdr-image-based-lighting-and-reflections" title="Link to this heading"></a></h2>
+<p>rayrai supports HDR equirectangular environments for real-time PBR preview and
+inspection. The HDR path is not a ray tracer; it precomputes cubemap data for
+environment background, diffuse irradiance, specular prefiltering, and a split-sum BRDF
+lookup table, then samples those textures in the PBR shader.</p>
+<p>The simplest setup is the <code class="docutils literal notranslate"><span class="pre">PbrEnvironment</span></code> bundle, which packs the four GL
+handles (radiance cubemap, diffuse irradiance, prefiltered specular, split-sum
+BRDF LUT) plus the mip count and an overall strength scalar into one struct:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">PbrEnvironment</span><span class="o">::</span><span class="n">loadFromHdrFile</span><span class="p">(</span><span class="s">&quot;/path/to/environment.hdr&quot;</span><span class="p">);</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">env</span><span class="p">.</span><span class="n">isComplete</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">visual</span><span class="o">-&gt;</span><span class="n">setPbrEnvironment</span><span class="p">(</span><span class="n">env</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">PbrEnvironment::LoadOptions</span></code> exposes the per-cubemap resolution, sample
+count, BRDF LUT size, and a default strength when the defaults are not
+appropriate. Optional parallax-corrected box projection is set via
+<code class="docutils literal notranslate"><span class="pre">boxProjection</span></code> / <code class="docutils literal notranslate"><span class="pre">probePosition</span></code> / <code class="docutils literal notranslate"><span class="pre">boxMin</span></code> / <code class="docutils literal notranslate"><span class="pre">boxMax</span></code> on the bundle.</p>
+<p>The lower-level static creators are still available when callers want to
+manage GL handles individually:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">hdr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;/path/to/environment.hdr&quot;</span><span class="p">;</span>
+<span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">loadHdrEquirectangularCubemap</span><span class="p">(</span><span class="n">hdr</span><span class="p">,</span><span class="w"> </span><span class="mi">128</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span>
+<span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">irradiance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">createHdrIrradianceCubemap</span><span class="p">(</span><span class="n">hdr</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">);</span>
+<span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">prefiltered</span><span class="w"> </span><span class="o">=</span>
+<span class="w">  </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">createHdrPrefilteredEnvironmentCubemap</span><span class="p">(</span><span class="n">hdr</span><span class="p">,</span><span class="w"> </span><span class="mi">128</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">);</span>
+<span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">brdf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">createSplitSumBrdfLut</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span><span class="w"> </span><span class="mi">128</span><span class="p">);</span>
+
+<span class="n">visual</span><span class="o">-&gt;</span><span class="n">setPbrEnvironment</span><span class="p">(</span><span class="n">env</span><span class="p">,</span><span class="w"> </span><span class="n">irradiance</span><span class="p">,</span><span class="w"> </span><span class="n">prefiltered</span><span class="p">,</span><span class="w"> </span><span class="n">brdf</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Use HDR environments with visible features when inspecting reflective materials. A
+featureless sky or uniform studio HDR can make it hard to tell whether reflections are
+working. <code class="docutils literal notranslate"><span class="pre">example_rayrai_pbr_asset_inspector</span></code>, <code class="docutils literal notranslate"><span class="pre">example_polyhaven_blue_wall</span></code>,
+<code class="docutils literal notranslate"><span class="pre">rayrai_feature_showcase</span></code>, and <code class="docutils literal notranslate"><span class="pre">rayrai_quality_comparison</span></code> use HDR/image-based
+lighting so metallic and glossy surfaces show visible reflections while non-metallic
+assets remain mostly diffuse.</p>
+<p>For scene-wide reflections, rayrai also has static reflection probe capture, local
+probe selection, reflection-probe sidecars, and planar ground reflection support.
+These are real-time approximation tools: they improve visual fidelity without
+enabling path tracing or other slow offline rendering mechanisms. Choose lower
+environment resolution, fewer prefilter samples, and fewer reflection updates for
+fast interactive runs; increase those values for screenshots or inspection.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">capture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">ReflectionProbeCaptureSettings</span><span class="p">{};</span>
+<span class="n">capture</span><span class="p">.</span><span class="n">resolution</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">128</span><span class="p">;</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">filter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">reflectionProbeFilterSettingsForCurrentQuality</span><span class="p">();</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">probe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">captureFilteredReflectionProbe</span><span class="p">(</span>
+<span class="w">  </span><span class="p">{</span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.5f</span><span class="p">},</span><span class="w"> </span><span class="mf">6.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="n">capture</span><span class="p">,</span><span class="w"> </span><span class="n">filter</span><span class="p">);</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">addReflectionProbe</span><span class="p">(</span><span class="n">probe</span><span class="p">);</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">applyNearestReflectionProbe</span><span class="p">(</span><span class="o">*</span><span class="n">visual</span><span class="p">,</span><span class="w"> </span><span class="n">visualPosition</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">captureReflectionProbeCubemapCached</span></code>/<code class="docutils literal notranslate"><span class="pre">captureFilteredReflectionProbeCached</span></code>
+when the same probe position is recomputed across frames (for example, while authoring
+or scrubbing weather). The cache is content-addressed by capture/filter settings; call
+<code class="docutils literal notranslate"><span class="pre">clearReflectionProbeCache()</span></code> to drop it. <code class="docutils literal notranslate"><span class="pre">selectReflectionProbeBlend(position)</span></code>
+returns the weighted blend that <code class="docutils literal notranslate"><span class="pre">applyNearestReflectionProbe</span></code> uses internally, which
+is useful for debug overlays.</p>
+<p>Authored scene sidecars can ship next to imported assets and describe reflection
+probes, environment/background settings, and weather. Loading and applying them is
+symmetric:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Reflection probe sidecar: probes plus selection/filter quality settings.</span>
+<span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">probePath</span><span class="p">;</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">probes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">loadReflectionProbeSidecar</span><span class="p">(</span>
+<span class="w">    </span><span class="n">sceneFile</span><span class="p">,</span><span class="w"> </span><span class="cm">/*settingsOut=*/</span><span class="k">nullptr</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">probePath</span><span class="p">);</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">applyReflectionProbeSidecarQualitySettings</span><span class="p">(</span><span class="n">sceneFile</span><span class="p">);</span>
+
+<span class="c1">// Environment sidecar: HDR, intensity, rotation, sky tint.</span>
+<span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">envPath</span><span class="p">;</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">loadEnvironmentSidecar</span><span class="p">(</span><span class="n">sceneFile</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">envPath</span><span class="p">);</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">applyEnvironmentSidecarSettings</span><span class="p">(</span><span class="n">sceneFile</span><span class="p">);</span>
+
+<span class="c1">// Weather sidecar: preset/settings plus local fog volumes.</span>
+<span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">wxPath</span><span class="p">;</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">wx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">loadWeatherSidecar</span><span class="p">(</span><span class="n">sceneFile</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">wxPath</span><span class="p">);</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">applyWeatherSidecarSettings</span><span class="p">(</span><span class="n">sceneFile</span><span class="p">);</span>
+
+<span class="c1">// Authoring helper: serialize a weather setup next to the scene file.</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">writeWeatherSidecar</span><span class="p">(</span>
+<span class="w">    </span><span class="s">&quot;/path/to/scene.weather.json&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">weatherSettings</span><span class="p">,</span><span class="w"> </span><span class="n">localFogVolumes</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">suggestReflectionProbePlacementFromSceneBounds()</span></code> is a non-mutating helper that
+proposes probe positions from current scene AABBs; use it as a starting point when
+authoring a sidecar by hand.</p>
+</section>
+<section id="reflections-decals-irradiance-volumes-and-lightmaps">
+<h2>Reflections, decals, irradiance volumes, and lightmaps<a class="headerlink" href="#reflections-decals-irradiance-volumes-and-lightmaps" title="Link to this heading"></a></h2>
+<p>Beyond probes and IBL, rayrai supports projected decals, irradiance volumes,
+and authored lightmaps as cheap indirect-light alternatives:</p>
+<ul class="simple">
+<li><p><strong>Projected decals</strong> (<code class="docutils literal notranslate"><span class="pre">addProjectedDecal</span></code>) — project a textured box onto
+any surface inside it; supports albedo / emission / normal / ORM slots,
+per-decal UV scaling, and distance fade.</p></li>
+<li><p><strong>Irradiance volumes</strong> (<code class="docutils literal notranslate"><span class="pre">addIrradianceVolume</span></code>) — blanket a region with a
+constant indirect colour for authored interiors that need indirect light
+without a full GI bake.</p></li>
+<li><p><strong>Lightmaps</strong> — populate <code class="docutils literal notranslate"><span class="pre">Material::lightmapMap</span></code> from an external bake
+tool to drive <code class="docutils literal notranslate"><span class="pre">92_lightmap_gi</span></code>-style authored interiors.</p></li>
+</ul>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Projected sign / poster decal.</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">ProjectedDecal</span><span class="w"> </span><span class="n">sign</span><span class="p">;</span>
+<span class="n">sign</span><span class="p">.</span><span class="n">center</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">2.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.6f</span><span class="p">);</span>
+<span class="n">sign</span><span class="p">.</span><span class="n">halfExtents</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.6f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.05f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.3f</span><span class="p">);</span>
+<span class="n">sign</span><span class="p">.</span><span class="n">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">);</span>
+<span class="n">sign</span><span class="p">.</span><span class="n">albedoMap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">posterTextureId</span><span class="p">;</span><span class="w">          </span><span class="c1">// sRGB poster art</span>
+<span class="n">sign</span><span class="p">.</span><span class="n">emissionMap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">emissiveTextureId</span><span class="p">;</span><span class="w">      </span><span class="c1">// optional glow</span>
+<span class="n">sign</span><span class="p">.</span><span class="n">emissionEnergy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.5f</span><span class="p">;</span>
+<span class="n">sign</span><span class="p">.</span><span class="n">albedoMix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">;</span>
+<span class="n">sign</span><span class="p">.</span><span class="n">distanceFadeEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">sign</span><span class="p">.</span><span class="n">distanceFadeBegin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">12.0f</span><span class="p">;</span>
+<span class="n">sign</span><span class="p">.</span><span class="n">distanceFadeLength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">4.0f</span><span class="p">;</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">addProjectedDecal</span><span class="p">(</span><span class="n">sign</span><span class="p">);</span>
+
+<span class="c1">// Interior indirect light volume covering a room.</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">IrradianceVolume</span><span class="w"> </span><span class="n">room</span><span class="p">;</span>
+<span class="n">room</span><span class="p">.</span><span class="n">center</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.5f</span><span class="p">);</span>
+<span class="n">room</span><span class="p">.</span><span class="n">halfExtents</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">4.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.7f</span><span class="p">);</span>
+<span class="n">room</span><span class="p">.</span><span class="n">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.32f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.30f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.28f</span><span class="p">);</span>
+<span class="n">room</span><span class="p">.</span><span class="n">strength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.85f</span><span class="p">;</span>
+<span class="n">room</span><span class="p">.</span><span class="n">edgeFade</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.22f</span><span class="p">;</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">addIrradianceVolume</span><span class="p">(</span><span class="n">room</span><span class="p">);</span>
+
+<span class="c1">// Lightmap-driven authored interior.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">floor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Material</span><span class="o">::</span><span class="n">pbr</span><span class="p">(</span><span class="s">&quot;floor&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">),</span>
+<span class="w">                                   </span><span class="cm">/*metallic=*/</span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*roughness=*/</span><span class="mf">0.55f</span><span class="p">);</span>
+<span class="n">floor</span><span class="p">.</span><span class="n">albedoMap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">floorAlbedoMapId</span><span class="p">;</span>
+<span class="n">floor</span><span class="p">.</span><span class="n">lightmapMap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">floorLightmapBakeId</span><span class="p">;</span><span class="w">   </span><span class="c1">// second UV channel</span>
+<span class="n">floorVisual</span><span class="o">-&gt;</span><span class="n">setMaterialOverride</span><span class="p">(</span><span class="n">floor</span><span class="p">);</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Reflection probe</p></th>
+<th class="head"><p>Projected decals</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><img alt="Room with reflection probe applied to glossy surfaces" src="../../_images/12_reflection_probe_room.png" />
+</td>
+<td><img alt="Decals projected onto multiple surfaces" src="../../_images/91_projected_decals.png" />
+</td>
+</tr>
+<tr class="row-odd"><td><p>Irradiance volumes</p></td>
+<td><p>Lightmap GI</p></td>
+</tr>
+<tr class="row-even"><td><img alt="Authored irradiance volumes filling indirect light" src="../../_images/93_irradiance_volumes.png" />
+</td>
+<td><img alt="Lightmap-driven GI on authored scenes" src="../../_images/92_lightmap_gi.png" />
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RenderQuality.html" class="btn btn-neutral float-left" title="Render quality, tone mapping, color grading" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Materials.html" class="btn btn-neutral float-right" title="PBR materials" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

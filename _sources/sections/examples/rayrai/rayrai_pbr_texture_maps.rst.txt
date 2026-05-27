@@ -41,7 +41,7 @@ Details
 - Keeps assets upright in RayRai/RaiSim's Z-up coordinate convention.
 - Uses the Ultra quality preset with tuned exposure, shadows, and additional scene
   lights.
-- Adds ``small_harbour_sunset_1k.hdr`` as an HDR environment. The HDR is used both for
+- Adds ``potsdamer_platz_1k.hdr`` as an HDR environment. The HDR is used both for
   the visible background and for PBR reflections through environment, irradiance,
   prefiltered environment, and BRDF lookup textures.
 - Lets the user move the camera around and inspect assets up close; this is the

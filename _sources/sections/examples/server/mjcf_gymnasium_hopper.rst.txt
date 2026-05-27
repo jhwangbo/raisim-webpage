@@ -17,7 +17,7 @@ Run:
 
    <raisim-install>/bin/mjcf_gymnasium_hopper
 
-Start ``rayrai_raisim_tcp_viewer`` in another terminal to visualize the server
+Start ``rayrai_tcp_viewer`` in another terminal to visualize the server
 scene.
 
 What it demonstrates:
@@ -26,4 +26,3 @@ What it demonstrates:
 - Retrieving the loaded articulated system by its MJCF root body name.
 - Applying a small procedural torque pattern through the normal RaiSim control
   path.
-

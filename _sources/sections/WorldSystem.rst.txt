@@ -41,6 +41,22 @@ Example targets:
 * ``mjcf_gymnasium_humanoid`` loads Gymnasium's Humanoid model and drops it
   from a raised arbitrary configuration.
 
+For callers that already hold a constructed ``raisim::World`` and want to
+populate it from an MJCF file at runtime (instead of constructing the world
+from the file path), use ``World::loadMjcfFile``:
+
+.. code-block:: cpp
+
+  raisim::World world;
+  world.loadMjcfFile("rsc/mjcf/gymnasium/hopper.xml");
+
+This is the same dispatch that ``World(configFile)`` does internally when
+the file's root is ``<mujoco>``. The world should normally be empty before
+calling — MJCF files often declare ground planes, ``worldbody`` lights, and
+option blocks that overwrite world-level state. The rayrai TCP viewer uses
+this entry point in its drag-drop **Joint Inspector** mode (see
+:doc:`RayraiTcpViewer`).
+
 Adding New Objects
 ============================
 To add a new object of type X, utilize the :code:`addX` method.
@@ -77,6 +93,39 @@ An object may consist of multiple bodies (e.g., an articulated system).
 A **local index** is used to designate individual bodies.
 To maintain API consistency, many methods require the local index argument even for single-body objects.
 For single-body objects, the local index is ignored, and users may pass 0 to comply with the API.
+
+Stable object identifiers
+-------------------------
+``Object::Id`` (a ``uint64_t``) is assigned when an object is added to a world
+and remains valid for the lifetime of that object even when other objects are
+removed. ``World::getObjectById(id)`` returns a pointer or ``nullptr`` when the
+object has been removed; ``isObjectAlive(id)`` returns the same information
+without dereferencing. ``getIndexInWorld()`` is fine for steady-state lookups,
+but in code that adds and removes objects (RL resets, asset streaming) prefer
+the stable id because indices shift after every removal.
+
+Snapshots and cloning
+---------------------
+Single-body objects support a fast capture/restore workflow for RL resets and
+rollback debugging. ``captureSingleBodySnapshot(obj, snapshotOut)`` fills a
+``SingleBodySnapshot`` (object id, type, body type, pose, linear/angular
+velocity, material, and collision group/mask). ``restoreSingleBodySnapshot``
+reapplies it later, either by pointer to the same object or by stable
+``ObjectId``; pass ``restoreCollisionProperties=false`` to skip material and
+collision filter restoration. The snapshot is plain data and cheap to copy and
+reuse. ``cloneSingleBodyObject(source, name)`` produces a new single-body
+object with the same primitive shape, mass, pose, velocity, body type,
+material, collision filter, and appearance; it returns ``nullptr`` for
+non-primitive single-body types.
+
+.. code-block:: cpp
+
+    raisim::World::SingleBodySnapshot snapshot;
+    world.captureSingleBodySnapshot(sphere, snapshot);
+    // ... simulate, then reset:
+    world.restoreSingleBodySnapshot(sphere, snapshot);
+
+    auto* twin = world.cloneSingleBodyObject(sphere, "sphere_copy");
 
 Saving the World to an XML File
 ================================

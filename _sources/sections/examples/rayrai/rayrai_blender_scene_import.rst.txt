@@ -34,7 +34,7 @@ The general Blender exporter is installed in:
 .. code-block:: bash
 
 
-   /path/to/raisim2Lib/scripts/export_blender_scene.py
+   $HOME/raisim2Lib/scripts/export_blender_scene.py
 
 It is copied from the source-tree helper used by the RayRai examples. The script is not
 asset-specific. It exports renderable Blender objects, applies modifiers, preserves
@@ -49,7 +49,7 @@ Run Blender in background mode:
 
 
    blender --background /path/to/scene.blend \
-     --python /path/to/raisim2Lib/scripts/export_blender_scene.py \
+     --python $HOME/raisim2Lib/scripts/export_blender_scene.py \
      -- --format glb --output /path/to/scene.glb
 
 The exporter also supports separate glTF output:
@@ -58,7 +58,7 @@ The exporter also supports separate glTF output:
 
 
    blender --background /path/to/scene.blend \
-     --python /path/to/raisim2Lib/scripts/export_blender_scene.py \
+     --python $HOME/raisim2Lib/scripts/export_blender_scene.py \
      -- --format gltf --output /path/to/scene.gltf
 
 ``.glb`` is usually easier to move around because most texture images are embedded in
@@ -163,4 +163,3 @@ If the imported scene looks wrong, check these first:
 Exporter source
 ---------------
 For reference, the installed exporter is:
-

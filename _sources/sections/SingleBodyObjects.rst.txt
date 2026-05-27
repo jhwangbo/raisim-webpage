@@ -52,24 +52,28 @@ Public mesh collision modes
 ---------------------------
 The public ``addMesh`` API exposes three collision representations:
 
-* ``MeshCollisionMode::CONVEXIFY``: CoACD convex decomposition. This creates multiple convex collision parts from one mesh. This is the default.
+* ``MeshCollisionMode::CONVEX_APPROXIMATION``: CoACD convex decomposition. This creates multiple convex collision parts from one mesh. This is the default for ``addMesh``.
 * ``MeshCollisionMode::CONVEX_HULL``: one convex hull built from the mesh.
 * ``MeshCollisionMode::ORIGINAL_MESH``: the original non-convex triangle mesh.
+
+``MeshCollisionMode::CONVEXIFY`` remains accepted as a legacy alias for
+``CONVEX_APPROXIMATION``. New code and documentation should use
+``CONVEX_APPROXIMATION``.
 
 Original non-convex triangle mesh collision is useful for imported visual meshes that are invalid
 CoACD input, but it is usually slower and less robust than convex collision geometry.
 
-Default convexify
------------------
+Default convex approximation
+------------------------------
 The shortest overload uses CoACD convex decomposition by default and estimates inertia/COM from the
 scaled axis-aligned bounding box. If CoACD cannot process the mesh, RaiSim warns and falls back to
-original non-convex triangle mesh collision:
+a single convex hull built from the mesh:
 
 .. code-block:: cpp
 
     auto* mesh = world.addMesh(meshFile, mass, scale);
 
-The explicit-inertia overload is also convexified by default:
+The explicit-inertia overload is also convex-approximated by default:
 
 .. code-block:: cpp
 
@@ -91,13 +95,13 @@ Use ``MeshCollisionMode::ORIGINAL_MESH`` when you intentionally want the non-con
     auto* mesh = world.addMesh(meshFile, mass, scale, "",
                                raisim::MeshCollisionMode::ORIGINAL_MESH);
 
-You can still pass ``MeshCollisionMode::CONVEXIFY`` explicitly when you want to make the default
+You can still pass ``MeshCollisionMode::CONVEX_APPROXIMATION`` explicitly when you want to make the default
 choice visible at the call site:
 
 .. code-block:: cpp
 
     auto* mesh = world.addMesh(meshFile, mass, scale, "",
-                               raisim::MeshCollisionMode::CONVEXIFY);
+                               raisim::MeshCollisionMode::CONVEX_APPROXIMATION);
 
 Custom CoACD options
 --------------------
@@ -114,7 +118,7 @@ make contact processing slower.
     options.mctsIteration = 80;
 
     auto* mesh = world.addMesh(meshFile, mass, scale, "",
-                               raisim::MeshCollisionMode::CONVEXIFY,
+                               raisim::MeshCollisionMode::CONVEX_APPROXIMATION,
                                raisim::CollisionGroup(1),
                                raisim::CollisionGroup(-1),
                                options);
@@ -130,17 +134,16 @@ CoACD input requirements
 The bundled CoACD integration is intentionally small and does not include heavy preprocessing
 dependencies. It works best with closed, reasonably manifold meshes.
 
-If ``MeshCollisionMode::CONVEXIFY`` fails, RaiSim prints a warning and falls back to original
-non-convex triangle mesh collision for that object. This keeps imported visual meshes such as
-robot body panels usable when they are not valid CoACD input. The fallback is a compatibility path,
-not the preferred high-performance collider: it can be slower and less robust than convex hulls or
-CoACD parts, especially for dynamic object stacks or dense contact scenes. For performance-critical
-simulation, use a cleaner manifold mesh, a preprocessed convex collision asset, or an explicit
-``MeshCollisionMode::CONVEX_HULL`` path.
+If ``MeshCollisionMode::CONVEX_APPROXIMATION`` fails (for example, the mesh is not 2-manifold),
+RaiSim prints a warning and falls back to a single convex hull (``MeshCollisionMode::CONVEX_HULL``)
+built from the same vertices. This keeps imported visual meshes such as robot body panels usable
+when they are not valid CoACD input, and avoids the deep-penetration and performance pathologies
+of non-convex triangle-mesh collision. If you intentionally want the original non-convex triangle
+mesh, request ``MeshCollisionMode::ORIGINAL_MESH`` explicitly.
 
 CoACD cache files
 -----------------
-Successful ``MeshCollisionMode::CONVEXIFY`` calls write an OBJ cache beside the source mesh. This
+Successful ``MeshCollisionMode::CONVEX_APPROXIMATION`` calls (including the legacy ``CONVEXIFY`` alias) write an OBJ cache beside the source mesh. This
 keeps repeated runs cheap: the first call pays the CoACD decomposition cost, while later calls with
 the same parameters load the saved convex parts directly.
 

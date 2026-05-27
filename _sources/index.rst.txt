@@ -88,6 +88,8 @@ Use this documentation in this order if you are new to RaiSim:
    :caption: Related software
 
    sections/Rayrai
+   sections/RayraiTcpViewer
+   sections/RaisimEngine2
    sections/RaisimGymTorch
    sections/RaiSimPy
    sections/RaiSimMatlab

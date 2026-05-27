@@ -1,0 +1,300 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sensors and depth/LiDAR &mdash; raisim 2.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b0caeef3" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=c3c8ae58"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Example targets" href="Examples.html" />
+    <link rel="prev" title="Capture, diagnostics, and headless rendering" href="Capture.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../Rayrai.html">rayrai Visualizer</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../Rayrai.html#overview">Overview</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="RenderQuality.html">Render quality, tone mapping, color grading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Lighting.html">Lighting, shadows, and HDR/IBL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Materials.html">PBR materials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Visuals.html">Custom visuals, instancing, and scene helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="PostProcess.html">Post-process effects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Weather.html">Weather and atmospherics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Capture.html">Capture, diagnostics, and headless rendering</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Sensors and depth/LiDAR</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#sensor-alignment">Sensor alignment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tcp-viewer-protocol">TCP viewer protocol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#depth-and-lidar">Depth and LiDAR</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Examples.html">Example targets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Performance.html">Performance notes and the C++ API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#included-binary-recommended">Included binary (recommended)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#build-and-link">Build and link</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#minimal-usage">Minimal usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#threading-contract">Threading contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#lifetime-and-error-model">Lifetime and error model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#example-custom-visuals-background-color">Example: custom visuals + background color</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#where-to-go-next">Where to go next</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../Rayrai.html">rayrai Visualizer</a></li>
+      <li class="breadcrumb-item active">Sensors and depth/LiDAR</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="sensors-and-depth-lidar">
+<h1>Sensors and depth/LiDAR<a class="headerlink" href="#sensors-and-depth-lidar" title="Link to this heading"></a></h1>
+<p>This page covers aligning rayrai to RaiSim camera sensors, rendering depth
+and LiDAR data, and the picking pipeline. For the general camera control
+APIs (free-fly, orbit, picking from the viewer) see <a class="reference internal" href="Capture.html"><span class="doc">Capture, diagnostics, and headless rendering</span></a>.</p>
+<section id="sensor-alignment">
+<h2>Sensor alignment<a class="headerlink" href="#sensor-alignment" title="Link to this heading"></a></h2>
+<p>rayrai can align rendering to RaiSim camera sensors. Use
+<code class="docutils literal notranslate"><span class="pre">syncRaisimCameraPose</span></code> and <code class="docutils literal notranslate"><span class="pre">renderWithExternalCamera</span></code> to ensure the
+render camera matches the sensor pose and intrinsics. RaiSim sensor rendering is
+world-object-only: custom visuals, instanced visuals, point clouds, coordinate
+frames, and other viewer-only helpers are excluded from RGB, depth, and LiDAR
+data-generation passes. Use generic external-camera rendering only when you
+intentionally want a viewer render that includes visualization objects.
+Note: <code class="docutils literal notranslate"><span class="pre">syncRaisimCameraPose</span></code> updates <code class="docutils literal notranslate"><span class="pre">Camera::position/front/up</span></code> directly;
+avoid calling <code class="docutils literal notranslate"><span class="pre">Camera::update()</span></code> immediately afterward unless you also update
+<code class="docutils literal notranslate"><span class="pre">yaw</span></code>/<code class="docutils literal notranslate"><span class="pre">pitch</span></code>.</p>
+<p>For runnable coverage, see
+<a class="reference internal" href="../examples/rayrai/rayrai_rgb_camera.html"><span class="doc">Rayrai RGB camera</span></a>,
+<a class="reference internal" href="../examples/rayrai/rayrai_depth_camera.html"><span class="doc">Rayrai depth camera</span></a>,
+<a class="reference internal" href="../examples/rayrai/rayrai_lidar_pointcloud.html"><span class="doc">Rayrai LiDAR point cloud</span></a>, and
+<a class="reference internal" href="../examples/rayrai/rayrai_aruco_marker.html"><span class="doc">Rayrai ArUco marker</span></a> for dedicated
+sensor examples. <code class="docutils literal notranslate"><span class="pre">rayrai_feature_showcase</span></code> adds aggregate external-camera,
+linear-depth, sensor-only, and fisheye coverage. <code class="docutils literal notranslate"><span class="pre">rayrai_benchmark</span></code> adds
+timed readback, picking, point-cloud, and scene-sync paths, while
+<code class="docutils literal notranslate"><span class="pre">rayrai_complete_showcase_benchmark</span></code> times the full Anymal RGB/depth/LiDAR
+showcase with optional readback and visualization startup profiling. The sensor
+overview in <a class="reference internal" href="#"><span class="doc">Sensors</span></a> includes a longer RGB/depth readback
+example.</p>
+<p>RGB/Depth camera workflow (manual source + external camera):</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">rgbCam</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getSensorSet</span><span class="p">(</span><span class="s">&quot;d455_front&quot;</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">getSensor</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">RGBCamera</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;color&quot;</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">depthCam</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getSensorSet</span><span class="p">(</span><span class="s">&quot;d455_front&quot;</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">getSensor</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">DepthCamera</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;depth&quot;</span><span class="p">);</span>
+
+<span class="n">rgbCam</span><span class="o">-&gt;</span><span class="n">setMeasurementSource</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">Sensor</span><span class="o">::</span><span class="n">MeasurementSource</span><span class="o">::</span><span class="n">MANUAL</span><span class="p">);</span>
+<span class="n">depthCam</span><span class="o">-&gt;</span><span class="n">setMeasurementSource</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">Sensor</span><span class="o">::</span><span class="n">MeasurementSource</span><span class="o">::</span><span class="n">MANUAL</span><span class="p">);</span>
+
+<span class="n">raisin</span><span class="o">::</span><span class="n">Camera</span><span class="w"> </span><span class="nf">rgbCamera</span><span class="p">(</span><span class="o">*</span><span class="n">rgbCam</span><span class="p">);</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">Camera</span><span class="w"> </span><span class="nf">depthCamera</span><span class="p">(</span><span class="o">*</span><span class="n">depthCam</span><span class="p">);</span>
+
+<span class="n">viewer</span><span class="p">.</span><span class="n">renderWithExternalCamera</span><span class="p">(</span><span class="o">*</span><span class="n">rgbCam</span><span class="p">,</span><span class="w"> </span><span class="n">rgbCamera</span><span class="p">,</span><span class="w"> </span><span class="p">{});</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">renderWithExternalCamera</span><span class="p">(</span><span class="o">*</span><span class="n">depthCam</span><span class="p">,</span><span class="w"> </span><span class="n">depthCamera</span><span class="p">,</span><span class="w"> </span><span class="p">{});</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">renderDepthPlaneDistance</span><span class="p">(</span><span class="o">*</span><span class="n">depthCam</span><span class="p">,</span><span class="w"> </span><span class="n">depthCamera</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>You can read back the camera buffers on CPU:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">prop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rgbCam</span><span class="o">-&gt;</span><span class="n">getProperties</span><span class="p">();</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">width</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">prop</span><span class="p">.</span><span class="n">width</span><span class="p">);</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">height</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">prop</span><span class="p">.</span><span class="n">height</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span><span class="w"> </span><span class="n">rgba</span><span class="p">(</span><span class="kt">size_t</span><span class="p">(</span><span class="n">width</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kt">size_t</span><span class="p">(</span><span class="n">height</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+<span class="n">rgbCamera</span><span class="p">.</span><span class="n">getRawImage</span><span class="p">(</span><span class="o">*</span><span class="n">rgbCam</span><span class="p">,</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Camera</span><span class="o">::</span><span class="n">SensorStorageMode</span><span class="o">::</span><span class="n">CUSTOM_BUFFER</span><span class="p">,</span>
+<span class="w">  </span><span class="n">rgba</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">rgba</span><span class="p">.</span><span class="n">size</span><span class="p">(),</span><span class="w"> </span><span class="cm">/*flipVertical=*/</span><span class="nb">false</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Depth uses a <code class="docutils literal notranslate"><span class="pre">float</span></code> buffer with <code class="docutils literal notranslate"><span class="pre">width</span> <span class="pre">*</span> <span class="pre">height</span></code> entries.</p>
+</section>
+<section id="tcp-viewer-protocol">
+<h2>TCP viewer protocol<a class="headerlink" href="#tcp-viewer-protocol" title="Link to this heading"></a></h2>
+<p>The rayrai TCP viewer protocol is explicitly versioned. The current viewer sends a
+protocol header with feature bits before each request, and the server replies with the
+negotiated feature set. A viewer rejects newer unsupported protocol versions with a clear
+error instead of attempting to parse an incompatible stream.</p>
+<p>Current feature bits cover the explicit header, deformable delta streaming, and sim
+control. Deformable objects send mesh topology during initialization or topology
+changes; ordinary update frames send vertex positions only. This keeps dynamic
+cloth/cube streaming cheaper while avoiding binary compression until network bandwidth
+is measured as a bottleneck. Sim-control messages share the same feature-negotiated
+request path.</p>
+<p>The protocol constants live in <code class="docutils literal notranslate"><span class="pre">rayrai/RaisimTcpCommon.hpp</span></code> (namespace
+<code class="docutils literal notranslate"><span class="pre">raisin::tcp_viewer</span></code>):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">kDefaultPort</span></code> — default <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> port the viewer connects to.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kProtocolVersion</span></code> — the current wire version. Mismatched versions cause
+the viewer to disconnect with a versioned-protocol error.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kProtocolFeatureExplicitHeader</span></code>, <code class="docutils literal notranslate"><span class="pre">kProtocolFeatureDeformableDelta</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">kProtocolFeatureSimControl</span></code> — the currently-negotiated feature bits;
+<code class="docutils literal notranslate"><span class="pre">kProtocolFeaturesSupported</span></code> is the OR of all bits this build understands.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kMaxMessageBytes</span></code> — maximum accepted message size (default 64 MiB),
+overridable at build time via the
+<code class="docutils literal notranslate"><span class="pre">RAISIM_TCP_VIEWER_MAX_MESSAGE_BYTES</span></code> preprocessor define when very large
+scenes need a larger frame budget.</p></li>
+</ul>
+<p>The wire format is a native-endian binary stream. Each TCP frame begins with
+an <code class="docutils literal notranslate"><span class="pre">int32_t</span></code> total-frame-size header (including the 4-byte header itself).
+Scene strings use <code class="docutils literal notranslate"><span class="pre">int32_t</span></code> lengths; sensor-response names use <code class="docutils literal notranslate"><span class="pre">uint64_t</span></code>
+lengths to remain ABI-compatible with the legacy <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> protocol.</p>
+<p>Custom TCP clients should use <code class="docutils literal notranslate"><span class="pre">raisin::tcp_viewer::BufferReader</span></code> to decode
+frames. It is a non-owning view over the received byte buffer with bounds-
+checked accessors:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisin</span><span class="o">::</span><span class="n">tcp_viewer</span><span class="o">::</span><span class="n">BufferReader</span><span class="w"> </span><span class="nf">reader</span><span class="p">(</span><span class="n">buffer</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">buffer</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reader</span><span class="p">.</span><span class="n">read</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">features</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reader</span><span class="p">.</span><span class="n">read</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reader</span><span class="p">.</span><span class="n">readString</span><span class="p">();</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">positions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reader</span><span class="p">.</span><span class="n">readVector</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">reader</span><span class="p">.</span><span class="n">ok</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// malformed frame; drop the connection</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Each read advances <code class="docutils literal notranslate"><span class="pre">reader.offset()</span></code> and sets <code class="docutils literal notranslate"><span class="pre">reader.ok</span> <span class="pre">=</span> <span class="pre">false</span></code> if there
+is not enough data left, so callers can decode an entire frame and check
+<code class="docutils literal notranslate"><span class="pre">ok</span></code> at the end rather than after every field.</p>
+</section>
+<section id="depth-and-lidar">
+<h2>Depth and LiDAR<a class="headerlink" href="#depth-and-lidar" title="Link to this heading"></a></h2>
+<p>The renderer supports a linear depth plane and a GPU-assisted LiDAR pass. These sensor
+passes render RaiSim world objects only; visualization-only objects are intentionally
+ignored so they cannot leak into training observations.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">renderDepthPlaneDistance</span></code> renders a linear depth texture.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">measureSpinningLidarSingleDrawGPU</span></code> renders a LiDAR slice using a
+spherical chunk shader.</p></li>
+</ul>
+<p>You can retrieve the depth texture via <code class="docutils literal notranslate"><span class="pre">getDepthPlaneTexture()</span></code>.</p>
+<p>LiDAR usage has two paths. Prefer the rayrai GPU path when rayrai is available:</p>
+<ol class="arabic simple">
+<li><p>GPU slice rendering via <code class="docutils literal notranslate"><span class="pre">measureSpinningLidarSingleDrawGPU</span></code> for fast
+incremental updates.</p></li>
+<li><p>CPU-based scan via RaiSim (<code class="docutils literal notranslate"><span class="pre">SpinningLidar::update</span></code>), then visualize with a
+point cloud, only when rayrai is unavailable or deterministic CPU ray-query
+behavior is required.</p></li>
+</ol>
+<p>GPU slice example:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">lidar</span><span class="o">-&gt;</span><span class="n">updatePose</span><span class="p">();</span>
+<span class="k">const</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">dvec3</span><span class="w"> </span><span class="n">posW</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">toGlm</span><span class="p">(</span><span class="n">lidar</span><span class="o">-&gt;</span><span class="n">getPosition</span><span class="p">());</span>
+<span class="k">const</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">dmat3</span><span class="w"> </span><span class="n">rotW</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">toGlm</span><span class="p">(</span><span class="n">lidar</span><span class="o">-&gt;</span><span class="n">getOrientation</span><span class="p">());</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">measureSpinningLidarSingleDrawGPU</span><span class="p">(</span><span class="o">*</span><span class="n">lidar</span><span class="p">,</span><span class="w"> </span><span class="n">posW</span><span class="p">,</span><span class="w"> </span><span class="n">rotW</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Capture.html" class="btn btn-neutral float-left" title="Capture, diagnostics, and headless rendering" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Examples.html" class="btn btn-neutral float-right" title="Example targets" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

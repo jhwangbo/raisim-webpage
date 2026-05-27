@@ -1,0 +1,477 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Capture, diagnostics, and headless rendering &mdash; raisim 2.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b0caeef3" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=c3c8ae58"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Sensors and depth/LiDAR" href="Sensors.html" />
+    <link rel="prev" title="Weather and atmospherics" href="Weather.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../Rayrai.html">rayrai Visualizer</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../Rayrai.html#overview">Overview</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="RenderQuality.html">Render quality, tone mapping, color grading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Lighting.html">Lighting, shadows, and HDR/IBL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Materials.html">PBR materials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Visuals.html">Custom visuals, instancing, and scene helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="PostProcess.html">Post-process effects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Weather.html">Weather and atmospherics</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Capture, diagnostics, and headless rendering</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#imgui-integration-sdl2-opengl">ImGui integration (SDL2 + OpenGL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#headless-offscreen-opengl-context">Headless/offscreen OpenGL context</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#camera-control-and-picking">Camera control and picking</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#captures-and-diagnostics">Captures and diagnostics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#exposure-calibration-and-output-transforms">Exposure, calibration, and output transforms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#async-mesh-loading">Async mesh loading</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#heightmap-visual-textures">Heightmap visual textures</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Sensors.html">Sensors and depth/LiDAR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Examples.html">Example targets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Performance.html">Performance notes and the C++ API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#included-binary-recommended">Included binary (recommended)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#build-and-link">Build and link</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#minimal-usage">Minimal usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#threading-contract">Threading contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#lifetime-and-error-model">Lifetime and error model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#example-custom-visuals-background-color">Example: custom visuals + background color</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#where-to-go-next">Where to go next</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../Rayrai.html">rayrai Visualizer</a></li>
+      <li class="breadcrumb-item active">Capture, diagnostics, and headless rendering</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="capture-diagnostics-and-headless-rendering">
+<h1>Capture, diagnostics, and headless rendering<a class="headerlink" href="#capture-diagnostics-and-headless-rendering" title="Link to this heading"></a></h1>
+<p>This page covers everything you need to drive rayrai without a GUI: the
+headless/offscreen GL context, ImGui integration, the camera and picking
+APIs, screenshot/diagnostics captures, exposure and calibration helpers,
+async mesh loading, and heightmap texture overrides.</p>
+<section id="imgui-integration-sdl2-opengl">
+<h2>ImGui integration (SDL2 + OpenGL)<a class="headerlink" href="#imgui-integration-sdl2-opengl" title="Link to this heading"></a></h2>
+<p>rayrai is designed to be embedded in custom UI. The repository ships a minimal
+SDL2/ImGui helper in <code class="docutils literal notranslate"><span class="pre">rayrai/example_common.hpp</span></code>. The core idea is:</p>
+<ol class="arabic simple">
+<li><p>Create an OpenGL context (SDL2 here).</p></li>
+<li><p>Render the RayraiWindow texture into an ImGui <code class="docutils literal notranslate"><span class="pre">Image</span></code>.</p></li>
+<li><p>Forward hover and cursor data to <code class="docutils literal notranslate"><span class="pre">RayraiWindow::update</span></code>.</p></li>
+</ol>
+<p>Minimal pattern (trimmed from the examples):</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">ExampleApp</span><span class="w"> </span><span class="n">app</span><span class="p">;</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">app</span><span class="p">.</span><span class="n">init</span><span class="p">(</span><span class="s">&quot;rayrai_example&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1280</span><span class="p">,</span><span class="w"> </span><span class="mi">720</span><span class="p">))</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+
+<span class="k">auto</span><span class="w"> </span><span class="n">world</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">viewer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">1280</span><span class="p">,</span><span class="w"> </span><span class="mi">720</span><span class="p">);</span>
+
+<span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">app</span><span class="p">.</span><span class="n">quit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">app</span><span class="p">.</span><span class="n">processEvents</span><span class="p">();</span>
+<span class="w">  </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">integrate</span><span class="p">();</span>
+
+<span class="w">  </span><span class="n">app</span><span class="p">.</span><span class="n">beginFrame</span><span class="p">();</span>
+<span class="w">  </span><span class="n">app</span><span class="p">.</span><span class="n">renderViewer</span><span class="p">(</span><span class="o">*</span><span class="n">viewer</span><span class="p">);</span><span class="w"> </span><span class="c1">// ImGui::Image + viewer.update(...)</span>
+<span class="w">  </span><span class="n">app</span><span class="p">.</span><span class="n">endFrame</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">renderViewer</span></code> helper uses <code class="docutils literal notranslate"><span class="pre">ImGui::IsItemHovered()</span></code> and mouse positions
+to drive camera interaction and picking. Current offscreen examples exercise
+the camera paths used by rayrai rendering and validation.</p>
+</section>
+<section id="headless-offscreen-opengl-context">
+<h2>Headless/offscreen OpenGL context<a class="headerlink" href="#headless-offscreen-opengl-context" title="Link to this heading"></a></h2>
+<p>If you already manage an OpenGL context (or want a headless one), use the static
+helpers to create and bind a hidden SDL window context:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">SDL_Window</span><span class="o">*</span><span class="w"> </span><span class="n">window</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">nullptr</span><span class="p">;</span>
+<span class="n">SDL_GLContext</span><span class="w"> </span><span class="n">glContext</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">nullptr</span><span class="p">;</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">createOffscreenGlContext</span><span class="p">(</span><span class="n">window</span><span class="p">,</span><span class="w"> </span><span class="n">glContext</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;rayrai_offscreen&quot;</span><span class="p">);</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">makeOffscreenContextCurrent</span><span class="p">(</span><span class="n">window</span><span class="p">,</span><span class="w"> </span><span class="n">glContext</span><span class="p">);</span>
+
+<span class="k">auto</span><span class="w"> </span><span class="n">world</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="w"> </span><span class="nf">viewer</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">640</span><span class="p">,</span><span class="w"> </span><span class="mi">480</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The offscreen path does not require an ImGui context. If an application embeds rayrai
+without ImGui, pass <code class="docutils literal notranslate"><span class="pre">false</span></code> for hover/click arguments to <code class="docutils literal notranslate"><span class="pre">RayraiWindow::update</span></code> or
+drive camera state explicitly. The renderer guards ImGui input access so headless tests
+and batch image generation can run without creating ImGui state.</p>
+<p>End-to-end headless capture (build a scene, render once, write a PNG):</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;SDL.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stb/stb_image_write.h&gt;</span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;raisim/World.hpp&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;rayrai/RayraiWindow.hpp&gt;</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">SDL_Init</span><span class="p">(</span><span class="n">SDL_INIT_VIDEO</span><span class="p">);</span>
+<span class="w">  </span><span class="n">SDL_Window</span><span class="o">*</span><span class="w"> </span><span class="n">window</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">nullptr</span><span class="p">;</span>
+<span class="w">  </span><span class="n">SDL_GLContext</span><span class="w"> </span><span class="n">gl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">nullptr</span><span class="p">;</span>
+<span class="w">  </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">createOffscreenGlContext</span><span class="p">(</span><span class="n">window</span><span class="p">,</span><span class="w"> </span><span class="n">gl</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;capture&quot;</span><span class="p">);</span>
+<span class="w">  </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">makeOffscreenContextCurrent</span><span class="p">(</span><span class="n">window</span><span class="p">,</span><span class="w"> </span><span class="n">gl</span><span class="p">);</span>
+
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">world</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="w">  </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">addGround</span><span class="p">();</span>
+<span class="w">  </span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">box</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">addBox</span><span class="p">(</span><span class="mf">0.4</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="w">  </span><span class="n">box</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.2</span><span class="p">);</span>
+<span class="w">  </span><span class="n">box</span><span class="o">-&gt;</span><span class="n">setAppearance</span><span class="p">(</span><span class="s">&quot;0.95,0.43,0.12,1&quot;</span><span class="p">);</span>
+
+<span class="w">  </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="w"> </span><span class="n">viewer</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">1280</span><span class="p">,</span><span class="w"> </span><span class="mi">720</span><span class="p">);</span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">defaultRenderQualitySettings</span><span class="p">(</span>
+<span class="w">      </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">RenderQualityPreset</span><span class="o">::</span><span class="n">Ultra</span><span class="p">);</span>
+<span class="w">  </span><span class="n">q</span><span class="p">.</span><span class="n">colorMode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">ViewerColorMode</span><span class="o">::</span><span class="n">AcesApprox</span><span class="p">;</span>
+<span class="w">  </span><span class="n">q</span><span class="p">.</span><span class="n">pbrToneMapping</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="w">  </span><span class="n">q</span><span class="p">.</span><span class="n">bloomEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="w">  </span><span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">q</span><span class="p">);</span>
+
+<span class="w">  </span><span class="c1">// Frame the box.</span>
+<span class="w">  </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">cam</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getCamera</span><span class="p">();</span>
+<span class="w">  </span><span class="n">cam</span><span class="p">.</span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">2.6f</span><span class="p">,</span><span class="w"> </span><span class="mf">2.2f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.6f</span><span class="p">);</span>
+<span class="w">  </span><span class="n">cam</span><span class="p">.</span><span class="n">front</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">normalize</span><span class="p">(</span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">-0.55f</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.45f</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.30f</span><span class="p">));</span>
+<span class="w">  </span><span class="n">cam</span><span class="p">.</span><span class="n">worldUp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cam</span><span class="p">.</span><span class="n">up</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">);</span>
+<span class="w">  </span><span class="n">cam</span><span class="p">.</span><span class="n">yaw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">degrees</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">atan2</span><span class="p">(</span><span class="n">cam</span><span class="p">.</span><span class="n">front</span><span class="p">.</span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">cam</span><span class="p">.</span><span class="n">front</span><span class="p">.</span><span class="n">x</span><span class="p">));</span>
+<span class="w">  </span><span class="n">cam</span><span class="p">.</span><span class="n">pitch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">degrees</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">asin</span><span class="p">(</span><span class="n">cam</span><span class="p">.</span><span class="n">front</span><span class="p">.</span><span class="n">z</span><span class="p">));</span>
+<span class="w">  </span><span class="n">cam</span><span class="p">.</span><span class="n">aspect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1280.0f</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">720.0f</span><span class="p">;</span>
+<span class="w">  </span><span class="n">cam</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span>
+
+<span class="w">  </span><span class="c1">// Warm up shadow maps / IBL / particle systems, then capture.</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1280</span><span class="p">,</span><span class="w"> </span><span class="mi">720</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span>
+<span class="w">  </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">RenderOverrides</span><span class="w"> </span><span class="n">ov</span><span class="p">;</span>
+<span class="w">  </span><span class="n">ov</span><span class="p">.</span><span class="n">doShadows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">capture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">captureSupersampledRgba</span><span class="p">(</span><span class="n">viewer</span><span class="p">.</span><span class="n">getCamera</span><span class="p">(),</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">ov</span><span class="p">);</span>
+
+<span class="w">  </span><span class="c1">// captureSupersampledRgba returns top-left row order, ready for PNG.</span>
+<span class="w">  </span><span class="n">stbi_write_png</span><span class="p">(</span><span class="s">&quot;/tmp/headless.png&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">capture</span><span class="p">.</span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">capture</span><span class="p">.</span><span class="n">height</span><span class="p">,</span>
+<span class="w">                 </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">capture</span><span class="p">.</span><span class="n">rgba</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">capture</span><span class="p">.</span><span class="n">width</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This is the same pattern used by the doc image generators under
+<code class="docutils literal notranslate"><span class="pre">docs/image_generators/</span></code> — see <code class="docutils literal notranslate"><span class="pre">doc_image_common.hpp</span></code> for a packaged
+helper that wraps the boilerplate above.</p>
+</section>
+<section id="camera-control-and-picking">
+<h2>Camera control and picking<a class="headerlink" href="#camera-control-and-picking" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> manages an internal camera for offscreen rendering.
+You can access or override it through <code class="docutils literal notranslate"><span class="pre">getCamera()</span></code> or by using
+<code class="docutils literal notranslate"><span class="pre">renderWithExternalCamera</span></code> when you want explicit control.</p>
+<p>Picking is available through <code class="docutils literal notranslate"><span class="pre">pickWithExternalCamera</span></code>. It renders a
+selection pass and returns the encoded object id for a pixel.</p>
+<p>The internal <code class="docutils literal notranslate"><span class="pre">update</span></code> call drives camera input and picking:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Cursor is in framebuffer coordinates of the render area</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">height</span><span class="p">,</span><span class="w"> </span><span class="n">isHovered</span><span class="p">,</span><span class="w"> </span><span class="n">cursorX</span><span class="p">,</span><span class="w"> </span><span class="n">cursorY</span><span class="p">,</span><span class="w"> </span><span class="n">shouldClick</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>For explicit picking against any camera (typically the same one used to render
+the visible frame), call <code class="docutils literal notranslate"><span class="pre">pickWithExternalCamera</span></code> with the framebuffer
+pixel coordinates. A return value of <code class="docutils literal notranslate"><span class="pre">0</span></code> means nothing was hit:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// From an ImGui handler: convert the mouse position into the render-target</span>
+<span class="c1">// framebuffer space and pick.</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ImGui</span><span class="o">::</span><span class="n">IsItemHovered</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">ImGui</span><span class="o">::</span><span class="n">IsMouseClicked</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">pos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ImGui</span><span class="o">::</span><span class="n">GetMousePos</span><span class="p">();</span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">origin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ImGui</span><span class="o">::</span><span class="n">GetItemRectMin</span><span class="p">();</span>
+<span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">fbX</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">pos</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">origin</span><span class="p">.</span><span class="n">x</span><span class="p">);</span>
+<span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">fbY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">pos</span><span class="p">.</span><span class="n">y</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">origin</span><span class="p">.</span><span class="n">y</span><span class="p">);</span>
+
+<span class="w">  </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">encoded</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">pickWithExternalCamera</span><span class="p">(</span><span class="n">viewer</span><span class="p">.</span><span class="n">getCamera</span><span class="p">(),</span>
+<span class="w">                                                   </span><span class="n">fbX</span><span class="p">,</span><span class="w"> </span><span class="n">fbY</span><span class="p">);</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">encoded</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// The encoded id is `RaisimObject::encodeId` / decode with the</span>
+<span class="w">    </span><span class="c1">// matching renderer helpers; for visuals you can look up by name in</span>
+<span class="w">    </span><span class="c1">// your own registry, or use the renderer&#39;s ``findVisualById`` /</span>
+<span class="w">    </span><span class="c1">// ``findObjectById`` accessors.</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;picked id = %u</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">encoded</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Picking renders a dedicated selection pass with a flat shader, so it is
+roughly as cheap as one MSAA-off pass of the scene. Use it on click events,
+not in the per-frame fast path.</p>
+</section>
+<section id="captures-and-diagnostics">
+<h2>Captures and diagnostics<a class="headerlink" href="#captures-and-diagnostics" title="Link to this heading"></a></h2>
+<p>Rayrai has explicit diagnostics APIs for renderer tuning, regression artifacts,
+and bug reports. These helpers are opt-in and are not part of the normal fast
+frame path.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">captureSupersampledRgba</span></code> renders high-resolution screenshots without
+resizing the caller’s camera.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">captureDebugPasses</span></code> captures the standard PBR/post-process debug-pass set
+as top-left ordered RGBA buffers.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">captureRenderPassTimings</span></code> inserts blocking GPU timer queries for pass-level
+measurements. Use it for benchmarks, not ordinary frames.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">renderDiagnosticsJson</span></code> and <code class="docutils literal notranslate"><span class="pre">writeRenderDiagnosticsFiles</span></code> export structured
+quality, scene, material, shadow, transparent-rendering, and resource state.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">analyzeRgbaLuminance</span></code>, <code class="docutils literal notranslate"><span class="pre">recommendExposure</span></code>, luminance histograms, and
+calibration helpers operate on captured RGBA pixels for screenshot/report
+workflows.</p></li>
+</ul>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisin</span><span class="o">::</span><span class="n">RenderOverrides</span><span class="w"> </span><span class="n">ov</span><span class="p">;</span>
+<span class="n">ov</span><span class="p">.</span><span class="n">doShadows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">rgba</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">captureSupersampledRgba</span><span class="p">(</span><span class="n">viewer</span><span class="p">.</span><span class="n">getCamera</span><span class="p">(),</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">ov</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">timings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">captureRenderPassTimings</span><span class="p">(</span><span class="n">viewer</span><span class="p">.</span><span class="n">getCamera</span><span class="p">(),</span><span class="w"> </span><span class="n">ov</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">renderDiagnosticsJson</span><span class="p">();</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">writeRenderDiagnosticsFiles</span><span class="p">(</span><span class="s">&quot;/tmp/rayrai_diag&quot;</span><span class="p">,</span><span class="w"> </span><span class="cm">/*importReport=*/</span><span class="p">{});</span>
+</pre></div>
+</div>
+<p>For transparent scenes, <code class="docutils literal notranslate"><span class="pre">transparentDrawDebugView</span></code> reports draw order, OIT,
+refraction, overdraw, and per-item sorting state. Shadow and reflection-probe
+planning are similarly exposed through <code class="docutils literal notranslate"><span class="pre">shadowDebugOverlaySummary</span></code>,
+<code class="docutils literal notranslate"><span class="pre">planDirectionalShadowCascades</span></code>, <code class="docutils literal notranslate"><span class="pre">planAdditionalShadowAtlas</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">reflectionProbeDebugOverlaySummary</span></code>. <code class="docutils literal notranslate"><span class="pre">shaderWarmupDiagnostics</span></code> reports
+shader compile/link cost from startup, and <code class="docutils literal notranslate"><span class="pre">estimateRenderPassAccounting</span></code>
+returns a CPU-only summary of which passes are active (fast path eligible,
+shadows, post-process, bloom, denoise, readback) along with the dominant
+bottleneck.</p>
+<p>For long-running applications and offline pipelines, see
+<a class="reference internal" href="RenderQuality.html"><span class="doc">Render quality, tone mapping, color grading</span></a> for the <code class="docutils literal notranslate"><span class="pre">recommendDynamicQuality</span></code> and
+<code class="docutils literal notranslate"><span class="pre">recommendMaterialTextureBudget</span></code> helpers that turn <code class="docutils literal notranslate"><span class="pre">captureRenderPassTimings</span></code>
+measurements into proposed setting changes.</p>
+</section>
+<section id="exposure-calibration-and-output-transforms">
+<h2>Exposure, calibration, and output transforms<a class="headerlink" href="#exposure-calibration-and-output-transforms" title="Link to this heading"></a></h2>
+<p>Capture pipelines often need consistent brightness and color across
+screenshots. rayrai provides static helpers that operate on captured RGBA
+buffers without touching renderer state:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">metrics</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">analyzeRgbaLuminance</span><span class="p">(</span><span class="n">rgba</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span>
+<span class="w">                                                          </span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">height</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">rec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">recommendExposure</span><span class="p">(</span>
+<span class="w">    </span><span class="n">metrics</span><span class="p">,</span><span class="w"> </span><span class="cm">/*currentExposure=*/</span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*targetMedian=*/</span><span class="mf">0.18f</span><span class="p">,</span>
+<span class="w">    </span><span class="cm">/*targetP95=*/</span><span class="mf">0.7f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*minExp=*/</span><span class="mf">0.05f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*maxExp=*/</span><span class="mf">16.0f</span><span class="p">);</span>
+<span class="kt">float</span><span class="w"> </span><span class="n">exposure</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">smoothExposure</span><span class="p">(</span>
+<span class="w">    </span><span class="cm">/*current=*/</span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="n">rec</span><span class="p">.</span><span class="n">recommendedExposure</span><span class="p">,</span>
+<span class="w">    </span><span class="cm">/*dt=*/</span><span class="mf">0.016f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*brightenRate=*/</span><span class="mf">4.0f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*darkenRate=*/</span><span class="mf">2.0f</span><span class="p">,</span>
+<span class="w">    </span><span class="cm">/*minExp=*/</span><span class="mf">0.05f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*maxExp=*/</span><span class="mf">16.0f</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>For batch capture validation, place known reference patches in the scene and
+measure them with <code class="docutils literal notranslate"><span class="pre">analyzeRgbaCalibrationPatches</span></code>; the recommended output
+transform from <code class="docutils literal notranslate"><span class="pre">recommendCalibrationOutputTransform</span></code> can then be applied
+with <code class="docutils literal notranslate"><span class="pre">transformRgbaForOutput</span></code> before saving the image.</p>
+<p><code class="docutils literal notranslate"><span class="pre">renderLuminanceHistogramRgba</span></code>, <code class="docutils literal notranslate"><span class="pre">renderCloudDebugRgba</span></code>,
+<code class="docutils literal notranslate"><span class="pre">renderRainDebugRgba</span></code>, and <code class="docutils literal notranslate"><span class="pre">renderSnowDebugRgba</span></code> render diagnostic panels
+(luminance histogram, cloud/precipitation breakdown, wet/snow response) as
+plain RGBA buffers for embedding into reports.</p>
+<p>The renderer also has a built-in auto-exposure loop: enable it via
+<code class="docutils literal notranslate"><span class="pre">RenderQualitySettings::autoExposureEnabled</span></code> and the renderer drives
+<code class="docutils literal notranslate"><span class="pre">pbrExposure</span></code> toward <code class="docutils literal notranslate"><span class="pre">autoExposureKey</span></code> (target post-tonemap luma) at
+<code class="docutils literal notranslate"><span class="pre">autoExposureSpeed</span></code> per frame, clamped to <code class="docutils literal notranslate"><span class="pre">[autoExposureMinFactor,</span>
+<span class="pre">autoExposureMaxFactor]</span></code>. For applications that need to drive exposure
+themselves (e.g. tone-matched batch capture), use the static helpers above to
+read the current frame’s luminance and recommend a new exposure value:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Frame loop driving exposure manually from the most recent capture.</span>
+<span class="kt">float</span><span class="w"> </span><span class="n">currentExposure</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">;</span>
+<span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">running</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">frame</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">captureSupersampledRgba</span><span class="p">(</span><span class="n">viewer</span><span class="p">.</span><span class="n">getCamera</span><span class="p">(),</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="p">{});</span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">metrics</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">analyzeRgbaLuminance</span><span class="p">(</span>
+<span class="w">      </span><span class="n">frame</span><span class="p">.</span><span class="n">rgba</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">frame</span><span class="p">.</span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">frame</span><span class="p">.</span><span class="n">height</span><span class="p">);</span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">rec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">recommendExposure</span><span class="p">(</span>
+<span class="w">      </span><span class="n">metrics</span><span class="p">,</span><span class="w"> </span><span class="n">currentExposure</span><span class="p">,</span>
+<span class="w">      </span><span class="cm">/*targetMedian=*/</span><span class="mf">0.18f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*targetP95=*/</span><span class="mf">0.7f</span><span class="p">,</span>
+<span class="w">      </span><span class="cm">/*minExp=*/</span><span class="mf">0.05f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*maxExp=*/</span><span class="mf">16.0f</span><span class="p">);</span>
+<span class="w">  </span><span class="n">currentExposure</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">smoothExposure</span><span class="p">(</span>
+<span class="w">      </span><span class="n">currentExposure</span><span class="p">,</span><span class="w"> </span><span class="n">rec</span><span class="p">.</span><span class="n">recommendedExposure</span><span class="p">,</span>
+<span class="w">      </span><span class="cm">/*dt=*/</span><span class="n">dtSeconds</span><span class="p">,</span>
+<span class="w">      </span><span class="cm">/*brightenRate=*/</span><span class="mf">4.0f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*darkenRate=*/</span><span class="mf">2.0f</span><span class="p">,</span>
+<span class="w">      </span><span class="cm">/*minExp=*/</span><span class="mf">0.05f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*maxExp=*/</span><span class="mf">16.0f</span><span class="p">);</span>
+
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">();</span>
+<span class="w">  </span><span class="n">q</span><span class="p">.</span><span class="n">pbrExposure</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">currentExposure</span><span class="p">;</span>
+<span class="w">  </span><span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">q</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="async-mesh-loading">
+<h2>Async mesh loading<a class="headerlink" href="#async-mesh-loading" title="Link to this heading"></a></h2>
+<p>For scene authoring tools and editors, expensive mesh imports can run on
+worker threads. The renderer’s main thread polls for completed assets and
+finalizes their GPU buffers:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span><span class="p">.</span><span class="n">setAsyncMeshLoadingEnabled</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">visual</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addVisualMesh</span><span class="p">(</span>
+<span class="w">    </span><span class="s">&quot;shelf&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/path/to/large_scene.glb&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span>
+<span class="w">    </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">);</span>
+
+<span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">viewer</span><span class="p">.</span><span class="n">pendingAsyncMeshLoadCount</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">viewer</span><span class="p">.</span><span class="n">pollAsyncMeshLoads</span><span class="p">(</span><span class="cm">/*maxAssets=*/</span><span class="mi">4</span><span class="p">);</span>
+<span class="w">  </span><span class="c1">// continue rendering / updating the UI between polls</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Async loading keeps the frame loop responsive on first import. The flag has
+no effect for assets that are already cached through
+<code class="docutils literal notranslate"><span class="pre">RayraiGlobalAsset</span></code>.</p>
+</section>
+<section id="heightmap-visual-textures">
+<h2>Heightmap visual textures<a class="headerlink" href="#heightmap-visual-textures" title="Link to this heading"></a></h2>
+<p>Heightmap visuals can carry application-specific color textures, overriding
+the default pattern resource for one heightmap at a time. Use
+<code class="docutils literal notranslate"><span class="pre">setHeightmapPatternResourcePath</span></code> for a global override or
+<code class="docutils literal notranslate"><span class="pre">setHeightmapColorTextureOverride(name,</span> <span class="pre">width,</span> <span class="pre">height,</span> <span class="pre">rgb)</span></code> for a per-name
+override that takes a contiguous RGB byte buffer. Patch updates are supported
+through <code class="docutils literal notranslate"><span class="pre">updateHeightmapColorTextureOverridePatch</span></code> (specify a min/max range
+in grid coordinates) so streaming visualizations can refresh dirty regions
+without re-uploading the full texture. Clear with
+<code class="docutils literal notranslate"><span class="pre">clearHeightmapColorTextureOverride(name)</span></code>.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">terrain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">addHeightMap</span><span class="p">(</span><span class="cm">/*sample_x=*/</span><span class="mi">256</span><span class="p">,</span><span class="w"> </span><span class="cm">/*sample_y=*/</span><span class="mi">256</span><span class="p">,</span>
+<span class="w">                                    </span><span class="cm">/*size_x=*/</span><span class="mf">40.0</span><span class="p">,</span><span class="w"> </span><span class="cm">/*size_y=*/</span><span class="mf">40.0</span><span class="p">,</span>
+<span class="w">                                    </span><span class="cm">/*centerX=*/</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="cm">/*centerY=*/</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">heights</span><span class="p">);</span>
+<span class="n">terrain</span><span class="o">-&gt;</span><span class="n">setName</span><span class="p">(</span><span class="s">&quot;procedural_terrain&quot;</span><span class="p">);</span>
+
+<span class="c1">// Initial full-resolution colour upload (e.g. semantic class colour map).</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">W</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">256</span><span class="p">,</span><span class="w"> </span><span class="n">H</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">256</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="o">&gt;</span><span class="w"> </span><span class="n">rgb</span><span class="p">(</span><span class="n">W</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">H</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span>
+<span class="n">fillSemanticColours</span><span class="p">(</span><span class="n">rgb</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">W</span><span class="p">,</span><span class="w"> </span><span class="n">H</span><span class="p">);</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setHeightmapColorTextureOverride</span><span class="p">(</span><span class="s">&quot;procedural_terrain&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">W</span><span class="p">,</span><span class="w"> </span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="n">rgb</span><span class="p">.</span><span class="n">data</span><span class="p">());</span>
+
+<span class="c1">// Later, after the simulation marked a 40×40 cell patch as dirty:</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dirtyMinY</span><span class="p">;</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">dirtyMaxY</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dirtyMinX</span><span class="p">;</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">dirtyMaxX</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">size_t</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">y</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">W</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">tie</span><span class="p">(</span><span class="n">rgb</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span><span class="w"> </span><span class="n">rgb</span><span class="p">[</span><span class="n">idx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">rgb</span><span class="p">[</span><span class="n">idx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="p">])</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">classColour</span><span class="p">(</span><span class="n">grid</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="n">x</span><span class="p">]);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">updateHeightmapColorTextureOverridePatch</span><span class="p">(</span>
+<span class="w">    </span><span class="s">&quot;procedural_terrain&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="cm">/*minX=*/</span><span class="n">dirtyMinX</span><span class="p">,</span><span class="w"> </span><span class="cm">/*maxX=*/</span><span class="n">dirtyMaxX</span><span class="p">,</span>
+<span class="w">    </span><span class="cm">/*minY=*/</span><span class="n">dirtyMinY</span><span class="p">,</span><span class="w"> </span><span class="cm">/*maxY=*/</span><span class="n">dirtyMaxY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">rgb</span><span class="p">.</span><span class="n">data</span><span class="p">());</span>
+
+<span class="c1">// Clean up when the heightmap is destroyed.</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">clearHeightmapColorTextureOverride</span><span class="p">(</span><span class="s">&quot;procedural_terrain&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Weather.html" class="btn btn-neutral float-left" title="Weather and atmospherics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Sensors.html" class="btn btn-neutral float-right" title="Sensors and depth/LiDAR" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,10 +1,10 @@
 ##########################################
-Rayrai Example: COACD Mesh Approximation
+Rayrai Example: CoACD Mesh Approximation
 ##########################################
 
 Overview
 ========
-Compares original triangle meshes with their COACD convex decomposition output.
+Compares original triangle meshes with their CoACD convex approximation output.
 Use it to visually inspect collision approximations generated from YCB meshes.
 
 Screenshot
@@ -33,18 +33,18 @@ Details
 =======
 - Loads several YCB OBJ meshes.
 - Calls ``World::addMesh`` directly for both the original triangle mesh and the
-  convexified mesh.
+  CoACD convex approximation mesh.
 - Passes ``raisim::CoacdOptions`` into ``addMesh`` so the mesh processing stays
   inside RaiSim rather than in application-side rendering code.
 - Prints the number of generated convex parts for each mesh.
-- Displays the original meshes in gray beside the convexified collision
-  approximations.
+- Displays the original meshes in gray beside the CoACD convex approximation
+  collision parts.
 
 What this example is not
 ========================
 This is not a manual mesh-processing example. Application code should not need
 to load OBJ vertices, split convex parts, or build OpenGL meshes directly just
-to use COACD collision. The intended user-facing workflow is:
+to use CoACD collision. The intended user-facing workflow is:
 
 .. code-block:: cpp
 
@@ -52,7 +52,7 @@ to use COACD collision. The intended user-facing workflow is:
    raisim::CoacdOptions options;
    options.maxConvexHull = 12;
    auto* mesh = world->addMesh(path, mass, scale, "",
-                               raisim::MeshCollisionMode::CONVEXIFY,
+                               raisim::MeshCollisionMode::CONVEX_APPROXIMATION,
                                collisionGroup, collisionMask, options);
 
 The rayrai side then visualizes the resulting RaiSim object.

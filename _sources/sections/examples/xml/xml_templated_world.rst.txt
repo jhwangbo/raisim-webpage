@@ -24,7 +24,7 @@ Run the installed executable:
    <raisim-install>/bin/xml_templated_world
 
 On Windows, run ``xml_templated_world.exe`` instead.
-This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.
+This example uses RaisimServer. Start ``rayrai_raisim_tcp_viewer`` and connect to port 8080.
 
 
 Details

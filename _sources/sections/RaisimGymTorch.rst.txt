@@ -50,7 +50,7 @@ From the ``raisimGymTorch`` directory:
     python setup.py develop
     python raisimGymTorch/env/envs/rsg_anymal/runner.py
 
-To visualize the policy, use the rayrai TCP viewer described in
+To visualize the policy, use ``rayrai_raisim_tcp_viewer`` as described in
 :doc:`Visualization`. The training script records policy performance every 200
 iterations. Older RaisimUnity/Unreal visualization workflows have been replaced;
 see :doc:`LegacyIntegrations` for migration notes.

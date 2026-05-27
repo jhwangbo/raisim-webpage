@@ -7,27 +7,32 @@ This page covers common issues when using the binary RaiSim distribution.
 Executable Not Found
 ====================
 
-Binary packages place tools and examples in the package ``bin`` directory:
+When you build examples from the ``raisim2Lib`` source tree, CMake places them
+under the build directory:
 
 .. code-block:: bash
 
-    <raisim-install>/bin/example_anymal_contacts
-    <raisim-install>/bin/rayrai_raisim_tcp_viewer
+    ./build/examples/primitive_grid
+    ./build/examples/rayrai_tcp_viewer
 
-If a command from old docs uses a build directory, replace it with the installed
-package ``bin`` directory.
+If a command from old docs uses an ``example_`` prefix, check :doc:`Examples`
+for the current target name.
 
 Missing Shared Libraries
 ========================
 
-For installed packages, ensure the runtime loader can find RaiSim:
+For installed packages and local builds, source the environment script before
+running examples, rayrai tools, applications, or importing ``raisimPy``:
 
 .. code-block:: bash
 
-    export RAISIM_LOCAL_INSTALL_ROOT=$HOME/raisim2Lib
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$RAISIM_LOCAL_INSTALL_ROOT/raisim/lib
+    cd $HOME/raisim2Lib
+    source ./raisim_env.sh
 
-On macOS, use ``DYLD_LIBRARY_PATH``.
+The script adds both RaiSim and rayrai libraries to the platform loader path.
+On macOS this is ``DYLD_LIBRARY_PATH``. On Linux this is ``LD_LIBRARY_PATH``.
+Because this is a per-terminal shell setting, source the script again in every
+new terminal before starting a viewer, an example, or Python with ``raisimPy``.
 
 Activation Key Not Found
 ========================
@@ -51,7 +56,7 @@ Check these points:
 
 * The simulation must create ``raisim::RaisimServer`` and call
   ``launchServer``.
-* The server-based example and ``rayrai_raisim_tcp_viewer`` must use the same
+* The server-based example and ``rayrai_tcp_viewer`` must use the same
   port. The default is ``8080``.
 * Start the simulation and viewer from the same installed RaiSim version.
 

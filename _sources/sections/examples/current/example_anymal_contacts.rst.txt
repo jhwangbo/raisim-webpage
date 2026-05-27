@@ -5,7 +5,7 @@ example_anymal_contacts
 ``rsc/anymal/urdf/anymal.urdf``, applies PD gains to the leg joints, and
 publishes the simulation through ``raisim::RaisimServer``.
 
-Run the rayrai TCP viewer in one terminal, then run the example in another:
+Run ``rayrai_raisim_tcp_viewer`` in one terminal, then run the example in another:
 
 .. code-block:: bash
 

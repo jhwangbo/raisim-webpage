@@ -25,7 +25,7 @@ Run the installed executable:
    <raisim-install>/bin/procedural_heightmap
 
 On Windows, run ``procedural_heightmap.exe`` instead.
-This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.
+This example uses RaisimServer. Start ``rayrai_raisim_tcp_viewer`` and connect to port 8080.
 
 
 Details

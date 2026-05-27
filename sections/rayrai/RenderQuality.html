@@ -1,0 +1,435 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Render quality, tone mapping, color grading &mdash; raisim 2.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b0caeef3" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=c3c8ae58"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Lighting, shadows, and HDR/IBL" href="Lighting.html" />
+    <link rel="prev" title="rayrai Visualizer" href="../Rayrai.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../Rayrai.html">rayrai Visualizer</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../Rayrai.html#overview">Overview</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Render quality, tone mapping, color grading</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#color-and-gamma-semantics">Color and gamma semantics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#render-quality-controls">Render-quality controls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tone-mapping-exposure-and-color-grading">Tone mapping, exposure, and color grading</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#adaptive-quality-and-texture-budgets">Adaptive quality and texture budgets</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Lighting.html">Lighting, shadows, and HDR/IBL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Materials.html">PBR materials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Visuals.html">Custom visuals, instancing, and scene helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="PostProcess.html">Post-process effects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Weather.html">Weather and atmospherics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Capture.html">Capture, diagnostics, and headless rendering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Sensors.html">Sensors and depth/LiDAR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Examples.html">Example targets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Performance.html">Performance notes and the C++ API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#included-binary-recommended">Included binary (recommended)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#build-and-link">Build and link</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#minimal-usage">Minimal usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#threading-contract">Threading contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#lifetime-and-error-model">Lifetime and error model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#example-custom-visuals-background-color">Example: custom visuals + background color</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#where-to-go-next">Where to go next</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../Rayrai.html">rayrai Visualizer</a></li>
+      <li class="breadcrumb-item active">Render quality, tone mapping, color grading</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="render-quality-tone-mapping-color-grading">
+<h1>Render quality, tone mapping, color grading<a class="headerlink" href="#render-quality-tone-mapping-color-grading" title="Link to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code> is the single struct that drives the renderer’s
+behaviour each frame. Pick a preset for the common cases, then override
+individual flags for the effects you need. Other pages cover narrower
+subsets of this struct: <a class="reference internal" href="PostProcess.html"><span class="doc">Post-process effects</span></a> for cinematic and screen-space
+effects, <a class="reference internal" href="Weather.html"><span class="doc">Weather and atmospherics</span></a> for atmospheric state, and <a class="reference internal" href="Lighting.html"><span class="doc">Lighting, shadows, and HDR/IBL</span></a> for
+shadow/light budgets.</p>
+<section id="color-and-gamma-semantics">
+<h2>Color and gamma semantics<a class="headerlink" href="#color-and-gamma-semantics" title="Link to this heading"></a></h2>
+<p>rayrai applies display gamma at the shader/output stage; do not pre-gamma-correct
+linear colours before passing them in. The convention:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Visuals::setColor</span></code> and most object/material color factors use linear <code class="docutils literal notranslate"><span class="pre">0..1</span></code> RGBA.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Camera::setBackgroundColorRgb255</span></code> and <code class="docutils literal notranslate"><span class="pre">RayraiWindow::setBackgroundColorRgb255</span></code>
+use legacy <code class="docutils literal notranslate"><span class="pre">0..255</span></code> RGBA. <code class="docutils literal notranslate"><span class="pre">setBackgroundColor</span></code> is kept as a compatibility wrapper
+for the same <code class="docutils literal notranslate"><span class="pre">0..255</span></code> range.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setBackgroundColorLinear</span></code> accepts linear <code class="docutils literal notranslate"><span class="pre">0..1</span></code> RGBA and converts it internally.</p></li>
+<li><p>Texture uploads distinguish color maps and data maps. Use <code class="docutils literal notranslate"><span class="pre">loadColorTextureWithTiling</span></code>
+for sRGB albedo/emissive maps, and <code class="docutils literal notranslate"><span class="pre">loadDataTextureWithTiling</span></code> for normal,
+metallic-roughness, AO, depth, mask, or other linear data textures.</p></li>
+</ul>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Linear object colours (0..1 floats).</span>
+<span class="n">sphere</span><span class="o">-&gt;</span><span class="n">setColor</span><span class="p">(</span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.95f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.43f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.12f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">));</span>
+
+<span class="c1">// Background: pick the API that matches your colour range.</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setBackgroundColorRgb255</span><span class="p">({</span><span class="mi">40</span><span class="p">,</span><span class="w"> </span><span class="mi">45</span><span class="p">,</span><span class="w"> </span><span class="mi">55</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">});</span><span class="w">           </span><span class="c1">// 0..255 sRGB</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setBackgroundColorLinear</span><span class="p">({</span><span class="mf">0.157f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.176f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.216f</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">});</span><span class="w">  </span><span class="c1">// 0..1 linear</span>
+
+<span class="c1">// Texture uploads distinguish colour maps from data maps:</span>
+<span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">albedo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">loadColorTextureWithTiling</span><span class="p">(</span>
+<span class="w">    </span><span class="s">&quot;/path/wood_albedo.png&quot;</span><span class="p">);</span><span class="w">      </span><span class="c1">// treated as sRGB</span>
+<span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">normal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">loadDataTextureWithTiling</span><span class="p">(</span>
+<span class="w">    </span><span class="s">&quot;/path/wood_normal.png&quot;</span><span class="p">);</span><span class="w">      </span><span class="c1">// treated as linear data</span>
+<span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">roughness</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">loadDataTextureWithTiling</span><span class="p">(</span>
+<span class="w">    </span><span class="s">&quot;/path/wood_orm.png&quot;</span><span class="p">);</span><span class="w">         </span><span class="c1">// treated as linear data</span>
+</pre></div>
+</div>
+</section>
+<section id="render-quality-controls">
+<h2>Render-quality controls<a class="headerlink" href="#render-quality-controls" title="Link to this heading"></a></h2>
+<p>rayrai keeps RL throughput and visual fidelity separate. The <code class="docutils literal notranslate"><span class="pre">Fast</span></code> preset keeps
+reflections, high-fidelity PBR, FXAA, and extra expensive viewer effects off by default.
+<code class="docutils literal notranslate"><span class="pre">Balanced</span></code> now uses the PBR + IBL path and a reflective checker ground, but
+still leaves the heavier High/Ultra effects off. <code class="docutils literal notranslate"><span class="pre">High</span></code> and <code class="docutils literal notranslate"><span class="pre">Ultra</span></code> enable
+the quality-oriented path, including stronger shadow filtering, FXAA,
+additional screen-space effects, and depth-of-field postprocessing.</p>
+<p>Every preset is tuned so directional shadows are readable out of the box while
+smooth and metallic materials still receive enough sky/IBL fill. Balanced and
+High use brighter ambient/environment defaults than older releases; Ultra keeps
+a lower direct ambient with stronger IBL and AgX tone mapping. You should not
+need to tweak ambient/diffuse/shadow values for a readable outdoor scene.</p>
+<p>The reflective checker ground is on by default for <code class="docutils literal notranslate"><span class="pre">Balanced</span></code>, <code class="docutils literal notranslate"><span class="pre">High</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">Ultra</span></code> (<code class="docutils literal notranslate"><span class="pre">reflectiveGround</span> <span class="pre">=</span> <span class="pre">true</span></code> plus the PBR path) and off for <code class="docutils literal notranslate"><span class="pre">Fast</span></code>.
+Heightmap terrain is intentionally excluded from the planar reflective-ground
+policy; it uses a rough, non-reflective PBR terrain material even when
+<code class="docutils literal notranslate"><span class="pre">reflectiveGround</span></code> is enabled.</p>
+<p>Use presets for common cases:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualityPreset</span><span class="p">(</span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">RenderQualityPreset</span><span class="o">::</span><span class="n">Fast</span><span class="p">);</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualityPreset</span><span class="p">(</span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">RenderQualityPreset</span><span class="o">::</span><span class="n">Ultra</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Use explicit settings when you need runtime control:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">quality</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">defaultRenderQualitySettings</span><span class="p">(</span>
+<span class="w">  </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">RenderQualityPreset</span><span class="o">::</span><span class="n">Ultra</span><span class="p">);</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">fxaaEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">depthOfFieldEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">depthOfFieldFocusDistance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">5.0f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">depthOfFieldFocusRange</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">8.0f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">depthOfFieldMaxRadius</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.25f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">reflectiveGround</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">addViewerFillLights</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">quality</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The shipped <code class="docutils literal notranslate"><span class="pre">rayrai_feature_showcase</span></code> target exercises these controls and
+writes offscreen images and reports.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Fast</p></th>
+<th class="head"><p>Balanced</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><img alt="Fast preset" src="../../_images/rayrai_quality_fast.png" />
+</td>
+<td><img alt="Balanced preset" src="../../_images/rayrai_quality_balanced.png" />
+</td>
+</tr>
+<tr class="row-odd"><td><p>High</p></td>
+<td><p>Ultra</p></td>
+</tr>
+<tr class="row-even"><td><img alt="High preset" src="../../_images/rayrai_quality_high.png" />
+</td>
+<td><img alt="Ultra preset" src="../../_images/rayrai_quality_ultra.png" />
+</td>
+</tr>
+</tbody>
+</table>
+<p>These four images are produced by <code class="docutils literal notranslate"><span class="pre">doc_image_quality_presets</span></code> in
+<code class="docutils literal notranslate"><span class="pre">docs/image_generators/</span></code> and are regenerated automatically as part of the
+<code class="docutils literal notranslate"><span class="pre">Sphinx</span></code> build target.</p>
+</section>
+<section id="tone-mapping-exposure-and-color-grading">
+<h2>Tone mapping, exposure, and color grading<a class="headerlink" href="#tone-mapping-exposure-and-color-grading" title="Link to this heading"></a></h2>
+<p>The viewer color pipeline is driven by <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code>. Tone mapping is
+selected by <code class="docutils literal notranslate"><span class="pre">colorMode</span></code> (<code class="docutils literal notranslate"><span class="pre">ViewerColorMode</span></code>): <code class="docutils literal notranslate"><span class="pre">FastLinear</span></code> (no tone curve),
+<code class="docutils literal notranslate"><span class="pre">AcesApprox</span></code> (ACES-fitted), <code class="docutils literal notranslate"><span class="pre">UnrealPreviewApprox</span></code>, <code class="docutils literal notranslate"><span class="pre">FilmicApprox</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">AgXApprox</span></code>. Exposure is controlled by <code class="docutils literal notranslate"><span class="pre">pbrExposure</span></code> plus an optional
+auto-exposure loop (<code class="docutils literal notranslate"><span class="pre">autoExposureEnabled</span></code>, <code class="docutils literal notranslate"><span class="pre">autoExposureKey</span></code>,
+<code class="docutils literal notranslate"><span class="pre">autoExposureSpeed</span></code>, <code class="docutils literal notranslate"><span class="pre">autoExposureMinFactor</span></code>, <code class="docutils literal notranslate"><span class="pre">autoExposureMaxFactor</span></code>)
+that drives exposure toward a target post-tonemap luma. White balance and
+saturation use <code class="docutils literal notranslate"><span class="pre">viewerWhiteBalance</span></code> and <code class="docutils literal notranslate"><span class="pre">viewerSaturation</span></code>.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">quality</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">();</span>
+
+<span class="c1">// Pick the tone curve.</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">colorMode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">ViewerColorMode</span><span class="o">::</span><span class="n">AcesApprox</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">pbrToneMapping</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">pbrExposure</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">;</span>
+
+<span class="c1">// Auto-exposure: target mid-gray luma 0.18 at moderate adaptation speed.</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">autoExposureEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">autoExposureKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.18f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">autoExposureSpeed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.05f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">autoExposureMinFactor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.10f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">autoExposureMaxFactor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">6.0f</span><span class="p">;</span>
+
+<span class="c1">// White balance + saturation tweaks (applied before grading).</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">viewerWhiteBalance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">1.02f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.00f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.96f</span><span class="p">);</span><span class="w">  </span><span class="c1">// slightly warm</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">viewerSaturation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.05f</span><span class="p">;</span>
+
+<span class="c1">// ASC-CDL grade applied at the end of the post-process chain.</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">viewerColorGradePreset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">ColorGradePreset</span><span class="o">::</span><span class="n">Cinematic</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">viewerColorGradeStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.8f</span><span class="p">;</span>
+
+<span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">quality</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The five tone-mapping curves render the same scene very differently — flat
+linear preserves source intensity but rolls off bright surfaces; ACES and
+Filmic compress highlights cinematically; AgX trades a slightly desaturated
+look for cleaner skin tones; UnrealPreview matches the engine reference:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>FastLinear</p></th>
+<th class="head"><p>ACES</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><img alt="FastLinear tone map" src="../../_images/rayrai_tonemap_fast_linear.png" />
+</td>
+<td><img alt="ACES tone map" src="../../_images/rayrai_tonemap_aces.png" />
+</td>
+</tr>
+<tr class="row-odd"><td><p>UnrealPreview</p></td>
+<td><p>Filmic</p></td>
+</tr>
+<tr class="row-even"><td><img alt="UnrealPreview tone map" src="../../_images/rayrai_tonemap_unreal_preview.png" />
+</td>
+<td><img alt="Filmic tone map" src="../../_images/rayrai_tonemap_filmic.png" />
+</td>
+</tr>
+<tr class="row-odd"><td><p>AgX</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><img alt="AgX tone map" src="../../_images/rayrai_tonemap_agx.png" />
+</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>ASC-CDL color grading is applied at the end of the post-process chain. Pick a
+preset with <code class="docutils literal notranslate"><span class="pre">viewerColorGradePreset</span></code> (<code class="docutils literal notranslate"><span class="pre">Neutral</span></code>, <code class="docutils literal notranslate"><span class="pre">Warm</span></code>, <code class="docutils literal notranslate"><span class="pre">Cool</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Cinematic</span></code>, <code class="docutils literal notranslate"><span class="pre">Bleach</span></code>) and blend it with the ungraded image using
+<code class="docutils literal notranslate"><span class="pre">viewerColorGradeStrength</span></code>. <code class="docutils literal notranslate"><span class="pre">gamma</span></code> overrides display gamma when needed.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Neutral</p></th>
+<th class="head"><p>Warm</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><img alt="Neutral grade" src="../../_images/rayrai_grade_neutral.png" />
+</td>
+<td><img alt="Warm grade" src="../../_images/rayrai_grade_warm.png" />
+</td>
+</tr>
+<tr class="row-odd"><td><p>Cool</p></td>
+<td><p>Cinematic</p></td>
+</tr>
+<tr class="row-even"><td><img alt="Cool grade" src="../../_images/rayrai_grade_cool.png" />
+</td>
+<td><img alt="Cinematic grade" src="../../_images/rayrai_grade_cinematic.png" />
+</td>
+</tr>
+<tr class="row-odd"><td><p>Bleach</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><img alt="Bleach grade" src="../../_images/rayrai_grade_bleach.png" />
+</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>The tone-mapping grid is produced by <code class="docutils literal notranslate"><span class="pre">doc_image_tone_mapping</span></code> and the grade
+grid by <code class="docutils literal notranslate"><span class="pre">doc_image_color_grading</span></code> in <code class="docutils literal notranslate"><span class="pre">docs/image_generators/</span></code>.</p>
+<p>For batch capture, the static helpers <code class="docutils literal notranslate"><span class="pre">analyzeRgbaLuminance</span></code>,
+<code class="docutils literal notranslate"><span class="pre">recommendExposure</span></code>, and <code class="docutils literal notranslate"><span class="pre">smoothExposure</span></code> (see <em>Exposure, calibration, and
+output transforms</em> below) drive automatic exposure adjustment without touching
+renderer state directly.</p>
+</section>
+<section id="adaptive-quality-and-texture-budgets">
+<h2>Adaptive quality and texture budgets<a class="headerlink" href="#adaptive-quality-and-texture-budgets" title="Link to this heading"></a></h2>
+<p>For long-running applications and offline pipelines, two static helpers convert
+measured timings or memory budgets into recommended settings without mutating
+the renderer:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">recommendDynamicQuality(currentSettings,</span> <span class="pre">preset,</span> <span class="pre">timings)</span></code> looks at GPU
+pass timings (from <code class="docutils literal notranslate"><span class="pre">captureRenderPassTimings</span></code>) and proposes a render-scale,
+shadow-update cadence, bloom/SSAO quality, and target frame time. The result
+is a <code class="docutils literal notranslate"><span class="pre">DynamicQualityRecommendation</span></code> with bottleneck flags
+(<code class="docutils literal notranslate"><span class="pre">fillRate</span></code>/<code class="docutils literal notranslate"><span class="pre">shadow</span></code>/<code class="docutils literal notranslate"><span class="pre">postprocess</span></code>) and a human-readable reason.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">recommendMaterialTextureBudget(budgetBytes)</span></code> proposes texture
+formats/filters and which slots can fall back when the asset set exceeds a
+byte budget. The result describes what would be changed; the application
+decides whether to apply it.</p></li>
+</ul>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Measure once per second of headroom.</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">RenderOverrides</span><span class="w"> </span><span class="n">ov</span><span class="p">;</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">timings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">captureRenderPassTimings</span><span class="p">(</span><span class="n">viewer</span><span class="p">.</span><span class="n">getCamera</span><span class="p">(),</span><span class="w"> </span><span class="n">ov</span><span class="p">);</span>
+
+<span class="k">auto</span><span class="w"> </span><span class="n">rec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">recommendDynamicQuality</span><span class="p">(</span>
+<span class="w">    </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">RenderQualityPreset</span><span class="o">::</span><span class="n">High</span><span class="p">,</span>
+<span class="w">    </span><span class="n">timings</span><span class="p">);</span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rec</span><span class="p">.</span><span class="n">fillRateBottleneck</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">();</span>
+<span class="w">  </span><span class="n">q</span><span class="p">.</span><span class="n">viewerRenderScale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rec</span><span class="p">.</span><span class="n">recommendedRenderScale</span><span class="p">;</span><span class="w">  </span><span class="c1">// e.g. 0.85</span>
+<span class="w">  </span><span class="n">q</span><span class="p">.</span><span class="n">updateShadowsEveryFrame</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rec</span><span class="p">.</span><span class="n">updateShadowsEveryFrame</span><span class="p">;</span>
+<span class="w">  </span><span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">q</span><span class="p">);</span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Adaptive: %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">rec</span><span class="p">.</span><span class="n">reason</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
+<span class="p">}</span>
+
+<span class="c1">// Texture budget recommendation for a 512 MiB target.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">budget</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">recommendMaterialTextureBudget</span><span class="p">(</span>
+<span class="w">    </span><span class="cm">/*budgetBytes=*/</span><span class="mi">512ull</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1024</span><span class="p">);</span>
+<span class="c1">// budget.recommendedFilter / .recommendedFormat tell you what to lower.</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../Rayrai.html" class="btn btn-neutral float-left" title="rayrai Visualizer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Lighting.html" class="btn btn-neutral float-right" title="Lighting, shadows, and HDR/IBL" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

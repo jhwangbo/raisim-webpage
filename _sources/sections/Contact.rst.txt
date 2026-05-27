@@ -65,7 +65,7 @@ Here is a more detailed example:
       std::cout<<"Contact Normal in the world frame: "<<contact.getNormal().e().transpose()<<std::endl;
       std::cout<<"Contact position in the world frame: "<<contact.getPosition().e().transpose()<<std::endl;
       std::cout<<"It collides with: "<<world.getObject(contact.getPairObjectIndex())<<std::endl;
-      if (contact.getPairContactIndexInPairObject() != raisim::BodyType::STATIC) {
+      if (contact.getPairObjectBodyType() != raisim::BodyType::STATIC) {
         /// Static objects do not store contacts, so check whether the pair object is static.
         /// This saves computation in RaiSim.
         world.getObject(contact.getPairObjectIndex())->getContacts(); /// You can use the same methods on the pair object

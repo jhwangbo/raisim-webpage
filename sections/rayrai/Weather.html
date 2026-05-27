@@ -1,0 +1,660 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weather and atmospherics &mdash; raisim 2.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b0caeef3" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=c3c8ae58"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Capture, diagnostics, and headless rendering" href="Capture.html" />
+    <link rel="prev" title="Post-process effects" href="PostProcess.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../Rayrai.html">rayrai Visualizer</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../Rayrai.html#overview">Overview</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="RenderQuality.html">Render quality, tone mapping, color grading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Lighting.html">Lighting, shadows, and HDR/IBL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Materials.html">PBR materials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Visuals.html">Custom visuals, instancing, and scene helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="PostProcess.html">Post-process effects</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Weather and atmospherics</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#weather-presets">Weather presets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#enabling-the-procedural-sky-and-sky-ibl">Enabling the procedural sky and sky IBL</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#volumetric-fog-sky-and-light-shafts">Volumetric fog, sky, and light shafts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#foliage-wind">Foliage wind</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#weather-wet-and-snow-material-response">Weather wet and snow material response</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rain-splashes-snow-flurries-lens-droplets-and-storm-lightning">Rain splashes, snow flurries, lens droplets, and storm lightning</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Capture.html">Capture, diagnostics, and headless rendering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Sensors.html">Sensors and depth/LiDAR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Examples.html">Example targets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Performance.html">Performance notes and the C++ API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#included-binary-recommended">Included binary (recommended)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#build-and-link">Build and link</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#minimal-usage">Minimal usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#threading-contract">Threading contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#lifetime-and-error-model">Lifetime and error model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#example-custom-visuals-background-color">Example: custom visuals + background color</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#where-to-go-next">Where to go next</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../Rayrai.html">rayrai Visualizer</a></li>
+      <li class="breadcrumb-item active">Weather and atmospherics</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="weather-and-atmospherics">
+<h1>Weather and atmospherics<a class="headerlink" href="#weather-and-atmospherics" title="Link to this heading"></a></h1>
+<p>Weather is preset-driven and exposes both renderer-side state
+(<code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code>) and runtime atmospheric overrides
+(<code class="docutils literal notranslate"><span class="pre">WeatherSettings</span></code>). When <code class="docutils literal notranslate"><span class="pre">WeatherSettings::enabled</span> <span class="pre">=</span> <span class="pre">true</span></code> the
+atmospheric fields on <code class="docutils literal notranslate"><span class="pre">WeatherSettings</span></code> override the matching
+<code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code> fields for that frame.</p>
+<section id="weather-presets">
+<h2>Weather presets<a class="headerlink" href="#weather-presets" title="Link to this heading"></a></h2>
+<p>Presets cover <code class="docutils literal notranslate"><span class="pre">Clear</span></code>, <code class="docutils literal notranslate"><span class="pre">Hazy</span></code>, <code class="docutils literal notranslate"><span class="pre">Overcast</span></code>, <code class="docutils literal notranslate"><span class="pre">Fog</span></code>, <code class="docutils literal notranslate"><span class="pre">Rain</span></code>,
+<code class="docutils literal notranslate"><span class="pre">HeavyRain</span></code>, <code class="docutils literal notranslate"><span class="pre">Snow</span></code>, <code class="docutils literal notranslate"><span class="pre">Storm</span></code>, <code class="docutils literal notranslate"><span class="pre">NightClear</span></code>, <code class="docutils literal notranslate"><span class="pre">NightRain</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">Custom</span></code>. Quality steps (<code class="docutils literal notranslate"><span class="pre">Low</span></code>, <code class="docutils literal notranslate"><span class="pre">Medium</span></code>, <code class="docutils literal notranslate"><span class="pre">High</span></code>, <code class="docutils literal notranslate"><span class="pre">Ultra</span></code>) trade
+fidelity against particle and texture budgets.</p>
+<p><code class="docutils literal notranslate"><span class="pre">WeatherSettings</span></code> and <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code> overlap on atmospheric
+fields (fog density, wetness, volumetric fog, sky tinting). The precedence
+rule is: when <code class="docutils literal notranslate"><span class="pre">WeatherSettings::enabled</span> <span class="pre">=</span> <span class="pre">true</span></code>, the renderer reads
+weather fields and ignores the corresponding <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code>
+fields for that frame. When <code class="docutils literal notranslate"><span class="pre">enabled</span> <span class="pre">=</span> <span class="pre">false</span></code>, <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code>
+applies. Numeric units in <code class="docutils literal notranslate"><span class="pre">WeatherSettings</span></code>: <code class="docutils literal notranslate"><span class="pre">timeOfDayHours</span></code> in hours
+<code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">24)</span></code>, <code class="docutils literal notranslate"><span class="pre">latitude</span></code> / <code class="docutils literal notranslate"><span class="pre">longitude</span></code> in degrees, <code class="docutils literal notranslate"><span class="pre">windSpeed</span></code> in m/s,
+<code class="docutils literal notranslate"><span class="pre">visibilityMeters</span></code> / <code class="docutils literal notranslate"><span class="pre">radius</span></code> / distance-fade fields in metres,
+<code class="docutils literal notranslate"><span class="pre">fogDensity</span></code> in metres⁻¹ (exponential extinction), <code class="docutils literal notranslate"><span class="pre">fogAnisotropy</span></code> is
+the Henyey-Greenstein <code class="docutils literal notranslate"><span class="pre">g</span></code> in <code class="docutils literal notranslate"><span class="pre">[-1,</span> <span class="pre">1]</span></code>, <code class="docutils literal notranslate"><span class="pre">cloudCoverage</span></code> /
+<code class="docutils literal notranslate"><span class="pre">cloudDensity</span></code> / <code class="docutils literal notranslate"><span class="pre">rainOcclusionStrength</span></code> / <code class="docutils literal notranslate"><span class="pre">humidity</span></code> / <code class="docutils literal notranslate"><span class="pre">wetness</span></code>
+normalized in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>, and <code class="docutils literal notranslate"><span class="pre">wetnessAccumulationRate</span></code> /
+<code class="docutils literal notranslate"><span class="pre">wetnessDryingRate</span></code> per second.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Clear</p></th>
+<th class="head"><p>Overcast</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><img alt="Clear weather preset" src="../../_images/rayrai_weather_clear.png" />
+</td>
+<td><img alt="Overcast weather preset" src="../../_images/rayrai_weather_overcast.png" />
+</td>
+</tr>
+<tr class="row-odd"><td><p>Rain</p></td>
+<td><p>Snow</p></td>
+</tr>
+<tr class="row-even"><td><img alt="Rain weather preset" src="../../_images/rayrai_weather_rain.png" />
+</td>
+<td><img alt="Snow weather preset" src="../../_images/rayrai_weather_snow.png" />
+</td>
+</tr>
+<tr class="row-odd"><td><p>Storm</p></td>
+<td><p>NightClear</p></td>
+</tr>
+<tr class="row-even"><td><img alt="Storm weather preset" src="../../_images/rayrai_weather_storm.png" />
+</td>
+<td><img alt="NightClear weather preset" src="../../_images/rayrai_weather_night_clear.png" />
+</td>
+</tr>
+</tbody>
+</table>
+<p>The grid is produced by <code class="docutils literal notranslate"><span class="pre">doc_image_weather_presets</span></code> in
+<code class="docutils literal notranslate"><span class="pre">docs/image_generators/</span></code>.</p>
+<p>Start from <code class="docutils literal notranslate"><span class="pre">RayraiWindow::defaultWeatherSettings</span></code>, apply it with
+<code class="docutils literal notranslate"><span class="pre">setWeatherSettings</span></code> or <code class="docutils literal notranslate"><span class="pre">setWeatherPreset</span></code>, and call <code class="docutils literal notranslate"><span class="pre">updateWeather</span></code>
+from your frame loop when the weather state should animate.
+<code class="docutils literal notranslate"><span class="pre">transitionWeather</span></code> blends between presets or settings over a duration;
+<code class="docutils literal notranslate"><span class="pre">weatherDiagnostics</span></code> reports the resolved sun/moon, fog, precipitation,
+wetness, snow, lightning, lens-droplet, and generated sky state.
+<code class="docutils literal notranslate"><span class="pre">setWeatherThunderCallback</span></code> fires when lightning produces a thunder event
+so the application can play audio or trigger gameplay reactions.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">weather</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">defaultWeatherSettings</span><span class="p">(</span>
+<span class="w">  </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">WeatherPreset</span><span class="o">::</span><span class="n">Rain</span><span class="p">);</span>
+<span class="n">weather</span><span class="p">.</span><span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">weather</span><span class="p">.</span><span class="n">affectSensors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="n">weather</span><span class="p">.</span><span class="n">timeOfDayHours</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">17.5f</span><span class="p">;</span>
+<span class="n">weather</span><span class="p">.</span><span class="n">windSpeed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3.0f</span><span class="p">;</span>
+<span class="n">weather</span><span class="p">.</span><span class="n">lensDropletsEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setWeatherSettings</span><span class="p">(</span><span class="n">weather</span><span class="p">);</span>
+
+<span class="n">viewer</span><span class="p">.</span><span class="n">setWeatherThunderCallback</span><span class="p">([](</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">event</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// play audio at event.delaySeconds with event.intensity, etc.</span>
+<span class="p">});</span>
+
+<span class="c1">// Frame loop animation.</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">updateWeather</span><span class="p">(</span><span class="n">dt</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">diagnostics</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">weatherDiagnostics</span><span class="p">();</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">diagnostics</span><span class="p">.</span><span class="n">lightningActive</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// react to the current flash</span>
+<span class="p">}</span>
+
+<span class="c1">// Smooth blend to a new preset over four seconds.</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">transitionWeather</span><span class="p">(</span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">WeatherPreset</span><span class="o">::</span><span class="n">Storm</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>For local effects, use <code class="docutils literal notranslate"><span class="pre">addLocalFogVolume</span></code> / <code class="docutils literal notranslate"><span class="pre">clearLocalFogVolumes</span></code>,
+<code class="docutils literal notranslate"><span class="pre">addProjectedDecal</span></code> / <code class="docutils literal notranslate"><span class="pre">clearProjectedDecals</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">addIrradianceVolume</span></code> / <code class="docutils literal notranslate"><span class="pre">clearIrradianceVolumes</span></code>. Each list is capped
+(eight local fog volumes, eight projected decals, eight irradiance volumes)
+so the fast frame path stays predictable. Weather-driven sky maps are
+created on demand with
+<code class="docutils literal notranslate"><span class="pre">generateWeatherSkyEnvironment(envFaceSize,</span> <span class="pre">irradianceFaceSize,</span>
+<span class="pre">setAsBackground)</span></code>; do this at transition points or setup time, not every
+frame. <code class="docutils literal notranslate"><span class="pre">clearWeatherSkyEnvironment</span></code> releases the cubemaps.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisin</span><span class="o">::</span><span class="n">LocalFogVolume</span><span class="w"> </span><span class="n">cloud</span><span class="p">;</span>
+<span class="n">cloud</span><span class="p">.</span><span class="n">center</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.2f</span><span class="p">);</span>
+<span class="n">cloud</span><span class="p">.</span><span class="n">radius</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3.0f</span><span class="p">;</span>
+<span class="n">cloud</span><span class="p">.</span><span class="n">density</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.18f</span><span class="p">;</span>
+<span class="n">cloud</span><span class="p">.</span><span class="n">edgeFade</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.45f</span><span class="p">;</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">addLocalFogVolume</span><span class="p">(</span><span class="n">cloud</span><span class="p">);</span>
+
+<span class="n">raisin</span><span class="o">::</span><span class="n">ProjectedDecal</span><span class="w"> </span><span class="n">puddle</span><span class="p">;</span>
+<span class="n">puddle</span><span class="p">.</span><span class="n">center</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">1.5f</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.8f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.01f</span><span class="p">);</span>
+<span class="n">puddle</span><span class="p">.</span><span class="n">halfExtents</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.8f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.05f</span><span class="p">);</span>
+<span class="n">puddle</span><span class="p">.</span><span class="n">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8f</span><span class="p">);</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">addProjectedDecal</span><span class="p">(</span><span class="n">puddle</span><span class="p">);</span>
+
+<span class="n">raisin</span><span class="o">::</span><span class="n">IrradianceVolume</span><span class="w"> </span><span class="n">ambient</span><span class="p">;</span>
+<span class="n">ambient</span><span class="p">.</span><span class="n">center</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.5f</span><span class="p">);</span>
+<span class="n">ambient</span><span class="p">.</span><span class="n">halfExtents</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">4.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0f</span><span class="p">);</span>
+<span class="n">ambient</span><span class="p">.</span><span class="n">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.20f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.22f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.30f</span><span class="p">);</span>
+<span class="n">ambient</span><span class="p">.</span><span class="n">strength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.8f</span><span class="p">;</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">addIrradianceVolume</span><span class="p">(</span><span class="n">ambient</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="enabling-the-procedural-sky-and-sky-ibl">
+<h2>Enabling the procedural sky and sky IBL<a class="headerlink" href="#enabling-the-procedural-sky-and-sky-ibl" title="Link to this heading"></a></h2>
+<p>The procedural sky is <strong>on by default</strong> in rayrai. The struct-default for
+<code class="docutils literal notranslate"><span class="pre">RenderQualitySettings::proceduralSkyBackgroundEnabled</span></code> is <code class="docutils literal notranslate"><span class="pre">true</span></code>, so
+every preset (Fast / Balanced / High / Ultra) renders the analytic
+Hillaire sky as the background out of the box. You do not need to do
+anything to turn it on; you only need to call the helpers below if you
+want it to <em>light</em> the scene as ambient.</p>
+<p>Two-step recipe to get a sky that also drives shaded-side ambient:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="w"> </span><span class="nf">viewer</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">1280</span><span class="p">,</span><span class="w"> </span><span class="mi">720</span><span class="p">);</span>
+
+<span class="c1">// 1) Pick a preset. Procedural sky is already enabled by every</span>
+<span class="c1">//    built-in preset, so no flag flip is needed.</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualityPreset</span><span class="p">(</span>
+<span class="w">    </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">RenderQualityPreset</span><span class="o">::</span><span class="n">High</span><span class="p">);</span>
+
+<span class="c1">// 2) Bake the procedural sky into a real IBL environment cubemap +</span>
+<span class="c1">//    irradiance cubemap so PBR materials sample sky colour for</span>
+<span class="c1">//    indirect lighting. Without this call the sky is &quot;background</span>
+<span class="c1">//    only&quot; — PBR surfaces see no environment contribution.</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">generateWeatherSkyEnvironment</span><span class="p">(</span>
+<span class="w">    </span><span class="cm">/*envFaceSize=*/</span><span class="mi">128</span><span class="p">,</span>
+<span class="w">    </span><span class="cm">/*irradianceFaceSize=*/</span><span class="mi">32</span><span class="p">,</span>
+<span class="w">    </span><span class="cm">/*setAsBackground=*/</span><span class="nb">true</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>After that, <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings::pbrEnvironmentIntensity</span></code> controls
+how strong the IBL contribution is. The preset defaults are tuned for
+outdoor daylight; lower it for an overcast or indoor feel.</p>
+<p>If you want to <strong>turn the sky off</strong> (for a flat colour background or to
+use an HDR environment instead):</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">();</span>
+<span class="n">q</span><span class="p">.</span><span class="n">proceduralSkyBackgroundEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">proceduralCloudLayerEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">q</span><span class="p">);</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setBackgroundColorRgb255</span><span class="p">({</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">22</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">});</span><span class="w">  </span><span class="c1">// flat fallback</span>
+</pre></div>
+</div>
+<p>To swap in your own HDR environment (the
+<a class="reference internal" href="Lighting.html"><span class="doc">PbrEnvironment</span></a> bundle), load the HDR file, set it as
+the background, and the PBR shader will use it instead of the procedural
+sky:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">PbrEnvironment</span><span class="o">::</span><span class="n">loadFromHdrFile</span><span class="p">(</span><span class="s">&quot;/path/studio.hdr&quot;</span><span class="p">);</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setEnvironmentBackground</span><span class="p">(</span><span class="n">env</span><span class="p">.</span><span class="n">environmentCubemap</span><span class="p">,</span><span class="w"> </span><span class="cm">/*exposure=*/</span><span class="mf">1.0f</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The procedural sky is cheap (a few small LUTs); the IBL bake is a
+one-time cost when the renderer initialises or when weather state
+changes substantially. Both are documented in more detail below.</p>
+</section>
+<section id="volumetric-fog-sky-and-light-shafts">
+<h2>Volumetric fog, sky, and light shafts<a class="headerlink" href="#volumetric-fog-sky-and-light-shafts" title="Link to this heading"></a></h2>
+<p>On top of the standard exponential fog (<code class="docutils literal notranslate"><span class="pre">fogDensity</span></code>,
+<code class="docutils literal notranslate"><span class="pre">fogColorOverrideEnabled</span></code>, <code class="docutils literal notranslate"><span class="pre">fogColor</span></code>), the renderer supports height fog
+(<code class="docutils literal notranslate"><span class="pre">heightFogEnabled</span></code>, <code class="docutils literal notranslate"><span class="pre">heightFogDensity</span></code>, <code class="docutils literal notranslate"><span class="pre">heightFogBaseHeight</span></code>,
+<code class="docutils literal notranslate"><span class="pre">heightFogFalloff</span></code>) and a volumetric fog volume
+(<code class="docutils literal notranslate"><span class="pre">volumetricFogEnabled</span></code>, <code class="docutils literal notranslate"><span class="pre">volumetricFogDensity</span></code>,
+<code class="docutils literal notranslate"><span class="pre">volumetricFogNoiseScale</span></code>, <code class="docutils literal notranslate"><span class="pre">volumetricFogNoiseStrength</span></code>,
+<code class="docutils literal notranslate"><span class="pre">volumetricFogColor</span></code>, <code class="docutils literal notranslate"><span class="pre">volumetricFogAnisotropy</span></code>,
+<code class="docutils literal notranslate"><span class="pre">volumetricFogAnimationTimeSeconds</span></code>, <code class="docutils literal notranslate"><span class="pre">volumetricFogWindDirection</span></code>,
+<code class="docutils literal notranslate"><span class="pre">volumetricFogWindSpeed</span></code>, <code class="docutils literal notranslate"><span class="pre">volumetricFogTurbulenceSpeed</span></code>).
+Volumetric lighting (<code class="docutils literal notranslate"><span class="pre">volumetricLightingEnabled</span></code>,
+<code class="docutils literal notranslate"><span class="pre">volumetricLightStrength</span></code>, <code class="docutils literal notranslate"><span class="pre">volumetricLightDecay</span></code>,
+<code class="docutils literal notranslate"><span class="pre">volumetricLightSamples</span></code>) scatters the main light through the fog volume.</p>
+<p>The procedural sky path uses an analytic Hillaire-style atmosphere LUT with
+multi-scatter and aerial-perspective passes. Enable it with
+<code class="docutils literal notranslate"><span class="pre">proceduralSkyBackgroundEnabled</span></code> and tune sun visibility
+(<code class="docutils literal notranslate"><span class="pre">proceduralSkySunStrength</span></code>, <code class="docutils literal notranslate"><span class="pre">proceduralSkySunSize</span></code>). A separate
+procedural cloud layer adds <code class="docutils literal notranslate"><span class="pre">proceduralCloudLayerEnabled</span></code>,
+<code class="docutils literal notranslate"><span class="pre">proceduralCloudCoverage</span></code>, <code class="docutils literal notranslate"><span class="pre">proceduralCloudDensity</span></code>,
+<code class="docutils literal notranslate"><span class="pre">proceduralCloudScale</span></code>, <code class="docutils literal notranslate"><span class="pre">proceduralCloudSoftness</span></code>,
+<code class="docutils literal notranslate"><span class="pre">proceduralCloudOffset</span></code>, <code class="docutils literal notranslate"><span class="pre">proceduralCloudTint</span></code>; cloud shadows
+(<code class="docutils literal notranslate"><span class="pre">cloudShadowProjectionEnabled</span></code>, <code class="docutils literal notranslate"><span class="pre">cloudShadowStrength</span></code>,
+<code class="docutils literal notranslate"><span class="pre">cloudShadowScale</span></code>) project that layer back onto the scene.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">quality</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">();</span>
+
+<span class="c1">// Height fog on top of the standard exponential fog.</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">fogDensity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.015f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">heightFogEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">heightFogDensity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.04f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">heightFogBaseHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">heightFogFalloff</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.35f</span><span class="p">;</span>
+
+<span class="c1">// Animated volumetric fog with subtle wind.</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">volumetricFogEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">volumetricFogDensity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.018f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">volumetricFogColor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.74f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.82f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.92f</span><span class="p">);</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">volumetricFogAnisotropy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.30f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">volumetricFogWindDirection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec2</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">);</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">volumetricFogWindSpeed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.6f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">volumetricFogAnimationTimeSeconds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">currentTimeSeconds</span><span class="p">;</span>
+
+<span class="c1">// Light shafts from the main directional light.</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">volumetricLightingEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">volumetricLightStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.6f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">volumetricLightDecay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.94f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">volumetricLightSamples</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">32</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">lightShaftsEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">lightShaftsStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.8f</span><span class="p">;</span>
+
+<span class="c1">// Procedural sky + clouds.</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">proceduralSkyBackgroundEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">proceduralSkySunStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.4f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">proceduralCloudLayerEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">proceduralCloudCoverage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.55f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">cloudShadowProjectionEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">cloudShadowStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.35f</span><span class="p">;</span>
+
+<span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">quality</span><span class="p">);</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../../_images/rayrai_volumetric_fog.png"><img alt="Pillars slicing the main light into volumetric shafts" src="../../_images/rayrai_volumetric_fog.png" style="width: 100%;" />
+</a>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Sky and height fog</p></th>
+<th class="head"><p>Volumetric fog + light shafts</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><img alt="Procedural sky with height fog" src="../../_images/13_sky_height_fog.png" />
+</td>
+<td><img alt="Volumetric fog and scattering" src="../../_images/16_volumetric_fog_lighting.png" />
+</td>
+</tr>
+<tr class="row-odd"><td><p>Cloud shadows</p></td>
+<td><p>Aerial perspective</p></td>
+</tr>
+<tr class="row-even"><td><img alt="Procedural cloud shadow projection" src="../../_images/28_weather_cloud_shadows.png" />
+</td>
+<td><img alt="Distance-based atmospheric tinting" src="../../_images/60_aerial_perspective.png" />
+</td>
+</tr>
+<tr class="row-odd"><td><p>Local fog volumes</p></td>
+<td><p>Light shafts (god rays)</p></td>
+</tr>
+<tr class="row-even"><td><img alt="Spherical local fog volumes" src="../../_images/29_weather_fog_local_volumes.png" />
+</td>
+<td><img alt="Screen-space light shafts" src="../../_images/65_light_shafts.png" />
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="foliage-wind">
+<h2>Foliage wind<a class="headerlink" href="#foliage-wind" title="Link to this heading"></a></h2>
+<p>Authored foliage and instanced grass deform under a global wind field when
+<code class="docutils literal notranslate"><span class="pre">foliageWindEnabled</span></code> is set. <code class="docutils literal notranslate"><span class="pre">foliageWindDirection</span></code> and
+<code class="docutils literal notranslate"><span class="pre">foliageWindSpeed</span></code> drive the base motion; <code class="docutils literal notranslate"><span class="pre">foliageWindTimeSeconds</span></code> is
+the wind clock the application drives from its frame loop.
+<code class="docutils literal notranslate"><span class="pre">foliageWindGustStrength</span></code> and <code class="docutils literal notranslate"><span class="pre">foliageWindGustScale</span></code> add slower gust
+noise on top, while <code class="docutils literal notranslate"><span class="pre">foliageWindBranchBend</span></code> controls coarse trunk/branch
+bend and <code class="docutils literal notranslate"><span class="pre">foliageWindLeafFlutter</span></code> controls fine leaf flutter. The
+per-mesh response amplitude comes from the material’s <code class="docutils literal notranslate"><span class="pre">FoliageType</span></code> and
+the vertex color channels populated by the importer.</p>
+<p>Foliage uses two-sided lighting and weather-driven leaf colour shifts.
+Grass patches and dense bushes are usually rendered through
+<code class="docutils literal notranslate"><span class="pre">InstancedVisuals</span></code> so thousands of blades share one upload, with
+per-instance scale and rotation driving subtle variation.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">quality</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">();</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">foliageWindEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">foliageWindDirection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec2</span><span class="p">(</span><span class="mf">0.7f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.7f</span><span class="p">);</span><span class="w">  </span><span class="c1">// diagonal wind</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">foliageWindSpeed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.4f</span><span class="p">;</span><span class="w">                       </span><span class="c1">// base m/s</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">foliageWindTimeSeconds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">currentTimeSeconds</span><span class="p">;</span><span class="w">   </span><span class="c1">// animation clock</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">foliageWindGustStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.6f</span><span class="p">;</span><span class="w">                </span><span class="c1">// gust amplitude</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">foliageWindGustScale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.2f</span><span class="p">;</span><span class="w">                   </span><span class="c1">// gust spatial scale</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">foliageWindBranchBend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.22f</span><span class="p">;</span><span class="w">                 </span><span class="c1">// coarse trunk bend</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">foliageWindLeafFlutter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.10f</span><span class="p">;</span><span class="w">                </span><span class="c1">// fine flutter</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">quality</span><span class="p">);</span>
+
+<span class="c1">// Mark a material as foliage so the wind shader applies to it.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">leaf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Material</span><span class="o">::</span><span class="n">foliage</span><span class="p">(</span>
+<span class="w">  </span><span class="s">&quot;oak_leaves&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Material</span><span class="o">::</span><span class="n">FoliageType</span><span class="o">::</span><span class="n">LeafCard</span><span class="p">,</span>
+<span class="w">  </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.32f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.55f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.21f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">));</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Foliage wind (poster frame)</p></th>
+<th class="head"><p>Leaf two-sided lighting</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><img alt="Trees and grass deform under foliageWindEnabled" src="../../_images/43_foliage_wind_poster.png" />
+</td>
+<td><img alt="Translucent leaf shading" src="../../_images/44_foliage_leaf_lighting.png" />
+</td>
+</tr>
+<tr class="row-odd"><td><p>Dense grass patch</p></td>
+<td><p>Foliage weather response</p></td>
+</tr>
+<tr class="row-even"><td><img alt="Instanced grass patches" src="../../_images/45_foliage_grass_patch.png" />
+</td>
+<td><img alt="Foliage tinting under weather" src="../../_images/46_foliage_weather_response.png" />
+</td>
+</tr>
+<tr class="row-odd"><td><p>Dense foliage instancing</p></td>
+<td><p>Poly Haven foliage import</p></td>
+</tr>
+<tr class="row-even"><td><img alt="Many thousands of instanced grass blades" src="../../_images/88_dense_foliage_instances.png" />
+</td>
+<td><img alt="Authored foliage from a Poly Haven scene" src="../../_images/53_polyhaven_foliage.png" />
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="weather-wet-and-snow-material-response">
+<h2>Weather wet and snow material response<a class="headerlink" href="#weather-wet-and-snow-material-response" title="Link to this heading"></a></h2>
+<p>Wet and snow surface response is decoupled from precipitation so applications
+can ramp it independently of the weather state. Enable
+<code class="docutils literal notranslate"><span class="pre">weatherWetMaterialEnabled</span></code> and drive it through <code class="docutils literal notranslate"><span class="pre">weatherWetness</span></code>,
+<code class="docutils literal notranslate"><span class="pre">weatherPuddleStrength</span></code>, <code class="docutils literal notranslate"><span class="pre">weatherRainRippleStrength</span></code>,
+<code class="docutils literal notranslate"><span class="pre">weatherRainRippleScale</span></code>, <code class="docutils literal notranslate"><span class="pre">weatherRainRipplePhase</span></code>,
+<code class="docutils literal notranslate"><span class="pre">weatherWetAlbedoDarkening</span></code>, <code class="docutils literal notranslate"><span class="pre">weatherWetRoughnessScale</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">weatherWetSpecularBoost</span></code>. Snow response uses
+<code class="docutils literal notranslate"><span class="pre">weatherSnowMaterialEnabled</span></code> plus <code class="docutils literal notranslate"><span class="pre">weatherSnowCoverage</span></code>,
+<code class="docutils literal notranslate"><span class="pre">weatherSnowAccumulationStrength</span></code>, <code class="docutils literal notranslate"><span class="pre">weatherSnowAlbedoBlend</span></code>,
+<code class="docutils literal notranslate"><span class="pre">weatherSnowRoughness</span></code>, <code class="docutils literal notranslate"><span class="pre">weatherSnowMetallicScale</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">weatherSnowNormalSoftening</span></code>. The <code class="docutils literal notranslate"><span class="pre">WeatherMask</span></code> texture slot on
+<code class="docutils literal notranslate"><span class="pre">Material</span></code> masks these effects per-asset, so authored awnings or
+undersides of overhangs stay dry.</p>
+<p>Wet response darkens albedo, drops roughness, and adds animated rain
+ripples on upward-facing surfaces; <code class="docutils literal notranslate"><span class="pre">wetnessAccumulationEnabled</span></code> lets the
+value ramp up over time during rain and ramp back down during dry intervals,
+controlled by <code class="docutils literal notranslate"><span class="pre">wetnessAccumulationRate</span></code> and <code class="docutils literal notranslate"><span class="pre">wetnessDryingRate</span></code>.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">quality</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">();</span>
+
+<span class="c1">// Wet material response (puddles, rain ripples, darkening).</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">weatherWetMaterialEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">weatherWetness</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.7f</span><span class="p">;</span><span class="w">                  </span><span class="c1">// 0..1</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">weatherPuddleStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">weatherRainRippleStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.45f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">weatherRainRippleScale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">18.0f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">weatherWetAlbedoDarkening</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.30f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">weatherWetRoughnessScale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.32f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">weatherWetSpecularBoost</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.40f</span><span class="p">;</span>
+
+<span class="c1">// Snow material response (albedo blend on upward faces).</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">weatherSnowMaterialEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">weatherSnowCoverage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.65f</span><span class="p">;</span><span class="w">             </span><span class="c1">// 0..1</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">weatherSnowAccumulationStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.8f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">weatherSnowAlbedoBlend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.78f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">weatherSnowRoughness</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.92f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">weatherSnowMetallicScale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.05f</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">weatherSnowNormalSoftening</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.62f</span><span class="p">;</span>
+
+<span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">quality</span><span class="p">);</span>
+
+<span class="c1">// Optional: drive accumulation/drying from the weather state instead.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">weather</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getWeatherSettings</span><span class="p">();</span>
+<span class="n">weather</span><span class="p">.</span><span class="n">wetnessAccumulationEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">weather</span><span class="p">.</span><span class="n">wetnessAccumulationRate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.35f</span><span class="p">;</span><span class="w">   </span><span class="c1">// per second</span>
+<span class="n">weather</span><span class="p">.</span><span class="n">wetnessDryingRate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.10f</span><span class="p">;</span><span class="w">         </span><span class="c1">// per second</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setWeatherSettings</span><span class="p">(</span><span class="n">weather</span><span class="p">);</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../../_images/rayrai_wet_material.png"><img alt="Wet material response: darker albedo, lower roughness, rain ripples" src="../../_images/rayrai_wet_material.png" style="width: 100%;" />
+</a>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Wet material response</p></th>
+<th class="head"><p>Snow material response</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><img alt="Wet darkening, roughness drop, rain ripples" src="../../_images/30_weather_wet_materials.png" />
+</td>
+<td><img alt="Snow albedo blend on upward faces" src="../../_images/31_weather_snow_materials.png" />
+</td>
+</tr>
+<tr class="row-odd"><td><p>Wetness accumulation</p></td>
+<td><p>Snow melt transition</p></td>
+</tr>
+<tr class="row-even"><td><img alt="Wetness ramp during rain" src="../../_images/41_weather_wetness_accumulation.png" />
+</td>
+<td><img alt="Snow melting between presets" src="../../_images/40_weather_snow_melt_transition.png" />
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="rain-splashes-snow-flurries-lens-droplets-and-storm-lightning">
+<h2>Rain splashes, snow flurries, lens droplets, and storm lightning<a class="headerlink" href="#rain-splashes-snow-flurries-lens-droplets-and-storm-lightning" title="Link to this heading"></a></h2>
+<p>Rain and snow generate animated particle systems on top of the material
+response. Rain splashes are short-lived secondary impact particles spawned
+on upward-facing surfaces; their density follows <code class="docutils literal notranslate"><span class="pre">precipitationRate</span></code>.
+Lens droplets render screen-space droplets on the lens (controllable via
+<code class="docutils literal notranslate"><span class="pre">lensDropletsEnabled</span></code>, <code class="docutils literal notranslate"><span class="pre">lensDropletDensity</span></code>, <code class="docutils literal notranslate"><span class="pre">lensDropletSize</span></code>,
+<code class="docutils literal notranslate"><span class="pre">lensDropletStreakLength</span></code>). Storms add stochastic lightning controlled by
+<code class="docutils literal notranslate"><span class="pre">lightningRate</span></code> and <code class="docutils literal notranslate"><span class="pre">lightningIntensity</span></code>; subscribe with
+<code class="docutils literal notranslate"><span class="pre">setWeatherThunderCallback</span></code> to play audio cues. Solar position uses the
+configured latitude / longitude / date and shifts the directional light
+accordingly throughout <code class="docutils literal notranslate"><span class="pre">timeOfDayHours</span></code>.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">weather</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">defaultWeatherSettings</span><span class="p">(</span>
+<span class="w">  </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">WeatherPreset</span><span class="o">::</span><span class="n">Storm</span><span class="p">);</span>
+<span class="n">weather</span><span class="p">.</span><span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">weather</span><span class="p">.</span><span class="n">precipitationRate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">12.0f</span><span class="p">;</span><span class="w">           </span><span class="c1">// conceptual mm/hr</span>
+<span class="n">weather</span><span class="p">.</span><span class="n">rainOcclusionStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.6f</span><span class="p">;</span><span class="w">        </span><span class="c1">// 0..1</span>
+<span class="n">weather</span><span class="p">.</span><span class="n">cloudCoverage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.95f</span><span class="p">;</span>
+<span class="n">weather</span><span class="p">.</span><span class="n">lightningRate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.15f</span><span class="p">;</span><span class="w">               </span><span class="c1">// events per second (Poisson)</span>
+<span class="n">weather</span><span class="p">.</span><span class="n">lightningLocalPointLightEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">weather</span><span class="p">.</span><span class="n">lensDropletsEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">weather</span><span class="p">.</span><span class="n">timeOfDayHours</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">17.0f</span><span class="p">;</span>
+<span class="n">weather</span><span class="p">.</span><span class="n">latitude</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">37.0f</span><span class="p">;</span>
+<span class="n">weather</span><span class="p">.</span><span class="n">longitude</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">127.0f</span><span class="p">;</span>
+<span class="n">weather</span><span class="p">.</span><span class="n">year</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2026</span><span class="p">;</span><span class="w"> </span><span class="n">weather</span><span class="p">.</span><span class="n">month</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"> </span><span class="n">weather</span><span class="p">.</span><span class="n">day</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">23</span><span class="p">;</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setWeatherSettings</span><span class="p">(</span><span class="n">weather</span><span class="p">);</span>
+
+<span class="n">viewer</span><span class="p">.</span><span class="n">setWeatherThunderCallback</span><span class="p">([](</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">event</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">audio</span><span class="p">.</span><span class="n">playThunder</span><span class="p">(</span><span class="n">event</span><span class="p">.</span><span class="n">delaySeconds</span><span class="p">,</span><span class="w"> </span><span class="n">event</span><span class="p">.</span><span class="n">intensity</span><span class="p">);</span>
+<span class="p">});</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Rain splashes</p></th>
+<th class="head"><p>Lens droplets</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><img alt="Rain impact splash particles" src="../../_images/34_weather_rain_splashes_poster.png" />
+</td>
+<td><img alt="Lens droplet post-process" src="../../_images/35_weather_lens_droplets_poster.png" />
+</td>
+</tr>
+<tr class="row-odd"><td><p>Snow particles</p></td>
+<td><p>Storm lightning</p></td>
+</tr>
+<tr class="row-even"><td><img alt="Snow particle accumulation" src="../../_images/32_weather_snow_particles_poster.png" />
+</td>
+<td><img alt="Stochastic lightning during storm preset" src="../../_images/33_weather_storm_lightning.png" />
+</td>
+</tr>
+<tr class="row-odd"><td><p>Rain occlusion</p></td>
+<td><p>Solar position over time of day</p></td>
+</tr>
+<tr class="row-even"><td><img alt="Rain density modulated by overhangs" src="../../_images/42_weather_rain_occlusion.png" />
+</td>
+<td><img alt="Sun position from latitude/longitude/date" src="../../_images/38_weather_solar_position.png" />
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="PostProcess.html" class="btn btn-neutral float-left" title="Post-process effects" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Capture.html" class="btn btn-neutral float-right" title="Capture, diagnostics, and headless rendering" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -25,7 +25,7 @@ Run the installed executable:
    <raisim-install>/bin/primitive_grid
 
 On Windows, run ``primitive_grid.exe`` instead.
-This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.
+This example uses RaisimServer. Start ``rayrai_raisim_tcp_viewer`` and connect to port 8080.
 
 
 Details

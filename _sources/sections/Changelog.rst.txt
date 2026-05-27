@@ -1,106 +1,36 @@
-Changelog: v2.2.0
-=================
+#########
+Changelog
+#########
 
-.. raw:: html
+Release-specific notes for RaiSim. The most recent release is at the top.
+Each version page summarises the user-visible changes — new features,
+behaviour changes, and bug fixes — without re-stating commit history.
 
-   <div style="padding: 1.1rem 1.3rem; margin: 1rem 0 1.5rem 0; border-left: 4px solid #2f80ed; background: #f4f8ff;">
-     <div style="font-size: 0.9rem; letter-spacing: 0.04em; text-transform: uppercase; color: #486581;">Recent development notes</div>
-     <div style="font-size: 1.35rem; font-weight: 700; margin-top: 0.25rem; color: #102a43;">Rayrai, deformable objects, and granular media</div>
-     <div style="margin-top: 0.45rem; color: #334e68;">Highlights for users upgrading to this release.</div>
-   </div>
+.. toctree::
+   :maxdepth: 1
+   :caption: Releases
 
-The latest changes are not just maintenance. They add three visible capabilities
-that affect how users inspect, build, and demonstrate simulations: the rayrai
-renderer, native deformable objects, and native granular media. The examples
-below were run from ``build/examples`` and captured through the rayrai viewer for
-this changelog.
+   changelog/v2.3.0
+   changelog/v2.2.0
 
-Rayrai becomes the main visual workflow
----------------------------------------
+Versions at a glance
+====================
 
-.. image:: ../image/changelog_rayrai_showcase.gif
-   :alt: rayrai complete showcase with RGB, depth, LiDAR, raw buffers, and scene visuals
-   :width: 100%
+.. list-table::
+   :header-rows: 1
+   :widths: 20 80
 
-.. image:: ../image/rayrai_pbr_texture_maps.png
-   :alt: rayrai PBR texture maps example with textured material rendering
-   :width: 100%
+   * - Version
+     - Headline
+   * - :doc:`v2.3.0 <changelog/v2.3.0>`
+     - Rolling and spinning friction; interactive sim control (pause /
+       step / force / pose); MJCF into an existing world; shader binary
+       cache + parallel prewarming; rayrai out-of-the-box quality;
+       documentation overhaul.
+   * - :doc:`v2.2.0 <changelog/v2.2.0>`
+     - Rayrai becomes the main visual workflow; deformable objects and
+       granular media examples; build / upgrade / Python polish.
 
-rayrai is now the supported in-process visualization path. For users, this means
-examples can render directly inside the simulation process, expose RGB/depth
-sensor buffers, preview LiDAR and point clouds, and show richer scenes without
-starting a separate legacy visualizer stack.
-
-This release adds and restores rayrai example documentation, source files,
-and assets. They also bundle PBR material examples so users can immediately
-inspect real textured models with renderer-side material support.
-
-User impact:
-
-* Run modern visualization examples directly from ``build/examples``.
-* Inspect RGB/depth camera output and raw sensor buffers through rayrai.
-* Use bundled PBR assets instead of assembling renderer demo resources by hand.
-
-
-Deformable objects are now example-ready
-----------------------------------------
-
-.. image:: ../image/changelog_deformable_objects.gif
-   :alt: deformable cloth and deformable cube stack in the rayrai TCP viewer
-   :width: 100%
-
-The deformable object example shows two workflows users can build on: an
-explicit cloth grid draping over a rigid obstacle and a stack of mesh-based
-deformable cubes. This makes the new deformable-body API concrete instead of
-leaving it as a header-level feature.
-
-The example demonstrates particle counts, triangle topology, material tuning,
-mesh construction, and server streaming of dynamic deformable topology. Users can
-start from this scene when building cloth, soft shells, or deformable collision
-experiments.
-
-User impact:
-
-* Create cloth from explicit vertices and triangles.
-* Build deformable objects from closed OBJ meshes.
-* Stream deformable topology and vertex updates through ``RaisimServer`` and
-  view them in rayrai.
-
-
-Granular media gets a native robot example
-------------------------------------------
-
-.. image:: ../image/changelog_granular_media.gif
-   :alt: ANYmal standing on native granular particles in the rayrai TCP viewer
-   :width: 100%
-
-Granular media is now visible as a native RaiSim feature through an ANYmal
-example standing on a particle bed. The scene shows the part users care about:
-rigid and articulated bodies interacting with granular particles while the
-particles are rendered as instanced visuals in rayrai.
-
-The example exposes practical controls for particle resolution, layers, radius,
-spacing, stiffness, damping, friction, rolling friction, and substeps. It also
-prints contact and stability statistics after headless runs, so users can tune
-material behavior and check whether a configuration stayed stable.
-
-User impact:
-
-* Create granular beds with fixed and dynamic particles.
-* Couple granular particles to an articulated robot.
-* Visualize particle motion and tune material parameters from a runnable example.
-
-
-Build, upgrade, and Python polish
----------------------------------
-
-This release also improves the less visible surfaces that affect daily
-use. Upgrade scripts were added for Linux and Windows, automatic upgrade support
-was wired into CMake, Windows build configuration was adjusted, and RaiSimPy
-symbol exposure was fixed.
-
-User impact:
-
-* Easier package upgrades on Linux and Windows.
-* Fewer platform-specific CMake surprises.
-* Cleaner Python binding behavior for articulated systems and sensors.
+Older releases predate this changelog structure and are not yet
+documented in this format. See the GitHub release tags for the raw
+release notes prior to v2.2.0.

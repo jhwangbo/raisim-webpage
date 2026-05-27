@@ -6,14 +6,15 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sensors &mdash; raisim 2.2.0 documentation</title>
+  <title>Sensors &mdash; raisim 2.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b0caeef3" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=b21de401"></script>
+      <script src="../_static/documentation_options.js?v=c3c8ae58"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -50,7 +51,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Visualization.html">Visualization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Troubleshooting.html">Troubleshooting</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog: v2.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Support.html">Support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
@@ -114,6 +115,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim6Sensor20getMeasurementSourceEv"><code class="docutils literal notranslate"><span class="pre">getMeasurementSource()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim6Sensor20setMeasurementSourceE17MeasurementSource"><code class="docutils literal notranslate"><span class="pre">setMeasurementSource()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisim6Sensor10getFrameIdEv"><code class="docutils literal notranslate"><span class="pre">getFrameId()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim6Sensor18setAttachmentFrameERK3VecIXL3EEERK3MatIXL3EEXL3EEE6size_t"><code class="docutils literal notranslate"><span class="pre">setAttachmentFrame()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim6Sensor9lockMutexEv"><code class="docutils literal notranslate"><span class="pre">lockMutex()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim6Sensor11unlockMutexEv"><code class="docutils literal notranslate"><span class="pre">unlockMutex()</span></code></a></li>
 </ul>
@@ -172,6 +174,8 @@
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimEngine2.html">RaiSim Engine 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
@@ -545,21 +549,27 @@ RGB/depth sensor path when rayrai is available because it uses the same sensor
 pose and intrinsics while producing renderer-backed color and depth buffers.
 Use the CPU camera capture API only when rayrai is unavailable or when a
 CPU-only deterministic ray-query result is specifically required.</p>
-<p>Runnable examples:</p>
+<p>Current runnable coverage:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="examples/rayrai/rayrai_rgb_camera.html"><span class="doc">Rayrai RGB camera</span></a> uses the Go1
-<code class="docutils literal notranslate"><span class="pre">d455_front/color</span></code> RGB sensor and renders it through <code class="docutils literal notranslate"><span class="pre">raisin::Camera</span></code>.
-Source: <code class="docutils literal notranslate"><span class="pre">examples/src/rayrai/sensors/rayrai_rgb_camera.cpp</span></code>.</p></li>
+<code class="docutils literal notranslate"><span class="pre">d455_front/color</span></code> RGB sensor and renders it through <code class="docutils literal notranslate"><span class="pre">raisin::Camera</span></code>.</p></li>
 <li><p><a class="reference internal" href="examples/rayrai/rayrai_depth_camera.html"><span class="doc">Rayrai depth camera</span></a> uses the Go1
 <code class="docutils literal notranslate"><span class="pre">d455_front/depth</span></code> depth sensor, renders the linear depth plane, and reads
-a <code class="docutils literal notranslate"><span class="pre">float</span></code> depth buffer back to the CPU. Source:
-<code class="docutils literal notranslate"><span class="pre">examples/src/rayrai/sensors/rayrai_depth_camera.cpp</span></code>.</p></li>
+a <code class="docutils literal notranslate"><span class="pre">float</span></code> depth buffer back to the CPU.</p></li>
 <li><p><a class="reference internal" href="examples/rayrai/rayrai_lidar_pointcloud.html"><span class="doc">Rayrai LiDAR point cloud</span></a>
 shows a robot-mounted <code class="docutils literal notranslate"><span class="pre">SpinningLidar</span></code> and visualizes its scan as a rayrai
-point cloud. Source: <code class="docutils literal notranslate"><span class="pre">examples/src/rayrai/sensors/rayrai_lidar_pointcloud.cpp</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">examples/src/rayrai/getting_started/rayrai_complete_showcase.cpp</span></code> combines
-RGB, depth, LiDAR, camera frustums, and raw RGB/depth buffer previews in one
-scene.</p></li>
+point cloud.</p></li>
+<li><p><a class="reference internal" href="examples/rayrai/rayrai_aruco_marker.html"><span class="doc">Rayrai ArUco marker</span></a> covers
+marker rendering and camera-facing visual output.</p></li>
+<li><p><a class="reference internal" href="examples/rayrai/rayrai_feature_showcase.html"><span class="doc">rayrai_feature_showcase</span></a>
+renders external-camera color outputs, linear depth outputs, sensor-only
+passes, fisheye camera output, and diagnostic image files.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_benchmark</span></code> covers RGB/depth readback, picking, point clouds,
+scene synchronization, and related renderer paths under benchmark timing.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_complete_showcase_benchmark</span></code> times the complete Anymal RGB/depth and
+LiDAR showcase path, including optional readback and visualization startup.</p></li>
+<li><p>Low-level regression coverage lives under <code class="docutils literal notranslate"><span class="pre">visualizer/rayrai/tests</span></code>,
+including fisheye camera, render diagnostics, and visual-frame-cache tests.</p></li>
 </ul>
 <p>A typical RGB/depth setup has four parts: load a URDF with sensors, switch the
 camera sensors to manual measurements, create rayrai camera objects from those
@@ -633,10 +643,16 @@ to world coordinates, and display the result in rayrai.</p>
 <section id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Prefer the rayrai RGB and depth examples above for robot-attached rendered
-camera buffers.</p></li>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">rayrai_complete_showcase</span></code> when you want one scene that combines sensor
-rendering, camera frustums, raw buffer readback, and LiDAR visualization.</p></li>
+<li><p>Use the dedicated rayrai RGB, depth, LiDAR, and ArUco examples above for
+robot-attached rendered sensor buffers.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">rayrai_feature_showcase</span></code> for aggregate coverage of rendered camera
+buffers, linear depth outputs, sensor-only rendering, and diagnostic image
+generation.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">rayrai_benchmark</span></code> when you need timed coverage for readback, picking,
+point clouds, scene synchronization, and related renderer paths.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">rayrai_complete_showcase_benchmark</span></code> when you need one timed scene that
+combines Anymal RGB/depth sensors, LiDAR visualization, optional readback, and
+visualization startup profiling.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">World::captureDepthCamera</span></code> supports depth, segmentation, optional hit
 points, and timestamps without a visualizer, but it is the CPU fallback path.</p></li>
 </ul>
@@ -882,6 +898,12 @@ points, and timestamps without a visualizer, but it is the CPU fallback path.</p
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim6Sensor18setAttachmentFrameERK3VecIXL3EEERK3MatIXL3EEXL3EEE6size_t">
+<span id="_CPPv3N6raisim6Sensor18setAttachmentFrameERK3VecIXL3EEERK3MatIXL3EEXL3EEE6size_t"></span><span id="_CPPv2N6raisim6Sensor18setAttachmentFrameERK3VecIX3EERK3MatIX3EX3EE6size_t"></span><span id="raisim::Sensor::setAttachmentFrame__Vec:3:CR.Mat:3.3:CR.s"></span><span class="target" id="classraisim_1_1Sensor_1a31e7e0157240f18e09cfedfbf662d58b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setAttachmentFrame</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pos</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Mat</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rot</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">frameId</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim6Sensor18setAttachmentFrameERK3VecIXL3EEERK3MatIXL3EEXL3EEE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Attach this sensor to an existing articulated-system frame. This is primarily useful for editor or procedural scene builders that create sensors after an articulated system has already been instantiated. </p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim6Sensor9lockMutexEv">
 <span id="_CPPv3N6raisim6Sensor9lockMutexEv"></span><span id="_CPPv2N6raisim6Sensor9lockMutexEv"></span><span id="raisim::Sensor::lockMutex"></span><span class="target" id="classraisim_1_1Sensor_1a8a874e04c72912bd7c083ee7d85f323c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lockMutex</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim6Sensor9lockMutexEv" title="Link to this definition"></a><br /></dt>
 <dd><p>locks chart mutex. This can be used if you use raisim in a multi-threaded environment. </p>
@@ -1104,6 +1126,12 @@ points, and timestamps without a visualizer, but it is the CPU fallback path.</p
 </dd></dl>
 
 <dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim11DepthCamera21DepthCameraProperties4lensE">
+<span id="_CPPv3N6raisim11DepthCamera21DepthCameraProperties4lensE"></span><span id="_CPPv2N6raisim11DepthCamera21DepthCameraProperties4lensE"></span><span id="raisim::DepthCamera::DepthCameraProperties::lens__CameraLensModel"></span><span class="target" id="structraisim_1_1DepthCamera_1_1DepthCameraProperties_1ae815f458d76cbe11fc92f93a153ee5e4"></span><span class="n"><span class="pre">CameraLensModel</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lens</span></span></span><a class="headerlink" href="#_CPPv4N6raisim11DepthCamera21DepthCameraProperties4lensE" title="Link to this definition"></a><br /></dt>
+<dd><p>Renderer lens specification serialized with the sensor metadata. CPU depth rays stay pinhole. </p>
+</dd></dl>
+
+<dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim11DepthCamera21DepthCameraProperties4meanE">
 <span id="_CPPv3N6raisim11DepthCamera21DepthCameraProperties4meanE"></span><span id="_CPPv2N6raisim11DepthCamera21DepthCameraProperties4meanE"></span><span id="raisim::DepthCamera::DepthCameraProperties::mean__double"></span><span class="target" id="structraisim_1_1DepthCamera_1_1DepthCameraProperties_1a01423a44b9b3e525937f024a29575b5a"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">mean</span></span></span><a class="headerlink" href="#_CPPv4N6raisim11DepthCamera21DepthCameraProperties4meanE" title="Link to this definition"></a><br /></dt>
 <dd><p>Noise mean. </p>
@@ -1275,6 +1303,12 @@ points, and timestamps without a visualizer, but it is the CPU fallback path.</p
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9RGBCamera19RGBCameraProperties4hFOVE">
 <span id="_CPPv3N6raisim9RGBCamera19RGBCameraProperties4hFOVE"></span><span id="_CPPv2N6raisim9RGBCamera19RGBCameraProperties4hFOVE"></span><span id="raisim::RGBCamera::RGBCameraProperties::hFOV__double"></span><span class="target" id="structraisim_1_1RGBCamera_1_1RGBCameraProperties_1a427ece9c22c9338ab66a213983d60fee"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hFOV</span></span></span><a class="headerlink" href="#_CPPv4N6raisim9RGBCamera19RGBCameraProperties4hFOVE" title="Link to this definition"></a><br /></dt>
 <dd><p>Horizontal field of view in radians. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim9RGBCamera19RGBCameraProperties4lensE">
+<span id="_CPPv3N6raisim9RGBCamera19RGBCameraProperties4lensE"></span><span id="_CPPv2N6raisim9RGBCamera19RGBCameraProperties4lensE"></span><span id="raisim::RGBCamera::RGBCameraProperties::lens__CameraLensModel"></span><span class="target" id="structraisim_1_1RGBCamera_1_1RGBCameraProperties_1a5c0786147ece765947f344a49e3836d5"></span><span class="n"><span class="pre">CameraLensModel</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lens</span></span></span><a class="headerlink" href="#_CPPv4N6raisim9RGBCamera19RGBCameraProperties4lensE" title="Link to this definition"></a><br /></dt>
+<dd><p>Renderer lens specification serialized with the sensor metadata. Defaults to pinhole. </p>
 </dd></dl>
 
 <dl class="cpp var">

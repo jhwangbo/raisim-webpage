@@ -7,7 +7,7 @@ granular_media
 
 Installed executable: ``granular_media``.
 
-Run the installed executable and connect with the rayrai TCP viewer:
+Run the installed executable and connect with ``rayrai_raisim_tcp_viewer``:
 
 .. code-block:: bash
 

@@ -6,14 +6,15 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Material System &mdash; raisim 2.2.0 documentation</title>
+  <title>Material System &mdash; raisim 2.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b0caeef3" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=b21de401"></script>
+      <script src="../_static/documentation_options.js?v=c3c8ae58"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -51,7 +52,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Visualization.html">Visualization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Troubleshooting.html">Troubleshooting</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog: v2.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Support.html">Support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
@@ -70,6 +71,17 @@
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Material System</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#rolling-and-spinning-friction">Rolling and Spinning Friction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#purpose">Purpose</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#coordinate-and-shape-conventions">Coordinate and shape conventions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#model">Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#solver-behavior-and-performance">Solver behavior and performance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#choosing-coefficients">Choosing coefficients</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#c-examples">C++ examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#xml-examples">XML examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#validation">Validation</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#example-single-bodies">Example - Single Bodies</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#xml-approach">XML Approach</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#c-approach-single-bodies">C++ Approach (Single Bodies)</a></li>
@@ -101,6 +113,8 @@
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimEngine2.html">RaiSim Engine 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
@@ -133,13 +147,15 @@
   <section id="material-system">
 <h1>Material System<a class="headerlink" href="#material-system" title="Link to this heading"></a></h1>
 <p><strong>In RaiSim, material properties are defined per material pair.</strong></p>
-<p>RaiSim currently utilizes five material properties:</p>
+<p>RaiSim currently utilizes seven material properties:</p>
 <ul class="simple">
 <li><p><strong>Coefficient of friction</strong> (<span class="math notranslate nohighlight">\(\mu\ge 0\)</span>): Defines the frictional force applied between two contacting materials.</p></li>
 <li><p><strong>Coefficient of restitution</strong> (<span class="math notranslate nohighlight">\(c_r\ge 0\)</span>): Determines the elasticity of the material pair.</p></li>
 <li><p><strong>Restitution threshold</strong> (<span class="math notranslate nohighlight">\(r_{th}\ge 0\)</span>): Objects will not rebound if the impact velocity falls below this threshold.</p></li>
 <li><p><strong>Coefficient of static friction</strong> (<span class="math notranslate nohighlight">\(\mu_{s}\ge \mu\)</span>): When specified, this defines the frictional force applied during near-zero relative velocity between contact points. By default, it equals the coefficient of friction.</p></li>
 <li><p><strong>Velocity threshold for static friction</strong> (<span class="math notranslate nohighlight">\(v_s \ge 0\)</span>): Required when the coefficient of static friction is defined. If the relative velocity exceeds this value, static friction is disregarded. Otherwise, the effective coefficient of friction is interpolated between the static and dynamic coefficients.</p></li>
+<li><p><strong>Coefficient of rolling friction</strong> (<span class="math notranslate nohighlight">\(\mu_r \ge 0\)</span>): Resists rotation that rolls a finite-radius body over a contact patch. It is disabled by default.</p></li>
+<li><p><strong>Coefficient of spinning friction</strong> (<span class="math notranslate nohighlight">\(\mu_s^{spin} \ge 0\)</span>): Resists torsional rotation about the contact normal. It is disabled by default.</p></li>
 </ul>
 <p>The bounce velocity is computed as <span class="math notranslate nohighlight">\(c_{th}(v_i-c_{th})\)</span>, where <span class="math notranslate nohighlight">\(v_i\)</span> represents the impact velocity.
 The following graphs illustrate the effects of these material properties.</p>
@@ -160,6 +176,182 @@ If default properties are not explicitly set, they default to {<span class="math
 </div>
 <p>The first two arguments specify the material names, followed by the coefficient of friction, coefficient of restitution, and restitution threshold.
 The order of the material names is interchangeable.</p>
+<p>For static friction, rolling friction, and spinning friction, use the extended overload:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">world</span><span class="p">.</span><span class="n">setMaterialPairProp</span><span class="p">(</span>
+<span class="w">    </span><span class="s">&quot;rubber&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;floor&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="mf">0.9</span><span class="p">,</span><span class="w">    </span><span class="c1">// dynamic friction mu</span>
+<span class="w">    </span><span class="mf">0.0</span><span class="p">,</span><span class="w">    </span><span class="c1">// restitution</span>
+<span class="w">    </span><span class="mf">0.0</span><span class="p">,</span><span class="w">    </span><span class="c1">// restitution threshold</span>
+<span class="w">    </span><span class="mf">1.1</span><span class="p">,</span><span class="w">    </span><span class="c1">// static friction mu_static</span>
+<span class="w">    </span><span class="mf">1e-3</span><span class="p">,</span><span class="w">   </span><span class="c1">// static-friction velocity threshold</span>
+<span class="w">    </span><span class="mf">0.05</span><span class="p">,</span><span class="w">   </span><span class="c1">// rolling friction mu_r</span>
+<span class="w">    </span><span class="mf">0.02</span><span class="p">);</span><span class="w">  </span><span class="c1">// spinning friction mu_spin</span>
+</pre></div>
+</div>
+<section id="rolling-and-spinning-friction">
+<h2>Rolling and Spinning Friction<a class="headerlink" href="#rolling-and-spinning-friction" title="Link to this heading"></a></h2>
+<section id="purpose">
+<h3>Purpose<a class="headerlink" href="#purpose" title="Link to this heading"></a></h3>
+<p>Coulomb friction acts on the tangential relative velocity of the two contact
+points. It is enough to oppose sliding, but it does not model all rotational
+losses at a finite contact patch. A sphere or cylinder can therefore keep
+rolling for too long, and an object spinning in place about the contact normal
+can keep rotating even when there is no lateral slip. Rolling and spinning
+friction add bounded angular friction impulses to handle those two effects.</p>
+<p>These coefficients are per material pair, just like ordinary friction. They are
+zero by default. If both are zero, RaiSim keeps the normal contact solver path
+and does not run the extra angular-friction path for that material pair.</p>
+</section>
+<section id="coordinate-and-shape-conventions">
+<h3>Coordinate and shape conventions<a class="headerlink" href="#coordinate-and-shape-conventions" title="Link to this heading"></a></h3>
+<p>RaiSim uses a <strong>z-up</strong> world convention. For primitive cylinders, the cylinder
+axis is the body’s <strong>local z axis</strong>. A default cylinder standing on a flat ground
+plane has its cylinder axis aligned with world z. That configuration is useful
+for spinning-friction tests, but it is not a rolling cylinder. To test or model
+cylinder rolling, rotate the cylinder so its local z axis lies in the horizontal
+world x-y plane.</p>
+<p>The contact frame has its local z axis along the contact normal. Angular
+friction is solved in this contact frame:</p>
+<ul class="simple">
+<li><p>contact-frame x and y angular components are rolling components;</p></li>
+<li><p>contact-frame z angular component is the spinning component.</p></li>
+</ul>
+</section>
+<section id="model">
+<h3>Model<a class="headerlink" href="#model" title="Link to this heading"></a></h3>
+<p>For a contact with normal impulse <span class="math notranslate nohighlight">\(p_n\)</span>, effective rolling radius
+<span class="math notranslate nohighlight">\(r_e\)</span>, rolling coefficient <span class="math notranslate nohighlight">\(\mu_r\)</span>, and spinning coefficient
+<span class="math notranslate nohighlight">\(\mu_{spin}\)</span>, RaiSim computes a bounded angular impulse
+<span class="math notranslate nohighlight">\(\boldsymbol{\tau}\)</span> in the contact frame. The tangential part
+<span class="math notranslate nohighlight">\(\boldsymbol{\tau}_{xy}\)</span> opposes rolling angular velocity, and the
+normal part <span class="math notranslate nohighlight">\(\tau_z\)</span> opposes spinning angular velocity:</p>
+<div class="math notranslate nohighlight">
+\[\|\boldsymbol{\tau}_{xy}\| \le \mu_r p_n r_e\]</div>
+<div class="math notranslate nohighlight">
+\[|\tau_z| \le \mu_{spin} p_n r_e\]</div>
+<p>The contact normal impulse <span class="math notranslate nohighlight">\(p_n\)</span> is the solved normal impulse for the same
+contact during the current contact iteration. The radius <span class="math notranslate nohighlight">\(r_e\)</span> is estimated
+from the dynamic object’s contact point to center-of-mass distance. For a sphere
+on a plane this is the sphere radius. For a cylinder lying on its side it is the
+cylinder radius at the side contact. For two dynamic bodies, RaiSim averages the
+two available contact radii.</p>
+<p>The solver forms the relative angular velocity in the contact frame,
+<span class="math notranslate nohighlight">\(\boldsymbol{\omega}_{rel}\)</span>, and an angular apparent inverse inertia:</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{K}_\omega = \mathbf{R}_{c}^{T} \mathbf{I}_{A}^{-1} \mathbf{R}_{c}
+   + \mathbf{R}_{c}^{T} \mathbf{I}_{B}^{-1} \mathbf{R}_{c}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathbf{R}_c\)</span> maps contact-frame impulses to world-frame angular
+impulses, and missing/static bodies contribute zero inverse inertia. The
+unconstrained angular impulse is then</p>
+<div class="math notranslate nohighlight">
+\[\boldsymbol{\tau}^{*} = -\mathbf{K}_\omega^{-1}
+   \boldsymbol{\omega}_{rel}\]</div>
+<p>and is projected onto the rolling/spinning friction bounds above. The impulse
+increment is applied to generalized velocity inside the contact solver iteration.
+This is intentionally not a post-step damping torque: applying torques after the
+contact solve can violate the contact constraints that were just solved and can
+produce penetration or lift-off artifacts.</p>
+</section>
+<section id="solver-behavior-and-performance">
+<h3>Solver behavior and performance<a class="headerlink" href="#solver-behavior-and-performance" title="Link to this heading"></a></h3>
+<p>Rolling/spinning friction is solver-integrated but opt-in:</p>
+<ul class="simple">
+<li><p>Material pairs with <span class="math notranslate nohighlight">\(\mu_r = 0\)</span> and <span class="math notranslate nohighlight">\(\mu_{spin} = 0\)</span> use the
+standard contact path.</p></li>
+<li><p>If any active contact has nonzero rolling or spinning friction, RaiSim uses an
+extended contact-solver path for that step.</p></li>
+<li><p>The extra work is local to contacts whose material pair requests angular
+friction. It computes contact-frame angular velocity, angular apparent inertia,
+and the projected angular impulse.</p></li>
+</ul>
+<p>This keeps existing scenes fast by default while allowing higher-fidelity
+rolling and spinning decay where the material pair needs it.</p>
+</section>
+<section id="choosing-coefficients">
+<h3>Choosing coefficients<a class="headerlink" href="#choosing-coefficients" title="Link to this heading"></a></h3>
+<p>Rolling and spinning coefficients are not replacements for Coulomb friction.
+Use them for rotational losses at a contact patch:</p>
+<ul class="simple">
+<li><p>Increase <span class="math notranslate nohighlight">\(\mu_r\)</span> when balls, wheels, barrels, or side-lying cylinders
+roll for too long despite plausible sliding friction.</p></li>
+<li><p>Increase <span class="math notranslate nohighlight">\(\mu_{spin}\)</span> when objects spin in place too long about the
+contact normal.</p></li>
+<li><p>Keep both zero for contacts where rotational loss is not important or where
+speed is more important than this detail.</p></li>
+<li><p>Start with small values such as <code class="docutils literal notranslate"><span class="pre">0.01</span></code> to <code class="docutils literal notranslate"><span class="pre">0.05</span></code>. Large values can make
+rolling decay very aggressive and can increase solver coupling.</p></li>
+</ul>
+<p>The spinning-friction case can be tested independently by setting Coulomb/static
+friction to zero and setting only <code class="docutils literal notranslate"><span class="pre">spinningFriction</span></code>. The object should spin
+down without relying on lateral slip friction.</p>
+</section>
+<section id="c-examples">
+<h3>C++ examples<a class="headerlink" href="#c-examples" title="Link to this heading"></a></h3>
+<p>Sphere rolling on a z-up ground plane:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setGravity</span><span class="p">({</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">-9.81</span><span class="p">});</span>
+<span class="n">world</span><span class="p">.</span><span class="n">addGround</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ground&quot;</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setMaterialPairProp</span><span class="p">(</span>
+<span class="w">    </span><span class="s">&quot;ground&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ball&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w">    </span><span class="c1">// dynamic friction, restitution, threshold</span>
+<span class="w">    </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1e-3</span><span class="p">,</span><span class="w">        </span><span class="c1">// static friction and transition speed</span>
+<span class="w">    </span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span><span class="w">       </span><span class="c1">// rolling friction, spinning friction</span>
+
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">ball</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ball&quot;</span><span class="p">);</span>
+<span class="n">ball</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">);</span>
+<span class="n">ball</span><span class="o">-&gt;</span><span class="n">setVelocity</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">-4.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Cylinder rolling on a z-up ground plane. The cylinder local z axis is first
+rotated to world x, so angular velocity about world x rolls it along world y:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">cylinder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addCylinder</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;body&quot;</span><span class="p">);</span>
+<span class="n">cylinder</span><span class="o">-&gt;</span><span class="n">setOrientation</span><span class="p">(</span><span class="mf">0.7071067812</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.7071067812</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+<span class="n">cylinder</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.3</span><span class="p">);</span>
+<span class="n">cylinder</span><span class="o">-&gt;</span><span class="n">setVelocity</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.4</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">14.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Spinning friction without Coulomb sliding friction:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">world</span><span class="p">.</span><span class="n">setMaterialPairProp</span><span class="p">(</span>
+<span class="w">    </span><span class="s">&quot;ground&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;body&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w">    </span><span class="c1">// no Coulomb/static friction contribution</span>
+<span class="w">    </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1e-3</span><span class="p">,</span>
+<span class="w">    </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.08</span><span class="p">);</span><span class="w">       </span><span class="c1">// spinning friction only</span>
+
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">cylinder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addCylinder</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;body&quot;</span><span class="p">);</span>
+<span class="n">cylinder</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4</span><span class="p">);</span><span class="w"> </span><span class="c1">// upright cylinder on z-up ground</span>
+<span class="n">cylinder</span><span class="o">-&gt;</span><span class="n">setVelocity</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">12.0</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="xml-examples">
+<h3>XML examples<a class="headerlink" href="#xml-examples" title="Link to this heading"></a></h3>
+<p>Rolling and spinning friction can also be set on <code class="docutils literal notranslate"><span class="pre">pair_prop</span></code> entries:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;material&gt;</span>
+<span class="w">  </span><span class="nt">&lt;default</span><span class="w"> </span><span class="na">friction=</span><span class="s">&quot;0.8&quot;</span><span class="w"> </span><span class="na">restitution=</span><span class="s">&quot;0&quot;</span><span class="w"> </span><span class="na">restitution_threshold=</span><span class="s">&quot;0&quot;</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;pair_prop</span><span class="w"> </span><span class="na">name1=</span><span class="s">&quot;ground&quot;</span><span class="w"> </span><span class="na">name2=</span><span class="s">&quot;ball&quot;</span>
+<span class="w">             </span><span class="na">friction=</span><span class="s">&quot;1.0&quot;</span><span class="w"> </span><span class="na">restitution=</span><span class="s">&quot;0&quot;</span><span class="w"> </span><span class="na">restitution_threshold=</span><span class="s">&quot;0&quot;</span>
+<span class="w">             </span><span class="na">static_friction=</span><span class="s">&quot;1.0&quot;</span><span class="w"> </span><span class="na">static_friction_velocity_threshold=</span><span class="s">&quot;0.001&quot;</span>
+<span class="w">             </span><span class="na">rolling_friction=</span><span class="s">&quot;0.05&quot;</span><span class="w"> </span><span class="na">spinning_friction=</span><span class="s">&quot;0.02&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/material&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="validation">
+<h3>Validation<a class="headerlink" href="#validation" title="Link to this heading"></a></h3>
+<p>RaiSim includes a regression test for the model. It checks that:</p>
+<ul class="simple">
+<li><p>a rolling sphere stops;</p></li>
+<li><p>side-lying cylinders rolling along world x and world y stop;</p></li>
+<li><p>a sphere and upright cylinder spinning about world z stop when only spinning
+friction is enabled;</p></li>
+<li><p>all objects remain on the z-up ground plane without monotonic sinking or
+lift-off.</p></li>
+</ul>
+<p>The benchmark <code class="docutils literal notranslate"><span class="pre">rolling_spinning_friction</span></code> creates many rolling spheres and
+side-lying cylinders with high initial angular velocity and can record a video
+for visual inspection.</p>
+</section>
+</section>
 <section id="example-single-bodies">
 <h2>Example - Single Bodies<a class="headerlink" href="#example-single-bodies" title="Link to this heading"></a></h2>
 <img alt="../_images/materials.gif" src="../_images/materials.gif" />
@@ -185,7 +377,7 @@ The order of the material names is interchangeable.</p>
 <span class="w">    </span><span class="nt">&lt;/objects&gt;</span>
 <span class="w">    </span><span class="nt">&lt;material&gt;</span>
 <span class="w">        </span><span class="nt">&lt;default</span><span class="w"> </span><span class="na">friction=</span><span class="s">&quot;0.8&quot;</span><span class="w"> </span><span class="na">restitution=</span><span class="s">&quot;0&quot;</span><span class="w"> </span><span class="na">restitution_threshold=</span><span class="s">&quot;0&quot;</span><span class="nt">/&gt;</span>
-<span class="w">        </span><span class="nt">&lt;pair_prop</span><span class="w"> </span><span class="na">name1=</span><span class="s">&quot;steel&quot;</span><span class="w"> </span><span class="na">name2=</span><span class="s">&quot;steel&quot;</span><span class="w"> </span><span class="na">friction=</span><span class="s">&quot;0.8&quot;</span><span class="w"> </span><span class="na">restitution=</span><span class="s">&quot;0.95&quot;</span><span class="w"> </span><span class="na">restitution_threshold=</span><span class="s">&quot;0.001&quot;</span><span class="nt">/&gt;</span>
+<span class="w">        </span><span class="nt">&lt;pair_prop</span><span class="w"> </span><span class="na">name1=</span><span class="s">&quot;steel&quot;</span><span class="w"> </span><span class="na">name2=</span><span class="s">&quot;steel&quot;</span><span class="w"> </span><span class="na">friction=</span><span class="s">&quot;0.8&quot;</span><span class="w"> </span><span class="na">restitution=</span><span class="s">&quot;0.95&quot;</span><span class="w"> </span><span class="na">restitution_threshold=</span><span class="s">&quot;0.001&quot;</span><span class="w"> </span><span class="na">rolling_friction=</span><span class="s">&quot;0.02&quot;</span><span class="w"> </span><span class="na">spinning_friction=</span><span class="s">&quot;0.01&quot;</span><span class="nt">/&gt;</span>
 <span class="w">        </span><span class="nt">&lt;pair_prop</span><span class="w"> </span><span class="na">name1=</span><span class="s">&quot;steel&quot;</span><span class="w"> </span><span class="na">name2=</span><span class="s">&quot;rubber&quot;</span><span class="w"> </span><span class="na">friction=</span><span class="s">&quot;0.8&quot;</span><span class="w"> </span><span class="na">restitution=</span><span class="s">&quot;0.15&quot;</span><span class="w"> </span><span class="na">restitution_threshold=</span><span class="s">&quot;0.001&quot;</span><span class="nt">/&gt;</span>
 <span class="w">        </span><span class="nt">&lt;pair_prop</span><span class="w"> </span><span class="na">name1=</span><span class="s">&quot;steel&quot;</span><span class="w"> </span><span class="na">name2=</span><span class="s">&quot;copper&quot;</span><span class="w"> </span><span class="na">friction=</span><span class="s">&quot;0.8&quot;</span><span class="w"> </span><span class="na">restitution=</span><span class="s">&quot;0.65&quot;</span><span class="w"> </span><span class="na">restitution_threshold=</span><span class="s">&quot;0.001&quot;</span><span class="nt">/&gt;</span>
 <span class="w">    </span><span class="nt">&lt;/material&gt;</span>
@@ -317,6 +509,18 @@ The order of the material names is interchangeable.</p>
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim22MaterialPairProperties18v_static_speed_invE">
 <span id="_CPPv3N6raisim22MaterialPairProperties18v_static_speed_invE"></span><span id="_CPPv2N6raisim22MaterialPairProperties18v_static_speed_invE"></span><span id="raisim::MaterialPairProperties::v_static_speed_inv__double"></span><span class="target" id="structraisim_1_1MaterialPairProperties_1a3d12797248dfb9434713aca535e4e649"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">v_static_speed_inv</span></span></span><a class="headerlink" href="#_CPPv4N6raisim22MaterialPairProperties18v_static_speed_invE" title="Link to this definition"></a><br /></dt>
 <dd><p>Inverse of static friction transition speed. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim22MaterialPairProperties11c_rolling_fE">
+<span id="_CPPv3N6raisim22MaterialPairProperties11c_rolling_fE"></span><span id="_CPPv2N6raisim22MaterialPairProperties11c_rolling_fE"></span><span id="raisim::MaterialPairProperties::c_rolling_f__double"></span><span class="target" id="structraisim_1_1MaterialPairProperties_1aced24580b1575598acbc4e7b31e87e52"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">c_rolling_f</span></span></span><a class="headerlink" href="#_CPPv4N6raisim22MaterialPairProperties11c_rolling_fE" title="Link to this definition"></a><br /></dt>
+<dd><p>Rolling friction coefficient. Zero keeps the standard contact solver path. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim22MaterialPairProperties12c_spinning_fE">
+<span id="_CPPv3N6raisim22MaterialPairProperties12c_spinning_fE"></span><span id="_CPPv2N6raisim22MaterialPairProperties12c_spinning_fE"></span><span id="raisim::MaterialPairProperties::c_spinning_f__double"></span><span class="target" id="structraisim_1_1MaterialPairProperties_1a88d13e2391bd328390aa1ed0a3d523e7"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">c_spinning_f</span></span></span><a class="headerlink" href="#_CPPv4N6raisim22MaterialPairProperties12c_spinning_fE" title="Link to this definition"></a><br /></dt>
+<dd><p>Spinning friction coefficient. Zero keeps the standard contact solver path. </p>
 </dd></dl>
 
 </div>

@@ -23,7 +23,7 @@ use ``<raisim-install>/bin`` for the directory containing those executables.
 2. Run a server-based example
 =============================
 
-Start the rayrai TCP viewer in one terminal:
+Start ``rayrai_raisim_tcp_viewer`` in one terminal:
 
 .. code-block:: bash
 

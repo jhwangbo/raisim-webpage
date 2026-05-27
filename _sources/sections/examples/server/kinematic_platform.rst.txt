@@ -25,7 +25,7 @@ Run the installed executable:
    <raisim-install>/bin/kinematic_platform
 
 On Windows, run ``kinematic_platform.exe`` instead.
-This example uses RaisimServer. Start the rayrai TCP viewer and connect to port 8080. RaisimUnity and RaisimUnreal are no longer supported.
+This example uses RaisimServer. Start ``rayrai_raisim_tcp_viewer`` and connect to port 8080.
 
 
 Details

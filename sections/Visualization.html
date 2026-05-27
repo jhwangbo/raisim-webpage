@@ -6,14 +6,15 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Visualization &mdash; raisim 2.2.0 documentation</title>
+  <title>Visualization &mdash; raisim 2.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b0caeef3" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=b21de401"></script>
+      <script src="../_static/documentation_options.js?v=c3c8ae58"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -55,7 +56,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Troubleshooting.html">Troubleshooting</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog: v2.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Support.html">Support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
@@ -82,6 +83,8 @@
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimEngine2.html">RaiSim Engine 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
@@ -131,7 +134,7 @@ where rendering should happen.</p>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> + TCP viewer</p></td>
 <td><p>Your simulation should publish world state and a separate viewer should
 display it.</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code> and <code class="docutils literal notranslate"><span class="pre">rayrai_raisim_tcp_viewer</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code> and <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>In-process rayrai</p></td>
 <td><p>Your application needs direct access to OpenGL textures, RGB/depth
@@ -155,12 +158,14 @@ of the simulation process. Your application owns the world and starts a
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Start the viewer from the same source build:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/rayrai_raisim_tcp_viewer
+<p>Start the viewer from the same source build in one sourced terminal:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>./raisim_env.sh
+./build/examples/rayrai_tcp_viewer
 </pre></div>
 </div>
-<p>Then run a server-based example:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/example_anymal_contacts
+<p>Then run a server-based example in another sourced terminal:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>./raisim_env.sh
+./build/examples/primitive_grid
 </pre></div>
 </div>
 <p>The viewer connects to port <code class="docutils literal notranslate"><span class="pre">8080</span></code> by default. Use this workflow for normal
@@ -186,13 +191,14 @@ fallback is explicitly required.</p>
 </pre></div>
 </div>
 <p>Examples:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/example_rayrai_pbr_asset_inspector
-&lt;raisim-install&gt;/bin/example_polyhaven_blue_wall<span class="w"> </span>--screenshot<span class="w"> </span>/tmp/blue_wall.png
-&lt;raisim-install&gt;/bin/example_rayrai_usd_importer
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>./raisim_env.sh
+./build/examples/rayrai_basic_scene
+./build/examples/rayrai_pbr_material_grid
+./build/examples/rayrai_pbr_texture_maps
 </pre></div>
 </div>
 <p>Use this workflow for screenshots, offscreen rendering, dataset generation,
-custom ImGui/Qt tools, PBR visual inspection, glTF/USD visual import, picking,
+custom ImGui/Qt tools, PBR visual inspection, glTF visual import, picking,
 and direct RGB/depth readback.</p>
 </section>
 <section id="which-page-next">
