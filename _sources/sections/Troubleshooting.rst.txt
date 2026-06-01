@@ -78,3 +78,16 @@ Examples expect their bundled assets to stay next to the installed package. If
 an example cannot find a URDF, mesh, texture, heightmap, or USD asset, verify
 that the package ``rsc`` or asset directory was copied together with ``bin`` and
 ``lib``.
+
+OpenUSD Runtime Or Plugin Missing
+=================================
+
+USD mesh loading uses the bundled OpenUSD runtime. Keep the installed
+``openusd`` directory and USD shared libraries next to the RaiSim binaries:
+``raisim/lib/openusd`` on Linux, and ``raisim/bin/openusd`` plus the ``usd_*.dll``
+files on Windows.
+
+If an executable is launched from another directory, run the package environment
+script first so the runtime loader can find RaiSim and OpenUSD. Source builds
+fail during CMake configuration when the matching ``prebuilt/openusd`` runtime
+is missing; regenerate that prebuilt package instead of disabling USD support.

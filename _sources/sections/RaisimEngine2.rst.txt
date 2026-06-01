@@ -56,6 +56,9 @@ Godot and glTF assets are Y-up, while RaiSim/rayrai scenes are authored Z-up.
 Use the import settings for Godot/Y-up assets so Engine 2 applies the right-handed
 conversion ``p_raisim = (x_godot, -z_godot, y_godot)`` to the imported local basis.
 
+The Engine 2 on-disk format is the ``.rscene`` text file. See
+:doc:`RsceneFile` for the format specification.
+
 Command-Line Workflow
 =====================
 

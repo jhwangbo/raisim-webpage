@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Capture, diagnostics, and headless rendering &mdash; raisim 2.3.0 documentation</title>
+  <title>Capture, diagnostics, and headless rendering &mdash; raisim 2.4.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b0caeef3" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=c3c8ae58"></script>
+      <script src="../../_static/documentation_options.js?v=4d935f96"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -65,6 +65,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../LoggingSystem.html">Logging System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../WorldSystem.html">World</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RsceneFile.html">.rscene File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
@@ -88,6 +90,7 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Capture, diagnostics, and headless rendering</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#imgui-integration-sdl2-opengl">ImGui integration (SDL2 + OpenGL)</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#headless-offscreen-opengl-context">Headless/offscreen OpenGL context</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#detectability-in-camera-captures">Detectability in camera captures</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#camera-control-and-picking">Camera control and picking</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#captures-and-diagnostics">Captures and diagnostics</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#exposure-calibration-and-output-transforms">Exposure, calibration, and output transforms</a></li>
@@ -251,6 +254,32 @@ and batch image generation can run without creating ImGui state.</p>
 <code class="docutils literal notranslate"><span class="pre">docs/image_generators/</span></code> — see <code class="docutils literal notranslate"><span class="pre">doc_image_common.hpp</span></code> for a packaged
 helper that wraps the boilerplate above.</p>
 </section>
+<section id="detectability-in-camera-captures">
+<h2>Detectability in camera captures<a class="headerlink" href="#detectability-in-camera-captures" title="Link to this heading"></a></h2>
+<p>External-camera captures draw RaiSim world objects according to the usual
+object visibility rules, but they intentionally filter rayrai custom
+visualization objects. <code class="docutils literal notranslate"><span class="pre">Visuals</span></code>, <code class="docutils literal notranslate"><span class="pre">InstancedVisuals</span></code>, and <code class="docutils literal notranslate"><span class="pre">PointCloud</span></code>
+instances must be marked detectable to appear in capture paths where
+<code class="docutils literal notranslate"><span class="pre">RenderOverrides::drawVisualizationObjects</span></code> or
+<code class="docutils literal notranslate"><span class="pre">RenderOverrides::drawPointClouds</span></code> is enabled:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">prop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addVisualMesh</span><span class="p">(</span><span class="s">&quot;visible_to_camera&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/path/prop.glb&quot;</span><span class="p">,</span>
+<span class="w">                                 </span><span class="n">glm</span><span class="o">::</span><span class="n">dvec3</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">));</span>
+<span class="n">prop</span><span class="o">-&gt;</span><span class="n">setDetectable</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">RenderOverrides::drawVisualizationObjects</span></code> and
+<code class="docutils literal notranslate"><span class="pre">RenderOverrides::drawPointClouds</span></code> enable those object families for an
+external render; they do not force non-detectable debug helpers into the
+captured image. Leave overlays, camera frustums, coordinate aids, and temporary
+debug geometry non-detectable when they should remain visible only in the
+interactive viewer.</p>
+<p>Detectability is not a physics flag. It does not create collision, dynamics,
+or a semantic label, and it does not affect normal viewer visibility.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">renderWithExternalCamera</span></code> overloads that take a RaiSim <code class="docutils literal notranslate"><span class="pre">RGBCamera</span></code> or
+<code class="docutils literal notranslate"><span class="pre">DepthCamera</span></code> are stricter: they disable custom visualization objects and
+point clouds entirely, regardless of detectability. That keeps RaiSim sensor
+images limited to world geometry.</p>
+</section>
 <section id="camera-control-and-picking">
 <h2>Camera control and picking<a class="headerlink" href="#camera-control-and-picking" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> manages an internal camera for offscreen rendering.
@@ -289,6 +318,11 @@ pixel coordinates. A return value of <code class="docutils literal notranslate">
 <p>Picking renders a dedicated selection pass with a flat shader, so it is
 roughly as cheap as one MSAA-off pass of the scene. Use it on click events,
 not in the per-frame fast path.</p>
+<p>The public picking helpers do not require <code class="docutils literal notranslate"><span class="pre">setDetectable(true)</span></code> by default.
+Detectability is primarily for external-camera/capture render filtering; some
+internal render policies can request detectable-only visualization candidates,
+but ordinary click picking is not the reason to mark a custom visual
+detectable.</p>
 </section>
 <section id="captures-and-diagnostics">
 <h2>Captures and diagnostics<a class="headerlink" href="#captures-and-diagnostics" title="Link to this heading"></a></h2>

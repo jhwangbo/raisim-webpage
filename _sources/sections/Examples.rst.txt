@@ -79,24 +79,25 @@ RaisimServer application publishes.
 
 Rayrai examples
 ---------------
-Examples such as ``example_polyhaven_blue_wall``,
-``example_rayrai_pbr_asset_inspector``, and ``example_rayrai_usd_importer``
-create or use a ``raisin::RayraiWindow`` directly and render in process. They
-do not need the TCP viewer:
+Examples such as ``example_polyhaven_blue_wall`` and
+``example_rayrai_pbr_asset_inspector`` create or use a
+``raisin::RayraiWindow`` directly and render in process. They do not need the
+TCP viewer:
 
 .. code-block:: bash
 
     <raisim-install>/bin/example_rayrai_pbr_asset_inspector
 
 Prefer these examples when you need camera images, GPU/offscreen rendering, PBR
-materials, USD/glTF visual import, or standalone rayrai feature inspection.
+materials, glTF visual import, or standalone rayrai feature inspection. USD
+visual meshes can also be loaded through ``RayraiWindow::addVisualMesh``; see
+:doc:`OpenUSD` for the importer scope.
 
 Non-visual examples
 -------------------
 Some examples are intended to print output or create files rather than show a
 window. ``example_model_asset_pipeline`` writes preprocessed and exported OBJ
-files to ``/tmp/raisim_model_asset_pipeline_example``. ``example_usd_importer``
-loads OpenUSD mesh assets into a ``raisim::World`` and prints mesh counts.
+files to ``/tmp/raisim_model_asset_pipeline_example``.
 
 Example layout
 ==============
@@ -135,11 +136,12 @@ Start with these targets when learning a specific feature:
    * - ``example_model_asset_pipeline``
      - Mesh preprocessing, content-hash cache reuse, ``addMesh`` with processed
        assets, and OBJ export from a world.
-   * - ``example_usd_importer``
-     - Loading OpenUSD mesh assets into ``raisim::World`` through
-       ``World::addMesh``.
-   * - ``example_rayrai_usd_importer``
-     - Loading the same OpenUSD assets as rayrai visual meshes.
+   * - ``shadow_hand_usd_cube``
+     - Loading an OpenUSD ShadowHand scene through ``World(shadow_hand.usd)``
+       with a textured cube visual and publishing it through ``RaisimServer``.
+   * - ``nvidia_usd_robots``
+     - Loading vetted NVIDIA Isaac Sim robot USD scenes through the ``World``
+       constructor and publishing them through ``RaisimServer``.
    * - ``example_polyhaven_blue_wall``
      - Importing a Poly Haven glTF scene with HDR IBL, imported lights,
        reflection probes, and screenshot command-line options.
@@ -164,11 +166,14 @@ Start with these targets when learning a specific feature:
    * - ``rayrai_raisim_tcp_viewer``
      - The TCP visualizer used by RaisimServer examples.
 
-Optional targets
-================
-Some targets depend on optional assets or platform packages:
+Runtime assets
+==============
+Some targets depend on bundled assets or platform runtime packages:
 
-* OpenUSD examples require the package's OpenUSD runtime and bundled USD files.
+* OpenUSD loading uses the package's bundled OpenUSD runtime and USD files; keep
+  the ``openusd`` runtime directory and ``rsc`` assets with the installed
+  package. OpenUSD examples are skipped by CMake only when the selected RaiSim
+  package is too old to expose USD scene loading.
 * Rayrai examples require SDL2/OpenGL and rayrai runtime libraries.
 * Poly Haven and PBR asset examples require the corresponding assets under
   ``rsc``.
@@ -187,8 +192,6 @@ Current Package Examples
 
    examples/current/example_anymal_contacts
    examples/current/example_atlas_contacts
-   examples/current/example_model_asset_pipeline
-   examples/current/example_usd_importer
    examples/current/granular_media
 
 Benchmark Examples
@@ -211,9 +214,6 @@ Rayrai Tools And Examples
    examples/current/rayrai_benchmark
    examples/current/rayrai_complete_showcase_benchmark
    examples/current/rayrai_pbr_first_draw_benchmark
-   examples/current/example_rayrai_pbr_asset_inspector
-   examples/current/example_rayrai_usd_importer
-   examples/current/example_polyhaven_blue_wall
    examples/rayrai/rayrai_basic_scene
    examples/rayrai/rayrai_complete_showcase
    examples/rayrai/rayrai_blender_scene_import
@@ -259,6 +259,7 @@ Server Examples
    examples/server/mjcf_gymnasium_humanoid
    examples/server/mjcf_gymnasium_walker2d
    examples/server/model_asset_pipeline
+   examples/server/nvidia_usd_robots
    examples/server/object_lifecycle_stress
    examples/server/primitive_grid
    examples/server/procedural_heightmap
@@ -266,6 +267,7 @@ Server Examples
    examples/server/ray_scan_lidar
    examples/server/sphere_drop
    examples/server/spring_damper_joints
+   examples/server/shadow_hand_usd_cube
    examples/server/templated_tracked_robot
    examples/server/visual_objects_showcase
    examples/server/wheeled_robot_force_control

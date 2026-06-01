@@ -32,5 +32,7 @@ Details
 =======
 - Creates custom visuals (sphere/box/cylinder/capsule/mesh) outside the physics world.
 - Animates visual positions and orientations each frame.
-- Demonstrates detectability for picking (``setDetectable(true)``).
-
+- Demonstrates ``setDetectable(true)`` for custom visuals that should appear in
+  external-camera and other detectable-only capture render passes.
+  Detectability is render filtering metadata; it does not add physics,
+  collision, or a RaiSim object.

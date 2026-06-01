@@ -84,7 +84,7 @@ The protocol constants live in ``rayrai/RaisimTcpCommon.hpp`` (namespace
   the viewer to disconnect with a versioned-protocol error.
 * ``kProtocolFeatureExplicitHeader``, ``kProtocolFeatureDeformableDelta``,
   and ``kProtocolFeatureSimControl`` — the currently-negotiated feature bits;
-  ``kProtocolFeaturesSupported`` is the OR of all bits this build understands.
+  ``kProtocolSupportedFeatures`` is the OR of all bits this build understands.
 * ``kMaxMessageBytes`` — maximum accepted message size (default 64 MiB),
   overridable at build time via the
   ``RAISIM_TCP_VIEWER_MAX_MESSAGE_BYTES`` preprocessor define when very large

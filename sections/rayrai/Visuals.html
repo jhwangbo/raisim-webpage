@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Custom visuals, instancing, and scene helpers &mdash; raisim 2.3.0 documentation</title>
+  <title>Custom visuals, instancing, and scene helpers &mdash; raisim 2.4.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b0caeef3" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=c3c8ae58"></script>
+      <script src="../../_static/documentation_options.js?v=4d935f96"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -65,6 +65,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../LoggingSystem.html">Logging System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../WorldSystem.html">World</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RsceneFile.html">.rscene File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
@@ -86,6 +88,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#coacd-mesh-approximation-visualization">CoACD mesh approximation visualization</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#custom-visuals-and-instancing">Custom visuals and instancing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#detectability-and-capture-render-passes">Detectability and capture render passes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#visual-shadow-casting-visibility-range-and-material-overrides">Visual shadow casting, visibility range, and material overrides</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#point-clouds-and-coordinate-frames">Point clouds and coordinate frames</a></li>
 </ul>
@@ -224,8 +227,8 @@ showcase with optional readback, visualization startup, and startup profiling.</
 for full PBR and core-eligible PBR material paths.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">example_rayrai_pbr_asset_inspector</span></code>: bundled glTF PBR sample assets under
 rayrai quality settings.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">example_rayrai_usd_importer</span></code>: OpenUSD visual mesh loading in an offscreen
-rayrai context.</p></li>
+<li><p>OpenUSD visual meshes can be loaded through <code class="docutils literal notranslate"><span class="pre">RayraiWindow::addVisualMesh</span></code>;
+see <a class="reference internal" href="../OpenUSD.html"><span class="doc">OpenUSD Loading</span></a> for importer scope and runtime layout.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">example_polyhaven_blue_wall</span></code>: Poly Haven glTF scene import with imported
 lights, HDR IBL, optional reflection probes, and screenshots.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">raisim_engine2_editor</span></code>: source-tree authoring editor that uses rayrai as
@@ -280,6 +283,57 @@ and deformables. Use <code class="docutils literal notranslate"><span class="pre
 programmatically deformed visual needs a tighter or more stable bound than its
 source mesh provides.</p>
 </section>
+<section id="detectability-and-capture-render-passes">
+<h2>Detectability and capture render passes<a class="headerlink" href="#detectability-and-capture-render-passes" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">VisualCategory</span></code> is a render-filter category for user-created visuals, not a
+physics or collision concept. <code class="docutils literal notranslate"><span class="pre">Visuals</span></code>, <code class="docutils literal notranslate"><span class="pre">InstancedVisuals</span></code>, <code class="docutils literal notranslate"><span class="pre">PointCloud</span></code>,
+and helpers built on top of <code class="docutils literal notranslate"><span class="pre">Visuals</span></code> default to
+<code class="docutils literal notranslate"><span class="pre">VisualCategory::NotDetectable</span></code>. The normal interactive viewer still draws
+non-detectable objects, which is intentional: debug axes, camera frustums,
+selection helpers, labels, temporary probes, and other viewer-only geometry can
+be visible to a human operator without contaminating external-camera or
+generated capture images.</p>
+<p>External camera scene-color renders filter custom visualization objects by this
+category. When a pass requests detectable-only visualization objects,
+<code class="docutils literal notranslate"><span class="pre">Visuals</span></code> and <code class="docutils literal notranslate"><span class="pre">InstancedVisuals</span></code> are included only after
+<code class="docutils literal notranslate"><span class="pre">setDetectable(true)</span></code> or
+<code class="docutils literal notranslate"><span class="pre">setCategory(VisualCategory::Detectable)</span></code>. Point clouds follow the same rule
+in passes that request detectable-only point clouds. Reflection-probe captures
+and supersampled documentation captures use the same external-camera machinery,
+so custom helper geometry that should appear there must also be marked
+detectable.</p>
+<p>The RaiSim <code class="docutils literal notranslate"><span class="pre">RGBCamera</span></code> and <code class="docutils literal notranslate"><span class="pre">DepthCamera</span></code> overloads intentionally disable
+rayrai custom visualization objects and point clouds, regardless of
+detectability. Use detectability for external-camera/capture paths where
+<code class="docutils literal notranslate"><span class="pre">RenderOverrides::drawVisualizationObjects</span></code> or
+<code class="docutils literal notranslate"><span class="pre">RenderOverrides::drawPointClouds</span></code> is enabled.</p>
+<p>Detectability does not create a RaiSim object, collision shape, dynamics body,
+semantic label, or material id. RaiSim world objects are controlled by their
+own wrappers and render-pass visibility rules; <code class="docutils literal notranslate"><span class="pre">VisualCategory</span></code> only applies
+to rayrai-created visualization objects and point clouds.</p>
+<p>Use this rule of thumb:</p>
+<ul class="simple">
+<li><p>call <code class="docutils literal notranslate"><span class="pre">setDetectable(true)</span></code> for custom props, targets, imported meshes, or
+point clouds that should appear in external camera, reflection-probe,
+or documentation captures;</p></li>
+<li><p>leave debug-only helpers non-detectable so they remain visible in the viewer
+but are skipped by detectable-only capture passes;</p></li>
+<li><p>use <code class="docutils literal notranslate"><span class="pre">RenderOverrides::drawVisualizationObjects</span></code> and
+<code class="docutils literal notranslate"><span class="pre">RenderOverrides::drawPointClouds</span></code> to enable those object families in an
+external render, but remember that those toggles still respect detectability
+filtering for custom visuals and point clouds.</p></li>
+</ul>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addVisualSphere</span><span class="p">(</span><span class="s">&quot;camera_target&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">0.08</span><span class="p">,</span>
+<span class="w">                                     </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.2f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">);</span>
+<span class="n">target</span><span class="o">-&gt;</span><span class="n">setDetectable</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span><span class="w">   </span><span class="c1">// Included in external-camera captures.</span>
+
+<span class="k">auto</span><span class="w"> </span><span class="n">axisHelper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addVisualBox</span><span class="p">(</span><span class="s">&quot;debug_axis&quot;</span><span class="p">,</span>
+<span class="w">                                      </span><span class="mf">0.02</span><span class="p">,</span><span class="w"> </span><span class="mf">0.02</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span>
+<span class="w">                                      </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.1f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">));</span>
+<span class="n">axisHelper</span><span class="o">-&gt;</span><span class="n">setDetectable</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span><span class="w"> </span><span class="c1">// Viewer helper; skipped by captures.</span>
+</pre></div>
+</div>
+</section>
 <section id="visual-shadow-casting-visibility-range-and-material-overrides">
 <h2>Visual shadow casting, visibility range, and material overrides<a class="headerlink" href="#visual-shadow-casting-visibility-range-and-material-overrides" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">raisin::Visuals</span></code> exposes per-visual controls that go beyond position/colour
@@ -302,8 +356,10 @@ material slot by name without touching the rest.</p></li>
 material (selection outlines, x-ray decals, ghost previews).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">setTwoSided</span></code> / <code class="docutils literal notranslate"><span class="pre">setFlatShading</span></code> / <code class="docutils literal notranslate"><span class="pre">setUseMeshColor</span></code> — quick toggles
 for inspection visuals.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">setCategory</span></code> / <code class="docutils literal notranslate"><span class="pre">setDetectable</span></code> — assign a <code class="docutils literal notranslate"><span class="pre">VisualCategory</span></code> and toggle
-inclusion in RaiSim sensor passes (off by default for viewer-only helpers).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setCategory</span></code> / <code class="docutils literal notranslate"><span class="pre">setDetectable</span></code> — assign the <code class="docutils literal notranslate"><span class="pre">VisualCategory</span></code> used by
+detectable-only external-camera, reflection-probe, documentation-capture, and
+point-cloud render filters. It is render metadata only, not physics or
+collision state.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">setPbrEnvironment(envMap,</span> <span class="pre">brdfLut)</span></code> / <code class="docutils literal notranslate"><span class="pre">setPbrEnvironment(envMap,</span>
 <span class="pre">irradianceMap,</span> <span class="pre">prefilteredMap,</span> <span class="pre">brdfLut,</span> <span class="pre">intensity)</span></code> — attach an HDR
 environment to a single visual when global IBL is not appropriate.</p></li>

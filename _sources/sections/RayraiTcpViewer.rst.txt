@@ -43,7 +43,24 @@ Quick start
    under the **Control** tab.
 
 Run ``rayrai_raisim_tcp_viewer --help`` for the full option list. On Windows
-use the ``.exe`` binary.
+use the ``.exe`` binary; the same TCP client and discovery paths are supported
+on Windows, Linux, and macOS.
+
+Server discovery
+================
+While running, ``RaisimServer`` sends a UDP discovery beacon once per second to
+port ``59312``. With the default loopback bind, the beacon is sent to
+``127.0.0.1``. After ``server.setBindLoopbackOnly(false)``, the beacon is
+broadcast on the local network.
+
+The viewer listens on the same UDP port, keeps compatible protocol-version
+beacons in the **Control** tab endpoint dropdown, and removes stale entries
+after roughly eight seconds without another beacon. Discovery only fills the
+endpoint list; direct ``--connect host:port`` and manually typed endpoints
+still work when UDP broadcast is blocked.
+
+For cross-machine connections on Windows, allow both the TCP server port
+(default ``8080``) and UDP discovery port ``59312`` through the firewall.
 
 Command-line options
 ====================
@@ -137,8 +154,10 @@ Control tab — widget reference
 
 **Connection row.**
 
-* **Host / port field** — type ``host:port`` directly, or pick a recent
-  entry from the dropdown chevron. Persisted in
+* **Host / port field** — type ``host:port`` directly, or pick a recent or
+  discovered entry from the dropdown chevron. Compatible ``RaisimServer``
+  beacons include host, executable, bind mode, and connection status; newer
+  incompatible protocol versions are filtered out. Persisted in
   ``$XDG_CONFIG_HOME/raisim/rayrai_tcp_viewer.json``.
 * **Connect / Disconnect** button — toggles the TCP socket. Greyed out
   while a session is replaying (``--replay-session``).
@@ -177,7 +196,7 @@ Control tab — widget reference
 **Simulation row.** Only enabled when the server has negotiated
 ``PROTOCOL_FEATURE_SIM_CONTROL``. The viewer greys the icons out
 automatically against a legacy ``RaisimServer`` build; see
-``TcpClient::serverSupportsSimControl()`` for the same flag from the client
+``RemoteScene::serverSupportsSimControl()`` for the same flag from the client
 side.
 
 * **Pause / Resume** (orange ⏸ when running, green ▶ when paused) — sends
@@ -492,7 +511,7 @@ The protocol constants live in ``rayrai/RaisimTcpCommon.hpp`` (namespace
   the viewer to disconnect with a versioned-protocol error.
 * ``kProtocolFeatureExplicitHeader``, ``kProtocolFeatureDeformableDelta``,
   and ``kProtocolFeatureSimControl`` — the currently-negotiated feature bits;
-  ``kProtocolFeaturesSupported`` is the OR of all bits this build understands.
+  ``kProtocolSupportedFeatures`` is the OR of all bits this build understands.
 * ``kMaxMessageBytes`` — maximum accepted message size (default 64 MiB),
   overridable at build time via the
   ``RAISIM_TCP_VIEWER_MAX_MESSAGE_BYTES`` preprocessor define when very large
@@ -672,7 +691,7 @@ After connecting, the first server frame carries the negotiated feature
 bits. A custom client should AND those bits with ``kProtocolFeatureSimControl``
 once at startup, and grey out sim-control surfaces if the bit is not set —
 exactly what ``rayrai_raisim_tcp_viewer`` does internally via
-``TcpClient::serverSupportsSimControl()``.
+``RemoteScene::serverSupportsSimControl()``.
 
 See also
 ========

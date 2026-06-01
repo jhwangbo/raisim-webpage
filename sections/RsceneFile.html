@@ -1,0 +1,1308 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>.rscene File &mdash; raisim 2.4.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b0caeef3" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=4d935f96"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="OpenUSD Loading" href="OpenUSD.html" />
+    <link rel="prev" title="World Configuration File" href="WorldConfigurationFile.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">.rscene File</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#rscene-vs-the-world-configuration-xml">.rscene vs. the World Configuration XML</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#file-layout-and-lexical-rules">File Layout And Lexical Rules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#comments-and-blank-lines">Comments And Blank Lines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#token-encoding">Token Encoding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#numbers-booleans-and-packed-values">Numbers, Booleans, And Packed Values</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#record-anatomy">Record Anatomy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mandatory-header-and-version">Mandatory Header And Version</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#section-order">Section Order</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#identity-model">Identity Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#whole-scene-records">Whole-Scene Records</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#raisim-engine-scene">raisim_engine_scene</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#time-step">time_step</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gravity">gravity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#solver">solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#asset-root">asset_root</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#snapping">snapping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scene-graph-prefab-override">scene_graph, prefab_override</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#editor-ux">editor_ux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#render-bake">render_bake</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#environment">environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#weather">weather</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rayrai-render">rayrai_render</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#resources">Resources</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#material">material</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#contact-material">contact_material</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#terrain-texture">terrain_texture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#asset">asset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#articulated-resource">articulated_resource</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#scene-tree-containers">Scene Tree Containers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#group">group</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#bodies-and-constraints">Bodies And Constraints</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#light">light</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#camera">camera</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#object">object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compound-compound-child">compound, compound_child</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#deformable">deformable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#granular">granular</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#articulated-articulated-ik">articulated, articulated_ik</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#wire">wire</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#terrain">Terrain</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#terrain-region">terrain_region</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#terrain-splat-layer-terrain-foliage-layer">terrain_splat_layer, terrain_foliage_layer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#sensors-and-visual-aids">Sensors And Visual Aids</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#sensor">sensor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reflection-probe">reflection_probe</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#local-fog">local_fog</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#projected-decal">projected_decal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#irradiance-volume">irradiance_volume</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#point-cloud">point_cloud</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#instanced-visual">instanced_visual</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#a-minimal-example-top-to-bottom">A Minimal Example, Top To Bottom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#loading-and-saving-programmatically">Loading And Saving Programmatically</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#relationship-to-projects-and-scripts">Relationship To Projects And Scripts</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">.rscene File</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rscene-file">
+<h1>.rscene File<a class="headerlink" href="#rscene-file" title="Link to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">.rscene</span></code> is the on-disk text format used by <a class="reference internal" href="RaisimEngine2.html"><span class="doc">RaiSim Engine 2</span></a> to save and
+load scenes. It is the canonical serialization of an Engine 2 <code class="docutils literal notranslate"><span class="pre">Scene</span></code>: every
+authoring resource the editor can manipulate — physics settings, the <code class="docutils literal notranslate"><span class="pre">/World</span></code>
+scene tree, materials, lights, cameras, objects, articulated systems, terrain
+regions, sensors, decals, constraints, render-bake settings, and so on — is
+round-tripped through it. The format is plain text, line-oriented, and diffs
+cleanly under version control.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">.rscene</span></code> does <strong>not</strong> replace <a class="reference internal" href="WorldConfigurationFile.html"><span class="doc">the World Configuration XML</span></a>. The two formats are intended for different
+workflows and both stay supported going forward:</p>
+<ul class="simple">
+<li><p>The XML world configuration file is the <strong>human-editing</strong> format.
+It is hand-written, supports <code class="docutils literal notranslate"><span class="pre">include</span></code>, <code class="docutils literal notranslate"><span class="pre">params</span></code>, <code class="docutils literal notranslate"><span class="pre">array</span></code> loops,
+and <code class="docutils literal notranslate"><span class="pre">{...}</span></code> expressions for parametric/templated worlds, and stays
+compact because it only describes the physics side.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.rscene</span></code> is the <strong>Engine 2</strong> format. It is produced and consumed by
+<code class="docutils literal notranslate"><span class="pre">raisim_engine2</span></code> (the editor and the <code class="docutils literal notranslate"><span class="pre">.re2</span></code> scripting layer), and
+stores the full authoring document — the same physics records as XML
+<strong>plus much richer visualization and editor state</strong>: lights, cameras,
+environment, weather, reflection probes, decals, irradiance volumes,
+sensors, terrain layers, instanced visuals, render-quality presets,
+groups, snapping, prefab overrides, and so on.</p></li>
+</ul>
+<p>Pick the XML world configuration file when you are writing scenes by
+hand or generating them with templates. Pick <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> when you are
+working through the Engine 2 editor or want the visualization,
+lighting, and sensor metadata to round-trip with the scene.</p>
+</div>
+<a class="reference internal image-reference" href="../_images/rayrai_rscene_warehouse.png"><img alt="Three safety-orange crates on a grey pallet under a warm spot light and a cool indirect fill, rendered from a warehouse-style .rscene" src="../_images/rayrai_rscene_warehouse.png" style="width: 100%;" />
+</a>
+<p>The image above is what the warehouse-style <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> example used
+throughout this page looks like once instantiated: a ground with a grey
+<code class="docutils literal notranslate"><span class="pre">mat_floor</span></code> material, two stacked crates and a smaller one in
+safety-orange <code class="docutils literal notranslate"><span class="pre">mat_safety</span></code>, a warm spot <code class="docutils literal notranslate"><span class="pre">light</span></code> as the key, a cool fill
+point <code class="docutils literal notranslate"><span class="pre">light</span></code>, and the procedural <code class="docutils literal notranslate"><span class="pre">rayrai_sky</span></code> background from the
+<code class="docutils literal notranslate"><span class="pre">environment</span></code> + <code class="docutils literal notranslate"><span class="pre">weather</span></code> records.</p>
+<section id="rscene-vs-the-world-configuration-xml">
+<h2>.rscene vs. the World Configuration XML<a class="headerlink" href="#rscene-vs-the-world-configuration-xml" title="Link to this heading"></a></h2>
+<p>RaiSim ships two text formats for describing scenes, and they coexist by
+design:</p>
+<ul class="simple">
+<li><p>The <strong>XML world configuration file</strong> is the hand-edited format used
+directly with <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code>. It is small, parametric, and ideal when
+a human is writing or templating a scene.</p></li>
+<li><p>The <strong>.rscene file</strong> is the Engine 2 format produced by the editor and
+<code class="docutils literal notranslate"><span class="pre">.re2</span></code> scripts. It stores the same physics description plus the
+visualization and editor state that the editor needs to round-trip.</p></li>
+</ul>
+<p>The table below maps how the two formats overlap and where <code class="docutils literal notranslate"><span class="pre">.rscene</span></code>
+adds capability that the XML format intentionally does not carry.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 18.0%" />
+<col style="width: 41.0%" />
+<col style="width: 41.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>World Configuration XML (<code class="docutils literal notranslate"><span class="pre">.xml</span></code>)</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">.rscene</span></code></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Reader / writer</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> (<code class="docutils literal notranslate"><span class="pre">World.loadFromXmlFile</span></code> and the XML save path).
+See <a class="reference internal" href="WorldConfigurationFile.html"><span class="doc">World Configuration File</span></a>.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">raisim_engine2::loadRsceneFile</span></code> / <code class="docutils literal notranslate"><span class="pre">saveRsceneFile</span></code> in
+<code class="docutils literal notranslate"><span class="pre">raisim_engine2/RSceneIO.hpp</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Scope</p></td>
+<td><p>Pure physics world: gravity, time step, materials, bodies, constraints,
+and articulated systems. No rendering, lighting, or editor state.</p></td>
+<td><p>Full authoring document: physics <strong>plus</strong> the rendering scene (lights,
+cameras, environment, weather, decals, probes, terrain layers, sensors,
+point clouds, instanced visuals) <strong>plus</strong> editor state (selection,
+snapping, prefab overrides, folder groups).</p></td>
+</tr>
+<tr class="row-even"><td><p>Hierarchy</p></td>
+<td><p>XML tree (<code class="docutils literal notranslate"><span class="pre">raisim</span></code> ▸ <code class="docutils literal notranslate"><span class="pre">objects</span></code> ▸ <code class="docutils literal notranslate"><span class="pre">sphere</span></code> / <code class="docutils literal notranslate"><span class="pre">box</span></code> / …).</p></td>
+<td><p>Flat record-per-line stream; tree structure is recovered from
+<code class="docutils literal notranslate"><span class="pre">/World/...</span></code> paths and <code class="docutils literal notranslate"><span class="pre">parentGroupId</span></code> references.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Authoring style</p></td>
+<td><p>Hand-written XML, with templates, <code class="docutils literal notranslate"><span class="pre">include</span></code>, <code class="docutils literal notranslate"><span class="pre">params</span></code>, <code class="docutils literal notranslate"><span class="pre">array</span></code>
+loops, and <code class="docutils literal notranslate"><span class="pre">{...}</span></code> expressions for parametric worlds.</p></td>
+<td><p>Produced by the Engine 2 editor or by <code class="docutils literal notranslate"><span class="pre">.re2</span></code> scripts. Plain text and
+diff-friendly, but normally machine-written rather than typed by hand.</p></td>
+</tr>
+<tr class="row-even"><td><p>Round-trip with the editor</p></td>
+<td><p>One-way: an XML file can be loaded into <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code>, but it
+was never meant to capture lights, cameras, or editor state.</p></td>
+<td><p>Round-trip: open in <code class="docutils literal notranslate"><span class="pre">raisim_engine2_editor</span></code>, modify, save back to the
+same file byte-stable for unchanged content.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Runtime use</p></td>
+<td><p>Loaded directly by the physics engine in production simulations and RL
+training (see <a class="reference internal" href="RaisimGymTorch.html"><span class="doc">RaisimGymTorch</span></a>).</p></td>
+<td><p>Loaded by Engine 2, then instantiated into a <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> through
+<code class="docutils literal notranslate"><span class="pre">raisim_engine2::RaisimBridge</span></code> and applied to a <code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> via
+<code class="docutils literal notranslate"><span class="pre">raisim_engine2::RayraiBridge</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p>When to use</p></td>
+<td><p>You are writing the scene by hand, templating physics worlds, or
+wiring up a physics-only simulation / RL environment.</p></td>
+<td><p>You are working through the Engine 2 editor or want the
+visualization, sensors, and render settings to round-trip with the
+scene.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The two formats are not interchangeable: Engine 2 does not currently emit
+<code class="docutils literal notranslate"><span class="pre">.xml</span></code>, and the XML reader does not consume <code class="docutils literal notranslate"><span class="pre">.rscene</span></code>. They are
+complementary surfaces for the same underlying physics world — hand-editable
+on one side, editor-driven on the other.</p>
+</section>
+<section id="file-layout-and-lexical-rules">
+<h2>File Layout And Lexical Rules<a class="headerlink" href="#file-layout-and-lexical-rules" title="Link to this heading"></a></h2>
+<p>A <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> file is a sequence of newline-separated <strong>records</strong>. The first
+non-blank, non-comment record must be the version header; every subsequent
+record describes one scene resource or one tree node.</p>
+<section id="comments-and-blank-lines">
+<h3>Comments And Blank Lines<a class="headerlink" href="#comments-and-blank-lines" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Lines whose first character is <code class="docutils literal notranslate"><span class="pre">#</span></code> are comments and are ignored by the
+loader.</p></li>
+<li><p>Blank lines are ignored.</p></li>
+<li><p>The trailing <code class="docutils literal notranslate"><span class="pre">\r</span></code> of a CRLF line ending is stripped, so files written on
+Windows load identically.</p></li>
+</ul>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span># warehouse_scene.rscene
+# Authored 2026-05-31 by /home/jemin
+raisim_engine_scene 1
+time_step 0.0025
+</pre></div>
+</div>
+</section>
+<section id="token-encoding">
+<h3>Token Encoding<a class="headerlink" href="#token-encoding" title="Link to this heading"></a></h3>
+<p>Tokens within a line are separated by spaces or tabs. There is no quoting
+mechanism. Instead, any byte that is a control character, space, <code class="docutils literal notranslate"><span class="pre">%</span></code> or
+<code class="docutils literal notranslate"><span class="pre">=</span></code> is percent-encoded as <code class="docutils literal notranslate"><span class="pre">%HH</span></code> (uppercase two-digit hex) when the saver
+writes it, and the loader decodes it on the way back in. Bare <code class="docutils literal notranslate"><span class="pre">-</span></code> is the
+canonical encoding of the empty string.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span># &quot;A label with spaces&quot; → &quot;A%20label%20with%20spaces&quot;
+asset A%20label%20with%20spaces mesh meshes/crate.obj id=crate_a ...
+# An empty optional path is written as a single dash:
+material engine_default 0.55 0.62 0.72 1 0 0.55 0 0 0 0 false - - - - - - id=engine_default ...
+</pre></div>
+</div>
+</section>
+<section id="numbers-booleans-and-packed-values">
+<h3>Numbers, Booleans, And Packed Values<a class="headerlink" href="#numbers-booleans-and-packed-values" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Numbers</strong> are serialized with <code class="docutils literal notranslate"><span class="pre">std::to_chars</span></code> so doubles round-trip
+exactly; the loader parses with <code class="docutils literal notranslate"><span class="pre">std::from_chars</span></code>. Both decimal and
+scientific notation are accepted.</p></li>
+<li><p><strong>Booleans</strong> accept <code class="docutils literal notranslate"><span class="pre">true</span></code> / <code class="docutils literal notranslate"><span class="pre">1</span></code> / <code class="docutils literal notranslate"><span class="pre">yes</span></code> / <code class="docutils literal notranslate"><span class="pre">on</span></code> and <code class="docutils literal notranslate"><span class="pre">false</span></code> /
+<code class="docutils literal notranslate"><span class="pre">0</span></code> / <code class="docutils literal notranslate"><span class="pre">no</span></code> / <code class="docutils literal notranslate"><span class="pre">off</span></code>. The saver always emits <code class="docutils literal notranslate"><span class="pre">true</span></code> / <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p></li>
+<li><p><strong>Vec2 / Vec3</strong> are packed as comma-separated CSV inside a single token:
+<code class="docutils literal notranslate"><span class="pre">broadphaseWorldMin=-100,-100,-100</span></code>, <code class="docutils literal notranslate"><span class="pre">uvScale=2,1</span></code>.</p></li>
+<li><p><strong>Quat</strong> uses <code class="docutils literal notranslate"><span class="pre">w,x,y,z</span></code> ordering: <code class="docutils literal notranslate"><span class="pre">quat=1,0,0,0</span></code> is identity.</p></li>
+<li><p><strong>Color</strong> is <code class="docutils literal notranslate"><span class="pre">r,g,b</span></code> (three components) or <code class="docutils literal notranslate"><span class="pre">r,g,b,a</span></code> (four components);
+the loader accepts either.</p></li>
+<li><p><strong>Lists of structs</strong> use <code class="docutils literal notranslate"><span class="pre">;</span></code> between elements and <code class="docutils literal notranslate"><span class="pre">,</span></code> between fields.
+<code class="docutils literal notranslate"><span class="pre">Transform</span></code> lists pack 10 numbers per entry (position, quaternion, scale).
+<code class="docutils literal notranslate"><span class="pre">Vec3</span></code> lists pack 3 per entry. Quaternions in transform lists are
+re-normalised on load.</p></li>
+<li><p><strong>Dense scalar arrays</strong> (heightmaps, vertex colors, splat weights, pinned
+vertices) are plain comma-separated CSV — they have only one level of
+delimiter, <code class="docutils literal notranslate"><span class="pre">,</span></code>.</p></li>
+<li><p><strong>String lists</strong> (module lists, material remaps, selection filters) are
+<code class="docutils literal notranslate"><span class="pre">;</span></code>-separated lists where each element is itself a percent-encoded token.</p></li>
+</ul>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span># Vec3 inside one token:
+gravity 0 0 -9.81                        # three positional tokens
+broadphaseWorldMin=-100,-100,-100        # CSV-packed Vec3 as a key=value
+
+# Quaternion field on a `light` record:
+quat=1,0,0,0
+
+# Color with and without alpha:
+color=0.66,0.78,0.96         # rgb
+color=0.66,0.78,0.96,1       # rgba
+
+# Transform list (instanced_visual): two instances:
+instances=1.0,0.0,0.0,1,0,0,0,1,1,1;3.0,0.5,0.0,1,0,0,0,1,1,1
+</pre></div>
+</div>
+</section>
+<section id="record-anatomy">
+<h3>Record Anatomy<a class="headerlink" href="#record-anatomy" title="Link to this heading"></a></h3>
+<p>Each non-comment line is one record:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt;tag&gt; &lt;positional_1&gt; &lt;positional_2&gt; ... &lt;key=value&gt;=... &lt;key=value&gt;=...
+</pre></div>
+</div>
+<p>The first token is the <strong>tag</strong> (record kind). Subsequent tokens are either
+<strong>positional</strong> (parsed by index — the saver always writes the same number in
+the same order) or <strong>key=value pairs</strong> parsed by name. The loader reads the
+positional fields by index, then scans the rest for any <code class="docutils literal notranslate"><span class="pre">=</span></code>-bearing tokens
+and looks them up by name. <strong>Unknown keys are silently ignored</strong>, which is
+what makes the format forward-compatible: a newer writer can add fields that
+older readers will drop on load without erroring.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>object /World/Props/CrateA box -0.6 0.2 0.6 0.998 0 0 0.0698 0.7 0.5 0.45 0.5 1 2.5 default mat_safety false true false - dynamic true 1 18446744073709551615 id=object_cratea parentGroupId=folder_props ...
+</pre></div>
+</div>
+<p>In that one line: <code class="docutils literal notranslate"><span class="pre">object</span></code> is the tag; <code class="docutils literal notranslate"><span class="pre">/World/Props/CrateA</span></code> is the
+scene-tree path; <code class="docutils literal notranslate"><span class="pre">box</span></code> is the primitive kind; the next 10 numbers are
+position (3), quaternion w,x,y,z (4) and scale (3); then <code class="docutils literal notranslate"><span class="pre">0.5</span> <span class="pre">1</span> <span class="pre">2.5</span></code> is
+<code class="docutils literal notranslate"><span class="pre">radius</span> <span class="pre">height</span> <span class="pre">mass</span></code>; then <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">mat_safety</span></code> are contact material and
+visual material names; the remaining positional flags are <code class="docutils literal notranslate"><span class="pre">visualOnly</span></code>,
+<code class="docutils literal notranslate"><span class="pre">visible</span></code>, <code class="docutils literal notranslate"><span class="pre">locked</span></code>, mesh path (<code class="docutils literal notranslate"><span class="pre">-</span></code> ⇒ empty), body mode, <code class="docutils literal notranslate"><span class="pre">collidable</span></code>,
+collision group, and collision mask. Everything after that is named
+<code class="docutils literal notranslate"><span class="pre">key=value</span></code>.</p>
+</section>
+<section id="mandatory-header-and-version">
+<h3>Mandatory Header And Version<a class="headerlink" href="#mandatory-header-and-version" title="Link to this heading"></a></h3>
+<p>The first non-blank, non-comment line must be the version header.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>raisim_engine_scene 1
+</pre></div>
+</div>
+<p>The loader rejects the file with <code class="docutils literal notranslate"><span class="pre">missing</span> <span class="pre">raisim_engine_scene</span> <span class="pre">header</span></code> if it
+is absent and with <code class="docutils literal notranslate"><span class="pre">unsupported</span> <span class="pre">rscene</span> <span class="pre">version</span></code> if the number does not
+match the version this build of Engine 2 understands. The version is a single
+integer; bumping it is a breaking change.</p>
+</section>
+<section id="section-order">
+<h3>Section Order<a class="headerlink" href="#section-order" title="Link to this heading"></a></h3>
+<p>The saver always emits records in a fixed, top-down order. The loader does
+not require this order, but humans, reviewers, and diff tools benefit from
+the convention, and Engine 2 produces a byte-stable round-trip for unchanged
+scenes when the binary version matches.</p>
+<ol class="arabic simple">
+<li><p>Header: <code class="docutils literal notranslate"><span class="pre">raisim_engine_scene</span> <span class="pre">1</span></code>.</p></li>
+<li><p>Physics: <code class="docutils literal notranslate"><span class="pre">time_step</span></code>, <code class="docutils literal notranslate"><span class="pre">gravity</span></code>, <code class="docutils literal notranslate"><span class="pre">solver</span></code>.</p></li>
+<li><p>Editor / authoring state: <code class="docutils literal notranslate"><span class="pre">snapping</span></code>, <code class="docutils literal notranslate"><span class="pre">asset_root</span></code>, <code class="docutils literal notranslate"><span class="pre">scene_graph</span></code>,
+<code class="docutils literal notranslate"><span class="pre">prefab_override</span></code> (zero or more), <code class="docutils literal notranslate"><span class="pre">editor_ux</span></code>, <code class="docutils literal notranslate"><span class="pre">render_bake</span></code>.</p></li>
+<li><p>Environment / rendering: <code class="docutils literal notranslate"><span class="pre">environment</span></code>, <code class="docutils literal notranslate"><span class="pre">weather</span></code>, <code class="docutils literal notranslate"><span class="pre">rayrai_render</span></code>.</p></li>
+<li><p>Resources: <code class="docutils literal notranslate"><span class="pre">material</span></code> (many), <code class="docutils literal notranslate"><span class="pre">contact_material</span></code> (many),
+<code class="docutils literal notranslate"><span class="pre">terrain_texture</span></code> (many), <code class="docutils literal notranslate"><span class="pre">asset</span></code> (many), <code class="docutils literal notranslate"><span class="pre">articulated_resource</span></code>
+(many).</p></li>
+<li><p>Scene tree: <code class="docutils literal notranslate"><span class="pre">group</span></code> records that lay out the folder hierarchy.</p></li>
+<li><p>Terrain regions, with each region followed by its
+<code class="docutils literal notranslate"><span class="pre">terrain_splat_layer</span></code> and <code class="docutils literal notranslate"><span class="pre">terrain_foliage_layer</span></code> children.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">light</span></code>, <code class="docutils literal notranslate"><span class="pre">camera</span></code>, <code class="docutils literal notranslate"><span class="pre">object</span></code>, <code class="docutils literal notranslate"><span class="pre">compound</span></code> (each followed by its
+<code class="docutils literal notranslate"><span class="pre">compound_child</span></code> records), <code class="docutils literal notranslate"><span class="pre">deformable</span></code>, <code class="docutils literal notranslate"><span class="pre">granular</span></code>, <code class="docutils literal notranslate"><span class="pre">articulated</span></code>
+(each followed by its <code class="docutils literal notranslate"><span class="pre">articulated_ik</span></code> IK targets).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sensor</span></code>, <code class="docutils literal notranslate"><span class="pre">wire</span></code>, <code class="docutils literal notranslate"><span class="pre">reflection_probe</span></code>, <code class="docutils literal notranslate"><span class="pre">local_fog</span></code>,
+<code class="docutils literal notranslate"><span class="pre">projected_decal</span></code>, <code class="docutils literal notranslate"><span class="pre">irradiance_volume</span></code>, <code class="docutils literal notranslate"><span class="pre">point_cloud</span></code>,
+<code class="docutils literal notranslate"><span class="pre">instanced_visual</span></code>.</p></li>
+</ol>
+</section>
+</section>
+<section id="identity-model">
+<h2>Identity Model<a class="headerlink" href="#identity-model" title="Link to this heading"></a></h2>
+<p>The scene tree is encoded redundantly: every node carries both a <strong>path</strong> and
+an <strong>id</strong>.</p>
+<ul class="simple">
+<li><p><strong>Paths</strong> are slash-separated and rooted at <code class="docutils literal notranslate"><span class="pre">/World</span></code>, for example
+<code class="docutils literal notranslate"><span class="pre">/World/Props/CrateA</span></code>. They are how the editor, <code class="docutils literal notranslate"><span class="pre">.re2</span></code> scripts, and
+selection refer to nodes. Paths are unique within a scene.</p></li>
+<li><p><strong>Ids</strong> are stable string handles (<code class="docutils literal notranslate"><span class="pre">id=object_cratea</span></code>). Parent references
+use the parent’s id, not its path. Ids are what survive renames and
+reparenting in the editor; if you rename <code class="docutils literal notranslate"><span class="pre">/World/Props</span></code> to
+<code class="docutils literal notranslate"><span class="pre">/World/Crates</span></code> the ids underneath stay the same.</p></li>
+<li><p><strong>Hierarchy</strong> is established by <code class="docutils literal notranslate"><span class="pre">group</span></code> records that declare the folder
+layout (<code class="docutils literal notranslate"><span class="pre">/World</span></code>, <code class="docutils literal notranslate"><span class="pre">/World/Props</span></code>, <code class="docutils literal notranslate"><span class="pre">/World/Lights</span></code> …) and by each
+leaf’s <code class="docutils literal notranslate"><span class="pre">parentGroupId</span></code> (objects, lights, cameras, etc.) or <code class="docutils literal notranslate"><span class="pre">parentId</span></code>
+(some non-physical nodes). The root <code class="docutils literal notranslate"><span class="pre">/World</span></code> group has <code class="docutils literal notranslate"><span class="pre">parentId=-</span></code>,
+which decodes to the empty string.</p></li>
+</ul>
+</section>
+<section id="whole-scene-records">
+<h2>Whole-Scene Records<a class="headerlink" href="#whole-scene-records" title="Link to this heading"></a></h2>
+<section id="raisim-engine-scene">
+<h3>raisim_engine_scene<a class="headerlink" href="#raisim-engine-scene" title="Link to this heading"></a></h3>
+<p>Format version token. Currently fixed at <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>raisim_engine_scene 1
+</pre></div>
+</div>
+</section>
+<section id="time-step">
+<h3>time_step<a class="headerlink" href="#time-step" title="Link to this heading"></a></h3>
+<p>Default simulation time step in seconds. Used by both physics and any sensor
+that publishes at the world’s rate.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>time_step 0.0025
+</pre></div>
+</div>
+</section>
+<section id="gravity">
+<h3>gravity<a class="headerlink" href="#gravity" title="Link to this heading"></a></h3>
+<p>Gravity vector in m/s², written as three positional numbers.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>gravity 0 0 -9.81
+</pre></div>
+</div>
+</section>
+<section id="solver">
+<h3>solver<a class="headerlink" href="#solver" title="Link to this heading"></a></h3>
+<p>Solver configuration: iteration count, tolerance, ERP, mode (<code class="docutils literal notranslate"><span class="pre">accurate</span></code>,
+<code class="docutils literal notranslate"><span class="pre">fast</span></code>, …), followed by a long list of default material parameters,
+contact-solver tunings, CCD settings, broadphase settings, and world time.
+All non-positional fields are <code class="docutils literal notranslate"><span class="pre">key=value</span></code> so they can be omitted.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>solver 80 1e-07 0.2 accurate erp2=0 defaultFriction=0.8 defaultRestitution=0 \
+  defaultRestitutionThreshold=0.001 defaultStaticFriction=0.8 \
+  defaultStaticFrictionVelocityThreshold=0.001 defaultRollingFriction=0 \
+  defaultSpinningFriction=0 contactAlphaInit=1 contactAlphaMin=1 \
+  contactAlphaDecay=1 contactMaxIterations=80 contactThreshold=1e-07 \
+  contactGjkMaxIterations=32 contactGjkTolerance=1e-06 \
+  contactEpaMaxIterations=64 contactEpaTolerance=0.0001 \
+  maxContactsPerPair=8 sweptCcdEnabled=false sweptCcdMinSpeed=0 \
+  sweptCcdSpeculativeMargin=0.0001 sleepingEnabled=true \
+  sleepingLinearVelocityThreshold=0.002 sleepingAngularVelocityThreshold=0.01 \
+  sleepingQuietSteps=2 broadphaseType=sap3_axis \
+  broadphaseWorldMin=-100,-100,-100 broadphaseWorldMax=100,100,100 \
+  broadphaseCellSize=1,1,1 broadphaseUseWorldBounds=false \
+  broadphasePadding=0.5 broadphaseMaxCellsPerAxis=128 \
+  broadphaseMaxCellsPerObject=64 worldTime=0 \
+  fixedContactSolverIterationOrder=false
+</pre></div>
+</div>
+<p>(The backslash continuations above are for legibility; a real <code class="docutils literal notranslate"><span class="pre">.rscene</span></code>
+keeps everything on a single line — there is no continuation syntax.)</p>
+<p>The first four positional tokens are <em>required</em>: <code class="docutils literal notranslate"><span class="pre">iterations</span></code>,
+<code class="docutils literal notranslate"><span class="pre">tolerance</span></code>, <code class="docutils literal notranslate"><span class="pre">erp</span></code>, <code class="docutils literal notranslate"><span class="pre">mode</span></code>. Every other knob has a default and can be
+omitted.</p>
+</section>
+<section id="asset-root">
+<h3>asset_root<a class="headerlink" href="#asset-root" title="Link to this heading"></a></h3>
+<p>Relative path the scene resolves mesh and texture references against. <code class="docutils literal notranslate"><span class="pre">.</span></code>
+means “the directory of the scene file”. This makes scenes saved under a
+project portable as long as the assets travel with them.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>asset_root .
+</pre></div>
+</div>
+</section>
+<section id="snapping">
+<h3>snapping<a class="headerlink" href="#snapping" title="Link to this heading"></a></h3>
+<p>Editor snapping state — grid / angle / scale checkboxes, step sizes, and the
+surface normal used by surface snap.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>snapping true true false false false false false false 0.1 15 0.1 0 surfaceNormal=0,0,1
+</pre></div>
+</div>
+<p>Positional layout: 8 booleans (<code class="docutils literal notranslate"><span class="pre">grid</span></code>, <code class="docutils literal notranslate"><span class="pre">angle</span></code>, <code class="docutils literal notranslate"><span class="pre">scale</span></code>, then 5 reserved
+flags written as <code class="docutils literal notranslate"><span class="pre">false</span></code>), then <code class="docutils literal notranslate"><span class="pre">gridSize</span></code> (m), <code class="docutils literal notranslate"><span class="pre">angleDegrees</span></code>,
+<code class="docutils literal notranslate"><span class="pre">scaleStep</span></code>, a reserved trailing 0, then the <code class="docutils literal notranslate"><span class="pre">surfaceNormal</span></code> key.</p>
+</section>
+<section id="scene-graph-prefab-override">
+<h3>scene_graph, prefab_override<a class="headerlink" href="#scene-graph-prefab-override" title="Link to this heading"></a></h3>
+<p>Global scene-tree behaviour, plus an optional list of per-node prefab property
+overrides.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>scene_graph inheritedTransforms=true keepWorldTransformOnReparent=true \
+  dragReparenting=true packedSceneOverrides=true transformSpace=global
+
+prefab_override /World/Props/Pallet property=visible value=false
+</pre></div>
+</div>
+<p>Each <code class="docutils literal notranslate"><span class="pre">prefab_override</span></code> carries a node path, the property name, and the value
+the prefab instance should override. Zero or more are allowed.</p>
+</section>
+<section id="editor-ux">
+<h3>editor_ux<a class="headerlink" href="#editor-ux" title="Link to this heading"></a></h3>
+<p>Per-user editor preferences — multi-select, copy/paste, duplicate, transform
+local-space toggle, selection filters, undo grouping, and the selection
+filter kind list (a <code class="docutils literal notranslate"><span class="pre">;</span></code>-separated string list).</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>editor_ux multiSelect=true copyPaste=true duplicate=true \
+  transformLocalSpace=false selectionFilters=true strongUndoGrouping=true \
+  selectionFilterKinds=object;light;camera
+</pre></div>
+</div>
+</section>
+<section id="render-bake">
+<h3>render_bake<a class="headerlink" href="#render-bake" title="Link to this heading"></a></h3>
+<p>Settings for offline bakes invoked from the editor — probe/lightmap/irradiance
+captures and rayrai’s debug reports.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>render_bake probeCaptureOnSave=false lightmapBakeEnabled=false \
+  irradianceBakeEnabled=false renderDiagnostics=false \
+  lightmapResolution=1024 probeCubemapSize=256 outputDirectory=bakes
+</pre></div>
+</div>
+</section>
+<section id="environment">
+<h3>environment<a class="headerlink" href="#environment" title="Link to this heading"></a></h3>
+<p>Sky/background, ambient, fog, post processing, and PBR environment lookup.
+Positional layout is <code class="docutils literal notranslate"><span class="pre">backgroundR</span> <span class="pre">backgroundG</span> <span class="pre">backgroundB</span> <span class="pre">ambientR</span> <span class="pre">ambientG</span>
+<span class="pre">ambientB</span> <span class="pre">fogDensity</span> <span class="pre">shadows</span> <span class="pre">true</span> <span class="pre">10</span> <span class="pre">envMapPath</span></code> followed by many named
+fields.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>environment 0.08 0.10 0.13 0.24 0.25 0.29 0 true true 10 - \
+  fogColor=0.66,0.78,0.96 exposure=1.05 gamma=2.2 \
+  bloomIntensity=0.12 bloomThreshold=0.82 bloomRadius=4 \
+  shadowMapSize=2048 shadowedLightBudget=1 backgroundMode=rayrai_sky \
+  colorMode=unreal_preview pbrEnvironmentIntensity=1 fxaa=true ssao=true \
+  heightFogEnabled=false heightFogDensity=0 heightFogBaseHeight=0 \
+  heightFogFalloff=0.35
+</pre></div>
+</div>
+<p>The 11th positional token is the environment-map texture path; <code class="docutils literal notranslate"><span class="pre">-</span></code> means
+“no HDR, use the procedural sky from <code class="docutils literal notranslate"><span class="pre">weather</span></code>”. <code class="docutils literal notranslate"><span class="pre">backgroundMode</span></code>
+accepts <code class="docutils literal notranslate"><span class="pre">rayrai_sky</span></code>, <code class="docutils literal notranslate"><span class="pre">hdr</span></code>, or <code class="docutils literal notranslate"><span class="pre">plain_color</span></code>.</p>
+</section>
+<section id="weather">
+<h3>weather<a class="headerlink" href="#weather" title="Link to this heading"></a></h3>
+<p>Rayrai sky / time-of-day / cloud / precipitation / lightning settings. The
+first positional token is the master <code class="docutils literal notranslate"><span class="pre">enabled</span></code> boolean; everything else is
+named.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>weather true preset=clear quality=high seed=1 timeOfDay=14 \
+  latitude=37 longitude=127 year=2026 month=7 day=15 \
+  windDirection=1,0.25,0 windSpeed=1.2 transitionSeconds=0 \
+  affectSensors=false cloudCoverage=0.03 cloudDensity=0.04 \
+  precipitationRate=0 rainOcclusionStrength=0 fogDensity=0 \
+  visibilityMeters=20000 fogColor=0.66,0.78,0.96 humidity=0.22 \
+  wetness=0 snowCoverage=0 lightningRate=0 \
+  useExplicitSunAngles=true sunAzimuthDegrees=210 sunElevationDegrees=58
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">preset</span></code> is one of the rayrai presets (<code class="docutils literal notranslate"><span class="pre">clear</span></code>, <code class="docutils literal notranslate"><span class="pre">overcast</span></code>, <code class="docutils literal notranslate"><span class="pre">storm</span></code>,
+…). <code class="docutils literal notranslate"><span class="pre">quality</span></code> selects sample counts for the procedural sky. Setting
+<code class="docutils literal notranslate"><span class="pre">useExplicitSunAngles=true</span></code> lets you override the date/time astronomical
+solver with explicit azimuth/elevation.</p>
+</section>
+<section id="rayrai-render">
+<h3>rayrai_render<a class="headerlink" href="#rayrai-render" title="Link to this heading"></a></h3>
+<p>Render-quality preset and post-processing toggles. <code class="docutils literal notranslate"><span class="pre">preset</span></code> is the named
+preset (<code class="docutils literal notranslate"><span class="pre">fast</span></code> / <code class="docutils literal notranslate"><span class="pre">balanced</span></code> / <code class="docutils literal notranslate"><span class="pre">high</span></code> / <code class="docutils literal notranslate"><span class="pre">ultra</span></code>); <code class="docutils literal notranslate"><span class="pre">custom=true</span></code>
+means the named fields override the preset’s defaults.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>rayrai_render preset=ultra custom=false colorMode=unreal_preview \
+  shadowResolution=2048 shadowBias=0.0008 shadowStrength=0.6 \
+  shadowPcfRadius=1.25 highFidelityPbr=false pbrToneMapping=false \
+  pbrExposure=1 autoExposure=false autoExposureKey=0.18 \
+  autoExposureSpeed=0.05 volumetricFog=false volumetricFogDensity=0 \
+  volumetricLightStrength=0 contactShadows=false contactShadowsLength=0.12 \
+  contactShadowsStrength=0.7 screenSpaceReflections=false \
+  screenSpaceReflectionStrength=0 motionBlur=false motionBlurDirection=0,0 \
+  motionBlurStrength=0 depthOfField=false depthOfFieldFocusDistance=5 \
+  depthOfFieldAperture=0 diagnostics=false
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/rayrai_rscene_environment_weather.png"><img alt="A compact RScene world under an overcast procedural sky with fog and post-processing, illustrating environment, weather, and rayrai_render records" src="../_images/rayrai_rscene_environment_weather.png" style="width: 100%;" />
+</a>
+<p>The image shows the whole-scene records working together: <code class="docutils literal notranslate"><span class="pre">environment</span></code>
+sets sky/fog/post-processing defaults, <code class="docutils literal notranslate"><span class="pre">weather</span></code> drives the procedural
+overcast sky and time of day, and <code class="docutils literal notranslate"><span class="pre">rayrai_render</span></code> selects the render-quality
+preset used for the capture.</p>
+</section>
+</section>
+<section id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Link to this heading"></a></h2>
+<p>These records define named, scene-global resources that scene-tree nodes
+reference by id or name. They are written before any <code class="docutils literal notranslate"><span class="pre">group</span></code> / object
+record.</p>
+<section id="material">
+<h3>material<a class="headerlink" href="#material" title="Link to this heading"></a></h3>
+<p>A material record names a PBR-style material and is referenced from objects,
+compounds, instanced visuals, terrain regions, etc. The positional fields are
+the legacy compact form (<code class="docutils literal notranslate"><span class="pre">name</span> <span class="pre">r</span> <span class="pre">g</span> <span class="pre">b</span> <span class="pre">a</span> <span class="pre">metallic</span> <span class="pre">roughness</span> <span class="pre">eR</span> <span class="pre">eG</span> <span class="pre">eB</span>
+<span class="pre">emissiveStrength</span> <span class="pre">doubleSided</span> <span class="pre">albedoTex</span> <span class="pre">normalTex</span> <span class="pre">metallicTex</span> <span class="pre">roughnessTex</span>
+<span class="pre">aoTex</span> <span class="pre">emissiveTex</span></code>); the named fields cover every other slot (UV transform,
+alpha mode, anisotropy, clearcoat, sheen, foliage, weather response,
+stencil/depth state, detail maps, lightmaps, and three texture transforms for
+albedo / normal / metallic-roughness).</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>material mat_floor 0.45 0.46 0.48 1 0 0.82 0 0 0 0 false - - - - - - \
+  id=mat_floor type=pbr uvScale=2,2 uvOffset=0,0 uvRotation=0 \
+  alphaMode=opaque alphaCutoff=0.5 normalStrength=1 normalConvention=opengl \
+  ior=1.5 transmission=0 cullMode=back \
+  albedoTransformAuthored=false albedoTransformScale=1,1 \
+  albedoTransformOffset=0,0 albedoTransformRotation=0
+</pre></div>
+</div>
+<p>The trailing <code class="docutils literal notranslate"><span class="pre">albedoTransform*</span></code>, <code class="docutils literal notranslate"><span class="pre">normalTransform*</span></code> and
+<code class="docutils literal notranslate"><span class="pre">metallicRoughnessTransform*</span></code> blocks are emitted by <code class="docutils literal notranslate"><span class="pre">writeTextureTransform</span></code>
+for each texture slot so per-texture UV authoring round-trips. Any unused
+texture slot is written as <code class="docutils literal notranslate"><span class="pre">-</span></code> (empty).</p>
+</section>
+<section id="contact-material">
+<h3>contact_material<a class="headerlink" href="#contact-material" title="Link to this heading"></a></h3>
+<p>Pairwise contact-material override — looked up by material A × material B.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>contact_material default rubber 0.95 0.03 0.001 0.8 0.001 0.01 0.01 \
+  id=default_rubber
+</pre></div>
+</div>
+<p>Positional layout: <code class="docutils literal notranslate"><span class="pre">materialA</span> <span class="pre">materialB</span> <span class="pre">friction</span> <span class="pre">restitution</span>
+<span class="pre">restitutionThreshold</span> <span class="pre">staticFriction</span> <span class="pre">staticFrictionVelocityThreshold</span>
+<span class="pre">rollingFriction</span> <span class="pre">spinningFriction</span></code>.</p>
+</section>
+<section id="terrain-texture">
+<h3>terrain_texture<a class="headerlink" href="#terrain-texture" title="Link to this heading"></a></h3>
+<p>A texture slot for terrain layer painting. The slot index is referenced by
+<code class="docutils literal notranslate"><span class="pre">terrain_region.baseTexture</span></code> and by <code class="docutils literal notranslate"><span class="pre">terrain_splat_layer.slot</span></code>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>terrain_texture 0 terrain_grass Grass color=0.28,0.43,0.2,1 albedo=- \
+  normal=- uvScale=4 normalDepth=1 aoStrength=1 roughness=0.82 \
+  detile=0,0 displacement=0,1
+</pre></div>
+</div>
+<p>Positional layout: <code class="docutils literal notranslate"><span class="pre">slot</span> <span class="pre">id</span> <span class="pre">name</span></code>. The optional <code class="docutils literal notranslate"><span class="pre">displacementTexture</span></code> key
+is written only when set.</p>
+</section>
+<section id="asset">
+<h3>asset<a class="headerlink" href="#asset" title="Link to this heading"></a></h3>
+<p>An imported mesh asset (gltf, glb, obj, fbx, etc.) plus its import-time
+options and generated-collision settings. Assets are referenced by id from
+<code class="docutils literal notranslate"><span class="pre">object.renderMeshPath</span></code> (when the object is a mesh primitive) and by
+imported scene tooling.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>asset Crate mesh meshes/crate.glb id=asset_crate defaultMaterial=mat_crate \
+  contactMaterial=default collisionPath=meshes/crate_col.obj bodyMode=dynamic \
+  mass=2.0 scale=1,1,1 quat=1,0,0,0 collidable=true collisionMode=convex_hull \
+  importSource=meshes/crate.glb importer=assimp autoReimport=true \
+  generateCollision=true generatedCollision=convex_hull \
+  remapMaterials=true importScale=1 importUpAxis=z importFlipWinding=false \
+  importRecenter=false importApplyRootScale=false \
+  materialRemaps=metal;mat_crate_metal;rubber;mat_crate_rubber \
+  importWarnings= sourceTimestamp=0 sidecarTimestamp=0 \
+  meshCollision=convex_hull customInertia=false inertiaDiagonal=0,0,0 \
+  centerOfMass=0,0,0 coacdThreshold=0.08 coacdMaxConvexHull=8 \
+  coacdPreprocess=off coacdSampleResolution=800
+</pre></div>
+</div>
+<p>Positional layout: <code class="docutils literal notranslate"><span class="pre">label</span> <span class="pre">primitiveKind</span> <span class="pre">path</span></code>. The trailing
+<code class="docutils literal notranslate"><span class="pre">meshCollision</span></code> / <code class="docutils literal notranslate"><span class="pre">coacd*</span></code> block is emitted by <code class="docutils literal notranslate"><span class="pre">writeMeshCollision</span></code> and
+covers the COACD convex-decomposition parameters used when the asset
+generates its own collision.</p>
+</section>
+<section id="articulated-resource">
+<h3>articulated_resource<a class="headerlink" href="#articulated-resource" title="Link to this heading"></a></h3>
+<p>URDF/MJCF resource declaration. <code class="docutils literal notranslate"><span class="pre">articulated</span></code> scene nodes refer back to it
+by <code class="docutils literal notranslate"><span class="pre">resourceId</span></code>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>articulated_resource cassie_resource Cassie urdf/cassie/robot.urdf \
+  resourceDirectory=urdf/cassie modules=actuator_pd;gait_planner \
+  jointOrder=hip_yaw;hip_pitch;knee;ankle \
+  doNotCollideWithParent=true convexifyCollisionMeshes=true
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/rayrai_rscene_resources.png"><img alt="A small resource gallery with PBR material samples, an imported mesh asset, and an articulated-resource marker" src="../_images/rayrai_rscene_resources.png" style="width: 100%;" />
+</a>
+<p>The resource records are scene-global definitions. In the image, the material
+samples represent <code class="docutils literal notranslate"><span class="pre">material</span></code> records, the imported marker represents an
+<code class="docutils literal notranslate"><span class="pre">asset</span></code> record, and the upright blue marker stands in for an
+<code class="docutils literal notranslate"><span class="pre">articulated_resource</span></code> that later <code class="docutils literal notranslate"><span class="pre">articulated</span></code> records instantiate.</p>
+</section>
+</section>
+<section id="scene-tree-containers">
+<h2>Scene Tree Containers<a class="headerlink" href="#scene-tree-containers" title="Link to this heading"></a></h2>
+<section id="group">
+<h3>group<a class="headerlink" href="#group" title="Link to this heading"></a></h3>
+<p>A folder inside the scene tree. Groups have a path, an id, optional parent
+id, and editor flags. The root <code class="docutils literal notranslate"><span class="pre">/World</span></code> group has <code class="docutils literal notranslate"><span class="pre">parentId=-</span></code>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>group /World id=folder_world parentId=- visible=true locked=false expanded=true
+group /World/Props id=folder_props parentId=folder_world visible=true \
+  locked=false expanded=true
+group /World/Lights id=folder_lights parentId=folder_world visible=true \
+  locked=false expanded=true
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/rayrai_rscene_scene_tree.png"><img alt="Two translucent scene-tree group volumes containing related objects, illustrating group records and grouped editor organization" src="../_images/rayrai_rscene_scene_tree.png" style="width: 100%;" />
+</a>
+<p>Groups are editor/scene-tree containers, not physics bodies. The translucent
+volumes in the image show how child objects are organised under separate
+<code class="docutils literal notranslate"><span class="pre">group</span></code> paths while remaining ordinary world objects.</p>
+</section>
+</section>
+<section id="bodies-and-constraints">
+<h2>Bodies And Constraints<a class="headerlink" href="#bodies-and-constraints" title="Link to this heading"></a></h2>
+<section id="light">
+<h3>light<a class="headerlink" href="#light" title="Link to this heading"></a></h3>
+<p>A scene light. The first 5 positional tokens are the legacy
+<code class="docutils literal notranslate"><span class="pre">direction(x,y,z)</span></code> and <code class="docutils literal notranslate"><span class="pre">intensity</span></code>; everything else is named, including
+<code class="docutils literal notranslate"><span class="pre">type</span></code> (<code class="docutils literal notranslate"><span class="pre">directional</span></code>, <code class="docutils literal notranslate"><span class="pre">point</span></code>, <code class="docutils literal notranslate"><span class="pre">spot</span></code>, <code class="docutils literal notranslate"><span class="pre">area</span></code>), full attenuation
+constants, projector cookie, color temperature, distance fade, and shadow
+parameters.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>light /World/Lights/Key -0.4 0.5 -1 4 id=light_key type=spot \
+  position=2,-3,4 color=1,0.86,0.64 ambientColor=0,0,0 \
+  specularColor=1,1,1 specularIntensity=1 \
+  attenuationConstant=1 attenuationLinear=0.04 attenuationQuadratic=0.012 \
+  range=14 coneAngle=30 innerConeAngle=18 radius=0 \
+  areaSize=1,1,0 areaRight=1,0,0 areaUp=0,1,0 \
+  projectorTexture=- projectorStrength=0 projectorUvScale=1,1 \
+  projectorUvOffset=0,0 negative=false temperatureEnabled=false \
+  shadows=true colorTemperature=6500 distanceFadeEnabled=false \
+  distanceFadeBegin=40 distanceFadeShadow=50 distanceFadeLength=10 \
+  shadowResolution=2048 shadowBias=0.0008 shadowStrength=0.85 \
+  shadowPcfRadius=1.25 shadowOrthoHalfSize=5 shadowNear=0.1 shadowFar=30 \
+  shadowCenter=0,0,0 shadowPosition=0,0,0 shadowUseCustomPosition=false
+</pre></div>
+</div>
+</section>
+<section id="camera">
+<h3>camera<a class="headerlink" href="#camera" title="Link to this heading"></a></h3>
+<p>A scene-graph camera. Positional fields are
+<code class="docutils literal notranslate"><span class="pre">path</span> <span class="pre">pos(x,y,z)</span> <span class="pre">rot(w,x,y,z)</span> <span class="pre">verticalFov</span> <span class="pre">nearPlane</span> <span class="pre">farPlane</span> <span class="pre">width</span> <span class="pre">height</span>
+<span class="pre">renderMode</span> <span class="pre">enabled</span></code>. <code class="docutils literal notranslate"><span class="pre">renderMode</span></code> is one of <code class="docutils literal notranslate"><span class="pre">rgb</span></code>, <code class="docutils literal notranslate"><span class="pre">depth</span></code>,
+<code class="docutils literal notranslate"><span class="pre">segmentation</span></code>, <code class="docutils literal notranslate"><span class="pre">rgb_depth</span></code>, etc. The remaining keys configure preview
+post-processing and an optional output path for headless captures.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>camera /World/Cameras/Editor 3 -5 2.2 0.488 -0.116 0.066 0.862 52 0.05 100 \
+  1280 720 rgb true id=camera_editor projection=perspective horizontalFov=0 \
+  orthoScale=10 previewPostProcessing=true previewExposure=1 \
+  previewGamma=2.2 previewDepthOfField=false previewFocusDistance=5 \
+  previewAperture=0 outputPath=-
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/rayrai_rscene_light_camera.png"><img alt="A scene lit by a warm point light with a cyan camera frustum helper, illustrating light and camera records" src="../_images/rayrai_rscene_light_camera.png" style="width: 100%;" />
+</a>
+<p>The warm marker shows the authored <code class="docutils literal notranslate"><span class="pre">light</span></code> position and influence, while the
+cyan frustum visualises the <code class="docutils literal notranslate"><span class="pre">camera</span></code> projection, near/far planes, and field
+of view that are stored in the record.</p>
+</section>
+<section id="object">
+<h3>object<a class="headerlink" href="#object" title="Link to this heading"></a></h3>
+<p>The most common body record: ground, primitives, single meshes, and
+single-body imports all become <code class="docutils literal notranslate"><span class="pre">object</span></code> records.</p>
+<p>Positional layout (in order):</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">path</span></code> — scene-tree path.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">primitive</span></code> — <code class="docutils literal notranslate"><span class="pre">ground</span></code>, <code class="docutils literal notranslate"><span class="pre">box</span></code>, <code class="docutils literal notranslate"><span class="pre">sphere</span></code>, <code class="docutils literal notranslate"><span class="pre">cylinder</span></code>,
+<code class="docutils literal notranslate"><span class="pre">capsule</span></code>, <code class="docutils literal notranslate"><span class="pre">mesh</span></code>, <code class="docutils literal notranslate"><span class="pre">half_space</span></code>, …</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">position</span></code> (3 numbers).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rotation</span></code> (4 numbers, <code class="docutils literal notranslate"><span class="pre">w,x,y,z</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">scale</span></code> (3 numbers).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">radius</span></code> and <code class="docutils literal notranslate"><span class="pre">height</span></code> — used by sphere/capsule/cylinder; ignored
+otherwise.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mass</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">contactMaterial</span></code> name.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">material</span></code> name (visual).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">visualOnly</span></code> boolean — convenience alias for body mode <code class="docutils literal notranslate"><span class="pre">visual_only</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">visible</span></code> boolean.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">locked</span></code> boolean — convenience alias for body mode <code class="docutils literal notranslate"><span class="pre">static</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">meshPath</span></code> — <code class="docutils literal notranslate"><span class="pre">-</span></code> for primitives.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bodyMode</span></code> — <code class="docutils literal notranslate"><span class="pre">dynamic</span></code>, <code class="docutils literal notranslate"><span class="pre">static</span></code>, <code class="docutils literal notranslate"><span class="pre">kinematic</span></code>, <code class="docutils literal notranslate"><span class="pre">visual_only</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">collidable</span></code> boolean.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">collisionGroup</span></code> (uint64).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">collisionMask</span></code> (uint64).</p></li>
+</ol>
+<p>Then a large key=value block covering identity, semantic-segmentation
+metadata, optional separate render/collision meshes, rayrai per-visual
+parameters (transparency, visibility range, mesh LOD, custom bounds,
+per-object PBR environment override), per-object raisim solver overrides,
+collision groups and masks, and the same <code class="docutils literal notranslate"><span class="pre">writeMeshCollision</span></code> COACD block
+as <code class="docutils literal notranslate"><span class="pre">asset</span></code>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>object /World/Ground ground 0 0 0 1 0 0 0 18 18 1 1 0 0 \
+  default mat_floor false true true - static true 1 18446744073709551615 \
+  id=object_ground parentGroupId=folder_world semanticClass=- \
+  instanceId=-1 segmentationColor=1,1,1 materialRemaps= \
+  renderMeshPath=- collisionMeshPath=- collisionMode=primitive \
+  castShadow=true visualUseMeshColor=false ...
+
+object /World/Props/CrateA box -0.6 0.2 0.6 0.998 0 0 0.0698 0.7 0.5 0.45 \
+  0.5 1 2.5 default mat_safety false true false - dynamic true 1 \
+  18446744073709551615 id=object_cratea parentGroupId=folder_props ...
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">parentGroupId=folder_props</span></code> ties the crate to the <code class="docutils literal notranslate"><span class="pre">/World/Props</span></code> folder
+declared earlier.</p>
+</section>
+<section id="compound-compound-child">
+<h3>compound, compound_child<a class="headerlink" href="#compound-compound-child" title="Link to this heading"></a></h3>
+<p>A compound rigid body — a single physics body composed of several primitive
+shapes. The <code class="docutils literal notranslate"><span class="pre">compound</span></code> record carries the body’s transform, mass, inertia,
+center of mass, and collision masks. Each child shape is emitted on a
+following <code class="docutils literal notranslate"><span class="pre">compound_child</span></code> line with the parent compound’s path repeated
+as a back-reference.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>compound /World/Props/Forklift 1 -2 0.5 1 0 0 0 1 1 1 12.0 dynamic true true \
+  id=compound_forklift parentGroupId=folder_props \
+  centerOfMass=0.0,0.0,0.3 inertiaDiagonal=2,2,1.2 \
+  collisionGroup=1 collisionMask=18446744073709551615 \
+  semanticClass=vehicle
+
+compound_child /World/Props/Forklift box 0 0 0 1 0 0 0 1 1 1 \
+  size=1.2,0.8,0.4 radius=0 height=0 contactMaterial=default material=mat_safety
+
+compound_child /World/Props/Forklift cylinder 0.3 0 -0.2 1 0 0 0 1 1 1 \
+  size=0,0,0 radius=0.15 height=0.1 contactMaterial=default material=mat_metal
+</pre></div>
+</div>
+<p>Children’s positions, rotations, and scales are expressed in the compound’s
+local frame. <code class="docutils literal notranslate"><span class="pre">size</span></code>/<code class="docutils literal notranslate"><span class="pre">radius</span></code>/<code class="docutils literal notranslate"><span class="pre">height</span></code> are interpreted per primitive
+kind.</p>
+<a class="reference internal image-reference" href="../_images/rayrai_rscene_object_compound_wire.png"><img alt="Primitive objects, a compound body made from child shapes, and a vertical wire constraint with a suspended bob" src="../_images/rayrai_rscene_object_compound_wire.png" style="width: 100%;" />
+</a>
+<p>This image groups the rigid-body records: standalone <code class="docutils literal notranslate"><span class="pre">object</span></code> primitives on
+the left, a <code class="docutils literal notranslate"><span class="pre">compound</span></code> with several <code class="docutils literal notranslate"><span class="pre">compound_child</span></code> shapes in the middle,
+and a <code class="docutils literal notranslate"><span class="pre">wire</span></code> constraint visualised as a taut segment on the right.</p>
+</section>
+<section id="deformable">
+<h3>deformable<a class="headerlink" href="#deformable" title="Link to this heading"></a></h3>
+<p>A soft body (cloth, mass-spring, or FEM volume). Positional layout:
+<code class="docutils literal notranslate"><span class="pre">path</span> <span class="pre">kind</span> <span class="pre">meshPath</span> <span class="pre">pos(x,y,z)</span> <span class="pre">rot(w,x,y,z)</span> <span class="pre">scale(x,y,z)</span></code>. <code class="docutils literal notranslate"><span class="pre">kind</span></code> is one
+of <code class="docutils literal notranslate"><span class="pre">cloth</span></code>, <code class="docutils literal notranslate"><span class="pre">mass_spring</span></code>, <code class="docutils literal notranslate"><span class="pre">fem</span></code> (and any future kinds).</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>deformable /World/Props/Flag cloth meshes/flag.obj 2 0 1.8 1 0 0 0 1 1 1 \
+  id=deformable_flag parentGroupId=folder_props \
+  pinnedVertices=0,1,2,3 scale=1 totalMass=0.2 \
+  distanceCompliance=0 distanceStiffness=1000 bendCompliance=0 \
+  bendStiffness=100 youngsModulus=0 poissonRatio=0.3 thickness=0.002 \
+  damping=0.01 collisionRadius=0.01 iterations=20 substeps=1 \
+  solverMode=xpbd particleMode=skinned particleSpacing=0.05 \
+  contactMaterial=default material=mat_fabric visible=true collidable=true \
+  collisionGroup=1 collisionMask=18446744073709551615
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">pinnedVertices</span></code> is a comma-separated list of vertex indices that are held
+in place.</p>
+</section>
+<section id="granular">
+<h3>granular<a class="headerlink" href="#granular" title="Link to this heading"></a></h3>
+<p>A particle system (sand, gravel, fluid-ish particles). Positions and radii
+can be specified per-particle, or a <code class="docutils literal notranslate"><span class="pre">boxMin</span></code>/<code class="docutils literal notranslate"><span class="pre">boxMax</span></code> + <code class="docutils literal notranslate"><span class="pre">spacing</span></code> lets
+the engine fill a box at load time.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>granular /World/Sandbox/Sand particles 0 0 0 1 0 0 0 1 1 1 \
+  id=granular_sand parentGroupId=folder_sandbox \
+  positions= radii= boxMin=-0.5,-0.5,0.0 boxMax=0.5,0.5,0.3 \
+  radius=0.01 spacing=0.025 maxParticles=20000 velocity=0,0,0 \
+  angularVelocity=0,0,0 materialId=0 fixed=false density=1600 \
+  normalStiffness=1e6 normalDamping=200 tangentialStiffness=1e5 \
+  tangentialDamping=20 friction=0.6 rollingFriction=0.05 \
+  cohesionStiffness=0 cohesionMaxDistance=0 normalContactModel=hertz \
+  substeps=2 visible=true
+</pre></div>
+</div>
+<p>When <code class="docutils literal notranslate"><span class="pre">positions</span></code> is non-empty it overrides the box fill; <code class="docutils literal notranslate"><span class="pre">radii</span></code> is the
+matching per-particle radius list (<code class="docutils literal notranslate"><span class="pre">;</span></code>- or <code class="docutils literal notranslate"><span class="pre">,</span></code>-CSV depending on whether
+each entry is a Vec3 or a scalar).</p>
+<a class="reference internal image-reference" href="../_images/rayrai_rscene_particles.png"><img alt="A wavy blue cloth-like particle sheet next to a pile of granular particles, illustrating deformable and granular records" src="../_images/rayrai_rscene_particles.png" style="width: 100%;" />
+</a>
+<p>The left cluster sketches a <code class="docutils literal notranslate"><span class="pre">deformable</span></code> node with particle/mesh state, and
+the right pile sketches a <code class="docutils literal notranslate"><span class="pre">granular</span></code> record filled from a box plus spacing.</p>
+</section>
+<section id="articulated-articulated-ik">
+<h3>articulated, articulated_ik<a class="headerlink" href="#articulated-articulated-ik" title="Link to this heading"></a></h3>
+<p>An articulated system instance, by reference to an
+<code class="docutils literal notranslate"><span class="pre">articulated_resource</span></code>. The positional layout is <code class="docutils literal notranslate"><span class="pre">path</span> <span class="pre">resourceId</span>
+<span class="pre">pos(x,y,z)</span> <span class="pre">rot(w,x,y,z)</span> <span class="pre">visible</span> <span class="pre">collidable</span></code>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>articulated /World/Robots/Cassie cassie_resource 0 0 1.0 1 0 0 0 true true \
+  id=articulated_cassie parentGroupId=folder_robots \
+  sourcePath=urdf/cassie/robot.urdf resourceDirectory=urdf/cassie \
+  modules=actuator_pd;gait_planner \
+  jointOrder=hip_yaw;hip_pitch;knee;ankle \
+  scale=1,1,1 doNotCollideWithParent=true convexifyCollisionMeshes=true \
+  collisionGroup=1 collisionMask=18446744073709551615 \
+  generalizedCoordinate=0,0,1.0,1,0,0,0,0,-0.6,1.2,-0.6 \
+  generalizedVelocity=0,0,0,0,0,0,0,0,0,0,0 \
+  semanticClass=robot
+
+articulated_ik /World/Robots/Cassie left_foot_link 0.0,0.15,0.05 \
+  enabled=true useOrientation=true orientation=1,0,0,0 \
+  maxIterations=80 positionTolerance=0.001 orientationTolerance=0.01 \
+  orientationWeight=0.5 damping=0.05 stepSize=0.5 maxStep=0.1 \
+  svdTolerance=1e-6 finiteDifferenceStep=1e-4 \
+  applyBestOnFailure=true enforceJointLimits=true \
+  inverseMethod=damped_least_squares transposeGain=0
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">generalizedCoordinate</span></code>/<code class="docutils literal notranslate"><span class="pre">generalizedVelocity</span></code> are CSV lists of doubles —
+the floating-base pose + per-joint configuration.</p>
+<p><code class="docutils literal notranslate"><span class="pre">articulated_ik</span></code> lines belong to the most recent <code class="docutils literal notranslate"><span class="pre">articulated</span></code> record:
+each defines a frame target (frame name, target position, optional target
+orientation) and the IK solver knobs used to drive that frame.</p>
+<a class="reference internal image-reference" href="../_images/rayrai_rscene_articulated.png"><img alt="A quadruped robot standing between an orange box and a grey box on the checkered ground, illustrating the articulated record" src="../_images/rayrai_rscene_articulated.png" style="width: 100%;" />
+</a>
+<p>The image renders the equivalent of an <code class="docutils literal notranslate"><span class="pre">articulated_resource</span></code> + <code class="docutils literal notranslate"><span class="pre">articulated</span></code>
+pair: a URDF-loaded ANYmal quadruped placed at world origin with the
+standing pose <code class="docutils literal notranslate"><span class="pre">generalizedCoordinate=0,0,0.54,1,0,0,0,0.03,0.4,-0.8,...</span></code>
+encoded into the record. The orange box on the left and the grey box on the
+right are ordinary <code class="docutils literal notranslate"><span class="pre">object</span></code> records (<code class="docutils literal notranslate"><span class="pre">object</span> <span class="pre">/World/Props/...</span></code>) included
+to give the robot a sense of scale.</p>
+</section>
+<section id="wire">
+<h3>wire<a class="headerlink" href="#wire" title="Link to this heading"></a></h3>
+<p>A length constraint between two bodies. Positional layout:
+<code class="docutils literal notranslate"><span class="pre">path</span> <span class="pre">kind</span> <span class="pre">bodyA</span> <span class="pre">bodyB</span> <span class="pre">length</span></code>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>wire /World/Constraints/Hoist stiff object_crateb compound_forklift 2.5 \
+  id=wire_hoist localIndexA=0 localIndexB=0 \
+  localPositionA=0,0,0.225 localPositionB=0.3,0,0.4 \
+  stiffness=1000 damping=10 compliance=0 \
+  visualizationWidth=0.01 enabled=true
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">kind</span></code> is one of <code class="docutils literal notranslate"><span class="pre">stiff</span></code>, <code class="docutils literal notranslate"><span class="pre">compliant</span></code>, <code class="docutils literal notranslate"><span class="pre">custom</span></code>. <code class="docutils literal notranslate"><span class="pre">localIndexA/B</span></code> and
+<code class="docutils literal notranslate"><span class="pre">localPositionA/B</span></code> describe the attachment points on each body’s local
+frame.</p>
+</section>
+</section>
+<section id="terrain">
+<h2>Terrain<a class="headerlink" href="#terrain" title="Link to this heading"></a></h2>
+<section id="terrain-region">
+<h3>terrain_region<a class="headerlink" href="#terrain-region" title="Link to this heading"></a></h3>
+<p>A heightfield region. The first set of positional tokens describes the grid:
+<code class="docutils literal notranslate"><span class="pre">path</span> <span class="pre">xSamples</span> <span class="pre">ySamples</span> <span class="pre">xSize</span> <span class="pre">ySize</span> <span class="pre">center(x,y,z)</span></code>. The rest of the line
+holds per-cell arrays — the heightmap itself plus optional texture splatting,
+wetness, holes, and per-vertex colours.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>terrain_region /World/Terrain/SculptedField 17 17 8 5.5 0 3.2 0 \
+  id=terrain_sculptedfield parentGroupId=folder_terrain location=0,0 \
+  material=mat_terrain contactMaterial=default baseTexture=2 \
+  visible=true collidable=true castShadow=true receiveShadow=true \
+  sourceKind=samples sourcePath=- cloneSource=- \
+  pngHeightScale=1 pngHeightOffset=0 \
+  proceduralFrequency=0.1 proceduralZScale=2 proceduralOctaves=5 \
+  proceduralLacunarity=2 proceduralGain=0.5 proceduralStepSize=0 \
+  proceduralHeightOffset=0 proceduralSeed=5489 \
+  lodLevels=7 collisionShapeSize=64 textureSplattingEnabled=true \
+  heights=0.02,0.02,0.0365,0.0640,... \
+  texturePrimary=0,0,0,0,3,3,3,... \
+  textureSecondary=0,0,3,3,3,3,3,... \
+  textureBlend=0,0,0.04,0.13,0.20,... \
+  wetness=0,0,0,0,... holes=0,0,0,0,... \
+  vertexColors=1,1,1,1;1,1,1,1;1,1,1,1;...
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">sourceKind</span></code> selects whether heights are explicit samples
+(<code class="docutils literal notranslate"><span class="pre">heights=...</span></code>), generated from a PNG (<code class="docutils literal notranslate"><span class="pre">sourcePath=heightmap.png</span></code> plus
+<code class="docutils literal notranslate"><span class="pre">pngHeightScale</span></code>/<code class="docutils literal notranslate"><span class="pre">pngHeightOffset</span></code>), generated procedurally
+(<code class="docutils literal notranslate"><span class="pre">procedural*</span></code> keys), or cloned from another region.</p>
+<a class="reference internal image-reference" href="../_images/rayrai_rscene_terrain.png"><img alt="A bumpy sand-coloured terrain heightmap with two crates and a stone boulder resting on top, illustrating the terrain_region record" src="../_images/rayrai_rscene_terrain.png" style="width: 100%;" />
+</a>
+<p>The image is what a procedural <code class="docutils literal notranslate"><span class="pre">terrain_region</span></code> record looks like when
+loaded: a 41×41 sample heightmap covering a 12 m × 12 m patch, driven by the
+Perlin parameters <code class="docutils literal notranslate"><span class="pre">proceduralFrequency=0.18</span> <span class="pre">proceduralZScale=0.9</span>
+<span class="pre">proceduralOctaves=5</span> <span class="pre">proceduralLacunarity=2</span> <span class="pre">proceduralGain=0.5</span>
+<span class="pre">proceduralSeed=5489</span></code>. The crates and boulder on top are independent
+<code class="docutils literal notranslate"><span class="pre">object</span></code> records, included so the terrain’s relief reads against
+recognisable shapes.</p>
+</section>
+<section id="terrain-splat-layer-terrain-foliage-layer">
+<h3>terrain_splat_layer, terrain_foliage_layer<a class="headerlink" href="#terrain-splat-layer-terrain-foliage-layer" title="Link to this heading"></a></h3>
+<p>Per-region splatting layers and foliage scattering layers. Each line repeats
+the parent region’s path as a back-reference.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>terrain_splat_layer /World/Terrain/SculptedField slot=2 enabled=true \
+  strength=1 weights=1,1,1,1,1,0.999,0.987,...
+
+terrain_foliage_layer /World/Terrain/SculptedField id=foliage_grass \
+  name=Grass enabled=true primitive=grass_blade meshPath=meshes/grass.obj \
+  size=0.06,0.06,0.30 colorA=0.30,0.55,0.20,1 colorB=0.45,0.65,0.25,1 \
+  density=1,1,1,1,... densityPerSquareMeter=120 maxInstances=200000 \
+  minScale=0.7 maxScale=1.3 randomYawDegrees=180 \
+  randomPitchDegrees=0 randomRollDegrees=0 alignToNormal=false \
+  minHeight=0 maxHeight=10 minSlopeDegrees=0 maxSlopeDegrees=30 \
+  castShadows=false detectable=false automaticMeshLod=true \
+  maxRenderedInstances=80000 renderedInstanceStride=1 \
+  projectedLod=true projectedLodMinRadiusPixels=2 projectedLodMaxStride=8 \
+  doubleBufferedInstanceUploads=true sortTransparentInstances=false \
+  seed=1234
+</pre></div>
+</div>
+<p>Splat-layer <code class="docutils literal notranslate"><span class="pre">weights</span></code> is a per-cell CSV. Foliage <code class="docutils literal notranslate"><span class="pre">density</span></code> is a per-cell
+CSV of normalised density values (0..1) that scales the global
+<code class="docutils literal notranslate"><span class="pre">densityPerSquareMeter</span></code>.</p>
+<a class="reference internal image-reference" href="../_images/rayrai_rscene_terrain_layers.png"><img alt="Coloured terrain splat patches, stepped height changes, foliage instances, and a boulder on a terrain region" src="../_images/rayrai_rscene_terrain_layers.png" style="width: 100%;" />
+</a>
+<p>The coloured patches correspond to <code class="docutils literal notranslate"><span class="pre">terrain_splat_layer</span></code> weights, while the
+repeated grass-like instances correspond to a <code class="docutils literal notranslate"><span class="pre">terrain_foliage_layer</span></code> bound
+to a parent <code class="docutils literal notranslate"><span class="pre">terrain_region</span></code>.</p>
+</section>
+</section>
+<section id="sensors-and-visual-aids">
+<h2>Sensors And Visual Aids<a class="headerlink" href="#sensors-and-visual-aids" title="Link to this heading"></a></h2>
+<section id="sensor">
+<h3>sensor<a class="headerlink" href="#sensor" title="Link to this heading"></a></h3>
+<p>A simulated sensor — RGB, depth, segmentation, IMU, lidar, force/torque, …
+Positional layout: <code class="docutils literal notranslate"><span class="pre">path</span> <span class="pre">kind</span> <span class="pre">parentObject</span> <span class="pre">pos(x,y,z)</span> <span class="pre">rot(w,x,y,z)</span></code>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>sensor /World/Robots/Cassie/Head/RgbCam rgb articulated_cassie \
+  0.05 0.0 0.18 1 0 0 0 \
+  id=sensor_head_rgb parentGroupId=folder_robots \
+  parentLink=head width=1280 height=720 updateRate=30 \
+  verticalFov=45 horizontalFov=70 nearPlane=0.05 farPlane=80 \
+  lidarChannels=0 lidarSamples=0 lidarMinRange=0 lidarMaxRange=0 \
+  lidarVerticalFov=0 segmentation=false \
+  calibrationFx=900 calibrationFy=900 calibrationCx=640 calibrationCy=360 \
+  noiseMean=0 noiseStddev=0 noiseSeed=0 enabled=true outputPath=-
+
+sensor /World/Robots/Cassie/Body/Imu imu articulated_cassie \
+  0 0 0 1 0 0 0 \
+  id=sensor_body_imu parentLink=pelvis updateRate=200 \
+  noiseMean=0 noiseStddev=0.01 noiseSeed=42 enabled=true outputPath=-
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">parentObject</span></code> is the <em>id</em> of the body the sensor is attached to;
+<code class="docutils literal notranslate"><span class="pre">parentLink</span></code> is the link name within an articulated system.</p>
+</section>
+<section id="reflection-probe">
+<h3>reflection_probe<a class="headerlink" href="#reflection-probe" title="Link to this heading"></a></h3>
+<p>A static reflection capture with optional box projection. Positional layout:
+<code class="docutils literal notranslate"><span class="pre">path</span> <span class="pre">pos(x,y,z)</span> <span class="pre">radius</span></code>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>reflection_probe /World/Probes/Hallway 0.0 0.0 1.6 6.0 \
+  id=probe_hallway parentGroupId=folder_probes strength=1.0 \
+  boxProjection=true boxMin=-3,-3,0 boxMax=3,3,3 \
+  captureOnApply=true captureCached=true captureFiltered=true \
+  cubemapSize=256 captureDrawVisualizationObjects=false \
+  captureDrawCoordinateFrames=false captureDrawPointClouds=false \
+  captureShadows=true captureEnvironmentBackground=true \
+  captureEnvironmentExposure=1.0 \
+  irradianceResolution=32 irradianceSamples=64 \
+  prefilteredResolution=128 prefilteredMipLevels=5 prefilteredSamples=64 \
+  brdfLutSize=128 brdfLutSamples=512 enabled=true
+</pre></div>
+</div>
+</section>
+<section id="local-fog">
+<h3>local_fog<a class="headerlink" href="#local-fog" title="Link to this heading"></a></h3>
+<p>A spherical local fog volume. Positional layout: <code class="docutils literal notranslate"><span class="pre">path</span> <span class="pre">center(x,y,z)</span> <span class="pre">radius</span></code>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>local_fog /World/Effects/CellarFog 2 -1 0.5 3.0 \
+  id=fog_cellar parentGroupId=folder_effects \
+  color=0.45,0.55,0.65 density=0.6 edgeFade=0.3 \
+  noiseScale=0.25 noiseStrength=0.4 enabled=true
+</pre></div>
+</div>
+</section>
+<section id="projected-decal">
+<h3>projected_decal<a class="headerlink" href="#projected-decal" title="Link to this heading"></a></h3>
+<p>A decal projected from a textured box onto every surface inside the box.
+Positional layout: <code class="docutils literal notranslate"><span class="pre">path</span> <span class="pre">pos(x,y,z)</span> <span class="pre">rot(w,x,y,z)</span> <span class="pre">scale(x,y,z)</span></code>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>projected_decal /World/Decals/PosterA 2 0 1.6 0.707 0 0 0.707 1 1 1 \
+  id=decal_posterA parentGroupId=folder_decals \
+  halfExtents=0.6,0.05,0.3 color=1,1,1,1 \
+  edgeFade=0.05 normalFade=0.5 upperFade=0.1 lowerFade=0.1 \
+  albedoTexture=textures/poster_a_albedo.png \
+  emissionTexture=- normalTexture=- ormTexture=- \
+  uvScale=1,1 uvOffset=0,0 albedoMix=1.0 emissionEnergy=0 \
+  normalStrength=1 ormStrength=1 \
+  distanceFadeEnabled=true distanceFadeBegin=12 distanceFadeLength=4 \
+  enabled=true
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/rayrai_rscene_atmosphere.png"><img alt="A warm dust haze wraps around stacked crates on a pallet while a glowing yellow warning decal lights the floor in front, illustrating the local_fog and projected_decal records" src="../_images/rayrai_rscene_atmosphere.png" style="width: 100%;" />
+</a>
+<p>The image combines two atmospheric records on top of the warehouse scene: a
+large bluish <code class="docutils literal notranslate"><span class="pre">local_fog</span></code> volume covering the upper area plus a denser warm
+<code class="docutils literal notranslate"><span class="pre">local_fog</span></code> puff hugging the left side of the crates, and an emissive
+warning-yellow <code class="docutils literal notranslate"><span class="pre">projected_decal</span></code> painted onto the floor in front of the
+pallet. Both records ship in the same <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> file as the <code class="docutils literal notranslate"><span class="pre">object</span></code>
+records they decorate, so the atmospheric look round-trips with the
+scene.</p>
+</section>
+<section id="irradiance-volume">
+<h3>irradiance_volume<a class="headerlink" href="#irradiance-volume" title="Link to this heading"></a></h3>
+<p>A box of constant indirect light. Positional layout: <code class="docutils literal notranslate"><span class="pre">path</span> <span class="pre">pos(x,y,z)</span>
+<span class="pre">rot(w,x,y,z)</span> <span class="pre">scale(x,y,z)</span></code>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>irradiance_volume /World/Volumes/Lobby 0 0 1.5 1 0 0 0 1 1 1 \
+  id=ivol_lobby parentGroupId=folder_volumes \
+  halfExtents=4,4,1.7 color=0.32,0.30,0.28,1 \
+  strength=0.85 edgeFade=0.22 normalBias=0.02 enabled=true
+</pre></div>
+</div>
+</section>
+<section id="point-cloud">
+<h3>point_cloud<a class="headerlink" href="#point-cloud" title="Link to this heading"></a></h3>
+<p>A static point cloud, e.g. for visualising captures or ROS bag data. Points
+and colours are stored in packed lists; <code class="docutils literal notranslate"><span class="pre">maxRenderedPoints</span></code> and
+<code class="docutils literal notranslate"><span class="pre">renderedPointStride</span></code> bound the visible subset without losing data on
+round-trip.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>point_cloud /World/Sensing/MapCloud id=pointcloud_map \
+  parentGroupId=folder_sensing \
+  points=1.0,0.0,0.0;1.1,0.0,0.0;1.2,0.0,0.0 \
+  colors=1,0,0,1;1,0.5,0,1;1,1,0,1 \
+  pointSize=2.5 maxRenderedPoints=100000 renderedPointStride=1 \
+  detectable=false enabled=true
+</pre></div>
+</div>
+</section>
+<section id="instanced-visual">
+<h3>instanced_visual<a class="headerlink" href="#instanced-visual" title="Link to this heading"></a></h3>
+<p>A GPU-instanced batch of one primitive or mesh. Positional layout:
+<code class="docutils literal notranslate"><span class="pre">path</span> <span class="pre">primitive</span></code>. <code class="docutils literal notranslate"><span class="pre">instances</span></code> is a <code class="docutils literal notranslate"><span class="pre">;</span></code>-separated list of transforms (10
+numbers each); <code class="docutils literal notranslate"><span class="pre">colorWeights</span></code> is a parallel float CSV that blends
+<code class="docutils literal notranslate"><span class="pre">colorA</span></code>/<code class="docutils literal notranslate"><span class="pre">colorB</span></code> per instance.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>instanced_visual /World/Foliage/Pebbles sphere id=instanced_pebbles \
+  parentGroupId=folder_foliage \
+  meshPath=meshes/pebble.obj size=0.04,0.04,0.04 \
+  colorA=0.40,0.36,0.30,1 colorB=0.50,0.45,0.40,1 \
+  instances=1.0,0.0,0.0,1,0,0,0,1,1,1;1.5,0.0,0.0,1,0,0,0,1,1,1;2.0,0.3,0.0,1,0,0,0,0.8,0.8,0.8 \
+  colorWeights=0.1,0.5,0.9 \
+  castShadows=true detectable=false automaticMeshLod=true \
+  maxRenderedInstances=20000 renderedInstanceStride=1 \
+  projectedLod=true projectedLodMinRadiusPixels=2 projectedLodMaxStride=8 \
+  doubleBufferedInstanceUploads=true sortTransparentInstances=false \
+  grassPatch=false terrainBinding=- terrainFoliageLayer=-1 \
+  densityPreview=false enabled=true
+</pre></div>
+</div>
+<p>Instanced visuals can also act as a <em>grass patch</em> (<code class="docutils literal notranslate"><span class="pre">grassPatch=true</span></code> with
+grass-specific parameters) or be bound to a parent terrain region’s foliage
+layer (<code class="docutils literal notranslate"><span class="pre">terrainBinding=&lt;terrain</span> <span class="pre">id&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">terrainFoliageLayer=&lt;slot&gt;</span></code>); the
+terrain authoring keys live in the same record so they round-trip cleanly.</p>
+<a class="reference internal image-reference" href="../_images/rayrai_rscene_visual_aids.png"><img alt="A camera/sensor frustum, point cloud, instanced markers, reflection probe marker, and irradiance volume marker around a target object" src="../_images/rayrai_rscene_visual_aids.png" style="width: 100%;" />
+</a>
+<p>The sensor and visual-aid records are shown together: the cyan frustum is a
+<code class="docutils literal notranslate"><span class="pre">sensor</span></code>/camera helper, the blue spiral is a <code class="docutils literal notranslate"><span class="pre">point_cloud</span></code>, the small
+orange boxes are an <code class="docutils literal notranslate"><span class="pre">instanced_visual</span></code>, the cyan sphere marks a
+<code class="docutils literal notranslate"><span class="pre">reflection_probe</span></code>, and the translucent blue box marks an
+<code class="docutils literal notranslate"><span class="pre">irradiance_volume</span></code>.</p>
+</section>
+</section>
+<section id="a-minimal-example-top-to-bottom">
+<h2>A Minimal Example, Top To Bottom<a class="headerlink" href="#a-minimal-example-top-to-bottom" title="Link to this heading"></a></h2>
+<p>Putting it together, this is roughly the smallest valid scene with one
+folder, one material, one camera, one light, and one dynamic box:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>raisim_engine_scene 1
+time_step 0.0025
+gravity 0 0 -9.81
+solver 80 1e-07 0.2 accurate defaultFriction=0.8 defaultRestitution=0
+snapping true true false false false false false false 0.1 15 0.1 0 surfaceNormal=0,0,1
+asset_root .
+scene_graph inheritedTransforms=true keepWorldTransformOnReparent=true \
+  dragReparenting=true packedSceneOverrides=true transformSpace=global
+editor_ux multiSelect=true copyPaste=true duplicate=true \
+  transformLocalSpace=false selectionFilters=true strongUndoGrouping=true \
+  selectionFilterKinds=
+render_bake probeCaptureOnSave=false lightmapBakeEnabled=false \
+  irradianceBakeEnabled=false renderDiagnostics=false \
+  lightmapResolution=1024 probeCubemapSize=256 outputDirectory=bakes
+environment 0.08 0.10 0.13 0.24 0.25 0.29 0 true true 10 - \
+  backgroundMode=rayrai_sky pbrEnvironmentIntensity=1
+weather true preset=clear quality=balanced timeOfDay=12
+rayrai_render preset=balanced custom=false colorMode=unreal_preview
+material mat_box 0.7 0.3 0.2 1 0 0.6 0 0 0 0 false - - - - - - id=mat_box
+group /World id=folder_world parentId=- visible=true locked=false expanded=true
+group /World/Props id=folder_props parentId=folder_world visible=true \
+  locked=false expanded=true
+light /World/MainLight -0.3 0.4 -1.0 3.5 id=light_main type=directional \
+  position=0,0,5 color=1,0.97,0.92 shadows=true shadowResolution=2048
+camera /World/Cam 3 -5 2 0.92 0 0 0.39 52 0.05 100 1280 720 rgb true \
+  id=camera_main
+object /World/Ground ground 0 0 0 1 0 0 0 20 20 1 1 0 0 default mat_box \
+  false true true - static true 1 18446744073709551615 id=object_ground \
+  parentGroupId=folder_world
+object /World/Props/CrateA box 0 0 0.5 1 0 0 0 1 1 1 0.5 1 1.0 default mat_box \
+  false true false - dynamic true 1 18446744073709551615 id=object_cratea \
+  parentGroupId=folder_props
+</pre></div>
+</div>
+<p>When the scene above is loaded by <code class="docutils literal notranslate"><span class="pre">raisim_engine2</span></code>, instantiated through
+<code class="docutils literal notranslate"><span class="pre">raisim_engine2::RaisimBridge</span></code>, and rendered through
+<code class="docutils literal notranslate"><span class="pre">raisim_engine2::RayraiBridge</span></code>, it looks like this:</p>
+<a class="reference internal image-reference" href="../_images/rayrai_rscene_minimal.png"><img alt="A reddish-orange unit box sitting on the checkered ground plane under the procedural rayrai sky, lit by a single warm directional light" src="../_images/rayrai_rscene_minimal.png" style="width: 100%;" />
+</a>
+<p>The single warm directional light comes from the <code class="docutils literal notranslate"><span class="pre">light</span> <span class="pre">/World/MainLight</span></code>
+record, the orange tint is the <code class="docutils literal notranslate"><span class="pre">mat_box</span></code> material’s albedo
+(<code class="docutils literal notranslate"><span class="pre">0.7</span> <span class="pre">0.3</span> <span class="pre">0.2</span> <span class="pre">1</span></code>), the camera frame matches the <code class="docutils literal notranslate"><span class="pre">camera</span> <span class="pre">/World/Cam</span></code>
+record’s eye point and 52° FOV, and the procedural sky comes from
+<code class="docutils literal notranslate"><span class="pre">environment</span> <span class="pre">backgroundMode=rayrai_sky</span></code> + <code class="docutils literal notranslate"><span class="pre">weather</span> <span class="pre">preset=clear</span></code>.</p>
+</section>
+<section id="loading-and-saving-programmatically">
+<h2>Loading And Saving Programmatically<a class="headerlink" href="#loading-and-saving-programmatically" title="Link to this heading"></a></h2>
+<p>The C++ entry points are in <code class="docutils literal notranslate"><span class="pre">raisim_engine2/RSceneIO.hpp</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;raisim_engine2/RSceneIO.hpp&quot;</span>
+
+<span class="n">raisim_engine2</span><span class="o">::</span><span class="n">Scene</span><span class="w"> </span><span class="n">scene</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">error</span><span class="p">;</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">raisim_engine2</span><span class="o">::</span><span class="n">loadRsceneFile</span><span class="p">(</span><span class="s">&quot;warehouse.rscene&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">scene</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">error</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// error contains &quot;line N: ...&quot; diagnostic</span>
+<span class="p">}</span>
+
+<span class="c1">// Mutate scene...</span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">raisim_engine2</span><span class="o">::</span><span class="n">saveRsceneFile</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;out.rscene&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">error</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// ...</span>
+<span class="p">}</span>
+
+<span class="c1">// String/stream overloads are also available:</span>
+<span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisim_engine2</span><span class="o">::</span><span class="n">saveRsceneString</span><span class="p">(</span><span class="n">scene</span><span class="p">);</span>
+<span class="n">raisim_engine2</span><span class="o">::</span><span class="n">loadRsceneString</span><span class="p">(</span><span class="n">text</span><span class="p">,</span><span class="w"> </span><span class="n">scene</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">error</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Errors are returned via the optional <code class="docutils literal notranslate"><span class="pre">std::string*</span></code> argument as
+<code class="docutils literal notranslate"><span class="pre">line</span> <span class="pre">&lt;N&gt;:</span> <span class="pre">&lt;message&gt;</span></code>, where <code class="docutils literal notranslate"><span class="pre">&lt;N&gt;</span></code> is the 1-based source line. The
+<code class="docutils literal notranslate"><span class="pre">Scene</span></code> instance is left in a partially populated state on failure, so the
+caller should discard it or load into a fresh <code class="docutils literal notranslate"><span class="pre">Scene</span></code> and only swap on
+success.</p>
+<p>To instantiate a loaded scene into a live <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code>, use
+<code class="docutils literal notranslate"><span class="pre">raisim_engine2::RaisimBridge</span></code> (header:
+<code class="docutils literal notranslate"><span class="pre">raisim_engine2/RaisimBridge.hpp</span></code>). For rendering it through rayrai, use
+<code class="docutils literal notranslate"><span class="pre">raisim_engine2::RayraiBridge</span></code>. Neither bridge depends on the <code class="docutils literal notranslate"><span class="pre">.rscene</span></code>
+text — they consume the in-memory <code class="docutils literal notranslate"><span class="pre">Scene</span></code> — so the file format is decoupled
+from the runtime systems it feeds.</p>
+</section>
+<section id="relationship-to-projects-and-scripts">
+<h2>Relationship To Projects And Scripts<a class="headerlink" href="#relationship-to-projects-and-scripts" title="Link to this heading"></a></h2>
+<p>A <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> is self-contained but is normally edited inside a <em>project</em>
+directory. A project root holds a <code class="docutils literal notranslate"><span class="pre">raisim_engine2_project</span></code> text file plus
+<code class="docutils literal notranslate"><span class="pre">assets/</span></code>, <code class="docutils literal notranslate"><span class="pre">examples/</span></code> (or another <code class="docutils literal notranslate"><span class="pre">scene_directory</span></code>), and a
+<code class="docutils literal notranslate"><span class="pre">default_scene</span></code> <code class="docutils literal notranslate"><span class="pre">.rscene</span></code>:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>raisim_engine2_project 1
+name RaiSim Engine 2 Built-in Project
+asset_directory assets
+scene_directory examples
+default_scene examples/warehouse_scene.rscene
+description Built-in scenes and assets shipped with raisim_engine2.
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">asset_root</span></code> record inside a scene records the path the scene resolves
+mesh/texture references against, so a scene saved under a project remains
+portable as long as the referenced assets travel with it.</p>
+<p><code class="docutils literal notranslate"><span class="pre">.re2</span></code> scripts are a parallel authoring surface: they are a tiny imperative
+language whose commands map one-to-one onto <code class="docutils literal notranslate"><span class="pre">Scene</span></code> mutations. Running
+<code class="docutils literal notranslate"><span class="pre">raisim_engine2</span> <span class="pre">--script</span> <span class="pre">foo.re2</span> <span class="pre">--save</span> <span class="pre">foo.rscene</span></code> is equivalent to
+opening the editor, executing the commands, and saving the resulting
+document. The <code class="docutils literal notranslate"><span class="pre">.re2</span></code> form is what version-controlled authoring tests use;
+the <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> form is what runtime tools load.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="WorldConfigurationFile.html" class="btn btn-neutral float-left" title="World Configuration File" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="OpenUSD.html" class="btn btn-neutral float-right" title="OpenUSD Loading" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

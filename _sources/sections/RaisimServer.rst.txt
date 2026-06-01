@@ -183,6 +183,24 @@ Treat this as a security boundary — once the server is reachable from a wider
 network, every client on that network can pause / step / force-apply /
 spawn-remove. There is no token or capability handshake to fall back on.
 
+Discovery beacons
+=================
+While the server is running, ``RaisimServer`` advertises itself with a UDP
+beacon once per second on port ``59312``. The beacon payload contains the
+RaiSim TCP protocol version, TCP port, host name, executable name, bind mode
+(``loopback`` or ``all``), and connection status. ``rayrai_raisim_tcp_viewer``
+uses these beacons to populate the detected-server list in its **Control**
+tab.
+
+With the default loopback bind, beacons are sent only to ``127.0.0.1``. After
+``server.setBindLoopbackOnly(false)``, they are broadcast on the local network
+so another machine can discover the server. Discovery is only a convenience
+layer: clients may always connect directly to the TCP endpoint with
+``--connect host:port`` or equivalent custom-client code.
+
+For Windows LAN use, allow both the TCP server port (``8080`` by default) and
+UDP port ``59312`` through the firewall. If UDP broadcast is blocked, manual
+TCP connection still works.
 
 RaisimServer API
 =========================

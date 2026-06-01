@@ -117,6 +117,36 @@ This is the same pattern used by the doc image generators under
 ``docs/image_generators/`` — see ``doc_image_common.hpp`` for a packaged
 helper that wraps the boilerplate above.
 
+Detectability in camera captures
+================================
+External-camera captures draw RaiSim world objects according to the usual
+object visibility rules, but they intentionally filter rayrai custom
+visualization objects. ``Visuals``, ``InstancedVisuals``, and ``PointCloud``
+instances must be marked detectable to appear in capture paths where
+``RenderOverrides::drawVisualizationObjects`` or
+``RenderOverrides::drawPointClouds`` is enabled:
+
+.. code-block:: cpp
+
+    auto prop = viewer.addVisualMesh("visible_to_camera", "/path/prop.glb",
+                                     glm::dvec3(1.0), glm::vec4(1.0f));
+    prop->setDetectable(true);
+
+``RenderOverrides::drawVisualizationObjects`` and
+``RenderOverrides::drawPointClouds`` enable those object families for an
+external render; they do not force non-detectable debug helpers into the
+captured image. Leave overlays, camera frustums, coordinate aids, and temporary
+debug geometry non-detectable when they should remain visible only in the
+interactive viewer.
+
+Detectability is not a physics flag. It does not create collision, dynamics,
+or a semantic label, and it does not affect normal viewer visibility.
+
+The ``renderWithExternalCamera`` overloads that take a RaiSim ``RGBCamera`` or
+``DepthCamera`` are stricter: they disable custom visualization objects and
+point clouds entirely, regardless of detectability. That keeps RaiSim sensor
+images limited to world geometry.
+
 Camera control and picking
 ==========================
 ``RayraiWindow`` manages an internal camera for offscreen rendering.
@@ -161,6 +191,12 @@ pixel coordinates. A return value of ``0`` means nothing was hit:
 Picking renders a dedicated selection pass with a flat shader, so it is
 roughly as cheap as one MSAA-off pass of the scene. Use it on click events,
 not in the per-frame fast path.
+
+The public picking helpers do not require ``setDetectable(true)`` by default.
+Detectability is primarily for external-camera/capture render filtering; some
+internal render policies can request detectable-only visualization candidates,
+but ordinary click picking is not the reason to mark a custom visual
+detectable.
 
 Captures and diagnostics
 ========================

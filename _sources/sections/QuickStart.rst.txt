@@ -56,12 +56,23 @@ need the TCP viewer:
 .. code-block:: bash
 
     <raisim-install>/bin/example_model_asset_pipeline
-    <raisim-install>/bin/example_usd_importer
+
+5. Run an OpenUSD mesh-loading example
+======================================
+
+Start the TCP viewer, then run the ShadowHand USD example:
+
+.. code-block:: bash
+
+    <raisim-install>/bin/rayrai_raisim_tcp_viewer
+    <raisim-install>/bin/shadow_hand_usd_cube
 
 Next steps
 ==========
 
 * Use :doc:`Examples` to choose a target by feature.
+* Use :doc:`OpenUSD` for USD mesh-loading scope, runtime layout, and
+  troubleshooting.
 * Use :doc:`Visualization` to choose between the TCP viewer and in-process
   rayrai.
 * Use :doc:`Troubleshooting` for common runtime, viewer, and activation issues.

@@ -217,15 +217,27 @@ Visual assets and collision assets should remain separate unless you explicitly 
 same mesh for both. A high-detail textured glTF visual mesh is often unsuitable as a collision mesh;
 use a simplified convex hull, CoACD decomposition, or authored collision asset for simulation.
 
-USD note
---------
-USD/USDA/USDC/USDZ mesh loading depends on Assimp being built with its optional USD importer. If the
-installed RaiSim package was configured with ``-DRAISIM_ASSIMP_USD_IMPORTER=OFF``, loading a USD mesh
-fails with a clear error. Rebuild RaiSim with ``-DRAISIM_ASSIMP_USD_IMPORTER=ON`` when USD import is
-required.
+OpenUSD mesh loading
+--------------------
+USD/USDA/USDC/USDZ files are loaded through RaiSim's bundled OpenUSD runtime, not through
+Assimp's USD importer. OpenUSD support is included in supported RaiSim builds, so
+``World::addMesh`` accepts USD files directly:
 
-Mesh collision is supported for mesh formats handled by Assimp. Keep collision meshes reasonably
-sized for performance.
+.. code-block:: cpp
+
+    auto* mesh = world.addMesh("asset.usd",
+                               1.0,
+                               1.0,
+                               "default",
+                               raisim::MeshCollisionMode::ORIGINAL_MESH);
+
+The importer reads ``UsdGeomMesh`` geometry, applies parent transforms, triangulates faces,
+and merges mesh prims into one RaiSim mesh object. It does not instantiate USD physics,
+articulations, variants, skeletons, lights, or full material graphs. Keep collision meshes
+reasonably sized, and use simplified collision assets, convex hulls, or CoACD when a USD
+visual mesh is too detailed for contact.
+
+See :doc:`OpenUSD` for runtime layout, examples, and troubleshooting.
 
 
 

@@ -7,13 +7,39 @@ objects within a single World instance can collide with one another unless their
 collision group and mask settings disable that pair. See :doc:`Contact` and
 :doc:`CollisionDetection` for contact and collision details.
 
-A World instance can be instantiated in two ways.
-The first method involves loading a RaiSim world configuration file in XML format.
-Further details regarding the XML format are available in the ``World Configuration File`` section.
+A ``raisim::World`` can be instantiated in three ways:
 
-The second method is to dynamically generate the world via code.
+#. **From a USD scene file (recommended default).** Pass a ``.usd``, ``.usda``,
+   ``.usdc``, or ``.usdz`` path to the constructor. RaiSim opens the USD
+   stage, imports the rigid bodies, articulated systems, and supported
+   collision shapes, and the world is ready to step. See :doc:`OpenUSD` for
+   the full import semantics and tooling story.
 
-These methods can be combined by loading an initial XML configuration and subsequently adding objects dynamically.
+   .. code-block:: cpp
+
+     raisim::World world("scene.usd");
+
+   This is the preferred entry point because the scene is portable across
+   USD-native tools (Isaac Sim, Omniverse, Blender, the
+   :doc:`RaisimEngine2` editor).
+
+#. **From a RaiSim XML or MuJoCo MJCF configuration file.** Pass an ``.xml``
+   or ``.mjcf`` path to the same constructor; the file's root tag
+   (``<raisim>`` or ``<mujoco>``) selects the loader. Use this when the
+   scene is hand-edited, template-driven, or already lives in one of those
+   formats. See :doc:`WorldConfigurationFile` for the XML schema.
+
+#. **Programmatically.** Default-construct an empty world and add objects
+   in code:
+
+   .. code-block:: cpp
+
+     raisim::World world;
+     world.addGround();
+     auto* box = world.addBox(1.0, 1.0, 1.0, 1.0);
+
+These methods can be combined: load an initial USD or XML scene and then
+add or remove objects in code before stepping.
 
 An experimental MJCF (MuJoCo file format) reader is also available. MJCF files
 can be loaded with the same

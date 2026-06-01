@@ -1,0 +1,314 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpenUSD Loading &mdash; raisim 2.4.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b0caeef3" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=4d935f96"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Raisim Server" href="RaisimServer.html" />
+    <link rel="prev" title=".rscene File" href="RsceneFile.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RsceneFile.html">.rscene File</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">OpenUSD Loading</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#instantiating-a-world-from-usd">Instantiating a World From USD</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#what-is-imported-from-a-usd-scene">What is imported from a USD scene</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#loading-usd-as-mesh-geometry">Loading USD as Mesh Geometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#runtime-requirements">Runtime requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mesh-import-semantics">Mesh Import Semantics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">OpenUSD Loading</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="openusd-loading">
+<h1>OpenUSD Loading<a class="headerlink" href="#openusd-loading" title="Link to this heading"></a></h1>
+<p>RaiSim loads OpenUSD files directly through the bundled OpenUSD runtime.
+OpenUSD support is part of supported RaiSim packages and source builds; it is
+not an optional Assimp importer path and there is no CMake switch to build
+RaiSim without it.</p>
+<figure class="align-default" id="id1">
+<a class="reference internal image-reference" href="../_images/rayrai_usd_nvidia_robots.png"><img alt="Three Isaac Sim robot USD assets imported into RaiSim" src="../_images/rayrai_usd_nvidia_robots.png" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Collision bodies from Isaac Sim robot USD assets imported as RaiSim
+articulated systems.</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<section id="instantiating-a-world-from-usd">
+<h2>Instantiating a World From USD<a class="headerlink" href="#instantiating-a-world-from-usd" title="Link to this heading"></a></h2>
+<p>The <strong>default way to instantiate a ``raisim::World``</strong> is to point the
+constructor at a USD scene file. The constructor inspects the file’s
+extension and, when it is <code class="docutils literal notranslate"><span class="pre">.usd</span></code>, <code class="docutils literal notranslate"><span class="pre">.usda</span></code>, <code class="docutils literal notranslate"><span class="pre">.usdc</span></code>, or <code class="docutils literal notranslate"><span class="pre">.usdz</span></code>,
+dispatches to the USD scene loader to build the world’s bodies, joints, and
+collision shapes in a single call:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;raisim/World.hpp&gt;</span>
+
+<span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">(</span><span class="s">&quot;scene.usd&quot;</span><span class="p">);</span><span class="w">   </span><span class="c1">// &lt;-- recommended default</span>
+
+<span class="c1">// World is now populated with the rigid bodies, articulated systems, and</span>
+<span class="c1">// collision shapes declared in scene.usd. Add a ground, set the time</span>
+<span class="c1">// step, attach controllers, and start stepping as usual.</span>
+<span class="n">world</span><span class="p">.</span><span class="n">addGround</span><span class="p">();</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.0025</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This unifies physics scene authoring on a single text/binary format that USD
+tooling — Isaac Sim, Omniverse, Blender’s USD exporter, RaiSim’s own
+<a class="reference internal" href="RaisimEngine2.html"><span class="doc">RaiSim Engine 2</span></a> editor — can produce and consume. Prefer it over
+hand-written XML when the scene is going to be authored by a tool or
+exchanged with other USD-native ecosystems.</p>
+<p>The same constructor still accepts a RaiSim <code class="docutils literal notranslate"><span class="pre">.xml</span></code> <a class="reference internal" href="WorldConfigurationFile.html"><span class="doc">world configuration
+file</span></a> or a MuJoCo <code class="docutils literal notranslate"><span class="pre">.mjcf</span></code>; the file’s extension
+(for USD) and root tag (<code class="docutils literal notranslate"><span class="pre">&lt;raisim&gt;</span></code> / <code class="docutils literal notranslate"><span class="pre">&lt;mujoco&gt;</span></code>) determine the loader.
+USD is the recommended default; XML stays available for hand-edited and
+template-driven worlds.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">usdWorld</span><span class="p">(</span><span class="s">&quot;scene.usd&quot;</span><span class="p">);</span><span class="w">           </span><span class="c1">// USD scene loader</span>
+<span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">xmlWorld</span><span class="p">(</span><span class="s">&quot;scene.xml&quot;</span><span class="p">);</span><span class="w">           </span><span class="c1">// RaiSim XML loader</span>
+<span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">mjcWorld</span><span class="p">(</span><span class="s">&quot;scene.mjcf&quot;</span><span class="p">);</span><span class="w">          </span><span class="c1">// MuJoCo MJCF loader</span>
+<span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">emptyWorld</span><span class="p">;</span><span class="w">                      </span><span class="c1">// empty world, build it</span>
+<span class="w">                                               </span><span class="c1">// up programmatically</span>
+</pre></div>
+</div>
+<figure class="align-default" id="id2">
+<a class="reference internal image-reference" href="../_images/rayrai_usd_shadow_hand_cube.png"><img alt="ShadowHand USD scene imported into RaiSim with a native cube" src="../_images/rayrai_usd_shadow_hand_cube.png" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><code class="docutils literal notranslate"><span class="pre">World(shadow_hand.usd)</span></code> imports the ShadowHand physical geometry; the
+cube is a native RaiSim rigid body.</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<section id="what-is-imported-from-a-usd-scene">
+<h3>What is imported from a USD scene<a class="headerlink" href="#what-is-imported-from-a-usd-scene" title="Link to this heading"></a></h3>
+<p>The USD constructor reads:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">UsdPhysicsRigidBodyAPI</span></code> bodies as rigid objects.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PhysicsFixedJoint</span></code>, <code class="docutils literal notranslate"><span class="pre">PhysicsRevoluteJoint</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">PhysicsPrismaticJoint</span></code> relationships between bodies, assembled into
+articulated systems.</p></li>
+<li><p>Primitive collision shapes — cube, sphere, capsule, cylinder — and
+triangle-mesh collision shapes via <code class="docutils literal notranslate"><span class="pre">UsdGeomMesh</span></code>.</p></li>
+<li><p>Per-body and per-link transforms.</p></li>
+</ul>
+<p>The constructor does <strong>not</strong> import PhysX tendons, drives, variants,
+skeletons, lights, or full material graphs. For high-fidelity rendering
+materials, pair USD physics import with the <a class="reference internal" href="Rayrai.html"><span class="doc">Rayrai</span></a> visual
+pipeline, or keep a separate render-quality USD/glTF alongside the physics
+USD.</p>
+</section>
+</section>
+<section id="loading-usd-as-mesh-geometry">
+<h2>Loading USD as Mesh Geometry<a class="headerlink" href="#loading-usd-as-mesh-geometry" title="Link to this heading"></a></h2>
+<p>The mesh loader also accepts <code class="docutils literal notranslate"><span class="pre">.usd</span></code>, <code class="docutils literal notranslate"><span class="pre">.usda</span></code>, <code class="docutils literal notranslate"><span class="pre">.usdc</span></code>, and <code class="docutils literal notranslate"><span class="pre">.usdz</span></code>
+files wherever a RaiSim mesh path is accepted, for individual single-body
+mesh objects rather than whole scenes:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">mesh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addMesh</span><span class="p">(</span><span class="s">&quot;asset.usd&quot;</span><span class="p">,</span>
+<span class="w">                           </span><span class="mf">1.0</span><span class="p">,</span>
+<span class="w">                           </span><span class="mf">1.0</span><span class="p">,</span>
+<span class="w">                           </span><span class="s">&quot;default&quot;</span><span class="p">,</span>
+<span class="w">                           </span><span class="n">raisim</span><span class="o">::</span><span class="n">MeshCollisionMode</span><span class="o">::</span><span class="n">ORIGINAL_MESH</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The same OpenUSD-backed path is used by <code class="docutils literal notranslate"><span class="pre">raisim::Mesh::loadMesh</span></code> and
+<code class="docutils literal notranslate"><span class="pre">raisim::Mesh::preprocessMesh</span></code>. Use <code class="docutils literal notranslate"><span class="pre">preprocessMesh</span></code> when you want a
+deterministic triangulated OBJ cache that can be reused by later runs.</p>
+</section>
+<section id="runtime-requirements">
+<h2>Runtime requirements<a class="headerlink" href="#runtime-requirements" title="Link to this heading"></a></h2>
+<p>Installed packages include the OpenUSD runtime next to RaiSim:</p>
+<ul class="simple">
+<li><p>On Linux, the runtime is installed under <code class="docutils literal notranslate"><span class="pre">raisim/lib/openusd</span></code> and the
+package environment script adds the required library path.</p></li>
+<li><p>On Windows, the USD DLLs are installed next to the RaiSim binaries and the
+plugin resources are under <code class="docutils literal notranslate"><span class="pre">raisim/bin/openusd</span></code>.</p></li>
+</ul>
+<p>Keep the <code class="docutils literal notranslate"><span class="pre">bin</span></code>, <code class="docutils literal notranslate"><span class="pre">lib</span></code>, <code class="docutils literal notranslate"><span class="pre">openusd</span></code>, and <code class="docutils literal notranslate"><span class="pre">rsc</span></code> directories together when
+copying an installed package. If you build from source, the bundled prebuilt
+OpenUSD tree must exist under <code class="docutils literal notranslate"><span class="pre">prebuilt/openusd/&lt;platform&gt;</span></code>; CMake fails at
+configure time if the required OpenUSD headers or libraries are missing.</p>
+</section>
+<section id="mesh-import-semantics">
+<h2>Mesh Import Semantics<a class="headerlink" href="#mesh-import-semantics" title="Link to this heading"></a></h2>
+<p>When USD is loaded as a mesh asset (via <code class="docutils literal notranslate"><span class="pre">addMesh</span></code> or <code class="docutils literal notranslate"><span class="pre">Mesh::loadMesh</span></code>),
+RaiSim treats it as triangle-mesh geometry:</p>
+<ul class="simple">
+<li><p>The loader opens the file as a <code class="docutils literal notranslate"><span class="pre">UsdStage</span></code> and traverses <code class="docutils literal notranslate"><span class="pre">UsdGeomMesh</span></code>
+prims.</p></li>
+<li><p>Parent transforms are applied to each mesh before vertices are added.</p></li>
+<li><p>Polygon faces are triangulated, and left-handed USD mesh winding is reversed.</p></li>
+<li><p>Multiple mesh prims in one USD file are merged into one RaiSim mesh object.</p></li>
+</ul>
+<p>For high-detail render assets, keep a separate simplified collision mesh or
+use <code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEX_HULL</span></code> / <code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEXIFY</span></code>
+when appropriate.</p>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">shadow_hand_usd_cube</span></code> loads
+<code class="docutils literal notranslate"><span class="pre">rsc/isaac/Robots/ShadowRobot/ShadowHand/shadow_hand.usd</span></code> through
+<code class="docutils literal notranslate"><span class="pre">World(shadow_hand.usd)</span></code> and publishes the scene through <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code>.
+The example target is generated only when CMake finds a RaiSim package with USD
+scene loading. RaiSim is expected to include OpenUSD on every supported
+architecture. Start the TCP viewer, then run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/rayrai_raisim_tcp_viewer
+&lt;raisim-install&gt;/bin/shadow_hand_usd_cube
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">nvidia_usd_robots</span></code> provides additional vetted Isaac Sim robot scenes:
+<code class="docutils literal notranslate"><span class="pre">create3</span></code>, <code class="docutils literal notranslate"><span class="pre">jetbot</span></code>, and <code class="docutils literal notranslate"><span class="pre">ant</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/nvidia_usd_robots
+</pre></div>
+</div>
+<p>On Windows, use the corresponding <code class="docutils literal notranslate"><span class="pre">.exe</span></code> binaries.</p>
+<p>rayrai can also load USD files as visual-only meshes through
+<code class="docutils literal notranslate"><span class="pre">RayraiWindow::addVisualMesh</span></code>. This is useful for inspection, but the same
+scope applies: geometry, transforms, basic display colour/opacity, not full USD
+scene semantics.</p>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading"></a></h2>
+<p>If a USD asset fails to load:</p>
+<ul class="simple">
+<li><p>Verify that the asset path exists and that the package <code class="docutils literal notranslate"><span class="pre">rsc</span></code> directory was
+copied with the binaries.</p></li>
+<li><p>Run the package environment script before launching examples from outside the
+installed <code class="docutils literal notranslate"><span class="pre">bin</span></code> directory.</p></li>
+<li><p>On Windows, make sure the USD DLLs are beside the executable and
+<code class="docutils literal notranslate"><span class="pre">bin/openusd</span></code> is still present.</p></li>
+<li><p>If source configuration fails, regenerate or restore the matching bundled
+OpenUSD prebuilt runtime for your platform.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RsceneFile.html" class="btn btn-neutral float-left" title=".rscene File" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RaisimServer.html" class="btn btn-neutral float-right" title="Raisim Server" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

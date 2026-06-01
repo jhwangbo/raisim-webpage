@@ -44,8 +44,8 @@ Quick map to the current rayrai-related targets:
   for full PBR and core-eligible PBR material paths.
 * ``example_rayrai_pbr_asset_inspector``: bundled glTF PBR sample assets under
   rayrai quality settings.
-* ``example_rayrai_usd_importer``: OpenUSD visual mesh loading in an offscreen
-  rayrai context.
+* OpenUSD visual meshes can be loaded through ``RayraiWindow::addVisualMesh``;
+  see :doc:`../OpenUSD` for importer scope and runtime layout.
 * ``example_polyhaven_blue_wall``: Poly Haven glTF scene import with imported
   lights, HDR IBL, optional reflection probes, and screenshots.
 * ``raisim_engine2_editor``: source-tree authoring editor that uses rayrai as

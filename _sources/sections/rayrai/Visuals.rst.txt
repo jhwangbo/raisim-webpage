@@ -89,8 +89,8 @@ Quick map to the current rayrai-related targets:
   for full PBR and core-eligible PBR material paths.
 * ``example_rayrai_pbr_asset_inspector``: bundled glTF PBR sample assets under
   rayrai quality settings.
-* ``example_rayrai_usd_importer``: OpenUSD visual mesh loading in an offscreen
-  rayrai context.
+* OpenUSD visual meshes can be loaded through ``RayraiWindow::addVisualMesh``;
+  see :doc:`../OpenUSD` for importer scope and runtime layout.
 * ``example_polyhaven_blue_wall``: Poly Haven glTF scene import with imported
   lights, HDR IBL, optional reflection probes, and screenshots.
 * ``raisim_engine2_editor``: source-tree authoring editor that uses rayrai as
@@ -152,6 +152,61 @@ and deformables. Use ``setCustomBounds(localCenter, localRadius)`` when a
 programmatically deformed visual needs a tighter or more stable bound than its
 source mesh provides.
 
+Detectability and capture render passes
+=======================================
+``VisualCategory`` is a render-filter category for user-created visuals, not a
+physics or collision concept. ``Visuals``, ``InstancedVisuals``, ``PointCloud``,
+and helpers built on top of ``Visuals`` default to
+``VisualCategory::NotDetectable``. The normal interactive viewer still draws
+non-detectable objects, which is intentional: debug axes, camera frustums,
+selection helpers, labels, temporary probes, and other viewer-only geometry can
+be visible to a human operator without contaminating external-camera or
+generated capture images.
+
+External camera scene-color renders filter custom visualization objects by this
+category. When a pass requests detectable-only visualization objects,
+``Visuals`` and ``InstancedVisuals`` are included only after
+``setDetectable(true)`` or
+``setCategory(VisualCategory::Detectable)``. Point clouds follow the same rule
+in passes that request detectable-only point clouds. Reflection-probe captures
+and supersampled documentation captures use the same external-camera machinery,
+so custom helper geometry that should appear there must also be marked
+detectable.
+
+The RaiSim ``RGBCamera`` and ``DepthCamera`` overloads intentionally disable
+rayrai custom visualization objects and point clouds, regardless of
+detectability. Use detectability for external-camera/capture paths where
+``RenderOverrides::drawVisualizationObjects`` or
+``RenderOverrides::drawPointClouds`` is enabled.
+
+Detectability does not create a RaiSim object, collision shape, dynamics body,
+semantic label, or material id. RaiSim world objects are controlled by their
+own wrappers and render-pass visibility rules; ``VisualCategory`` only applies
+to rayrai-created visualization objects and point clouds.
+
+Use this rule of thumb:
+
+* call ``setDetectable(true)`` for custom props, targets, imported meshes, or
+  point clouds that should appear in external camera, reflection-probe,
+  or documentation captures;
+* leave debug-only helpers non-detectable so they remain visible in the viewer
+  but are skipped by detectable-only capture passes;
+* use ``RenderOverrides::drawVisualizationObjects`` and
+  ``RenderOverrides::drawPointClouds`` to enable those object families in an
+  external render, but remember that those toggles still respect detectability
+  filtering for custom visuals and point clouds.
+
+.. code-block:: cpp
+
+    auto target = viewer.addVisualSphere("camera_target", 0.08,
+                                         1.0f, 0.2f, 0.1f, 1.0f);
+    target->setDetectable(true);   // Included in external-camera captures.
+
+    auto axisHelper = viewer.addVisualBox("debug_axis",
+                                          0.02, 0.02, 1.0,
+                                          glm::vec4(0.1f, 0.8f, 1.0f, 1.0f));
+    axisHelper->setDetectable(false); // Viewer helper; skipped by captures.
+
 Visual shadow casting, visibility range, and material overrides
 ================================================================
 ``raisin::Visuals`` exposes per-visual controls that go beyond position/colour
@@ -174,8 +229,10 @@ and are useful for authoring polished scenes:
   material (selection outlines, x-ray decals, ghost previews).
 * ``setTwoSided`` / ``setFlatShading`` / ``setUseMeshColor`` — quick toggles
   for inspection visuals.
-* ``setCategory`` / ``setDetectable`` — assign a ``VisualCategory`` and toggle
-  inclusion in RaiSim sensor passes (off by default for viewer-only helpers).
+* ``setCategory`` / ``setDetectable`` — assign the ``VisualCategory`` used by
+  detectable-only external-camera, reflection-probe, documentation-capture, and
+  point-cloud render filters. It is render metadata only, not physics or
+  collision state.
 * ``setPbrEnvironment(envMap, brdfLut)`` / ``setPbrEnvironment(envMap,
   irradianceMap, prefilteredMap, brdfLut, intensity)`` — attach an HDR
   environment to a single visual when global IBL is not appropriate.
