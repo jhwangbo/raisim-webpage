@@ -82,9 +82,15 @@ Contacts And External Forces
 ============================
 
 ``getContacts()`` returns the contacts accumulated on an object during the last
-world step. Contact point ids are local to that contact list and can be passed
-to ``getContactPointVel(pointId, vel)`` to query the world-frame contact-point
-velocity.
+world step. For rigid ``SingleBodyObject`` instances and articulated systems,
+contact point ids stored in the solver correspond to entries in this contact
+list. For particle-like objects such as ``DeformableObject`` and
+``GranularSystem``, solver contact point ids identify particles instead. Do not
+assume a solver point id can always be used as an index into ``getContacts()``.
+
+Use ``getContactPointVel(pointId, vel)`` with the point id supplied by the
+contact/object API to query the world-frame contact-point velocity. For
+particle-like objects, local body and force APIs use particle indices.
 
 External forces and torques use local body or particle indices:
 

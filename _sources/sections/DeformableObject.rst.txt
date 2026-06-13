@@ -276,13 +276,11 @@ Common failure modes:
 * Filled objects that collapse need more internal struts, smaller spacing, or
   higher elastic stiffness.
 
-Validation
-
 Rayrai Visualization
 ====================
 
 ``RaisimServer`` serializes deformable objects as dynamic ``Shape::Mesh``
-visuals for ``visualizer/rayrai``. The first visualizer packet sends the object
+visuals for rayrai viewers. The first visualizer packet sends the object
 name, triangle topology, and current vertex positions. Later packets keep the
 same topology and stream updated vertex positions only. Rayrai rebuilds the
 custom OpenGL mesh, recomputes normals from the triangle list, and renders the

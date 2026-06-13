@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RaisimGymTorch &mdash; raisim 2.4.0 documentation</title>
+  <title>RaisimGymTorch &mdash; raisim 2.4.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b0caeef3" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=4d935f96"></script>
+      <script src="../_static/documentation_options.js?v=7a6bd5fc"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -149,6 +149,8 @@ RaisimGymTorch can process about 500k time steps per second in the above environ
 <li><p>Anaconda</p></li>
 <li><p>PyTorch (<a class="reference external" href="https://pytorch.org/">https://pytorch.org/</a>)</p></li>
 <li><p>To use the GPU, install CUDA as well. Use the version recommended by PyTorch.</p></li>
+<li><p>OpenMP on Linux/Windows. On macOS, OpenMP is used when available; otherwise
+RaisimGymTorch builds with a serial fallback.</p></li>
 <li><p>Other dependencies are installed when you build a RaisimGymTorch environment for the first time.</p></li>
 </ul>
 </section>
@@ -161,7 +163,20 @@ python<span class="w"> </span>setup.py<span class="w"> </span>develop
 python<span class="w"> </span>raisimGymTorch/env/envs/rsg_anymal/runner.py
 </pre></div>
 </div>
-<p>To visualize the policy, use <code class="docutils literal notranslate"><span class="pre">rayrai_raisim_tcp_viewer</span></code> as described in
+<p>On macOS, source the package environment before building so Python can load the
+RaiSim and rayrai dynamic libraries:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>..
+<span class="nb">source</span><span class="w"> </span>./raisim_env.sh
+<span class="nb">cd</span><span class="w"> </span>raisimGymTorch
+python<span class="w"> </span>setup.py<span class="w"> </span>develop
+</pre></div>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">../raisim</span></code> or <code class="docutils literal notranslate"><span class="pre">../rayrai</span></code> is missing, CMake downloads the matching
+macOS package automatically: <code class="docutils literal notranslate"><span class="pre">macos-arm64</span></code> on Apple Silicon, including
+Rosetta shells, and <code class="docutils literal notranslate"><span class="pre">macos-x86_64</span></code> on Intel when that asset is available.
+Install <code class="docutils literal notranslate"><span class="pre">libomp</span></code> if you want OpenMP parallelism on macOS; without it, the C++
+vectorized environment compiles with a serial fallback.</p>
+<p>To visualize the policy, use <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> as described in
 <a class="reference internal" href="Visualization.html"><span class="doc">Visualization</span></a>. The training script records policy performance every 200
 iterations. Older RaisimUnity/Unreal visualization workflows have been replaced;
 see <a class="reference internal" href="LegacyIntegrations.html"><span class="doc">Legacy Integrations</span></a> for migration notes.</p>
@@ -221,7 +236,7 @@ However, if you want to keep multiple environments, you may want to rename a few
 <p>The <code class="docutils literal notranslate"><span class="pre">ENVIRONMENT</span></code> class defines the dynamics, reward, termination condition, and so on.
 This class inherits from <code class="docutils literal notranslate"><span class="pre">RaisimGymEnv</span></code>, which adds basic functionality such as <code class="docutils literal notranslate"><span class="pre">setSimulationTimeStep</span></code>, <code class="docutils literal notranslate"><span class="pre">setControlTimeStep</span></code>, and <code class="docutils literal notranslate"><span class="pre">getObDim</span></code>.
 If <code class="docutils literal notranslate"><span class="pre">RaisimGymEnv</span></code> is not general enough for you, you can also make <code class="docutils literal notranslate"><span class="pre">ENVIRONMENT</span></code> independent of <code class="docutils literal notranslate"><span class="pre">RaisimGymEnv</span></code>.</p>
-<p><code class="docutils literal notranslate"><span class="pre">RaisimGymEnv</span></code> is wrapped by <code class="docutils literal notranslate"><span class="pre">VectorizedEnvironment</span></code>, which parallelizes the environment using OpenMP.
+<p><code class="docutils literal notranslate"><span class="pre">RaisimGymEnv</span></code> is wrapped by <code class="docutils literal notranslate"><span class="pre">VectorizedEnvironment</span></code>, which parallelizes the environment using OpenMP when OpenMP is available.
 You can consider it similar to <code class="docutils literal notranslate"><span class="pre">VectorEnv</span></code> in OpenAI Baselines, but RaisimGym parallelization happens in C++, which makes it orders of magnitude faster.</p>
 <p><code class="docutils literal notranslate"><span class="pre">raisim_gym.cpp</span></code> is a pybind11 wrapper for <code class="docutils literal notranslate"><span class="pre">VectorizedEnvironment</span></code>.
 It defines the interface functions.</p>

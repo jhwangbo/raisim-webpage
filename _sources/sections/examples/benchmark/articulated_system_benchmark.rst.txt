@@ -21,7 +21,5 @@ The example covers:
 * Atlas falling with and without ground contact.
 * Chain robots with 10 and 20 springed links.
 
-Use the unified benchmark runner documented in the Performance page for
-repeatable benchmark selection and shorter targeted runs. Use this example when
-you want the package-level standalone executable that mirrors the historical
-articulated-system timing scenes.
+Use this package-level standalone executable for articulated-system timing
+checks.

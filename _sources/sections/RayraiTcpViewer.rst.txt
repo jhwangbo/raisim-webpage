@@ -2,7 +2,7 @@
 Rayrai TCP Viewer
 #################
 
-The ``rayrai_raisim_tcp_viewer`` binary is the recommended visualizer for
+The ``rayrai_tcp_viewer`` binary is the recommended visualizer for
 ``RaisimServer`` simulations. It connects to a running server over TCP, renders
 the world with the full rayrai pipeline (PBR + IBL + post-process), and lets
 you interactively pause, step, force-poke, and reposition objects without
@@ -36,13 +36,13 @@ Quick start
 
    .. code-block:: bash
 
-       ./rayrai/<OS>/bin/rayrai_raisim_tcp_viewer
+       ./rayrai/<OS>/bin/rayrai_tcp_viewer
 
 3. The viewer auto-connects to ``localhost:8080``. To point it at a different
    endpoint, pass ``--connect host:port`` or type into the host / port fields
    under the **Control** tab.
 
-Run ``rayrai_raisim_tcp_viewer --help`` for the full option list. On Windows
+Run ``rayrai_tcp_viewer --help`` for the full option list. On Windows
 use the ``.exe`` binary; the same TCP client and discovery paths are supported
 on Windows, Linux, and macOS.
 
@@ -536,7 +536,7 @@ builds, and dataset preview generation:
 
     # 2) Capture a 1280x720 PNG framed on the scene, then exit.
     LD_LIBRARY_PATH=$RAYRAI_DIR/lib:$RAISIM_DIR/lib \\
-      ./rayrai_raisim_tcp_viewer \\
+      ./rayrai_tcp_viewer \\
         --connect 127.0.0.1:8080 \\
         --camera-lookat 14,-14,6,-1,-1,3 \\
         --screenshot out.png \\
@@ -690,7 +690,7 @@ Feature negotiation
 After connecting, the first server frame carries the negotiated feature
 bits. A custom client should AND those bits with ``kProtocolFeatureSimControl``
 once at startup, and grey out sim-control surfaces if the bit is not set —
-exactly what ``rayrai_raisim_tcp_viewer`` does internally via
+exactly what ``rayrai_tcp_viewer`` does internally via
 ``RemoteScene::serverSupportsSimControl()``.
 
 See also

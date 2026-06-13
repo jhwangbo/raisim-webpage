@@ -5,7 +5,7 @@ Server Example: Dynamic Heightmap
 Overview
 ========
 Updates a heightmap height field and color map every frame to animate terrain.
-Use ``rayrai_raisim_tcp_viewer`` for supported visualization.
+Use ``rayrai_tcp_viewer`` for supported visualization.
 
 Screenshot
 ==========
@@ -26,7 +26,7 @@ Run the installed executable:
    <raisim-install>/bin/dynamic_heightmap
 
 On Windows, run ``dynamic_heightmap.exe`` instead.
-This example uses RaisimServer. Start ``rayrai_raisim_tcp_viewer`` and connect to port 8080.
+This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.
 
 
 Details

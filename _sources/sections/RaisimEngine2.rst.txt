@@ -131,7 +131,7 @@ ground/heightmap patterns, and render-quality settings. The bridge reports what
 was applied through ``raisim_engine2::RayraiApplyReport``.
 
 Use Engine 2 for authoring and inspection. Use ordinary RaiSim APIs,
-``RaisimServer`` + ``rayrai_raisim_tcp_viewer``, or in-process
+``RaisimServer`` + ``rayrai_tcp_viewer``, or in-process
 ``raisin::RayraiWindow`` code for runtime applications that do not need the
 editor/document layer.
 

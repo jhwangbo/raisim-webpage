@@ -37,6 +37,8 @@ Assuming that you have installed RaiSim:
 * Anaconda
 * PyTorch (https://pytorch.org/)
 * To use the GPU, install CUDA as well. Use the version recommended by PyTorch.
+* OpenMP on Linux/Windows. On macOS, OpenMP is used when available; otherwise
+  RaisimGymTorch builds with a serial fallback.
 * Other dependencies are installed when you build a RaisimGymTorch environment for the first time.
 
 How to run the example
@@ -50,7 +52,23 @@ From the ``raisimGymTorch`` directory:
     python setup.py develop
     python raisimGymTorch/env/envs/rsg_anymal/runner.py
 
-To visualize the policy, use ``rayrai_raisim_tcp_viewer`` as described in
+On macOS, source the package environment before building so Python can load the
+RaiSim and rayrai dynamic libraries:
+
+.. code-block:: bash
+
+    cd ..
+    source ./raisim_env.sh
+    cd raisimGymTorch
+    python setup.py develop
+
+If ``../raisim`` or ``../rayrai`` is missing, CMake downloads the matching
+macOS package automatically: ``macos-arm64`` on Apple Silicon, including
+Rosetta shells, and ``macos-x86_64`` on Intel when that asset is available.
+Install ``libomp`` if you want OpenMP parallelism on macOS; without it, the C++
+vectorized environment compiles with a serial fallback.
+
+To visualize the policy, use ``rayrai_tcp_viewer`` as described in
 :doc:`Visualization`. The training script records policy performance every 200
 iterations. Older RaisimUnity/Unreal visualization workflows have been replaced;
 see :doc:`LegacyIntegrations` for migration notes.
@@ -119,7 +137,7 @@ The ``ENVIRONMENT`` class defines the dynamics, reward, termination condition, a
 This class inherits from ``RaisimGymEnv``, which adds basic functionality such as ``setSimulationTimeStep``, ``setControlTimeStep``, and ``getObDim``.
 If ``RaisimGymEnv`` is not general enough for you, you can also make ``ENVIRONMENT`` independent of ``RaisimGymEnv``.
 
-``RaisimGymEnv`` is wrapped by ``VectorizedEnvironment``, which parallelizes the environment using OpenMP.
+``RaisimGymEnv`` is wrapped by ``VectorizedEnvironment``, which parallelizes the environment using OpenMP when OpenMP is available.
 You can consider it similar to ``VectorEnv`` in OpenAI Baselines, but RaisimGym parallelization happens in C++, which makes it orders of magnitude faster.
 
 ``raisim_gym.cpp`` is a pybind11 wrapper for ``VectorizedEnvironment``.
@@ -130,5 +148,3 @@ Finally, ``RaisimGymVecEnv`` is a Python class that wraps a Python library creat
 Common issues and solutions
 ================================
 * If Python scripts complain about missing "libcudnn.so": conda install -c nvidia cudnn
-
-

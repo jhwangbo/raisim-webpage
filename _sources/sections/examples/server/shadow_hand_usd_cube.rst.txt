@@ -36,7 +36,7 @@ Run the installed executable:
    <raisim-install>/bin/shadow_hand_usd_cube
 
 On Windows, run ``shadow_hand_usd_cube.exe`` instead.
-This example uses RaisimServer. Start ``rayrai_raisim_tcp_viewer`` and connect
+This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect
 to port 8080. The viewer remains interactive while the simulation runs.
 
 Details

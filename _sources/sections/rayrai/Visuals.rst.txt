@@ -15,8 +15,7 @@ mesh approximation. It shows the source mesh and generated convex parts side by
 side. The decomposition side uses per-part colors so individual convex bodies
 can be inspected. The example is registered as the
 ``rayrai_coacd_mesh_approximation`` target. Package examples keep its source
-under ``examples/src/rayrai/assets``; the current source checkout also registers
-the same target from ``examples/src/rayrai``.
+under ``examples/src/rayrai/assets``.
 
 This example uses real meshes from ``rsc`` such as YCB and Minitaur assets. Some robot
 visual meshes are intentionally not used because they are non-manifold visual shells and
@@ -53,9 +52,8 @@ Rayrai examples are documented in :doc:`Examples <Examples>`. Each example page 
 
 Quick map to the current rayrai-related targets:
 
-* ``rayrai_raisim_tcp_viewer``: supported packaged TCP viewer for
+* ``rayrai_tcp_viewer``: supported packaged TCP viewer for
   ``raisim::RaisimServer`` scenes.
-* ``rayrai_tcp_viewer``: source-tree TCP viewer example target.
 * ``rayrai_basic_scene``: minimal ImGui + SDL2 app showing the standard update
   loop, custom visuals, and the offscreen render texture.
 * ``rayrai_complete_showcase``: broad in-process scene that combines RGB/depth
@@ -78,23 +76,12 @@ Quick map to the current rayrai-related targets:
   rayrai visuals with stable ids, snapshots, collision filters, and cloning.
 * ``rayrai_rolling_spinning_friction`` / ``rayrai_swept_ccd``: physics-focused
   scenes that visualize rolling/spinning friction and swept CCD.
-* ``rayrai_feature_showcase``: offscreen image and metrics generation for the
-  current rayrai feature set.
-* ``rayrai_quality_comparison``: preset comparison images and quality report.
-* ``rayrai_benchmark``: rendering, readback, scene-sync, and TCP serialization
-  benchmark coverage.
-* ``rayrai_complete_showcase_benchmark``: timed version of the complete sensor
-  showcase with optional readback, visualization startup, and startup profiling.
-* ``rayrai_pbr_first_draw_benchmark``: isolated first-draw and warm-frame timing
-  for full PBR and core-eligible PBR material paths.
-* ``example_rayrai_pbr_asset_inspector``: bundled glTF PBR sample assets under
-  rayrai quality settings.
+* ``rayrai_pbr_material_grid`` and ``rayrai_pbr_texture_maps``: bundled glTF
+  PBR sample assets under rayrai quality settings.
 * OpenUSD visual meshes can be loaded through ``RayraiWindow::addVisualMesh``;
   see :doc:`../OpenUSD` for importer scope and runtime layout.
-* ``example_polyhaven_blue_wall``: Poly Haven glTF scene import with imported
-  lights, HDR IBL, optional reflection probes, and screenshots.
-* ``raisim_engine2_editor``: source-tree authoring editor that uses rayrai as
-  its 3D viewport and scene-preview renderer. See :doc:`../RaisimEngine2`.
+* ``rayrai_visual_asset_support``: glTF/GLB scene import with imported lights,
+  HDR IBL, optional reflection probes, and screenshots.
 
 Custom visuals and instancing
 =============================
@@ -377,4 +364,3 @@ geometry without rendering colour.
           :alt: Visuals fading at near and far range
      - .. image:: ../../image/rayrai/showcase/125_visual_material_override_overlay.png
           :alt: Material override and material overlay on a single visual
-

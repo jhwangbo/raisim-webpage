@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Deformable Objects &mdash; raisim 2.4.0 documentation</title>
+  <title>Deformable Objects &mdash; raisim 2.4.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b0caeef3" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=4d935f96"></script>
+      <script src="../_static/documentation_options.js?v=7a6bd5fc"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -385,12 +385,11 @@ legacy <code class="docutils literal notranslate"><span class="pre">bendStiffnes
 <li><p>Filled objects that collapse need more internal struts, smaller spacing, or
 higher elastic stiffness.</p></li>
 </ul>
-<p>Validation</p>
 </section>
 <section id="rayrai-visualization">
 <h2>Rayrai Visualization<a class="headerlink" href="#rayrai-visualization" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> serializes deformable objects as dynamic <code class="docutils literal notranslate"><span class="pre">Shape::Mesh</span></code>
-visuals for <code class="docutils literal notranslate"><span class="pre">visualizer/rayrai</span></code>. The first visualizer packet sends the object
+visuals for rayrai viewers. The first visualizer packet sends the object
 name, triangle topology, and current vertex positions. Later packets keep the
 same topology and stream updated vertex positions only. Rayrai rebuilds the
 custom OpenGL mesh, recomputes normals from the triangle list, and renders the
@@ -418,6 +417,12 @@ path described above.</p>
 <span id="_CPPv3N6raisim16DeformableObjectE"></span><span id="_CPPv2N6raisim16DeformableObjectE"></span><span id="raisim::DeformableObject"></span><span class="target" id="classraisim_1_1DeformableObject"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DeformableObject</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="Object.html#_CPPv4N6raisim6ObjectE" title="raisim::Object"><span class="n"><span class="pre">Object</span></span></a><a class="headerlink" href="#_CPPv4N6raisim16DeformableObjectE" title="Link to this definition"></a><br /></dt>
 <dd><div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16DeformableObjectD0Ev">
+<span id="_CPPv3N6raisim16DeformableObjectD0Ev"></span><span id="_CPPv2N6raisim16DeformableObjectD0Ev"></span><span id="raisim::DeformableObject::~DeformableObject"></span><span class="target" id="classraisim_1_1DeformableObject_1a4c6eb1327e4c92356e7fdf6a16a44ab1"></span><span class="sig-name descname"><span class="n"><span class="pre">~DeformableObject</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N6raisim16DeformableObjectD0Ev" title="Link to this definition"></a><br /></dt>
+<dd><p>out-of-line so the destructor (and the destruction of members such as the over-aligned BendingConstraint vector) is emitted in the RaiSim library translation unit. those vectors are allocated inside the library, which is built with -march=native and therefore sees the Eigen-induced 32-byte alignment of BendingConstraint; a consumer compiled without that flag would otherwise destroy them with a default-aligned operator delete, an alignment mismatch (caught by AddressSanitizer). </p>
+</dd></dl>
+
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim16DeformableObject13getObjectTypeEv">
 <span id="_CPPv3NK6raisim16DeformableObject13getObjectTypeEv"></span><span id="_CPPv2NK6raisim16DeformableObject13getObjectTypeEv"></span><span id="raisim::DeformableObject::getObjectTypeC"></span><span class="target" id="classraisim_1_1DeformableObject_1a07883d05827e581d292e441c80542aec"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">ObjectType</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getObjectType</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4NK6raisim16DeformableObject13getObjectTypeEv" title="Link to this definition"></a><br /></dt>

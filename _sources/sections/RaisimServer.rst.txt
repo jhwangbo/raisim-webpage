@@ -3,7 +3,7 @@ Raisim Server
 #############################
 
 RaisimServer serializes ``raisim::World`` and streams the data to clients via TCP/IP.
-Use ``rayrai_raisim_tcp_viewer`` for supported server-side visualization.
+Use ``rayrai_tcp_viewer`` for supported server-side visualization.
 For older Unity or Unreal visualization workflows, see :doc:`LegacyIntegrations`.
 For a workflow-level comparison between server-based visualization and
 in-process rayrai rendering, see :doc:`Visualization`.
@@ -89,7 +89,7 @@ headers.
 Interactive sim control
 =======================
 When the ``SIM_CONTROL`` feature is negotiated, a connected client (such as
-``rayrai_raisim_tcp_viewer``) can drive the simulation from its UI rather than
+``rayrai_tcp_viewer``) can drive the simulation from its UI rather than
 just observing it. The viewer's **Control** tab gets a *Simulation* row with
 icon-text buttons for Pause / Resume / Step / Step 10.
 
@@ -188,7 +188,7 @@ Discovery beacons
 While the server is running, ``RaisimServer`` advertises itself with a UDP
 beacon once per second on port ``59312``. The beacon payload contains the
 RaiSim TCP protocol version, TCP port, host name, executable name, bind mode
-(``loopback`` or ``all``), and connection status. ``rayrai_raisim_tcp_viewer``
+(``loopback`` or ``all``), and connection status. ``rayrai_tcp_viewer``
 uses these beacons to populate the detected-server list in its **Control**
 tab.
 

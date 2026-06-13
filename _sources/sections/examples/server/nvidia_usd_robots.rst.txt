@@ -40,7 +40,7 @@ Run the example:
    <raisim-install>/bin/nvidia_usd_robots
 
 On Windows, run ``nvidia_usd_robots.exe`` instead. This example uses
-RaisimServer. Start ``rayrai_raisim_tcp_viewer`` and connect to port 8080.
+RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.
 
 Details
 =======

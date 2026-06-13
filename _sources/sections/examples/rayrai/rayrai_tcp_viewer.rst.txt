@@ -4,16 +4,23 @@ Rayrai Example: TCP Viewer
 
 Overview
 ========
-Standalone source-tree TCP viewer for ``raisim::RaisimServer`` scenes. It
+Standalone TCP viewer for ``raisim::RaisimServer`` scenes. It
 connects to a running server, downloads the remote scene, and renders it with
 rayrai and ImGui controls. Installed binary packages should normally use
-``rayrai_raisim_tcp_viewer`` for interactive viewing; this page documents the
+``rayrai_tcp_viewer`` for interactive viewing; this page documents the
 example target named ``rayrai_tcp_viewer``, which also exposes batch and
 diagnostics command-line options.
 
 Binary
 ======
 Installed executable: ``rayrai_tcp_viewer``.
+
+Source
+======
+The public example entry point is ``examples/src/rayrai/rayrai_tcp_viewer.cpp``.
+It is a compatibility wrapper for older local build scripts; the maintained
+implementation lives in ``examples/src/rayrai/tools/rayrai_tcp_viewer.cpp`` and
+is the file used by ``examples/CMakeLists.txt``.
 
 Run
 ====
@@ -66,7 +73,7 @@ Details
 - Interactive tools include Shift+left-drag force application, a 2-point ruler,
   3-point angle measurement, pose grabber axes, body frames, COM markers, and
   keyboard shortcut help.
-- Use ``rayrai_raisim_tcp_viewer`` as the supported packaged viewer when both
+- Use ``rayrai_tcp_viewer`` as the supported packaged viewer when both
   executables are available and you only need interactive viewing.
 - Direct RGB/depth sensor workflows should prefer in-process rayrai when the
   application needs deterministic renderer buffers.

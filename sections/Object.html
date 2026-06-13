@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Objects &mdash; raisim 2.4.0 documentation</title>
+  <title>Objects &mdash; raisim 2.4.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b0caeef3" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=4d935f96"></script>
+      <script src="../_static/documentation_options.js?v=7a6bd5fc"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -293,9 +293,14 @@ Here is an example.</p>
 <section id="contacts-and-external-forces">
 <h2>Contacts And External Forces<a class="headerlink" href="#contacts-and-external-forces" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">getContacts()</span></code> returns the contacts accumulated on an object during the last
-world step. Contact point ids are local to that contact list and can be passed
-to <code class="docutils literal notranslate"><span class="pre">getContactPointVel(pointId,</span> <span class="pre">vel)</span></code> to query the world-frame contact-point
-velocity.</p>
+world step. For rigid <code class="docutils literal notranslate"><span class="pre">SingleBodyObject</span></code> instances and articulated systems,
+contact point ids stored in the solver correspond to entries in this contact
+list. For particle-like objects such as <code class="docutils literal notranslate"><span class="pre">DeformableObject</span></code> and
+<code class="docutils literal notranslate"><span class="pre">GranularSystem</span></code>, solver contact point ids identify particles instead. Do not
+assume a solver point id can always be used as an index into <code class="docutils literal notranslate"><span class="pre">getContacts()</span></code>.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">getContactPointVel(pointId,</span> <span class="pre">vel)</span></code> with the point id supplied by the
+contact/object API to query the world-frame contact-point velocity. For
+particle-like objects, local body and force APIs use particle indices.</p>
 <p>External forces and torques use local body or particle indices:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">object</span><span class="o">-&gt;</span><span class="n">setExternalForce</span><span class="p">(</span><span class="n">localIdx</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">});</span>
 <span class="n">object</span><span class="o">-&gt;</span><span class="n">setExternalTorque</span><span class="p">(</span><span class="n">localIdx</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.2</span><span class="p">});</span>

@@ -24,13 +24,10 @@ For runnable coverage, see
 :doc:`Rayrai depth camera <../examples/rayrai/rayrai_depth_camera>`,
 :doc:`Rayrai LiDAR point cloud <../examples/rayrai/rayrai_lidar_pointcloud>`, and
 :doc:`Rayrai ArUco marker <../examples/rayrai/rayrai_aruco_marker>` for dedicated
-sensor examples. ``rayrai_feature_showcase`` adds aggregate external-camera,
-linear-depth, sensor-only, and fisheye coverage. ``rayrai_benchmark`` adds
-timed readback, picking, point-cloud, and scene-sync paths, while
-``rayrai_complete_showcase_benchmark`` times the full Anymal RGB/depth/LiDAR
-showcase with optional readback and visualization startup profiling. The sensor
-overview in :doc:`Sensors <Sensors>` includes a longer RGB/depth readback
-example.
+sensor examples. ``rayrai_complete_showcase`` combines RGB/depth cameras, LiDAR
+visualization, camera frustums, raw buffer readback, and custom visuals in one
+runnable scene. The sensor overview in :doc:`Sensors <Sensors>` includes a
+longer RGB/depth readback example.
 
 RGB/Depth camera workflow (manual source + external camera):
 
@@ -142,4 +139,3 @@ GPU slice example:
     const glm::dvec3 posW = raisin::toGlm(lidar->getPosition());
     const glm::dmat3 rotW = raisin::toGlm(lidar->getOrientation());
     viewer.measureSpinningLidarSingleDrawGPU(*lidar, posW, rotW);
-

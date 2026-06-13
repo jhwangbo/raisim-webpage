@@ -92,9 +92,10 @@ Cache statistics (per process, across all ``Shader::compile`` calls):
                 static_cast<unsigned long long>(s.coordinatedWaits));
     raisin::Shader::resetBinaryCacheStats();  // scope a measurement window
 
-Pre-warming for parallel RL can be done with the installed/source-tree
-``rayrai_shader_prewarm`` utility, which creates an offscreen context and
-compiles every built-in shader into the persistent binary cache:
+Pre-warming for parallel RL can be done with the ``rayrai_shader_prewarm``
+utility when it is available in the rayrai package. The utility creates an
+offscreen context and compiles every built-in shader into the persistent binary
+cache:
 
 .. code-block:: bash
 
@@ -264,4 +265,3 @@ RaiSim integration
    :members:
 
 .. (BufferReader doxygen entry moved to :doc:`../RayraiTcpViewer`.)
-

@@ -83,8 +83,9 @@ Use explicit settings when you need runtime control:
     quality.addViewerFillLights = false;
     viewer.setRenderQualitySettings(quality);
 
-The shipped ``rayrai_feature_showcase`` target exercises these controls and
-writes offscreen images and reports.
+The shipped rayrai examples, including ``rayrai_pbr_material_grid``,
+``rayrai_quality_lighting``, and ``rayrai_complete_showcase``, exercise these
+controls in runnable scenes.
 
 .. list-table::
    :header-rows: 1
@@ -246,4 +247,3 @@ the renderer:
     auto budget = raisin::RayraiWindow::recommendMaterialTextureBudget(
         /*budgetBytes=*/512ull * 1024 * 1024);
     // budget.recommendedFilter / .recommendedFormat tell you what to lower.
-

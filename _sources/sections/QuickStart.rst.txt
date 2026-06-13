@@ -23,21 +23,21 @@ use ``<raisim-install>/bin`` for the directory containing those executables.
 2. Run a server-based example
 =============================
 
-Start ``rayrai_raisim_tcp_viewer`` in one terminal:
+Start ``rayrai_tcp_viewer`` in one terminal:
 
 .. code-block:: bash
 
-    <raisim-install>/bin/rayrai_raisim_tcp_viewer
+    <raisim-install>/bin/rayrai_tcp_viewer
 
-Run a RaiSim example in another terminal:
+Run a server example in another terminal:
 
 .. code-block:: bash
 
-    <raisim-install>/bin/example_anymal_contacts
+    <raisim-install>/bin/primitive_grid
 
-``example_anymal_contacts`` and ``example_atlas_contacts`` create a
-``raisim::RaisimServer`` scene. The viewer connects to the default port
-``8080`` unless the application changes it.
+``primitive_grid`` and the other server examples create a ``raisim::RaisimServer``
+scene. The viewer connects to the default port ``8080`` unless the application
+changes it.
 
 3. Run an in-process rayrai example
 ===================================
@@ -47,15 +47,15 @@ need the TCP viewer:
 
 .. code-block:: bash
 
-    <raisim-install>/bin/example_rayrai_pbr_asset_inspector
-    <raisim-install>/bin/example_polyhaven_blue_wall --fast-load
+    <raisim-install>/bin/rayrai_pbr_material_grid
+    <raisim-install>/bin/rayrai_visual_asset_support
 
 4. Run a non-visual example
 ===========================
 
 .. code-block:: bash
 
-    <raisim-install>/bin/example_model_asset_pipeline
+    <raisim-install>/bin/model_asset_pipeline
 
 5. Run an OpenUSD mesh-loading example
 ======================================
@@ -64,7 +64,7 @@ Start the TCP viewer, then run the ShadowHand USD example:
 
 .. code-block:: bash
 
-    <raisim-install>/bin/rayrai_raisim_tcp_viewer
+    <raisim-install>/bin/rayrai_tcp_viewer
     <raisim-install>/bin/shadow_hand_usd_cube
 
 Next steps

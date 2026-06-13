@@ -24,7 +24,7 @@ Run the installed executable:
 
 On Windows, run ``xml_world_loader.exe`` instead.
 The XML loader expects an absolute path to the world file.
-This example uses RaisimServer. Start ``rayrai_raisim_tcp_viewer`` and connect to port 8080.
+This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.
 
 
 Details

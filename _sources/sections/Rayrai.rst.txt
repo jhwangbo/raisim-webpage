@@ -46,14 +46,14 @@ package in ``rayrai/<OS>`` ships the headers and CMake config for these dependen
 Included binary (recommended)
 =============================
 For most users, the easiest way to use rayrai is the included TCP viewer
-binary at ``rayrai/<OS>/bin/rayrai_raisim_tcp_viewer``. It connects to a
+binary at ``rayrai/<OS>/bin/rayrai_tcp_viewer``. It connects to a
 running ``RaisimServer`` and provides full PBR rendering, scene inspection,
 interactive pause / step / force application, screenshots, and session
 recording.
 
 .. code-block:: bash
 
-    ./rayrai/<OS>/bin/rayrai_raisim_tcp_viewer
+    ./rayrai/<OS>/bin/rayrai_tcp_viewer
 
 See :doc:`RayraiTcpViewer` for the full UI tour, command-line options,
 the sim-control workflow, authentication setup, and the wire-format

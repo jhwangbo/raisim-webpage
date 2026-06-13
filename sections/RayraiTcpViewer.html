@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rayrai TCP Viewer &mdash; raisim 2.4.0 documentation</title>
+  <title>Rayrai TCP Viewer &mdash; raisim 2.4.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b0caeef3" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=4d935f96"></script>
+      <script src="../_static/documentation_options.js?v=7a6bd5fc"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -116,6 +116,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisin10tcp_viewer12BufferReader6offsetEv"><code class="docutils literal notranslate"><span class="pre">offset()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisin10tcp_viewer12BufferReader4sizeEv"><code class="docutils literal notranslate"><span class="pre">size()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisin10tcp_viewer12BufferReader9remainingEv"><code class="docutils literal notranslate"><span class="pre">remaining()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisin10tcp_viewer12BufferReader12canReadBytesE6size_t"><code class="docutils literal notranslate"><span class="pre">canReadBytes()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0EN6raisin10tcp_viewer12BufferReader4readE1Tv"><code class="docutils literal notranslate"><span class="pre">read()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0ENK6raisin10tcp_viewer12BufferReader4peekEb6size_tR1T"><code class="docutils literal notranslate"><span class="pre">peek()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisin10tcp_viewer12BufferReader8readBoolEv"><code class="docutils literal notranslate"><span class="pre">readBool()</span></code></a></li>
@@ -167,7 +168,7 @@
              
   <section id="rayrai-tcp-viewer">
 <h1>Rayrai TCP Viewer<a class="headerlink" href="#rayrai-tcp-viewer" title="Link to this heading"></a></h1>
-<p>The <code class="docutils literal notranslate"><span class="pre">rayrai_raisim_tcp_viewer</span></code> binary is the recommended visualizer for
+<p>The <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> binary is the recommended visualizer for
 <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> simulations. It connects to a running server over TCP, renders
 the world with the full rayrai pipeline (PBR + IBL + post-process), and lets
 you interactively pause, step, force-poke, and reposition objects without
@@ -230,7 +231,7 @@ Balanced, High, and Ultra presets.</span><a class="headerlink" href="#id1" title
 <li><p>Start any <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> example. The server listens on <code class="docutils literal notranslate"><span class="pre">127.0.0.1:8080</span></code>
 by default.</p></li>
 <li><p>Launch the viewer:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./rayrai/&lt;OS&gt;/bin/rayrai_raisim_tcp_viewer
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./rayrai/&lt;OS&gt;/bin/rayrai_tcp_viewer
 </pre></div>
 </div>
 </li>
@@ -238,7 +239,7 @@ by default.</p></li>
 endpoint, pass <code class="docutils literal notranslate"><span class="pre">--connect</span> <span class="pre">host:port</span></code> or type into the host / port fields
 under the <strong>Control</strong> tab.</p></li>
 </ol>
-<p>Run <code class="docutils literal notranslate"><span class="pre">rayrai_raisim_tcp_viewer</span> <span class="pre">--help</span></code> for the full option list. On Windows
+<p>Run <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span> <span class="pre">--help</span></code> for the full option list. On Windows
 use the <code class="docutils literal notranslate"><span class="pre">.exe</span></code> binary; the same TCP client and discovery paths are supported
 on Windows, Linux, and macOS.</p>
 </section>
@@ -757,7 +758,7 @@ builds, and dataset preview generation:</p>
 
 <span class="c1"># 2) Capture a 1280x720 PNG framed on the scene, then exit.</span>
 <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$RAYRAI_DIR</span>/lib:<span class="nv">$RAISIM_DIR</span>/lib<span class="w"> </span><span class="se">\\</span>
-<span class="w">  </span>./rayrai_raisim_tcp_viewer<span class="w"> </span><span class="se">\\</span>
+<span class="w">  </span>./rayrai_tcp_viewer<span class="w"> </span><span class="se">\\</span>
 <span class="w">    </span>--connect<span class="w"> </span><span class="m">127</span>.0.0.1:8080<span class="w"> </span><span class="se">\\</span>
 <span class="w">    </span>--camera-lookat<span class="w"> </span><span class="m">14</span>,-14,6,-1,-1,3<span class="w"> </span><span class="se">\\</span>
 <span class="w">    </span>--screenshot<span class="w"> </span>out.png<span class="w"> </span><span class="se">\\</span>
@@ -904,7 +905,7 @@ shipped viewer’s Pause / Step / force / pose surface.</p>
 <p>After connecting, the first server frame carries the negotiated feature
 bits. A custom client should AND those bits with <code class="docutils literal notranslate"><span class="pre">kProtocolFeatureSimControl</span></code>
 once at startup, and grey out sim-control surfaces if the bit is not set —
-exactly what <code class="docutils literal notranslate"><span class="pre">rayrai_raisim_tcp_viewer</span></code> does internally via
+exactly what <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> does internally via
 <code class="docutils literal notranslate"><span class="pre">RemoteScene::serverSupportsSimControl()</span></code>.</p>
 </section>
 </section>
@@ -967,6 +968,20 @@ in-process rayrai.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Remaining byte count. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisin10tcp_viewer12BufferReader12canReadBytesE6size_t">
+<span id="_CPPv3NK6raisin10tcp_viewer12BufferReader12canReadBytesE6size_t"></span><span id="_CPPv2NK6raisin10tcp_viewer12BufferReader12canReadBytesE6size_t"></span><span id="raisin::tcp_viewer::BufferReader::canReadBytes__sC"></span><span class="target" id="structraisin_1_1tcp__viewer_1_1BufferReader_1a6d8ea45747f2a68361c353d3360b1716"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">canReadBytes</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin10tcp_viewer12BufferReader12canReadBytesE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Check if a byte range can be consumed from the current cursor. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>count</strong> – Byte count. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the range is fully inside the unread payload. </p>
 </dd>
 </dl>
 </dd></dl>

@@ -25,7 +25,7 @@ Run the installed executable:
    <raisim-install>/bin/wheeled_robot_force_control
 
 On Windows, run ``wheeled_robot_force_control.exe`` instead.
-This example uses RaisimServer. Start ``rayrai_raisim_tcp_viewer`` and connect to port 8080.
+This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.
 
 
 Details

@@ -25,7 +25,7 @@ Run the installed executable:
    <raisim-install>/bin/visual_objects_showcase
 
 On Windows, run ``visual_objects_showcase.exe`` instead.
-This example uses RaisimServer. Start ``rayrai_raisim_tcp_viewer`` and connect to port 8080.
+This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.
 
 
 Details

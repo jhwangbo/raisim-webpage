@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; raisim 2.4.0 documentation</title>
+  <title>Installation &mdash; raisim 2.4.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=a5c4661c" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=4d935f96"></script>
+      <script src="../_static/documentation_options.js?v=7a6bd5fc"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../_static/tabs.js?v=3030b3cb"></script>
@@ -156,9 +156,11 @@ license details.</p>
 </pre></div>
 </div>
 <p>Unpack the package to a local directory such as <code class="docutils literal notranslate"><span class="pre">$HOME/raisim2Lib</span></code> on
-Linux/macOS or <code class="docutils literal notranslate"><span class="pre">C:\raisim</span></code> on Windows. Keep the package directories together;
-examples and rayrai tools expect the bundled assets to remain next to the
-installed binaries.</p>
+Linux/macOS or <code class="docutils literal notranslate"><span class="pre">C:\raisim</span></code> on Windows. Current macOS packages are named
+<code class="docutils literal notranslate"><span class="pre">macos-arm64-&lt;version&gt;.zip</span></code> for Apple Silicon and
+<code class="docutils literal notranslate"><span class="pre">macos-x86_64-&lt;version&gt;.zip</span></code> for Intel. Keep the package directories
+together; examples and rayrai tools expect the bundled assets to remain next to
+the installed binaries.</p>
 </section>
 <section id="local-install-layout">
 <h2>Local Install Layout<a class="headerlink" href="#local-install-layout" title="Link to this heading"></a></h2>
@@ -199,16 +201,24 @@ explicitly when you want the Python wrapper.</p>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">raisim_env.sh</span></code> adds both <code class="docutils literal notranslate"><span class="pre">raisim/lib</span></code> and <code class="docutils literal notranslate"><span class="pre">rayrai/lib</span></code> to
-<code class="docutils literal notranslate"><span class="pre">DYLD_LIBRARY_PATH</span></code>. Configure and build this source tree with examples
-and <code class="docutils literal notranslate"><span class="pre">raisimPy</span></code> enabled:</p>
+<code class="docutils literal notranslate"><span class="pre">DYLD_LIBRARY_PATH</span></code>. Configure and build this source tree in Release mode:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-DRAISIM_EXAMPLE<span class="o">=</span>ON<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-DRAISIM_PY<span class="o">=</span>ON
+<span class="w">  </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-DRAISIM_EXAMPLE<span class="o">=</span>ON
 cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>-j
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">RAISIM_EXAMPLE</span></code> is enabled by default. <code class="docutils literal notranslate"><span class="pre">RAISIM_PY</span></code> must be enabled
-explicitly when you want the Python wrapper.</p>
+<p><code class="docutils literal notranslate"><span class="pre">RAISIM_EXAMPLE</span></code> is enabled by default. If <code class="docutils literal notranslate"><span class="pre">raisim/</span></code> is missing or its
+version differs from <code class="docutils literal notranslate"><span class="pre">RAISIM_VERSION</span></code>, CMake downloads the pinned release
+asset and replaces both <code class="docutils literal notranslate"><span class="pre">raisim/</span></code> and <code class="docutils literal notranslate"><span class="pre">rayrai/</span></code>.</p>
+<p>You can also update an unpacked macOS tree explicitly:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./raisim_upgrade.sh<span class="w"> </span>-y
+</pre></div>
+</div>
+<p>Apple Silicon hosts select <code class="docutils literal notranslate"><span class="pre">macos-arm64</span></code>, even when CMake or the shell is
+running under Rosetta. Intel Mac builds select <code class="docutils literal notranslate"><span class="pre">macos-x86_64</span></code> when that
+release asset is available. <code class="docutils literal notranslate"><span class="pre">RAISIM_PY</span></code> must be enabled explicitly when
+you want the Python wrapper.</p>
 </div><div aria-labelledby="tab-0-V2luZG93cw==" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-0-V2luZG93cw==" name="V2luZG93cw==" role="tabpanel" tabindex="0"><p>Run <code class="docutils literal notranslate"><span class="pre">raisim_env.bat</span></code> or add the installed RaiSim and rayrai <code class="docutils literal notranslate"><span class="pre">bin</span></code>
 directories to <code class="docutils literal notranslate"><span class="pre">Path</span></code>. Configure and build this source tree with examples
 and <code class="docutils literal notranslate"><span class="pre">raisimPy</span></code> enabled:</p>
@@ -230,6 +240,9 @@ cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>
 cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>-j
 </pre></div>
 </div>
+<p>On macOS, prefer adding <code class="docutils literal notranslate"><span class="pre">-DCMAKE_BUILD_TYPE=Release</span></code> to the configure command
+for local example builds. If <code class="docutils literal notranslate"><span class="pre">raisim/</span></code> is missing or its version differs from
+<code class="docutils literal notranslate"><span class="pre">RAISIM_VERSION</span></code>, the configure step downloads the pinned macOS package.</p>
 <p>Installation is optional for running examples from the build tree. If you do
 install, choose a prefix you can write to instead of relying on CMake’s default
 <code class="docutils literal notranslate"><span class="pre">/usr/local</span></code>:</p>

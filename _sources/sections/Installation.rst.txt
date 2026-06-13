@@ -37,9 +37,11 @@ Download the RaiSim2 binary package for your platform from:
     https://github.com/raisimTech/raisim2Lib
 
 Unpack the package to a local directory such as ``$HOME/raisim2Lib`` on
-Linux/macOS or ``C:\raisim`` on Windows. Keep the package directories together;
-examples and rayrai tools expect the bundled assets to remain next to the
-installed binaries.
+Linux/macOS or ``C:\raisim`` on Windows. Current macOS packages are named
+``macos-arm64-<version>.zip`` for Apple Silicon and
+``macos-x86_64-<version>.zip`` for Intel. Keep the package directories
+together; examples and rayrai tools expect the bundled assets to remain next to
+the installed binaries.
 
 Local Install Layout
 ====================
@@ -95,18 +97,29 @@ Environment Setup
         source ./raisim_env.sh
 
     ``raisim_env.sh`` adds both ``raisim/lib`` and ``rayrai/lib`` to
-    ``DYLD_LIBRARY_PATH``. Configure and build this source tree with examples
-    and ``raisimPy`` enabled:
+    ``DYLD_LIBRARY_PATH``. Configure and build this source tree in Release mode:
 
     .. code-block:: bash
 
         cmake -S . -B build \
-          -DRAISIM_EXAMPLE=ON \
-          -DRAISIM_PY=ON
+          -DCMAKE_BUILD_TYPE=Release \
+          -DRAISIM_EXAMPLE=ON
         cmake --build build -j
 
-    ``RAISIM_EXAMPLE`` is enabled by default. ``RAISIM_PY`` must be enabled
-    explicitly when you want the Python wrapper.
+    ``RAISIM_EXAMPLE`` is enabled by default. If ``raisim/`` is missing or its
+    version differs from ``RAISIM_VERSION``, CMake downloads the pinned release
+    asset and replaces both ``raisim/`` and ``rayrai/``.
+
+    You can also update an unpacked macOS tree explicitly:
+
+    .. code-block:: bash
+
+        ./raisim_upgrade.sh -y
+
+    Apple Silicon hosts select ``macos-arm64``, even when CMake or the shell is
+    running under Rosetta. Intel Mac builds select ``macos-x86_64`` when that
+    release asset is available. ``RAISIM_PY`` must be enabled explicitly when
+    you want the Python wrapper.
 
   .. group-tab:: Windows
 
@@ -133,6 +146,10 @@ Use this command sequence when you want examples and ``raisimPy`` from the local
       -DRAISIM_EXAMPLE=ON \
       -DRAISIM_PY=ON
     cmake --build build -j
+
+On macOS, prefer adding ``-DCMAKE_BUILD_TYPE=Release`` to the configure command
+for local example builds. If ``raisim/`` is missing or its version differs from
+``RAISIM_VERSION``, the configure step downloads the pinned macOS package.
 
 Installation is optional for running examples from the build tree. If you do
 install, choose a prefix you can write to instead of relying on CMake's default

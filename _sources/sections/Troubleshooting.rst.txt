@@ -15,8 +15,10 @@ under the build directory:
     ./build/examples/primitive_grid
     ./build/examples/rayrai_tcp_viewer
 
-If a command from old docs uses an ``example_`` prefix, check :doc:`Examples`
-for the current target name.
+Installed packages use ``<raisim-install>/bin/rayrai_tcp_viewer`` for the
+supported TCP viewer. The ``rayrai_tcp_viewer`` command is the examples
+source-tree target. If a command from old docs uses an ``example_`` prefix,
+check :doc:`Examples` for the current target name.
 
 Missing Shared Libraries
 ========================
@@ -56,8 +58,8 @@ Check these points:
 
 * The simulation must create ``raisim::RaisimServer`` and call
   ``launchServer``.
-* The server-based example and ``rayrai_tcp_viewer`` must use the same
-  port. The default is ``8080``.
+* The server-based example and TCP viewer must use the same port. The default
+  is ``8080``.
 * Start the simulation and viewer from the same installed RaiSim version.
 
 The TCP viewer receives world state only. It does not write RGB/depth rendered

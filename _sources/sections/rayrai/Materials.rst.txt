@@ -142,17 +142,10 @@ The shipped PBR examples and tools are:
 * ``rayrai_pbr_texture_maps``: texture-slot coverage for base color, normal,
   metallic-roughness, occlusion, and emissive maps.
 * ``rayrai_visual_asset_support``: authored glTF/GLB scene import with PBR
-  materials, embedded lights, and reflection-probe sidecars while keeping
-  visual and collision geometry separate.
-* ``example_rayrai_pbr_asset_inspector``: bundled glTF PBR sample assets under
-  Ultra quality settings with HDR environment lighting, SSAO, bloom, shadows,
-  and screenshot output.
-* ``example_polyhaven_blue_wall``: Poly Haven glTF scene import with authored
-  lights, HDR IBL, optional reflection probes, shadow budgets, and screenshot
-  output.
-* ``rayrai_feature_showcase`` and ``rayrai_quality_comparison``: offscreen
-  feature coverage and preset comparison images that exercise the PBR path,
-  post-processing, lighting, and diagnostics.
+  materials, embedded lights, reflection-probe sidecars, and screenshot output
+  while keeping visual and collision geometry separate.
+* ``rayrai_quality_lighting``: additional-light and quality preset coverage for
+  inspecting PBR materials.
 
 Authored light sources are imported through:
 
@@ -336,4 +329,3 @@ included for context.
           :alt: Clearcoat, sheen, anisotropy slots
      - .. image:: ../../image/rayrai/showcase/09_blue_wall_scene.png
           :alt: Authored Poly Haven blue wall scene
-

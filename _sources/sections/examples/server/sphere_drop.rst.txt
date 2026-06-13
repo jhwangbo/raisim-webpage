@@ -19,7 +19,7 @@ Run the installed executable:
    <raisim-install>/bin/sphere_drop
 
 On Windows, run ``sphere_drop.exe`` instead.
-This example uses RaisimServer. Start ``rayrai_raisim_tcp_viewer`` and connect to port 8080.
+This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.
 
 
 Details

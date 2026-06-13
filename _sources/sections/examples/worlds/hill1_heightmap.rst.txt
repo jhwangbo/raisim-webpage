@@ -25,7 +25,7 @@ Run the installed executable:
    <raisim-install>/bin/hill1_heightmap
 
 On Windows, run ``hill1_heightmap.exe`` instead.
-This example uses RaisimServer. Start ``rayrai_raisim_tcp_viewer`` and connect to port 8080.
+This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.
 
 
 Details

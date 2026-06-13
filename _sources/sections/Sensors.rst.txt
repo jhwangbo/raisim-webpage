@@ -411,15 +411,8 @@ Current runnable coverage:
   point cloud.
 * :doc:`Rayrai ArUco marker <examples/rayrai/rayrai_aruco_marker>` covers
   marker rendering and camera-facing visual output.
-* :doc:`rayrai_feature_showcase <examples/rayrai/rayrai_feature_showcase>`
-  renders external-camera color outputs, linear depth outputs, sensor-only
-  passes, fisheye camera output, and diagnostic image files.
-* ``rayrai_benchmark`` covers RGB/depth readback, picking, point clouds,
-  scene synchronization, and related renderer paths under benchmark timing.
-* ``rayrai_complete_showcase_benchmark`` times the complete Anymal RGB/depth and
-  LiDAR showcase path, including optional readback and visualization startup.
-* Low-level regression coverage lives under ``visualizer/rayrai/tests``,
-  including fisheye camera, render diagnostics, and visual-frame-cache tests.
+Use the package examples above as public reference programs for sensor
+rendering workflows.
 
 A typical RGB/depth setup has four parts: load a URDF with sensors, switch the
 camera sensors to manual measurements, create rayrai camera objects from those
@@ -500,14 +493,8 @@ Examples
 
 * Use the dedicated rayrai RGB, depth, LiDAR, and ArUco examples above for
   robot-attached rendered sensor buffers.
-* Use ``rayrai_feature_showcase`` for aggregate coverage of rendered camera
-  buffers, linear depth outputs, sensor-only rendering, and diagnostic image
-  generation.
-* Use ``rayrai_benchmark`` when you need timed coverage for readback, picking,
-  point clouds, scene synchronization, and related renderer paths.
-* Use ``rayrai_complete_showcase_benchmark`` when you need one timed scene that
-  combines Anymal RGB/depth sensors, LiDAR visualization, optional readback, and
-  visualization startup profiling.
+* Use ``rayrai_complete_showcase`` when you need one runnable scene that
+  combines RGB/depth cameras, LiDAR visualization, and custom visuals.
 * ``World::captureDepthCamera`` supports depth, segmentation, optional hit
   points, and timestamps without a visualizer, but it is the CPU fallback path.
 

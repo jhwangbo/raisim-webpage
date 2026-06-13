@@ -79,6 +79,35 @@ Collision detection details
 For a detailed breakdown of collision pairs, narrowphase algorithms, and
 per-pair contact counts, see the :doc:`CollisionDetection` section.
 
+Contact Solver Notes
+====================
+
+RaiSim uses a bisection-based per-contact solver for rigid contacts, closed-loop
+pin constraints, and hard length constraints. ``World::setContactSolverParam``
+still accepts the historical alpha arguments, but the current implementation
+keeps the three alpha values fixed internally; only ``maxIter`` and
+``threshold`` affect the solver configuration. ``World::setERP`` controls the
+position-error reduction terms used by the contact solve.
+
+The solver warm-starts ordinary rigid contacts from the previous converged
+solve when the object pair and contact position still match. The cached impulse
+is stored in world coordinates and projected into the current contact frame and
+friction cone before it is applied. Warm-start data is intentionally not reused
+after a non-converged or stalled solve.
+
+Particle-style contacts are handled differently. Deformable and granular
+contacts use particle/vertex ids as solver point ids, and those ids are not
+persistent contact-list indices. The contact solver therefore does not
+warm-start deformable or granular contacts; they use the exact re-solve path
+each step. This avoids treating a particle id as an index into
+``Object::getContacts()`` and keeps particle contacts independent of contact
+list layout.
+
+``World::setContactSolverIterationOrder(order)`` sets the starting sweep
+direction for the next contact solve. The bisection solver then flips the stored
+direction after each solve, so subsequent solves alternate between forward and
+reverse sweeps unless the application sets the starting direction again.
+
 API
 =========
 You can get a vector of collisions on an object using ``raisim::Object::getContacts``.

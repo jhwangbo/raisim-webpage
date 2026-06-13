@@ -5,11 +5,13 @@ Examples
 Overview
 ========
 The RaiSim binary distribution ships runnable C++ examples and rayrai tools.
-Use the ``example_*`` executables to exercise RaiSim physics APIs, mesh
-import/export, OpenUSD mesh loading, and PBR rayrai asset inspection. Use
-``rayrai_raisim_tcp_viewer`` to inspect applications that publish a
-``raisim::World`` through ``raisim::RaisimServer``. RaisimUnity and
-RaisimUnreal are no longer supported.
+Use server examples such as ``primitive_grid``, rayrai examples such as
+``rayrai_pbr_material_grid``, and non-visual tools such as
+``model_asset_pipeline`` to exercise RaiSim physics APIs, mesh import/export,
+OpenUSD mesh loading, and rayrai asset inspection. Use ``rayrai_tcp_viewer`` to
+inspect applications that publish a
+``raisim::World`` through ``raisim::RaisimServer``. RaisimUnity and RaisimUnreal
+are no longer supported.
 
 .. image:: ../image/examples_overview.png
    :alt: Overview of RaiSim and rayrai examples
@@ -27,15 +29,15 @@ Run examples from the installed package ``bin`` directory:
 
 .. code-block:: bash
 
-    <raisim-install>/bin/example_anymal_contacts
-    <raisim-install>/bin/example_rayrai_pbr_asset_inspector
+    <raisim-install>/bin/primitive_grid
+    <raisim-install>/bin/rayrai_pbr_material_grid
 
 On Windows, use the ``.exe`` executable from the installed package ``bin``
 directory:
 
 .. code-block:: powershell
 
-    C:\path\to\raisim\bin\example_anymal_contacts.exe
+    C:\path\to\raisim\bin\primitive_grid.exe
 
 If the runtime loader cannot find shared libraries, use the platform-specific
 environment setup before running examples:
@@ -61,17 +63,17 @@ full workflow comparison.
 
 RaisimServer examples
 ---------------------
-``example_anymal_contacts`` and ``example_atlas_contacts`` create a RaiSim world
-and publish it through ``raisim::RaisimServer``. They do not open a renderer
-window themselves. Start ``rayrai_raisim_tcp_viewer``, then run the example:
+Server examples such as ``primitive_grid`` create a RaiSim world and publish it
+through ``raisim::RaisimServer``. They do not open a renderer window themselves.
+Start ``rayrai_tcp_viewer``, then run the example:
 
 .. code-block:: bash
 
     # Terminal 1
-    <raisim-install>/bin/rayrai_raisim_tcp_viewer
+    <raisim-install>/bin/rayrai_tcp_viewer
 
     # Terminal 2
-    <raisim-install>/bin/example_anymal_contacts
+    <raisim-install>/bin/primitive_grid
 
 The default server port is ``8080`` unless the example changes it. Use this
 path when you want to inspect the same simulation data that a normal
@@ -79,14 +81,13 @@ RaisimServer application publishes.
 
 Rayrai examples
 ---------------
-Examples such as ``example_polyhaven_blue_wall`` and
-``example_rayrai_pbr_asset_inspector`` create or use a
-``raisin::RayraiWindow`` directly and render in process. They do not need the
-TCP viewer:
+Examples such as ``rayrai_pbr_material_grid``, ``rayrai_pbr_texture_maps``, and
+``rayrai_visual_asset_support`` create or use a ``raisin::RayraiWindow``
+directly and render in process. They do not need the TCP viewer:
 
 .. code-block:: bash
 
-    <raisim-install>/bin/example_rayrai_pbr_asset_inspector
+    <raisim-install>/bin/rayrai_pbr_material_grid
 
 Prefer these examples when you need camera images, GPU/offscreen rendering, PBR
 materials, glTF visual import, or standalone rayrai feature inspection. USD
@@ -96,8 +97,8 @@ visual meshes can also be loaded through ``RayraiWindow::addVisualMesh``; see
 Non-visual examples
 -------------------
 Some examples are intended to print output or create files rather than show a
-window. ``example_model_asset_pipeline`` writes preprocessed and exported OBJ
-files to ``/tmp/raisim_model_asset_pipeline_example``.
+window. ``model_asset_pipeline`` writes preprocessed and exported OBJ files to
+``/tmp/raisim_model_asset_pipeline_example``.
 
 Example layout
 ==============
@@ -109,15 +110,11 @@ The installed package groups examples by executable behavior:
 
    * - Group
      - Purpose
-   * - ``example_*``
-     - Installed examples for RaiSim physics, mesh import/export, OpenUSD mesh
-       loading, and rayrai asset inspection.
+   * - Server examples
+     - Installed examples for RaiSim physics, contact, terrain, sensor, robot,
+       XML/MJCF, and OpenUSD scene workflows.
    * - ``rayrai_*``
      - rayrai tools and standalone renderer examples.
-   * - Server examples
-     - Examples that publish a world through ``RaisimServer`` and are viewed
-       with ``rayrai_raisim_tcp_viewer``.
-
 Choosing an example
 ===================
 Start with these targets when learning a specific feature:
@@ -128,12 +125,9 @@ Start with these targets when learning a specific feature:
 
    * - Target
      - Demonstrates
-   * - ``example_anymal_contacts``
-     - ANYmal standing on ground with PD gains and RaisimServer publishing.
-   * - ``example_atlas_contacts``
-     - Atlas contact simulation with a small timestep and RaisimServer
-       publishing.
-   * - ``example_model_asset_pipeline``
+   * - ``primitive_grid``
+     - Basic rigid primitive creation and RaisimServer publishing.
+   * - ``model_asset_pipeline``
      - Mesh preprocessing, content-hash cache reuse, ``addMesh`` with processed
        assets, and OBJ export from a world.
    * - ``shadow_hand_usd_cube``
@@ -142,28 +136,15 @@ Start with these targets when learning a specific feature:
    * - ``nvidia_usd_robots``
      - Loading vetted NVIDIA Isaac Sim robot USD scenes through the ``World``
        constructor and publishing them through ``RaisimServer``.
-   * - ``example_polyhaven_blue_wall``
-     - Importing a Poly Haven glTF scene with HDR IBL, imported lights,
-       reflection probes, and screenshot command-line options.
-   * - ``example_rayrai_pbr_asset_inspector``
-     - Inspecting bundled glTF PBR sample assets under rayrai quality settings.
+   * - ``rayrai_pbr_material_grid``
+     - Inspecting metallic-roughness PBR material behavior under rayrai.
+   * - ``rayrai_visual_asset_support``
+     - Importing glTF/GLB visual scenes with PBR materials, authored lights,
+       and reflection-probe sidecars.
    * - ``rayrai_coacd_mesh_approximation``
      - Visually comparing original meshes and CoACD convex approximation
        parts generated through ``World::addMesh``.
-   * - ``rayrai_feature_showcase``
-     - Offscreen image generation for rayrai features, including full scene,
-       depth of field, depth plane, deformables, PBR maps, and HDR IBL.
-   * - ``rayrai_quality_comparison``
-     - Preset comparison images and quality reports for rayrai rendering.
-   * - ``rayrai_benchmark``
-     - Rendering, readback, scene-sync, and TCP serialization benchmarks.
-   * - ``rayrai_complete_showcase_benchmark``
-     - Timed Anymal sensor-showcase benchmark with optional readback,
-       visualization startup, startup profiling, and PBR world materials.
-   * - ``rayrai_pbr_first_draw_benchmark``
-     - First-draw and warm-frame benchmark for full PBR and core-eligible PBR
-       shader-material paths.
-   * - ``rayrai_raisim_tcp_viewer``
+   * - ``rayrai_tcp_viewer``
      - The TCP visualizer used by RaisimServer examples.
 
 Runtime assets
@@ -190,8 +171,6 @@ Current Package Examples
 .. toctree::
    :maxdepth: 1
 
-   examples/current/example_anymal_contacts
-   examples/current/example_atlas_contacts
    examples/current/granular_media
 
 Benchmark Examples
@@ -209,11 +188,6 @@ Rayrai Tools And Examples
 .. toctree::
    :maxdepth: 1
 
-   examples/current/rayrai_raisim_tcp_viewer
-   examples/current/rayrai_quality_comparison
-   examples/current/rayrai_benchmark
-   examples/current/rayrai_complete_showcase_benchmark
-   examples/current/rayrai_pbr_first_draw_benchmark
    examples/rayrai/rayrai_basic_scene
    examples/rayrai/rayrai_complete_showcase
    examples/rayrai/rayrai_blender_scene_import
@@ -232,7 +206,6 @@ Rayrai Tools And Examples
    examples/rayrai/rayrai_runtime_scene_editing
    examples/rayrai/rayrai_rolling_spinning_friction
    examples/rayrai/rayrai_swept_ccd
-   examples/rayrai/rayrai_feature_showcase
    examples/rayrai/rayrai_tcp_viewer
 
 Server Examples

@@ -174,10 +174,10 @@ manage GL handles individually:
 
 Use HDR environments with visible features when inspecting reflective materials. A
 featureless sky or uniform studio HDR can make it hard to tell whether reflections are
-working. ``example_rayrai_pbr_asset_inspector``, ``example_polyhaven_blue_wall``,
-``rayrai_feature_showcase``, and ``rayrai_quality_comparison`` use HDR/image-based
-lighting so metallic and glossy surfaces show visible reflections while non-metallic
-assets remain mostly diffuse.
+working. ``rayrai_pbr_material_grid``, ``rayrai_pbr_texture_maps``, and
+``rayrai_visual_asset_support`` use HDR/image-based lighting so metallic and
+glossy surfaces show visible reflections while non-metallic assets remain
+mostly diffuse.
 
 For scene-wide reflections, rayrai also has static reflection probe capture, local
 probe selection, reflection-probe sidecars, and planar ground reflection support.
@@ -295,4 +295,3 @@ and authored lightmaps as cheap indirect-light alternatives:
           :alt: Authored irradiance volumes filling indirect light
      - .. image:: ../../image/rayrai/showcase/92_lightmap_gi.png
           :alt: Lightmap-driven GI on authored scenes
-

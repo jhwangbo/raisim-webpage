@@ -15,6 +15,6 @@ Run:
 
    <raisim-install>/bin/granular_media
 
-Start ``rayrai_raisim_tcp_viewer`` before running this example if you want to view the
+Start ``rayrai_tcp_viewer`` before running this example if you want to view the
 simulation interactively.
 

@@ -141,7 +141,7 @@ architecture. Start the TCP viewer, then run:
 
 .. code-block:: bash
 
-    <raisim-install>/bin/rayrai_raisim_tcp_viewer
+    <raisim-install>/bin/rayrai_tcp_viewer
     <raisim-install>/bin/shadow_hand_usd_cube
 
 ``nvidia_usd_robots`` provides additional vetted Isaac Sim robot scenes:
