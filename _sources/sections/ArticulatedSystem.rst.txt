@@ -246,51 +246,40 @@ For details, check the `URDF protocol <http://wiki.ros.org/urdf/XML>`_.
 Mesh collision mode for URDF
 *******************************
 URDF does not provide a tag to choose the mesh collision mode. In RaiSim, the mode
-is selected at load time with ``ArticulatedSystemOption::collisionMeshMode``. The
-default is ``MeshCollisionMode::CONVEX_HULL``, which builds one convex hull for
-each mesh collision element.
-
-Use ``MeshCollisionMode::CONVEX_APPROXIMATION`` when you want CoACD convex
-decomposition for articulated-system mesh collisions, and pass ``CoacdOptions``
-when the default decomposition parameters are not appropriate:
+is selected at load time with ``ArticulatedSystemOption::convexifyCollisionMeshes``.
+The default is ``false``, which keeps each URDF collision mesh as the original
+non-convex triangle mesh. Set it to ``true`` to build a convex contact mesh for
+each URDF mesh collision element:
 
 .. code-block:: cpp
 
   raisim::ArticulatedSystemOption options;
-  options.setCollisionMeshMode(raisim::MeshCollisionMode::CONVEX_APPROXIMATION);
+  options.convexifyCollisionMeshes = true;
   auto* robot = world.addArticulatedSystem(urdfPath, "", {}, 1, -1, options);
+
+This articulated-system option is a simple original-mesh versus convex-mesh
+choice. It does not expose the single-body ``CoacdOptions`` path. Use authored
+simplified collision meshes in the URDF when you need precise control over
+robot-link collision geometry. Use ``raisim::World::addMesh`` with
+``MeshCollisionMode::CONVEXIFY`` for standalone mesh objects that should use
+CoACD convex decomposition:
+
+.. code-block:: cpp
 
   raisim::CoacdOptions coacd;
   coacd.threshold = 0.06;
   coacd.maxConvexHull = 12;
 
-  raisim::ArticulatedSystemOption tunedOptions;
-  tunedOptions.setCollisionMeshMode(raisim::MeshCollisionMode::CONVEX_APPROXIMATION, coacd);
-  auto* tunedRobot = world.addArticulatedSystem(urdfPath, "", {}, 1, -1, tunedOptions);
+  auto* prop = world.addMesh(meshPath, mass, scale, "default",
+                             raisim::MeshCollisionMode::CONVEXIFY,
+                             raisim::CollisionGroup(1),
+                             raisim::CollisionGroup(-1),
+                             coacd);
 
-Use ``MeshCollisionMode::ORIGINAL_MESH`` only when you intentionally want the
-original non-convex triangle mesh for collision:
-
-.. code-block:: cpp
-
-  raisim::ArticulatedSystemOption options;
-  options.setCollisionMeshMode(raisim::MeshCollisionMode::ORIGINAL_MESH);
-  auto* robot = world.addArticulatedSystem(urdfPath, "", {}, 1, -1, options);
-
-The older ``convexifyCollisionMeshes`` switch is kept for compatibility. Setting
-it to ``false`` maps the default hull mode to ``ORIGINAL_MESH``; new code should
-prefer ``setCollisionMeshMode`` so hull, CoACD approximation, and original-mesh
-behavior are explicit.
-
-If ``MeshCollisionMode::CONVEX_APPROXIMATION`` is requested and CoACD cannot
-process a particular collision mesh (for example, the mesh is not 2-manifold),
-RaiSim prints a warning and falls back to a single convex hull for that mesh —
-the same policy as ``raisim::World::addMesh``. Falling back to a convex hull
-rather than the original non-convex mesh avoids deep penetration and contact
-instabilities that the non-convex triangle-mesh collider can exhibit when the
-body has an offset COM or is forced into terrain by another body. Use
-``MeshCollisionMode::ORIGINAL_MESH`` explicitly if you need the non-convex
-triangle mesh.
+For articulated robots, original non-convex triangle-mesh collision can be
+slower and less robust than primitive, convex, or authored collision geometry.
+Prefer primitive collision shapes or simplified convex mesh assets for feet,
+hands, wheels, and links that touch terrain frequently.
 
 Templated URDF
 *******************************

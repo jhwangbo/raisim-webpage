@@ -52,7 +52,7 @@ to use CoACD collision. The intended user-facing workflow is:
    raisim::CoacdOptions options;
    options.maxConvexHull = 12;
    auto* mesh = world->addMesh(path, mass, scale, "",
-                               raisim::MeshCollisionMode::CONVEX_APPROXIMATION,
+                               raisim::MeshCollisionMode::CONVEXIFY,
                                collisionGroup, collisionMask, options);
 
 The rayrai side then visualizes the resulting RaiSim object.

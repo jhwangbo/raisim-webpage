@@ -411,6 +411,7 @@ Current runnable coverage:
   point cloud.
 * :doc:`Rayrai ArUco marker <examples/rayrai/rayrai_aruco_marker>` covers
   marker rendering and camera-facing visual output.
+
 Use the package examples above as public reference programs for sensor
 rendering workflows.
 

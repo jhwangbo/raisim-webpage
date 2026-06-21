@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Single-Body Objects &mdash; raisim 2.4.3 documentation</title>
+  <title>Single-Body Objects &mdash; raisim 2.4.4 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b0caeef3" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=7a6bd5fc"></script>
+      <script src="../_static/documentation_options.js?v=b1e24531"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -50,6 +50,11 @@
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Visualization.html">Visualization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FeatureMap.html">Feature Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ProjectLayout.html">Project Layout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Benchmark.html">Benchmark</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Troubleshooting.html">Troubleshooting</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
@@ -182,13 +187,10 @@ Meshes are added via <code class="docutils literal notranslate"><span class="pre
 <h3>Public mesh collision modes<a class="headerlink" href="#public-mesh-collision-modes" title="Link to this heading"></a></h3>
 <p>The public <code class="docutils literal notranslate"><span class="pre">addMesh</span></code> API exposes three collision representations:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEX_APPROXIMATION</span></code>: CoACD convex decomposition. This creates multiple convex collision parts from one mesh. This is the default for <code class="docutils literal notranslate"><span class="pre">addMesh</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEXIFY</span></code>: CoACD convex decomposition. This creates multiple convex collision parts from one mesh. This is the default for <code class="docutils literal notranslate"><span class="pre">addMesh</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEX_HULL</span></code>: one convex hull built from the mesh.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::ORIGINAL_MESH</span></code>: the original non-convex triangle mesh.</p></li>
 </ul>
-<p><code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEXIFY</span></code> remains accepted as a legacy alias for
-<code class="docutils literal notranslate"><span class="pre">CONVEX_APPROXIMATION</span></code>. New code and documentation should use
-<code class="docutils literal notranslate"><span class="pre">CONVEX_APPROXIMATION</span></code>.</p>
 <p>Original non-convex triangle mesh collision is useful for imported visual meshes that are invalid
 CoACD input, but it is usually slower and less robust than convex collision geometry.</p>
 </section>
@@ -217,10 +219,10 @@ a single convex hull built from the mesh:</p>
 <span class="w">                           </span><span class="n">raisim</span><span class="o">::</span><span class="n">MeshCollisionMode</span><span class="o">::</span><span class="n">ORIGINAL_MESH</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>You can still pass <code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEX_APPROXIMATION</span></code> explicitly when you want to make the default
+<p>You can still pass <code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEXIFY</span></code> explicitly when you want to make the default
 choice visible at the call site:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">mesh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addMesh</span><span class="p">(</span><span class="n">meshFile</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="n">scale</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span>
-<span class="w">                           </span><span class="n">raisim</span><span class="o">::</span><span class="n">MeshCollisionMode</span><span class="o">::</span><span class="n">CONVEX_APPROXIMATION</span><span class="p">);</span>
+<span class="w">                           </span><span class="n">raisim</span><span class="o">::</span><span class="n">MeshCollisionMode</span><span class="o">::</span><span class="n">CONVEXIFY</span><span class="p">);</span>
 </pre></div>
 </div>
 </section>
@@ -236,7 +238,7 @@ make contact processing slower.</p>
 <span class="n">options</span><span class="p">.</span><span class="n">mctsIteration</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">80</span><span class="p">;</span>
 
 <span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">mesh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addMesh</span><span class="p">(</span><span class="n">meshFile</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="n">scale</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span>
-<span class="w">                           </span><span class="n">raisim</span><span class="o">::</span><span class="n">MeshCollisionMode</span><span class="o">::</span><span class="n">CONVEX_APPROXIMATION</span><span class="p">,</span>
+<span class="w">                           </span><span class="n">raisim</span><span class="o">::</span><span class="n">MeshCollisionMode</span><span class="o">::</span><span class="n">CONVEXIFY</span><span class="p">,</span>
 <span class="w">                           </span><span class="n">raisim</span><span class="o">::</span><span class="n">CollisionGroup</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
 <span class="w">                           </span><span class="n">raisim</span><span class="o">::</span><span class="n">CollisionGroup</span><span class="p">(</span><span class="mi">-1</span><span class="p">),</span>
 <span class="w">                           </span><span class="n">options</span><span class="p">);</span>
@@ -251,7 +253,7 @@ make contact processing slower.</p>
 <h3>CoACD input requirements<a class="headerlink" href="#coacd-input-requirements" title="Link to this heading"></a></h3>
 <p>The bundled CoACD integration is intentionally small and does not include heavy preprocessing
 dependencies. It works best with closed, reasonably manifold meshes.</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEX_APPROXIMATION</span></code> fails (for example, the mesh is not 2-manifold),
+<p>If <code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEXIFY</span></code> fails (for example, the mesh is not 2-manifold),
 RaiSim prints a warning and falls back to a single convex hull (<code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEX_HULL</span></code>)
 built from the same vertices. This keeps imported visual meshes such as robot body panels usable
 when they are not valid CoACD input, and avoids the deep-penetration and performance pathologies
@@ -260,8 +262,8 @@ mesh, request <code class="docutils literal notranslate"><span class="pre">MeshC
 </section>
 <section id="coacd-cache-files">
 <h3>CoACD cache files<a class="headerlink" href="#coacd-cache-files" title="Link to this heading"></a></h3>
-<p>Successful <code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEX_APPROXIMATION</span></code> calls (including the legacy <code class="docutils literal notranslate"><span class="pre">CONVEXIFY</span></code> alias) write an OBJ cache beside the source mesh. This
-keeps repeated runs cheap: the first call pays the CoACD decomposition cost, while later calls with
+<p>Successful <code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEXIFY</span></code> calls write an OBJ cache beside the
+source mesh. This keeps repeated runs cheap: the first call pays the CoACD decomposition cost, while later calls with
 the same parameters load the saved convex parts directly.</p>
 <p>The file name starts with <code class="docutils literal notranslate"><span class="pre">raisim_coacd_</span></code> and includes the source mesh stem, a content hash,
 scale, and CoACD option values, for example:</p>
@@ -290,7 +292,7 @@ fresh decomposition without editing the source mesh.</p>
 <span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">mesh</span><span class="o">-&gt;</span><span class="n">getCollisionBodyCount</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>When CoACD falls back to original non-convex mesh collision, <code class="docutils literal notranslate"><span class="pre">getCoacdConvexParts()</span></code> is empty and
+<p>When CoACD falls back to a single convex hull, <code class="docutils literal notranslate"><span class="pre">getCoacdConvexParts()</span></code> is empty and
 <code class="docutils literal notranslate"><span class="pre">getCollisionBodyCount()</span></code> returns <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
 <p>The rayrai example <code class="docutils literal notranslate"><span class="pre">rayrai_coacd_mesh_approximation</span></code> displays original meshes next to colored
 convex decomposition parts.</p>

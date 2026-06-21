@@ -1,0 +1,352 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Performance &mdash; raisim 2.4.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b0caeef3" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=b1e24531"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Benchmark" href="Benchmark.html" />
+    <link rel="prev" title="Project Layout" href="ProjectLayout.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FeatureMap.html">Feature Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ProjectLayout.html">Project Layout</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Performance</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-usually-costs-time">What Usually Costs Time</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#collision-modeling">Collision Modeling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#contacts-and-solver-work">Contacts and Solver Work</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sleeping-islands">Sleeping Islands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#package-timing-examples">Package Timing Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#threading-and-determinism">Threading and Determinism</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#algorithm-background">Algorithm Background</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Benchmark.html">Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RsceneFile.html">.rscene File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Performance</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="performance">
+<h1>Performance<a class="headerlink" href="#performance" title="Link to this heading"></a></h1>
+<p>This page is a practical tuning guide for users of the <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> binary
+package workspace and for downstream applications linked against the downloaded
+RaiSim and rayrai packages. For commands that build and run package examples,
+see <a class="reference internal" href="BuildAndTest.html"><span class="doc">Build, Test, and Benchmark</span></a>.</p>
+<p>Fast scenes usually come from three choices:</p>
+<ul class="simple">
+<li><p>keep collision geometry simple and intentional;</p></li>
+<li><p>avoid creating more contacts than the task needs;</p></li>
+<li><p>measure with timing-oriented package examples or your downstream workload on
+one thread before changing solver or modeling choices.</p></li>
+</ul>
+<section id="what-usually-costs-time">
+<h2>What Usually Costs Time<a class="headerlink" href="#what-usually-costs-time" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 24.0%" />
+<col style="width: 38.0%" />
+<col style="width: 38.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Cost center</p></th>
+<th class="head"><p>What increases it</p></th>
+<th class="head"><p>What to do first</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Broadphase collision detection</p></td>
+<td><p>Many active collision bodies, large worlds, or dense moving object sets.</p></td>
+<td><p>Use collision groups/masks and choose a broadphase that matches the scene.
+See <a class="reference internal" href="WorldSystem.html"><span class="doc">World</span></a> and <a class="reference internal" href="CollisionDetection.html"><span class="doc">Collision Detection and Colliders</span></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Narrowphase collision detection</p></td>
+<td><p>Expensive shape pairs, dense mesh contact, or geometry that creates many
+candidate contacts.</p></td>
+<td><p>Use primitives, height maps, simplified convex collision assets, or cached
+mesh preprocessing where possible. See <a class="reference internal" href="SingleBodyObjects.html"><span class="doc">Single-Body Objects</span></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p>Contact properties</p></td>
+<td><p>Many articulated bodies touching many other bodies.</p></td>
+<td><p>Remove unnecessary collision shapes and split non-interacting objects with
+collision masks.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Contact solver</p></td>
+<td><p>Stacks, pinched contacts, highly coupled contacts, or excessive contact
+manifolds.</p></td>
+<td><p>Reduce redundant contacts before tuning solver iterations.</p></td>
+</tr>
+<tr class="row-even"><td><p>Sensors</p></td>
+<td><p>Large CPU depth images, many lidar rays, or high sensor update rates.</p></td>
+<td><p>Use in-process rayrai for RGB/depth sensor images when rayrai is
+available. Lower CPU ray-query resolution/update rate only for headless
+fallback or deterministic physics-ray workloads. See <a class="reference internal" href="Sensors.html"><span class="doc">Sensors</span></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Visualization</p></td>
+<td><p>Rendering in the simulation process, high-quality PBR settings, or
+synchronous screen capture.</p></td>
+<td><p>Use <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> + <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> for debugging, and
+in-process rayrai only when the application needs rendered images. See
+<a class="reference internal" href="Visualization.html"><span class="doc">Visualization</span></a>.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="collision-modeling">
+<h2>Collision Modeling<a class="headerlink" href="#collision-modeling" title="Link to this heading"></a></h2>
+<p>Collision geometry is often the largest performance lever. Visual meshes should
+not automatically become collision meshes. Prefer this order:</p>
+<ol class="arabic simple">
+<li><p>primitive shapes for robot links and simple objects;</p></li>
+<li><p>height maps for terrain;</p></li>
+<li><p>preprocessed convex collision assets for irregular objects;</p></li>
+<li><p>mesh collision only when the task really needs mesh-level contact.</p></li>
+</ol>
+<p>Use <code class="docutils literal notranslate"><span class="pre">World::addMesh</span></code> preprocessing and cache reuse when a mesh collision asset
+is needed repeatedly. For broadphase-heavy scenes, configure
+<code class="docutils literal notranslate"><span class="pre">contact::BroadphaseType::MultiBoxPrune</span></code> with bounds and cell sizes that match
+the active world volume. For very small scenes or debugging, brute-force
+broadphase can be useful, but it should not be the default assumption for large
+worlds.</p>
+</section>
+<section id="contacts-and-solver-work">
+<h2>Contacts and Solver Work<a class="headerlink" href="#contacts-and-solver-work" title="Link to this heading"></a></h2>
+<p>The contact solver cost depends on how coupled the contacts are. Ten isolated
+contacts are very different from ten contacts in a compressed stack. Before
+tuning solver parameters, check whether the model is generating contacts that do
+not matter for the task:</p>
+<ul class="simple">
+<li><p>remove decorative collision bodies;</p></li>
+<li><p>simplify foot, gripper, and terrain collision geometry;</p></li>
+<li><p>avoid overlapping collision shapes in one body unless they are intentional;</p></li>
+<li><p>use collision groups and masks to skip pairs that should never interact;</p></li>
+<li><p>keep timesteps and material parameters within the stability range required by
+the task.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">World::setContactSolverParam</span></code> exposes solver parameters for advanced users,
+but it is usually a later step. Reducing redundant contacts tends to be more
+robust than asking the solver to process a harder problem faster.</p>
+</section>
+<section id="sleeping-islands">
+<h2>Sleeping Islands<a class="headerlink" href="#sleeping-islands" title="Link to this heading"></a></h2>
+<p>Sleeping is enabled by default. RaiSim can skip simulation work for dynamic
+islands whose velocities remain below the configured thresholds for a few steps.
+This helps scenes with piles, props, or objects that settle and then stay quiet.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">world</span><span class="p">.</span><span class="n">setSleepingEnabled</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setSleepingParameters</span><span class="p">(</span><span class="cm">/*linear*/</span><span class="w"> </span><span class="mf">0.002</span><span class="p">,</span><span class="w"> </span><span class="cm">/*angular*/</span><span class="w"> </span><span class="mf">0.01</span><span class="p">,</span><span class="w"> </span><span class="cm">/*quietSteps*/</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">wakeAll</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>Disable sleeping when every object must remain numerically active every step, or
+when a benchmark is intended to measure the awake dynamics path. Use the
+<code class="docutils literal notranslate"><span class="pre">island_sleep</span></code> benchmark to quantify the effect for stack-like scenes.</p>
+</section>
+<section id="package-timing-examples">
+<h2>Package Timing Examples<a class="headerlink" href="#package-timing-examples" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> ships standalone timing-oriented examples for binary package
+users. The RaiSim engine source tree has a separate unified benchmark runner
+used by maintainers for release validation, but that runner is not available in
+this workspace because <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> downloads RaiSim and rayrai as binary
+packages. Build the public examples in Release mode and run timing commands on
+one thread:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-S<span class="w"> </span>examples<span class="w"> </span>-B<span class="w"> </span>/tmp/raisim2lib-examples<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release
+cmake<span class="w"> </span>--build<span class="w"> </span>/tmp/raisim2lib-examples<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--target<span class="w"> </span>anymal_standing_benchmark<span class="w"> </span>articulated_system_benchmark<span class="w"> </span><span class="se">\</span>
+<span class="w">             </span>granular_media<span class="w"> </span>island_sleep_benchmark<span class="w"> </span>-j12
+<span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>/tmp/raisim2lib-examples/anymal_standing_benchmark<span class="w"> </span>--fast
+<span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>/tmp/raisim2lib-examples/articulated_system_benchmark
+<span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>/tmp/raisim2lib-examples/island_sleep_benchmark<span class="w"> </span>--steps<span class="o">=</span><span class="m">12000</span>
+</pre></div>
+</div>
+<p>Installed binary packages can also provide these executables under
+<code class="docutils literal notranslate"><span class="pre">&lt;raisim-install&gt;/bin</span></code>.</p>
+<p>Representative timing examples include:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 36.0%" />
+<col style="width: 64.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Executable</p></th>
+<th class="head"><p>Use it for</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">anymal_standing_benchmark</span></code></p></td>
+<td><p>Headless articulated robot contact scenario.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">articulated_system_benchmark</span></code></p></td>
+<td><p>Articulated-system stepping cost.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">granular_media</span></code></p></td>
+<td><p>Granular bed interaction with a robot model.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">island_sleep_benchmark</span></code></p></td>
+<td><p>Sleeping-island speedup and wake behavior.</p></td>
+</tr>
+</tbody>
+</table>
+<p>For stable comparisons, run the same executable, package version, compiler,
+build type, CPU governor, benchmark arguments, and repeat count. Run one timing
+process at a time. Avoid comparing a visualized run against a headless run
+unless visualization is the measured workload.</p>
+</section>
+<section id="threading-and-determinism">
+<h2>Threading and Determinism<a class="headerlink" href="#threading-and-determinism" title="Link to this heading"></a></h2>
+<p>RaiSim simulation performance should be measured on one simulation thread unless
+the experiment explicitly studies external parallelism. Running many worlds in
+parallel is an application-level design choice; it is different from changing the
+deterministic stepping behavior of one <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">World::setContactSolverIterationOrder(order)</span></code> sets the starting sweep
+direction for the next contact solve. The solver flips the stored direction
+after each solve, so reset it before each measured step only if the experiment
+requires the same starting sweep every time. For reproducible benchmark numbers,
+also control random seeds in the benchmark or application, keep visualization
+disabled unless measured, and pin the same benchmark arguments.</p>
+</section>
+<section id="algorithm-background">
+<h2>Algorithm Background<a class="headerlink" href="#algorithm-background" title="Link to this heading"></a></h2>
+<p>RaiSim uses an articulated-system dynamics path designed to avoid forming and
+inverting a full mass matrix for ordinary forward dynamics. The practical effect
+is that articulated dynamics without heavy contact work scales much better with
+degrees of freedom than a pipeline that explicitly forms and factorizes the mass
+matrix every step.</p>
+<p>That does not make every simulation linear in model size. Collision detection,
+contact generation, solver coupling, deformable bodies, granular media, sensors,
+and rendering can dominate the wall time. Treat old headline kHz numbers as
+historical context, not as a guarantee for a current scene. Measure the package
+example or downstream application you actually run, with the compiler, hardware,
+and build options in front of you.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ProjectLayout.html" class="btn btn-neutral float-left" title="Project Layout" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Benchmark.html" class="btn btn-neutral float-right" title="Benchmark" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

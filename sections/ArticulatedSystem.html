@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Articulated Systems &mdash; raisim 2.4.3 documentation</title>
+  <title>Articulated Systems &mdash; raisim 2.4.4 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b0caeef3" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=7a6bd5fc"></script>
+      <script src="../_static/documentation_options.js?v=b1e24531"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -51,6 +51,11 @@
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Visualization.html">Visualization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FeatureMap.html">Feature Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ProjectLayout.html">Project Layout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Benchmark.html">Benchmark</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Troubleshooting.html">Troubleshooting</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
@@ -379,45 +384,36 @@ For details, check the <a class="reference external" href="http://wiki.ros.org/u
 <section id="mesh-collision-mode-for-urdf">
 <h3>Mesh collision mode for URDF<a class="headerlink" href="#mesh-collision-mode-for-urdf" title="Link to this heading"></a></h3>
 <p>URDF does not provide a tag to choose the mesh collision mode. In RaiSim, the mode
-is selected at load time with <code class="docutils literal notranslate"><span class="pre">ArticulatedSystemOption::collisionMeshMode</span></code>. The
-default is <code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEX_HULL</span></code>, which builds one convex hull for
-each mesh collision element.</p>
-<p>Use <code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEX_APPROXIMATION</span></code> when you want CoACD convex
-decomposition for articulated-system mesh collisions, and pass <code class="docutils literal notranslate"><span class="pre">CoacdOptions</span></code>
-when the default decomposition parameters are not appropriate:</p>
+is selected at load time with <code class="docutils literal notranslate"><span class="pre">ArticulatedSystemOption::convexifyCollisionMeshes</span></code>.
+The default is <code class="docutils literal notranslate"><span class="pre">false</span></code>, which keeps each URDF collision mesh as the original
+non-convex triangle mesh. Set it to <code class="docutils literal notranslate"><span class="pre">true</span></code> to build a convex contact mesh for
+each URDF mesh collision element:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">ArticulatedSystemOption</span><span class="w"> </span><span class="n">options</span><span class="p">;</span>
-<span class="n">options</span><span class="p">.</span><span class="n">setCollisionMeshMode</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">MeshCollisionMode</span><span class="o">::</span><span class="n">CONVEX_APPROXIMATION</span><span class="p">);</span>
+<span class="n">options</span><span class="p">.</span><span class="n">convexifyCollisionMeshes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
 <span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">robot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addArticulatedSystem</span><span class="p">(</span><span class="n">urdfPath</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{},</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">-1</span><span class="p">,</span><span class="w"> </span><span class="n">options</span><span class="p">);</span>
-
-<span class="n">raisim</span><span class="o">::</span><span class="n">CoacdOptions</span><span class="w"> </span><span class="n">coacd</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>This articulated-system option is a simple original-mesh versus convex-mesh
+choice. It does not expose the single-body <code class="docutils literal notranslate"><span class="pre">CoacdOptions</span></code> path. Use authored
+simplified collision meshes in the URDF when you need precise control over
+robot-link collision geometry. Use <code class="docutils literal notranslate"><span class="pre">raisim::World::addMesh</span></code> with
+<code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEXIFY</span></code> for standalone mesh objects that should use
+CoACD convex decomposition:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">CoacdOptions</span><span class="w"> </span><span class="n">coacd</span><span class="p">;</span>
 <span class="n">coacd</span><span class="p">.</span><span class="n">threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.06</span><span class="p">;</span>
 <span class="n">coacd</span><span class="p">.</span><span class="n">maxConvexHull</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">12</span><span class="p">;</span>
 
-<span class="n">raisim</span><span class="o">::</span><span class="n">ArticulatedSystemOption</span><span class="w"> </span><span class="n">tunedOptions</span><span class="p">;</span>
-<span class="n">tunedOptions</span><span class="p">.</span><span class="n">setCollisionMeshMode</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">MeshCollisionMode</span><span class="o">::</span><span class="n">CONVEX_APPROXIMATION</span><span class="p">,</span><span class="w"> </span><span class="n">coacd</span><span class="p">);</span>
-<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">tunedRobot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addArticulatedSystem</span><span class="p">(</span><span class="n">urdfPath</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{},</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">-1</span><span class="p">,</span><span class="w"> </span><span class="n">tunedOptions</span><span class="p">);</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">prop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addMesh</span><span class="p">(</span><span class="n">meshPath</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="n">scale</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;default&quot;</span><span class="p">,</span>
+<span class="w">                           </span><span class="n">raisim</span><span class="o">::</span><span class="n">MeshCollisionMode</span><span class="o">::</span><span class="n">CONVEXIFY</span><span class="p">,</span>
+<span class="w">                           </span><span class="n">raisim</span><span class="o">::</span><span class="n">CollisionGroup</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+<span class="w">                           </span><span class="n">raisim</span><span class="o">::</span><span class="n">CollisionGroup</span><span class="p">(</span><span class="mi">-1</span><span class="p">),</span>
+<span class="w">                           </span><span class="n">coacd</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Use <code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::ORIGINAL_MESH</span></code> only when you intentionally want the
-original non-convex triangle mesh for collision:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">ArticulatedSystemOption</span><span class="w"> </span><span class="n">options</span><span class="p">;</span>
-<span class="n">options</span><span class="p">.</span><span class="n">setCollisionMeshMode</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">MeshCollisionMode</span><span class="o">::</span><span class="n">ORIGINAL_MESH</span><span class="p">);</span>
-<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">robot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addArticulatedSystem</span><span class="p">(</span><span class="n">urdfPath</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{},</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">-1</span><span class="p">,</span><span class="w"> </span><span class="n">options</span><span class="p">);</span>
-</pre></div>
-</div>
-<p>The older <code class="docutils literal notranslate"><span class="pre">convexifyCollisionMeshes</span></code> switch is kept for compatibility. Setting
-it to <code class="docutils literal notranslate"><span class="pre">false</span></code> maps the default hull mode to <code class="docutils literal notranslate"><span class="pre">ORIGINAL_MESH</span></code>; new code should
-prefer <code class="docutils literal notranslate"><span class="pre">setCollisionMeshMode</span></code> so hull, CoACD approximation, and original-mesh
-behavior are explicit.</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEX_APPROXIMATION</span></code> is requested and CoACD cannot
-process a particular collision mesh (for example, the mesh is not 2-manifold),
-RaiSim prints a warning and falls back to a single convex hull for that mesh —
-the same policy as <code class="docutils literal notranslate"><span class="pre">raisim::World::addMesh</span></code>. Falling back to a convex hull
-rather than the original non-convex mesh avoids deep penetration and contact
-instabilities that the non-convex triangle-mesh collider can exhibit when the
-body has an offset COM or is forced into terrain by another body. Use
-<code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::ORIGINAL_MESH</span></code> explicitly if you need the non-convex
-triangle mesh.</p>
+<p>For articulated robots, original non-convex triangle-mesh collision can be
+slower and less robust than primitive, convex, or authored collision geometry.
+Prefer primitive collision shapes or simplified convex mesh assets for feet,
+hands, wheels, and links that touch terrain frequently.</p>
 </section>
 <section id="templated-urdf">
 <h3>Templated URDF<a class="headerlink" href="#templated-urdf" title="Link to this heading"></a></h3>

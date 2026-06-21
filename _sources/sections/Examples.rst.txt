@@ -115,6 +115,7 @@ The installed package groups examples by executable behavior:
        XML/MJCF, and OpenUSD scene workflows.
    * - ``rayrai_*``
      - rayrai tools and standalone renderer examples.
+
 Choosing an example
 ===================
 Start with these targets when learning a specific feature:

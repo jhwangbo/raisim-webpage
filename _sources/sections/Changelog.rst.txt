@@ -10,6 +10,7 @@ behaviour changes, and bug fixes — without re-stating commit history.
    :maxdepth: 1
    :caption: Releases
 
+   changelog/v2.4.3
    changelog/v2.3.0
    changelog/v2.2.0
 
@@ -22,6 +23,11 @@ Versions at a glance
 
    * - Version
      - Headline
+   * - :doc:`v2.4.3 <changelog/v2.4.3>`
+     - Binary package version update; speed and code-cleanup work in RaiSim;
+       expanded release-validation benchmarks; longer stress and actuated Atlas
+       workloads; granular/deformable/contact diagnostics; mesh/OpenUSD asset
+       pipeline improvements; corrected mesh collision-mode documentation.
    * - :doc:`v2.3.0 <changelog/v2.3.0>`
      - Rolling and spinning friction; interactive sim control (pause /
        step / force / pose); MJCF into an existing world; shader binary
