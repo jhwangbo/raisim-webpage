@@ -5,13 +5,13 @@ articulated_system_benchmark
 articulated dynamics workloads. It runs several fixed scenes and prints timing
 through ``raisim::print_timediff``.
 
-Installed executable: ``articulated_system_benchmark``.
+CMake target: ``articulated_system_benchmark``.
 
 Run it single-threaded for benchmark comparisons:
 
 .. code-block:: bash
 
-   OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 <raisim-install>/bin/articulated_system_benchmark
+   OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 ./build-examples/examples/articulated_system_benchmark
 
 On Windows, run ``articulated_system_benchmark.exe`` instead.
 

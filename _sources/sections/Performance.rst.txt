@@ -110,28 +110,29 @@ when a benchmark is intended to measure the awake dynamics path. Use the
 Package Timing Examples
 =======================
 
-``raisim2Lib`` ships standalone timing-oriented examples for binary package
-users. The RaiSim engine source tree has a separate unified benchmark runner
-used by maintainers for release validation, but that runner is not available in
-this workspace because ``raisim2Lib`` downloads RaiSim and rayrai as binary
-packages. Build the public examples in Release mode and run timing commands on
-one thread:
+``raisim2Lib`` ships source for standalone timing-oriented examples for binary
+package users. Maintainers use a separate unified benchmark runner from the
+closed-source RaiSim engine repository for release validation; that runner is
+not available in this public workspace. Build the public examples in Release
+mode and run timing commands on one thread:
 
 .. code-block:: bash
 
-  cmake -S examples -B /tmp/raisim2lib-examples -DCMAKE_BUILD_TYPE=Release
-  cmake --build /tmp/raisim2lib-examples \
+  cmake -S . -B build-examples \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DRAISIM_EXAMPLE=ON
+  cmake --build build-examples \
       --target anymal_standing_benchmark articulated_system_benchmark \
                granular_media island_sleep_benchmark -j12
   OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
-      /tmp/raisim2lib-examples/anymal_standing_benchmark --fast
+      ./build-examples/examples/anymal_standing_benchmark --fast
   OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
-      /tmp/raisim2lib-examples/articulated_system_benchmark
+      ./build-examples/examples/articulated_system_benchmark
   OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
-      /tmp/raisim2lib-examples/island_sleep_benchmark --steps=12000
+      ./build-examples/examples/island_sleep_benchmark --steps=12000
 
-Installed binary packages can also provide these executables under
-``<raisim-install>/bin``.
+The public workspace does not install these example executables; run them from
+the build tree shown above.
 
 Representative timing examples include:
 

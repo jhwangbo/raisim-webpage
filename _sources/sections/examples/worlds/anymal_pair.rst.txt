@@ -12,17 +12,17 @@ Screenshot
    :alt: anymal_pair example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``anymal_pair``.
+CMake target: ``anymal_pair``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/anymal_pair
+   ./build-examples/examples/anymal_pair
 
 On Windows, run ``anymal_pair.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

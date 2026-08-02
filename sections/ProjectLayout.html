@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Project Layout &mdash; raisim 2.4.4 documentation</title>
+  <title>Project Layout &mdash; raisim 2.4.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=68f46a9b" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=b1e24531"></script>
+      <script src="../_static/documentation_options.js?v=159ac128"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -53,7 +53,7 @@
 <li class="toctree-l1"><a class="reference internal" href="FeatureMap.html">Feature Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="BuildAndTest.html">Build, Test, and Benchmark</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Project Layout</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#source-directories">Source Directories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#public-workspace-directories">Public Workspace Directories</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#build-directories">Build Directories</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installed-package-layout">Installed Package Layout</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#where-to-add-new-things">Where To Add New Things</a></li>
@@ -95,7 +95,7 @@
 <li class="toctree-l1"><a class="reference internal" href="RaisimEngine2.html">RaiSim Engine 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab</a></li>
 <li class="toctree-l1"><a class="reference internal" href="LegacyIntegrations.html">Legacy Integrations</a></li>
 </ul>
 
@@ -130,8 +130,8 @@ documentation around those packages. It is not the RaiSim engine source tree,
 so engine-internal benchmark sources and implementation files are not available
 here. This page maps the directories users most often need while installing the
 package and building examples.</p>
-<section id="source-directories">
-<h2>Source Directories<a class="headerlink" href="#source-directories" title="Link to this heading"></a></h2>
+<section id="public-workspace-directories">
+<h2>Public Workspace Directories<a class="headerlink" href="#public-workspace-directories" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 28.0%" />
@@ -152,8 +152,8 @@ CMake config files.</p></td>
 viewer runtime, headers, and CMake config files.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">examples</span></code></p></td>
-<td><p>C++ example sources and their CMake project. Targets use installed
-executable names such as <code class="docutils literal notranslate"><span class="pre">primitive_grid</span></code> and <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code>.</p></td>
+<td><p>C++ example sources and their CMake project. CMake target names include
+<code class="docutils literal notranslate"><span class="pre">primitive_grid</span></code> and <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">rsc</span></code></p></td>
 <td><p>Runtime resources such as robot models, meshes, textures, USD/glTF
@@ -179,7 +179,7 @@ assets, and example data.</p></td>
 </section>
 <section id="build-directories">
 <h2>Build Directories<a class="headerlink" href="#build-directories" title="Link to this heading"></a></h2>
-<p>Build directories are not part of the source tree. The docs use these names for
+<p>Build directories are generated locally and are not part of the repository. The docs use these names for
 clarity:</p>
 <table class="docutils align-default">
 <colgroup>
@@ -206,13 +206,13 @@ clarity:</p>
 </tr>
 </tbody>
 </table>
-<p>On Linux and macOS, example executables built from <code class="docutils literal notranslate"><span class="pre">raisim2Lib/examples</span></code> are
-placed under the example build tree. Installed binary-package executables are
-under <code class="docutils literal notranslate"><span class="pre">&lt;raisim-install&gt;/bin</span></code>. For example:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build-examples/primitive_grid
-./build-examples/rayrai_tcp_viewer
-&lt;raisim-install&gt;/bin/primitive_grid
-&lt;raisim-install&gt;/bin/rayrai_tcp_viewer
+<p>On Linux and macOS, a top-level build places example executables under the
+<code class="docutils literal notranslate"><span class="pre">examples</span></code> subdirectory of the build tree. The install target does not copy
+these source-built examples. The packaged TCP viewer is shipped separately
+under <code class="docutils literal notranslate"><span class="pre">rayrai/bin</span></code>. For example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build-examples/examples/primitive_grid
+./build-examples/examples/rayrai_tcp_viewer
+./rayrai/bin/rayrai_raisim_tcp_viewer
 </pre></div>
 </div>
 <p>On Windows, CMake places runtime executables under <code class="docutils literal notranslate"><span class="pre">&lt;build-dir&gt;/bin</span></code>.</p>
@@ -223,9 +223,9 @@ user-facing interface.</p>
 </section>
 <section id="installed-package-layout">
 <h2>Installed Package Layout<a class="headerlink" href="#installed-package-layout" title="Link to this heading"></a></h2>
-<p>A local install creates separate package prefixes for RaiSim and rayrai:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$RAISIM_LOCAL_INSTALL_ROOT/raisim
-$RAISIM_LOCAL_INSTALL_ROOT/rayrai
+<p>The unpacked release contains separate package prefixes for RaiSim and rayrai:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt;raisim2Lib&gt;/raisim
+&lt;raisim2Lib&gt;/rayrai
 </pre></div>
 </div>
 <p>Downstream projects use <code class="docutils literal notranslate"><span class="pre">CMAKE_PREFIX_PATH</span></code> to find these installed packages.

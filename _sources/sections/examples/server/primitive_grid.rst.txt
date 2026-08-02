@@ -12,17 +12,17 @@ Screenshot
    :alt: primitive_grid example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``primitive_grid``.
+CMake target: ``primitive_grid``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/primitive_grid
+   ./build-examples/examples/primitive_grid
 
 On Windows, run ``primitive_grid.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

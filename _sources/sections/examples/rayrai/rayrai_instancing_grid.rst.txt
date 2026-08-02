@@ -12,17 +12,17 @@ Screenshot
    :alt: rayrai_instancing_grid example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``rayrai_instancing_grid``.
+CMake target: ``rayrai_instancing_grid``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/rayrai_instancing_grid
+   ./build-examples/examples/rayrai_instancing_grid
 
 On Windows, run ``rayrai_instancing_grid.exe`` instead.
 This example uses the in-process rayrai renderer (no external client required).

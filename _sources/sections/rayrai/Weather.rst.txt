@@ -408,9 +408,10 @@ Rain and snow generate animated particle systems on top of the material
 response. Rain splashes are short-lived secondary impact particles spawned
 on upward-facing surfaces; their density follows ``precipitationRate``.
 Lens droplets render screen-space droplets on the lens (controllable via
-``lensDropletsEnabled``, ``lensDropletDensity``, ``lensDropletSize``,
-``lensDropletStreakLength``). Storms add stochastic lightning controlled by
-``lightningRate`` and ``lightningIntensity``; subscribe with
+``lensDropletsEnabled`` and ``lensDropletStrength``). Derived droplet count,
+maximum pixel size, and alpha are reported by ``WeatherDiagnostics`` rather
+than configured independently. Storms add stochastic lightning controlled by
+``lightningRate`` and the ``lightningLocalPoint*`` fields; subscribe with
 ``setWeatherThunderCallback`` to play audio cues. Solar position uses the
 configured latitude / longitude / date and shifts the directional light
 accordingly throughout ``timeOfDayHours``.

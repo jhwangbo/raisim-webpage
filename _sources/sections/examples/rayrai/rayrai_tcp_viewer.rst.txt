@@ -6,14 +6,14 @@ Overview
 ========
 Standalone TCP viewer for ``raisim::RaisimServer`` scenes. It
 connects to a running server, downloads the remote scene, and renders it with
-rayrai and ImGui controls. Installed binary packages should normally use
-``rayrai_tcp_viewer`` for interactive viewing; this page documents the
-example target named ``rayrai_tcp_viewer``, which also exposes batch and
-diagnostics command-line options.
+rayrai and ImGui controls. Binary packages should normally use
+``rayrai/bin/rayrai_raisim_tcp_viewer`` for interactive viewing; this page
+documents the example target named ``rayrai_tcp_viewer``, which also exposes
+batch and diagnostics command-line options.
 
-Binary
+Target
 ======
-Installed executable: ``rayrai_tcp_viewer``.
+CMake target: ``rayrai_tcp_viewer``.
 
 Source
 ======
@@ -24,15 +24,22 @@ is the file used by ``examples/CMakeLists.txt``.
 
 Run
 ====
-Run the installed executable while a RaisimServer application is running:
+Run the build-tree executable while a RaisimServer application is running:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/rayrai_tcp_viewer
+   ./build-examples/examples/rayrai_tcp_viewer
 
-On Windows, run ``rayrai_tcp_viewer.exe`` instead. This viewer is a separate
-rayrai client process; in-process rayrai examples open their own renderer window
-and do not need it.
+Or run the prebuilt package tool:
+
+.. code-block:: bash
+
+   ./rayrai/bin/rayrai_raisim_tcp_viewer
+
+On Windows, the corresponding names are ``rayrai_tcp_viewer.exe`` for the
+source-built example and ``rayrai_raisim_tcp_viewer.exe`` for the packaged
+tool. This viewer is a separate rayrai client process; in-process rayrai
+examples open their own renderer window and do not need it.
 
 Useful options
 ==============
@@ -73,7 +80,7 @@ Details
 - Interactive tools include Shift+left-drag force application, a 2-point ruler,
   3-point angle measurement, pose grabber axes, body frames, COM markers, and
   keyboard shortcut help.
-- Use ``rayrai_tcp_viewer`` as the supported packaged viewer when both
-  executables are available and you only need interactive viewing.
+- Use ``rayrai_raisim_tcp_viewer`` as the supported prebuilt package tool when
+  you do not need to rebuild the example target.
 - Direct RGB/depth sensor workflows should prefer in-process rayrai when the
   application needs deterministic renderer buffers.

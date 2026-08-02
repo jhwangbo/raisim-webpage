@@ -5,13 +5,13 @@ ycb_objects
    :alt: ycb_objects example
    :width: 100%
 
-Installed executable: ``ycb_objects``.
+CMake target: ``ycb_objects``.
 
 Run:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/ycb_objects
+   ./build-examples/examples/ycb_objects
 
 On Windows, run ``ycb_objects.exe`` instead.
 

@@ -5,13 +5,13 @@ granular_media
    :alt: granular_media example
    :width: 100%
 
-Installed executable: ``granular_media``.
+CMake target: ``granular_media``.
 
-Run the installed executable and connect with ``rayrai_tcp_viewer``:
+Run the build-tree executable and connect with ``rayrai_tcp_viewer``:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/granular_media
+   ./build-examples/examples/granular_media
 
 On Windows, run ``granular_media.exe`` instead.
 

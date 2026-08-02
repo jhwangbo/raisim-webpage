@@ -12,17 +12,17 @@ Screenshot
    :alt: spring_damper_joints example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``spring_damper_joints``.
+CMake target: ``spring_damper_joints``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/spring_damper_joints
+   ./build-examples/examples/spring_damper_joints
 
 On Windows, run ``spring_damper_joints.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

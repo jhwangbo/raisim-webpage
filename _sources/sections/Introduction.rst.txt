@@ -13,8 +13,8 @@ particles.
 * The accuracy of RaiSim has been validated in numerous academic publications (`[2] <https://robotics.sciencemag.org/content/4/26/eaau5872/tab-article-info>`_, `[3] <https://arxiv.org/pdf/1901.07517.pdf>`_, `[4] <https://robotics.sciencemag.org/content/5/47/eabc5986>`_,  `[5] <https://arxiv.org/abs/1909.08399>`_,  `[6] <https://arxiv.org/abs/2011.08811>`_)
 * The C++ API is organized around explicit worlds, objects, materials, sensors,
   and visualizer integration.
-* The binary distribution ships headers, libraries, examples, rayrai tools, and
-  documentation.
+* The binary distribution ships headers, libraries, example sources, prebuilt
+  rayrai tools, and documentation.
 
 System Requirements
 =====================
@@ -71,7 +71,7 @@ Below is a minimal downstream CMake file for an installed RaiSim package.
     target_link_libraries(app PUBLIC pthread)
   endif()
 
-For installed examples and visualization workflows, see :doc:`QuickStart` and
+For source-built examples and visualization workflows, see :doc:`QuickStart` and
 :doc:`Examples`.
 
 .. _RAISIM_EXAMPLE: https://github.com/raisimTech/raisimExample

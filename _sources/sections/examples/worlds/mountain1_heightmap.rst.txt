@@ -12,17 +12,17 @@ Screenshot
    :alt: mountain1_heightmap example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``mountain1_heightmap``.
+CMake target: ``mountain1_heightmap``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/mountain1_heightmap
+   ./build-examples/examples/mountain1_heightmap
 
 On Windows, run ``mountain1_heightmap.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

@@ -12,17 +12,17 @@ Screenshot
    :alt: templated_tracked_robot example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``templated_tracked_robot``.
+CMake target: ``templated_tracked_robot``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/templated_tracked_robot
+   ./build-examples/examples/templated_tracked_robot
 
 On Windows, run ``templated_tracked_robot.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

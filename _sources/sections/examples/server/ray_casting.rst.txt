@@ -12,17 +12,17 @@ Screenshot
    :alt: ray_casting example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``ray_casting``.
+CMake target: ``ray_casting``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/ray_casting
+   ./build-examples/examples/ray_casting
 
 On Windows, run ``ray_casting.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

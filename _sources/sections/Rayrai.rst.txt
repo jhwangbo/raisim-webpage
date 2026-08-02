@@ -40,20 +40,21 @@ point is ``raisin::RayraiWindow``.
 
 Dependencies
 ============
-rayrai depends on SDL2, OpenGL, glbinding, glm, assimp, stb, and imgui. The installed
-package in ``rayrai/<OS>`` ships the headers and CMake config for these dependencies.
+rayrai depends on SDL2, OpenGL, glbinding, glm, assimp, stb, and imgui. The
+current package uses the flat ``rayrai`` prefix and ships the headers,
+libraries, and CMake configuration for these dependencies there.
 
 Included binary (recommended)
 =============================
 For most users, the easiest way to use rayrai is the included TCP viewer
-binary at ``rayrai/<OS>/bin/rayrai_tcp_viewer``. It connects to a
+binary at ``rayrai/bin/rayrai_raisim_tcp_viewer``. It connects to a
 running ``RaisimServer`` and provides full PBR rendering, scene inspection,
 interactive pause / step / force application, screenshots, and session
 recording.
 
 .. code-block:: bash
 
-    ./rayrai/<OS>/bin/rayrai_tcp_viewer
+    ./rayrai/bin/rayrai_raisim_tcp_viewer
 
 See :doc:`RayraiTcpViewer` for the full UI tour, command-line options,
 the sim-control workflow, authentication setup, and the wire-format
@@ -61,7 +62,7 @@ reference for writing custom clients.
 
 Build and link
 ==============
-rayrai installs a CMake package under ``rayrai/<OS>``. Add it to
+rayrai installs a CMake package under ``rayrai``. Add it to
 ``CMAKE_PREFIX_PATH`` and link the ``rayrai`` target.
 
 .. code-block:: cmake
@@ -72,7 +73,7 @@ rayrai installs a CMake package under ``rayrai/<OS>``. Add it to
     target_link_libraries(my_app PRIVATE rayrai)
 
 In practice, you will also set the Raisim prefix (for example, ``-DCMAKE_PREFIX_PATH``)
-to include both ``raisim/<OS>`` and ``rayrai/<OS>``.
+to include both ``raisim`` and ``rayrai``.
 
 Minimal usage
 =============

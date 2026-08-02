@@ -12,17 +12,17 @@ Screenshot
    :alt: kinematic_platform example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``kinematic_platform``.
+CMake target: ``kinematic_platform``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/kinematic_platform
+   ./build-examples/examples/kinematic_platform
 
 On Windows, run ``kinematic_platform.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

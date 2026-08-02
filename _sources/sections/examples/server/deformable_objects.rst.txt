@@ -16,20 +16,20 @@ cloth topology and deformable mesh construction from closed OBJ meshes.
    :alt: deformable_objects example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``deformable_objects``.
+CMake target: ``deformable_objects``.
 
 This example is only built when the installed RaiSim package exposes
 ``raisim::DeformableObject``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/deformable_objects
+   ./build-examples/examples/deformable_objects
 
 On Windows, run ``deformable_objects.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.
@@ -97,8 +97,8 @@ This example uses RaisimServer. Start ``rayrai_tcp_viewer`` before running it:
 .. code-block:: bash
 
 
-   <raisim-install>/bin/rayrai_tcp_viewer
-   <raisim-install>/bin/deformable_objects
+   ./build-examples/examples/rayrai_tcp_viewer
+   ./build-examples/examples/deformable_objects
 
 The visualizer receives dynamic deformable topology and vertex updates through
 the server stream.

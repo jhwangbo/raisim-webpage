@@ -7,11 +7,13 @@ Height Map Using the Terrain Generator
 XML approach
 -----------------------------
 
-Run the example with:
+The matching asset is
+``rsc/xmlScripts/heightMaps/heightMapUsingTerrainGenerator.xml``. Load it
+through the world configuration constructor in your application:
 
-.. code-block:: bash
+.. code-block:: cpp
 
-    ./xmlReader <PATH_TO_RAISIMLIB>/rsc/xmlScripts/heightMaps/heightMapUsingTerrainGenerator.xml
+    raisim::World world("/path/to/raisim2Lib/rsc/xmlScripts/heightMaps/heightMapUsingTerrainGenerator.xml");
 
 The XML file is constructed as follows:
 

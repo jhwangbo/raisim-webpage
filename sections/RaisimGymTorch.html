@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RaisimGymTorch &mdash; raisim 2.4.4 documentation</title>
+  <title>RaisimGymTorch &mdash; raisim 2.4.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=68f46a9b" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=b1e24531"></script>
+      <script src="../_static/documentation_options.js?v=159ac128"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -100,7 +100,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab</a></li>
 <li class="toctree-l1"><a class="reference internal" href="LegacyIntegrations.html">Legacy Integrations</a></li>
 </ul>
 
@@ -194,12 +194,13 @@ To build the debug app, build your environment with</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>setup.py<span class="w"> </span>develop<span class="w"> </span>--Debug
 </pre></div>
 </div>
-<p>Then, the debug executable is created next to your pybind11 package (<code class="docutils literal notranslate"><span class="pre">raisimGymTorch/raisimGymTorch/env/bin</span></code>).
+<p>Then, the debug executable is created next to your nanobind package
+(<code class="docutils literal notranslate"><span class="pre">raisimGymTorch/raisimGymTorch/env/bin</span></code>).
 If you use CLion (recommended), open the raisimGymTorch directory in CLion.
 It will automatically add the debug app executable.
 It provides a convenient GUI for debugging.</p>
 <p>You can run the debug app as:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./debug_app_&lt;environment<span class="w"> </span>name&gt;<span class="w"> </span>&lt;full<span class="w"> </span>path<span class="w"> </span>to<span class="w"> </span>rsc<span class="w"> </span>directory&gt;<span class="w"> </span>&lt;full<span class="w"> </span>path<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>cfg<span class="w"> </span>file&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./&lt;environment<span class="w"> </span>name&gt;_debug_app<span class="w"> </span>&lt;full<span class="w"> </span>path<span class="w"> </span>to<span class="w"> </span>rsc<span class="w"> </span>directory&gt;<span class="w"> </span>&lt;full<span class="w"> </span>path<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>cfg<span class="w"> </span>file&gt;
 </pre></div>
 </div>
 <p>or add the arguments to the CLion run configuration.</p>
@@ -208,7 +209,8 @@ Visual Studio compiled executables will not work if it links against a library b
 </section>
 <section id="how-does-it-work">
 <h2>How does it work?<a class="headerlink" href="#how-does-it-work" title="Link to this heading"></a></h2>
-<p>RaisimGymTorch wraps a C++ environment (i.e., ENVIRONMENT.hpp) as a Python library using pybind11.
+<p>RaisimGymTorch wraps a C++ environment (i.e., <code class="docutils literal notranslate"><span class="pre">Environment.hpp</span></code>) as a Python
+library using nanobind.
 When you call <code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">setup.py</span> <span class="pre">develop</span></code>, all environments under <code class="docutils literal notranslate"><span class="pre">raisimGymTorch/raisimGymTorch/env/envs</span></code> are compiled.
 The compiled libraries are stored in <code class="docutils literal notranslate"><span class="pre">raisimGymTorch/raisimGymTorch/env/bin</span></code>.</p>
 <p>Everything else happens in Python.
@@ -218,13 +220,16 @@ Your launch file (e.g., <code class="docutils literal notranslate"><span class="
 </section>
 <section id="how-to-add-a-custom-environment">
 <h2>How to add a custom environment?<a class="headerlink" href="#how-to-add-a-custom-environment" title="Link to this heading"></a></h2>
-<p>You can copy <code class="docutils literal notranslate"><span class="pre">raisimGymTorch/raisimGymTorch</span></code> to another location.
-Delete the temporary directories <code class="docutils literal notranslate"><span class="pre">build</span></code> and <code class="docutils literal notranslate"><span class="pre">raisim_gym_torch.egg-info</span></code> (created when you run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">develop</span></code>).
-To build in another directory, point CMake to RaiSim:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>setup.py<span class="w"> </span>develop<span class="w"> </span>--CMAKE_PREFIX_PATH<span class="w"> </span>&lt;WHERE-YOU-HAVE-RAISIM&gt;/raisim/&lt;OS&gt;
+<p>Keep the top-level <code class="docutils literal notranslate"><span class="pre">raisimGymTorch</span></code> directory beside the current flat
+<code class="docutils literal notranslate"><span class="pre">raisim</span></code> and <code class="docutils literal notranslate"><span class="pre">rayrai</span></code> package directories. Its CMake project discovers
+those sibling prefixes directly. After adding or copying an environment under
+<code class="docutils literal notranslate"><span class="pre">raisimGymTorch/raisimGymTorch/env/envs</span></code>, rebuild with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/path/to/raisim2Lib/raisimGymTorch
+python<span class="w"> </span>setup.py<span class="w"> </span>develop
 </pre></div>
 </div>
-<p>Everything will work without further steps.
+<p>Delete generated <code class="docutils literal notranslate"><span class="pre">build</span></code> and <code class="docutils literal notranslate"><span class="pre">raisim_gym_torch.egg-info</span></code> directories before
+a clean rebuild when changing Python interpreters or build configurations.
 However, if you want to keep multiple environments, you may want to rename a few items.</p>
 <blockquote>
 <div><ul class="simple">
@@ -243,7 +248,7 @@ This class inherits from <code class="docutils literal notranslate"><span class=
 If <code class="docutils literal notranslate"><span class="pre">RaisimGymEnv</span></code> is not general enough for you, you can also make <code class="docutils literal notranslate"><span class="pre">ENVIRONMENT</span></code> independent of <code class="docutils literal notranslate"><span class="pre">RaisimGymEnv</span></code>.</p>
 <p><code class="docutils literal notranslate"><span class="pre">RaisimGymEnv</span></code> is wrapped by <code class="docutils literal notranslate"><span class="pre">VectorizedEnvironment</span></code>, which parallelizes the environment using OpenMP when OpenMP is available.
 You can consider it similar to <code class="docutils literal notranslate"><span class="pre">VectorEnv</span></code> in OpenAI Baselines, but RaisimGym parallelization happens in C++, which makes it orders of magnitude faster.</p>
-<p><code class="docutils literal notranslate"><span class="pre">raisim_gym.cpp</span></code> is a pybind11 wrapper for <code class="docutils literal notranslate"><span class="pre">VectorizedEnvironment</span></code>.
+<p><code class="docutils literal notranslate"><span class="pre">raisim_gym.cpp</span></code> is a nanobind wrapper for <code class="docutils literal notranslate"><span class="pre">VectorizedEnvironment</span></code>.
 It defines the interface functions.</p>
 <p>Finally, <code class="docutils literal notranslate"><span class="pre">RaisimGymVecEnv</span></code> is a Python class that wraps a Python library created from <code class="docutils literal notranslate"><span class="pre">raisim_gym.cpp</span></code>.</p>
 </section>

@@ -20,8 +20,7 @@ A ``raisim::World`` can be instantiated in three ways:
      raisim::World world("scene.usd");
 
    This is the preferred entry point because the scene is portable across
-   USD-native tools (Isaac Sim, Omniverse, Blender, the
-   :doc:`RaisimEngine2` editor).
+   public USD-native tools such as Isaac Sim, Omniverse, and Blender.
 
 #. **From a RaiSim XML or MuJoCo MJCF configuration file.** Pass an ``.xml``
    or ``.mjcf`` path to the same constructor; the file's root tag
@@ -54,7 +53,9 @@ articulated bodies, free, slide, and hinge joints, primitive geoms, mesh assets,
 inertial tags, defaults, compiler ``angle``/``eulerseq`` settings,
 ``compiler meshdir``, and material colors. Mesh asset paths are resolved
 relative to the MJCF file directory, or relative to ``compiler meshdir`` when it
-is provided. MJCF files without an ``asset`` block are accepted.
+is provided. MJCF files without an ``asset`` block are accepted. Following the
+MJCF default, a ``geom`` with no ``type`` attribute is treated as a sphere and
+must provide at least one ``size`` value for its radius.
 
 It is not a complete MuJoCo replacement; advanced MJCF features such as
 ``include``, tendons, equality constraints, actuators beyond the supported

@@ -12,17 +12,17 @@ Screenshot
    :alt: rayrai_custom_visuals example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``rayrai_custom_visuals``.
+CMake target: ``rayrai_custom_visuals``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/rayrai_custom_visuals
+   ./build-examples/examples/rayrai_custom_visuals
 
 On Windows, run ``rayrai_custom_visuals.exe`` instead.
 This example uses the in-process rayrai renderer (no external client required).

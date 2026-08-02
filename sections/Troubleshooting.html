@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Troubleshooting &mdash; raisim 2.4.4 documentation</title>
+  <title>Troubleshooting &mdash; raisim 2.4.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=68f46a9b" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=b1e24531"></script>
+      <script src="../_static/documentation_options.js?v=159ac128"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -98,7 +98,7 @@
 <li class="toctree-l1"><a class="reference internal" href="RaisimEngine2.html">RaiSim Engine 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab</a></li>
 <li class="toctree-l1"><a class="reference internal" href="LegacyIntegrations.html">Legacy Integrations</a></li>
 </ul>
 
@@ -130,16 +130,16 @@
 <p>This page covers common issues when using the binary RaiSim distribution.</p>
 <section id="executable-not-found">
 <h2>Executable Not Found<a class="headerlink" href="#executable-not-found" title="Link to this heading"></a></h2>
-<p>When you build examples from the <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> source tree, CMake places them
+<p>When you build examples from the public <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> workspace, CMake places them
 under the build directory:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build/examples/primitive_grid
-./build/examples/rayrai_tcp_viewer
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build-examples/examples/primitive_grid
+./build-examples/examples/rayrai_tcp_viewer
 </pre></div>
 </div>
-<p>Installed packages use <code class="docutils literal notranslate"><span class="pre">&lt;raisim-install&gt;/bin/rayrai_tcp_viewer</span></code> for the
-supported TCP viewer. The <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> command is the examples
-source-tree target. If a command from old docs uses an <code class="docutils literal notranslate"><span class="pre">example_</span></code> prefix,
-check <a class="reference internal" href="Examples.html"><span class="doc">Examples</span></a> for the current target name.</p>
+<p>The unpacked package uses <code class="docutils literal notranslate"><span class="pre">rayrai/bin/rayrai_raisim_tcp_viewer</span></code> for the
+prebuilt TCP viewer. <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> is the public example target.
+If a command from old docs uses an <code class="docutils literal notranslate"><span class="pre">example_</span></code> prefix, check <a class="reference internal" href="Examples.html"><span class="doc">Examples</span></a>
+for the current target name.</p>
 </section>
 <section id="missing-shared-libraries">
 <h2>Missing Shared Libraries<a class="headerlink" href="#missing-shared-libraries" title="Link to this heading"></a></h2>
@@ -187,10 +187,10 @@ machine provides a usable software or hardware OpenGL stack.</p>
 </section>
 <section id="example-asset-missing">
 <h2>Example Asset Missing<a class="headerlink" href="#example-asset-missing" title="Link to this heading"></a></h2>
-<p>Examples expect their bundled assets to stay next to the installed package. If
+<p>Examples expect their bundled assets to stay with the release workspace. If
 an example cannot find a URDF, mesh, texture, heightmap, or USD asset, verify
-that the package <code class="docutils literal notranslate"><span class="pre">rsc</span></code> or asset directory was copied together with <code class="docutils literal notranslate"><span class="pre">bin</span></code> and
-<code class="docutils literal notranslate"><span class="pre">lib</span></code>.</p>
+that the top-level <code class="docutils literal notranslate"><span class="pre">rsc</span></code> directory exists and that CMake copied it to
+<code class="docutils literal notranslate"><span class="pre">build-examples/examples/rsc</span></code> (or <code class="docutils literal notranslate"><span class="pre">build-examples/bin/rsc</span></code> on Windows).</p>
 </section>
 <section id="openusd-runtime-or-plugin-missing">
 <h2>OpenUSD Runtime Or Plugin Missing<a class="headerlink" href="#openusd-runtime-or-plugin-missing" title="Link to this heading"></a></h2>
@@ -199,9 +199,9 @@ that the package <code class="docutils literal notranslate"><span class="pre">rs
 <code class="docutils literal notranslate"><span class="pre">raisim/lib/openusd</span></code> on Linux, and <code class="docutils literal notranslate"><span class="pre">raisim/bin/openusd</span></code> plus the <code class="docutils literal notranslate"><span class="pre">usd_*.dll</span></code>
 files on Windows.</p>
 <p>If an executable is launched from another directory, run the package environment
-script first so the runtime loader can find RaiSim and OpenUSD. Source builds
-fail during CMake configuration when the matching <code class="docutils literal notranslate"><span class="pre">prebuilt/openusd</span></code> runtime
-is missing; regenerate that prebuilt package instead of disabling USD support.</p>
+script first so the runtime loader can find RaiSim and OpenUSD. If an OpenUSD
+runtime is missing from the public package, reinstall or upgrade the matching
+<code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> release instead of trying to rebuild the closed-source engine.</p>
 </section>
 </section>
 

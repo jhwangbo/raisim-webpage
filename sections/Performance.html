@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Performance &mdash; raisim 2.4.4 documentation</title>
+  <title>Performance &mdash; raisim 2.4.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=68f46a9b" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=b1e24531"></script>
+      <script src="../_static/documentation_options.js?v=159ac128"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -98,7 +98,7 @@
 <li class="toctree-l1"><a class="reference internal" href="RaisimEngine2.html">RaiSim Engine 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab</a></li>
 <li class="toctree-l1"><a class="reference internal" href="LegacyIntegrations.html">Legacy Integrations</a></li>
 </ul>
 
@@ -241,26 +241,27 @@ when a benchmark is intended to measure the awake dynamics path. Use the
 </section>
 <section id="package-timing-examples">
 <h2>Package Timing Examples<a class="headerlink" href="#package-timing-examples" title="Link to this heading"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> ships standalone timing-oriented examples for binary package
-users. The RaiSim engine source tree has a separate unified benchmark runner
-used by maintainers for release validation, but that runner is not available in
-this workspace because <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> downloads RaiSim and rayrai as binary
-packages. Build the public examples in Release mode and run timing commands on
-one thread:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-S<span class="w"> </span>examples<span class="w"> </span>-B<span class="w"> </span>/tmp/raisim2lib-examples<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release
-cmake<span class="w"> </span>--build<span class="w"> </span>/tmp/raisim2lib-examples<span class="w"> </span><span class="se">\</span>
+<p><code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> ships source for standalone timing-oriented examples for binary
+package users. Maintainers use a separate unified benchmark runner from the
+closed-source RaiSim engine repository for release validation; that runner is
+not available in this public workspace. Build the public examples in Release
+mode and run timing commands on one thread:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build-examples<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-DRAISIM_EXAMPLE<span class="o">=</span>ON
+cmake<span class="w"> </span>--build<span class="w"> </span>build-examples<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--target<span class="w"> </span>anymal_standing_benchmark<span class="w"> </span>articulated_system_benchmark<span class="w"> </span><span class="se">\</span>
 <span class="w">             </span>granular_media<span class="w"> </span>island_sleep_benchmark<span class="w"> </span>-j12
 <span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>/tmp/raisim2lib-examples/anymal_standing_benchmark<span class="w"> </span>--fast
+<span class="w">    </span>./build-examples/examples/anymal_standing_benchmark<span class="w"> </span>--fast
 <span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>/tmp/raisim2lib-examples/articulated_system_benchmark
+<span class="w">    </span>./build-examples/examples/articulated_system_benchmark
 <span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>/tmp/raisim2lib-examples/island_sleep_benchmark<span class="w"> </span>--steps<span class="o">=</span><span class="m">12000</span>
+<span class="w">    </span>./build-examples/examples/island_sleep_benchmark<span class="w"> </span>--steps<span class="o">=</span><span class="m">12000</span>
 </pre></div>
 </div>
-<p>Installed binary packages can also provide these executables under
-<code class="docutils literal notranslate"><span class="pre">&lt;raisim-install&gt;/bin</span></code>.</p>
+<p>The public workspace does not install these example executables; run them from
+the build tree shown above.</p>
 <p>Representative timing examples include:</p>
 <table class="docutils align-default">
 <colgroup>

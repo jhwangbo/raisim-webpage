@@ -7,11 +7,13 @@ Height Map Using a PNG File
 XML approach
 -----------------------------
 
-Run the example with:
+The matching asset is
+``rsc/xmlScripts/heightMaps/heightMapUsingPng.xml``. Load it through the world
+configuration constructor in your application:
 
-.. code-block:: bash
+.. code-block:: cpp
 
-    ./xmlReader <PATH_TO_RAISIMLIB>/rsc/xmlScripts/heightMaps/heightMapUsingPng.xml
+    raisim::World world("/path/to/raisim2Lib/rsc/xmlScripts/heightMaps/heightMapUsingPng.xml");
 
 The XML file is constructed as follows:
 
@@ -35,4 +37,5 @@ C++ approach
 
 .. code-block:: cpp
 
-  auto heightMap = world.addHeightMap("<PATH-TO-PNG>/zurichHeightMap.png", 0, 0, 500, 500, 0.005, -10);
+  auto* heightMap = world.addHeightMap("/path/to/zurichHeightMap.png",
+                                       0, 0, 500, 500, 0.005, -10);

@@ -11,17 +11,17 @@ Overview
 ========
 Enables inverse dynamics on ANYmal and prints the resulting joint forces and torques. It compares inverse dynamics outputs to the applied generalized forces.
 
-Binary
+Target
 ======
-Installed executable: ``inverse_dynamics``.
+CMake target: ``inverse_dynamics``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/inverse_dynamics
+   ./build-examples/examples/inverse_dynamics
 
 On Windows, run ``inverse_dynamics.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

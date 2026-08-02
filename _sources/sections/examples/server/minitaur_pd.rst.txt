@@ -12,17 +12,17 @@ Screenshot
    :alt: minitaur_pd example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``minitaur_pd``.
+CMake target: ``minitaur_pd``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/minitaur_pd
+   ./build-examples/examples/minitaur_pd
 
 On Windows, run ``minitaur_pd.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

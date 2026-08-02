@@ -6,17 +6,17 @@ Overview
 ========
 Drops 1000 dynamic spheres from a compact 3D lattice above a ground plane. It is a simple high-object-count scene for checking primitive creation, broadphase contacts, and server visualization.
 
-Binary
+Target
 ======
-Installed executable: ``sphere_drop``.
+CMake target: ``sphere_drop``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/sphere_drop
+   ./build-examples/examples/sphere_drop
 
 On Windows, run ``sphere_drop.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

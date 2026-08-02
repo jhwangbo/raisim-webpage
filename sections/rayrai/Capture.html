@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Capture, diagnostics, and headless rendering &mdash; raisim 2.4.4 documentation</title>
+  <title>Capture, diagnostics, and headless rendering &mdash; raisim 2.4.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=68f46a9b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=b1e24531"></script>
+      <script src="../../_static/documentation_options.js?v=159ac128"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -100,7 +100,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#captures-and-diagnostics">Captures and diagnostics</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#exposure-calibration-and-output-transforms">Exposure, calibration, and output transforms</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#async-mesh-loading">Async mesh loading</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#heightmap-visual-textures">Heightmap visual textures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#heightmap-appearance-and-streaming-updates">Heightmap appearance and streaming updates</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="Sensors.html">Sensors and depth/LiDAR</a></li>
@@ -122,7 +122,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../RaisimEngine2.html">RaiSim Engine 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../RaiSimPy.html">RaisimPy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimMatlab.html">RaisimMatlab</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../LegacyIntegrations.html">Legacy Integrations</a></li>
 </ul>
 
@@ -297,9 +297,9 @@ selection pass and returns the encoded object id for a pixel.</p>
 <span class="n">viewer</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">height</span><span class="p">,</span><span class="w"> </span><span class="n">isHovered</span><span class="p">,</span><span class="w"> </span><span class="n">cursorX</span><span class="p">,</span><span class="w"> </span><span class="n">cursorY</span><span class="p">,</span><span class="w"> </span><span class="n">shouldClick</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>For explicit picking against any camera (typically the same one used to render
-the visible frame), call <code class="docutils literal notranslate"><span class="pre">pickWithExternalCamera</span></code> with the framebuffer
-pixel coordinates. A return value of <code class="docutils literal notranslate"><span class="pre">0</span></code> means nothing was hit:</p>
+<p>For custom visuals under the internal camera, <code class="docutils literal notranslate"><span class="pre">pickTargetVisualAt</span></code> resolves
+the pick id and returns the public <code class="docutils literal notranslate"><span class="pre">Visuals*</span></code> directly. A null pointer means
+nothing was hit:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// From an ImGui handler: convert the mouse position into the render-target</span>
 <span class="c1">// framebuffer space and pick.</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ImGui</span><span class="o">::</span><span class="n">IsItemHovered</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">ImGui</span><span class="o">::</span><span class="n">IsMouseClicked</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
@@ -308,18 +308,18 @@ pixel coordinates. A return value of <code class="docutils literal notranslate">
 <span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">fbX</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">pos</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">origin</span><span class="p">.</span><span class="n">x</span><span class="p">);</span>
 <span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">fbY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">pos</span><span class="p">.</span><span class="n">y</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">origin</span><span class="p">.</span><span class="n">y</span><span class="p">);</span>
 
-<span class="w">  </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">encoded</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">pickWithExternalCamera</span><span class="p">(</span><span class="n">viewer</span><span class="p">.</span><span class="n">getCamera</span><span class="p">(),</span>
-<span class="w">                                                   </span><span class="n">fbX</span><span class="p">,</span><span class="w"> </span><span class="n">fbY</span><span class="p">);</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">encoded</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="c1">// The encoded id is `RaisimObject::encodeId` / decode with the</span>
-<span class="w">    </span><span class="c1">// matching renderer helpers; for visuals you can look up by name in</span>
-<span class="w">    </span><span class="c1">// your own registry, or use the renderer&#39;s ``findVisualById`` /</span>
-<span class="w">    </span><span class="c1">// ``findObjectById`` accessors.</span>
-<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;picked id = %u</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">encoded</span><span class="p">);</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">visual</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">pickTargetVisualAt</span><span class="p">(</span><span class="n">fbX</span><span class="p">,</span><span class="w"> </span><span class="n">fbY</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">viewer</span><span class="p">.</span><span class="n">setTargetVisual</span><span class="p">(</span><span class="n">visual</span><span class="p">);</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
+<p>For an explicit camera, <code class="docutils literal notranslate"><span class="pre">pickWithExternalCamera</span></code> returns the encoded
+selection value (<code class="docutils literal notranslate"><span class="pre">0</span></code> for no hit). The current public API does not expose an
+encoded-id-to-object lookup. Treat that value as opaque and maintain an
+application-side registry when external-camera picks must be correlated with
+application entities. Known custom visuals can still be retrieved by name with
+<code class="docutils literal notranslate"><span class="pre">getVisualObject(name)</span></code>.</p>
 <p>Picking renders a dedicated selection pass with a flat shader, so it is
 roughly as cheap as one MSAA-off pass of the scene. Use it on click events,
 not in the per-frame fast path.</p>
@@ -443,45 +443,42 @@ finalizes their GPU buffers:</p>
 no effect for assets that are already cached through
 <code class="docutils literal notranslate"><span class="pre">RayraiGlobalAsset</span></code>.</p>
 </section>
-<section id="heightmap-visual-textures">
-<h2>Heightmap visual textures<a class="headerlink" href="#heightmap-visual-textures" title="Link to this heading"></a></h2>
-<p>Heightmap visuals can carry application-specific color textures, overriding
-the default pattern resource for one heightmap at a time. Use
-<code class="docutils literal notranslate"><span class="pre">setHeightmapPatternResourcePath</span></code> for a global override or
-<code class="docutils literal notranslate"><span class="pre">setHeightmapColorTextureOverride(name,</span> <span class="pre">width,</span> <span class="pre">height,</span> <span class="pre">rgb)</span></code> for a per-name
-override that takes a contiguous RGB byte buffer. Patch updates are supported
-through <code class="docutils literal notranslate"><span class="pre">updateHeightmapColorTextureOverridePatch</span></code> (specify a min/max range
-in grid coordinates) so streaming visualizations can refresh dirty regions
-without re-uploading the full texture. Clear with
-<code class="docutils literal notranslate"><span class="pre">clearHeightmapColorTextureOverride(name)</span></code>.</p>
+<section id="heightmap-appearance-and-streaming-updates">
+<h2>Heightmap appearance and streaming updates<a class="headerlink" href="#heightmap-appearance-and-streaming-updates" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">setHeightmapPatternResourcePath</span></code> applies one tiled albedo texture to every
+heightmap in the viewer. The matching
+<code class="docutils literal notranslate"><span class="pre">setHeightmapNormalResourcePath</span></code> and <code class="docutils literal notranslate"><span class="pre">setHeightmapHeightResourcePath</span></code>
+methods provide global normal and height/parallax textures. Passing an empty
+path clears the corresponding resource.</p>
+<p>Per-heightmap data is authored on <code class="docutils literal notranslate"><span class="pre">raisim::HeightMap</span></code> itself. Use
+<code class="docutils literal notranslate"><span class="pre">setColor</span></code> for a full RGB color map, <code class="docutils literal notranslate"><span class="pre">setColorPatch</span></code> for a rectangular
+color patch after the full map has been initialized, and
+<code class="docutils literal notranslate"><span class="pre">updateVisualHeightPatch</span></code> for a visualization-only height update. These
+updates are synchronized into the mirrored rayrai heightmap; they do not create
+a renderer-owned per-name texture override.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">terrain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">addHeightMap</span><span class="p">(</span><span class="cm">/*sample_x=*/</span><span class="mi">256</span><span class="p">,</span><span class="w"> </span><span class="cm">/*sample_y=*/</span><span class="mi">256</span><span class="p">,</span>
 <span class="w">                                    </span><span class="cm">/*size_x=*/</span><span class="mf">40.0</span><span class="p">,</span><span class="w"> </span><span class="cm">/*size_y=*/</span><span class="mf">40.0</span><span class="p">,</span>
 <span class="w">                                    </span><span class="cm">/*centerX=*/</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="cm">/*centerY=*/</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">heights</span><span class="p">);</span>
-<span class="n">terrain</span><span class="o">-&gt;</span><span class="n">setName</span><span class="p">(</span><span class="s">&quot;procedural_terrain&quot;</span><span class="p">);</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setHeightmapPatternResourcePath</span><span class="p">(</span><span class="s">&quot;/path/to/terrain_albedo.png&quot;</span><span class="p">);</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setHeightmapNormalResourcePath</span><span class="p">(</span><span class="s">&quot;/path/to/terrain_normal.png&quot;</span><span class="p">);</span>
 
-<span class="c1">// Initial full-resolution colour upload (e.g. semantic class colour map).</span>
-<span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">W</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">256</span><span class="p">,</span><span class="w"> </span><span class="n">H</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">256</span><span class="p">;</span>
-<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="o">&gt;</span><span class="w"> </span><span class="n">rgb</span><span class="p">(</span><span class="n">W</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">H</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span>
-<span class="n">fillSemanticColours</span><span class="p">(</span><span class="n">rgb</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">W</span><span class="p">,</span><span class="w"> </span><span class="n">H</span><span class="p">);</span>
-<span class="n">viewer</span><span class="p">.</span><span class="n">setHeightmapColorTextureOverride</span><span class="p">(</span><span class="s">&quot;procedural_terrain&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">W</span><span class="p">,</span><span class="w"> </span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="n">rgb</span><span class="p">.</span><span class="n">data</span><span class="p">());</span>
+<span class="c1">// Initialize one RGB value per height sample.</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">ColorRGB</span><span class="o">&gt;</span><span class="w"> </span><span class="n">colors</span><span class="p">(</span><span class="mi">256</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">256</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mi">90</span><span class="p">,</span><span class="w"> </span><span class="mi">130</span><span class="p">,</span><span class="w"> </span><span class="mi">70</span><span class="p">});</span>
+<span class="n">terrain</span><span class="o">-&gt;</span><span class="n">setColor</span><span class="p">(</span><span class="n">colors</span><span class="p">);</span>
 
-<span class="c1">// Later, after the simulation marked a 40×40 cell patch as dirty:</span>
-<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dirtyMinY</span><span class="p">;</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">dirtyMaxY</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dirtyMinX</span><span class="p">;</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">dirtyMaxX</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kt">size_t</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">y</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">W</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
-<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">tie</span><span class="p">(</span><span class="n">rgb</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span><span class="w"> </span><span class="n">rgb</span><span class="p">[</span><span class="n">idx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">rgb</span><span class="p">[</span><span class="n">idx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="p">])</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">classColour</span><span class="p">(</span><span class="n">grid</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="n">x</span><span class="p">]);</span>
-<span class="w">  </span><span class="p">}</span>
+<span class="c1">// Patch bounds are inclusive; the patch vector is tightly packed.</span>
+<span class="k">constexpr</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">minX</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="n">maxX</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">59</span><span class="p">;</span>
+<span class="k">constexpr</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">minY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="n">maxY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">69</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">ColorRGB</span><span class="o">&gt;</span><span class="w"> </span><span class="n">patch</span><span class="p">(</span>
+<span class="w">    </span><span class="p">(</span><span class="n">maxX</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">minX</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">maxY</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">minY</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="p">{</span><span class="mi">210</span><span class="p">,</span><span class="w"> </span><span class="mi">170</span><span class="p">,</span><span class="w"> </span><span class="mi">70</span><span class="p">});</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">terrain</span><span class="o">-&gt;</span><span class="n">setColorPatch</span><span class="p">(</span><span class="n">patch</span><span class="p">,</span><span class="w"> </span><span class="n">minX</span><span class="p">,</span><span class="w"> </span><span class="n">maxX</span><span class="p">,</span><span class="w"> </span><span class="n">minY</span><span class="p">,</span><span class="w"> </span><span class="n">maxY</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// Invalid bounds, patch size, or no initialized full color map.</span>
 <span class="p">}</span>
-<span class="n">viewer</span><span class="p">.</span><span class="n">updateHeightmapColorTextureOverridePatch</span><span class="p">(</span>
-<span class="w">    </span><span class="s">&quot;procedural_terrain&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="cm">/*minX=*/</span><span class="n">dirtyMinX</span><span class="p">,</span><span class="w"> </span><span class="cm">/*maxX=*/</span><span class="n">dirtyMaxX</span><span class="p">,</span>
-<span class="w">    </span><span class="cm">/*minY=*/</span><span class="n">dirtyMinY</span><span class="p">,</span><span class="w"> </span><span class="cm">/*maxY=*/</span><span class="n">dirtyMaxY</span><span class="p">,</span>
-<span class="w">    </span><span class="n">rgb</span><span class="p">.</span><span class="n">data</span><span class="p">());</span>
-
-<span class="c1">// Clean up when the heightmap is destroyed.</span>
-<span class="n">viewer</span><span class="p">.</span><span class="n">clearHeightmapColorTextureOverride</span><span class="p">(</span><span class="s">&quot;procedural_terrain&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
+<p><code class="docutils literal notranslate"><span class="pre">updateVisualHeightPatch</span></code> also takes inclusive bounds, but its height input is
+the full row-major height array; only the requested region is copied. Call
+<code class="docutils literal notranslate"><span class="pre">update(...)</span></code> instead when physics collision heights must change too.</p>
 </section>
 </section>
 

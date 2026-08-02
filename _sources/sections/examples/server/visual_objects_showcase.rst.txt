@@ -12,17 +12,17 @@ Screenshot
    :alt: visual_objects_showcase example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``visual_objects_showcase``.
+CMake target: ``visual_objects_showcase``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/visual_objects_showcase
+   ./build-examples/examples/visual_objects_showcase
 
 On Windows, run ``visual_objects_showcase.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

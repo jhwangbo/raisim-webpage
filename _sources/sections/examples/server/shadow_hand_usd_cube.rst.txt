@@ -23,17 +23,17 @@ The executable is generated only when CMake finds a RaiSim package with USD
 scene loading. RaiSim is expected to include OpenUSD on every supported
 architecture.
 
-Binary
+Target
 ======
-Installed executable when available: ``shadow_hand_usd_cube``.
+CMake target when available: ``shadow_hand_usd_cube``.
 
 Run
 ===
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/shadow_hand_usd_cube
+   ./build-examples/examples/shadow_hand_usd_cube
 
 On Windows, run ``shadow_hand_usd_cube.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect

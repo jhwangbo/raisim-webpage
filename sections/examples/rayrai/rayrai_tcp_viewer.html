@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rayrai Example: TCP Viewer &mdash; raisim 2.4.4 documentation</title>
+  <title>Rayrai Example: TCP Viewer &mdash; raisim 2.4.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=68f46a9b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=b1e24531"></script>
+      <script src="../../../_static/documentation_options.js?v=159ac128"></script>
       <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -79,7 +79,7 @@
 <li class="toctree-l3"><a class="reference internal" href="rayrai_swept_ccd.html">Rayrai Example: Swept CCD</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Rayrai Example: TCP Viewer</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#overview">Overview</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#binary">Binary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#target">Target</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#source">Source</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#run">Run</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#useful-options">Useful options</a></li>
@@ -131,7 +131,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../RaisimEngine2.html">RaiSim Engine 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../RaiSimPy.html">RaisimPy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../RaiSimMatlab.html">RaisimMatlab</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../LegacyIntegrations.html">Legacy Integrations</a></li>
 </ul>
 
@@ -165,14 +165,14 @@
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
 <p>Standalone TCP viewer for <code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code> scenes. It
 connects to a running server, downloads the remote scene, and renders it with
-rayrai and ImGui controls. Installed binary packages should normally use
-<code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> for interactive viewing; this page documents the
-example target named <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code>, which also exposes batch and
-diagnostics command-line options.</p>
+rayrai and ImGui controls. Binary packages should normally use
+<code class="docutils literal notranslate"><span class="pre">rayrai/bin/rayrai_raisim_tcp_viewer</span></code> for interactive viewing; this page
+documents the example target named <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code>, which also exposes
+batch and diagnostics command-line options.</p>
 </section>
-<section id="binary">
-<h2>Binary<a class="headerlink" href="#binary" title="Link to this heading"></a></h2>
-<p>Installed executable: <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code>.</p>
+<section id="target">
+<h2>Target<a class="headerlink" href="#target" title="Link to this heading"></a></h2>
+<p>CMake target: <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code>.</p>
 </section>
 <section id="source">
 <h2>Source<a class="headerlink" href="#source" title="Link to this heading"></a></h2>
@@ -183,13 +183,18 @@ is the file used by <code class="docutils literal notranslate"><span class="pre"
 </section>
 <section id="run">
 <h2>Run<a class="headerlink" href="#run" title="Link to this heading"></a></h2>
-<p>Run the installed executable while a RaisimServer application is running:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/rayrai_tcp_viewer
+<p>Run the build-tree executable while a RaisimServer application is running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build-examples/examples/rayrai_tcp_viewer
 </pre></div>
 </div>
-<p>On Windows, run <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer.exe</span></code> instead. This viewer is a separate
-rayrai client process; in-process rayrai examples open their own renderer window
-and do not need it.</p>
+<p>Or run the prebuilt package tool:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./rayrai/bin/rayrai_raisim_tcp_viewer
+</pre></div>
+</div>
+<p>On Windows, the corresponding names are <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer.exe</span></code> for the
+source-built example and <code class="docutils literal notranslate"><span class="pre">rayrai_raisim_tcp_viewer.exe</span></code> for the packaged
+tool. This viewer is a separate rayrai client process; in-process rayrai
+examples open their own renderer window and do not need it.</p>
 </section>
 <section id="useful-options">
 <h2>Useful options<a class="headerlink" href="#useful-options" title="Link to this heading"></a></h2>
@@ -229,8 +234,8 @@ scene/object JSON diagnostics.</p></li>
 <li><p>Interactive tools include Shift+left-drag force application, a 2-point ruler,
 3-point angle measurement, pose grabber axes, body frames, COM markers, and
 keyboard shortcut help.</p></li>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> as the supported packaged viewer when both
-executables are available and you only need interactive viewing.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">rayrai_raisim_tcp_viewer</span></code> as the supported prebuilt package tool when
+you do not need to rebuild the example target.</p></li>
 <li><p>Direct RGB/depth sensor workflows should prefer in-process rayrai when the
 application needs deterministic renderer buffers.</p></li>
 </ul>

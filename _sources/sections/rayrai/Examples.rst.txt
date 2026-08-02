@@ -4,12 +4,14 @@ Example targets
 
 Examples
 ========
-Rayrai examples are documented in :doc:`Examples <Examples>`. Each example page includes a short explanation and installed executable usage.
+Rayrai examples are documented in :doc:`Examples <Examples>`. Each example
+page includes a short explanation, CMake target, and build-tree usage.
 
 Quick map to the current rayrai-related targets:
 
-* ``rayrai_tcp_viewer``: supported packaged TCP viewer for
-  ``raisim::RaisimServer`` scenes.
+* ``rayrai_tcp_viewer``: source-built example target corresponding to the
+  packaged ``rayrai_raisim_tcp_viewer`` tool for ``raisim::RaisimServer``
+  scenes.
 * ``rayrai_basic_scene``: minimal ImGui + SDL2 app showing the standard update
   loop, custom visuals, and the offscreen render texture.
 * ``rayrai_complete_showcase``: broad in-process scene that combines RGB/depth

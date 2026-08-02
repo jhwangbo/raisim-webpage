@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; raisim 2.4.4 documentation</title>
+  <title>Installation &mdash; raisim 2.4.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=a5c4661c" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=b1e24531"></script>
+      <script src="../_static/documentation_options.js?v=159ac128"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../_static/tabs.js?v=3030b3cb"></script>
@@ -102,7 +102,7 @@
 <li class="toctree-l1"><a class="reference internal" href="RaisimEngine2.html">RaiSim Engine 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab</a></li>
 <li class="toctree-l1"><a class="reference internal" href="LegacyIntegrations.html">Legacy Integrations</a></li>
 </ul>
 
@@ -137,14 +137,15 @@
 for examples and <code class="docutils literal notranslate"><span class="pre">raisimPy</span></code>, dependencies, and license activation for the
 binary RaiSim2 distribution. Get RaiSim2 from
 <code class="docutils literal notranslate"><span class="pre">https://github.com/raisimTech/raisim2Lib</span></code>; it is distributed as binary
-libraries with headers, examples, rayrai tools, and documentation.</p>
+libraries with headers, example sources, rayrai tools, and documentation.</p>
 </section>
 <section id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading"></a></h2>
 <p>Minimum requirements:</p>
 <ul class="simple">
 <li><p>A supported 64-bit operating system.</p></li>
-<li><p>A C++17-capable compiler when building your own application against RaiSim.</p></li>
+<li><p>CMake 3.18 or newer for the top-level package workspace.</p></li>
+<li><p>A C++20-capable compiler when building your own application against RaiSim.</p></li>
 <li><p>OpenGL runtime support for rayrai.</p></li>
 <li><p>SDL2 runtime libraries for rayrai on Linux or macOS when they are not bundled
 with the package.</p></li>
@@ -164,24 +165,24 @@ license details.</p>
 Linux/macOS or <code class="docutils literal notranslate"><span class="pre">C:\raisim</span></code> on Windows. Current macOS packages are named
 <code class="docutils literal notranslate"><span class="pre">macos-arm64-&lt;version&gt;.zip</span></code> for Apple Silicon and
 <code class="docutils literal notranslate"><span class="pre">macos-x86_64-&lt;version&gt;.zip</span></code> for Intel. Keep the package directories
-together; examples and rayrai tools expect the bundled assets to remain next to
-the installed binaries.</p>
+together; examples and rayrai tools resolve resources from the accompanying
+<code class="docutils literal notranslate"><span class="pre">rsc</span></code> and package directories.</p>
 </section>
 <section id="local-install-layout">
 <h2>Local Install Layout<a class="headerlink" href="#local-install-layout" title="Link to this heading"></a></h2>
-<p>Local installation is recommended so RaiSim does not conflict with unrelated
-system packages. The Linux installer uses:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">RAISIM_LOCAL_INSTALL_ROOT</span><span class="o">=</span><span class="si">${</span><span class="nv">RAISIM_LOCAL_INSTALL_ROOT</span><span class="k">:-</span><span class="nv">$HOME</span><span class="p">/raisim2Lib</span><span class="si">}</span>
-</pre></div>
-</div>
-<p>The installer places the current architecture into:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$RAISIM_LOCAL_INSTALL_ROOT/raisim
-$RAISIM_LOCAL_INSTALL_ROOT/rayrai
+<p>The unpacked release is already a usable local package tree. Its current flat
+layout is:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt;raisim2Lib&gt;/raisim
+&lt;raisim2Lib&gt;/rayrai
 </pre></div>
 </div>
 <p>RaiSim and rayrai are installed as CMake packages. Downstream projects that use
 only physics should point <code class="docutils literal notranslate"><span class="pre">CMAKE_PREFIX_PATH</span></code> at the RaiSim package prefix.
 Projects that use rayrai should include both prefixes.</p>
+<p>Older releases also supported architecture subdirectories such as
+<code class="docutils literal notranslate"><span class="pre">raisim/linux</span></code> and <code class="docutils literal notranslate"><span class="pre">rayrai/linux</span></code>. The current CMake and environment scripts
+still recognize that legacy layout, but new documentation and release archives
+use the flat prefixes above.</p>
 </section>
 <section id="environment-setup">
 <h2>Environment Setup<a class="headerlink" href="#environment-setup" title="Link to this heading"></a></h2>
@@ -190,13 +191,16 @@ Projects that use rayrai should include both prefixes.</p>
 <span class="nb">source</span><span class="w"> </span>./raisim_env.sh
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">raisim_env.sh</span></code> adds both <code class="docutils literal notranslate"><span class="pre">raisim/lib</span></code> and <code class="docutils literal notranslate"><span class="pre">rayrai/lib</span></code> to
-<code class="docutils literal notranslate"><span class="pre">LD_LIBRARY_PATH</span></code>. Configure and build this source tree with examples and
-<code class="docutils literal notranslate"><span class="pre">raisimPy</span></code> enabled:</p>
+<p><code class="docutils literal notranslate"><span class="pre">raisim_env.sh</span></code> adds the matching RaiSim and rayrai library directories
+to <code class="docutils literal notranslate"><span class="pre">LD_LIBRARY_PATH</span></code>. Current flat packages use <code class="docutils literal notranslate"><span class="pre">raisim/lib</span></code> and
+<code class="docutils literal notranslate"><span class="pre">rayrai/lib</span></code>; legacy packages use the <code class="docutils literal notranslate"><span class="pre">$RAISIM_OS/lib</span></code> directories
+below those prefixes. Configure and build this public workspace with
+examples and <code class="docutils literal notranslate"><span class="pre">raisimPy</span></code> enabled:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-DRAISIM_EXAMPLE<span class="o">=</span>ON<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-DRAISIM_PY<span class="o">=</span>ON
-cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>-j
+cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>--parallel<span class="w"> </span><span class="m">12</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">RAISIM_EXAMPLE</span></code> is enabled by default. <code class="docutils literal notranslate"><span class="pre">RAISIM_PY</span></code> must be enabled
@@ -205,12 +209,14 @@ explicitly when you want the Python wrapper.</p>
 <span class="nb">source</span><span class="w"> </span>./raisim_env.sh
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">raisim_env.sh</span></code> adds both <code class="docutils literal notranslate"><span class="pre">raisim/lib</span></code> and <code class="docutils literal notranslate"><span class="pre">rayrai/lib</span></code> to
-<code class="docutils literal notranslate"><span class="pre">DYLD_LIBRARY_PATH</span></code>. Configure and build this source tree in Release mode:</p>
+<p><code class="docutils literal notranslate"><span class="pre">raisim_env.sh</span></code> adds the matching RaiSim and rayrai library directories
+to <code class="docutils literal notranslate"><span class="pre">DYLD_LIBRARY_PATH</span></code>. It selects the legacy <code class="docutils literal notranslate"><span class="pre">$RAISIM_OS/lib</span></code>
+directories when present and otherwise uses the current flat <code class="docutils literal notranslate"><span class="pre">lib</span></code>
+directories. Configure and build this public workspace in Release mode:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-DRAISIM_EXAMPLE<span class="o">=</span>ON
-cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>-j
+cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>--parallel<span class="w"> </span><span class="m">12</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">RAISIM_EXAMPLE</span></code> is enabled by default. If <code class="docutils literal notranslate"><span class="pre">raisim/</span></code> is missing or its
@@ -225,10 +231,10 @@ running under Rosetta. Intel Mac builds select <code class="docutils literal not
 release asset is available. <code class="docutils literal notranslate"><span class="pre">RAISIM_PY</span></code> must be enabled explicitly when
 you want the Python wrapper.</p>
 </div><div aria-labelledby="tab-0-V2luZG93cw==" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-0-V2luZG93cw==" name="V2luZG93cw==" role="tabpanel" tabindex="0"><p>Run <code class="docutils literal notranslate"><span class="pre">raisim_env.bat</span></code> or add the installed RaiSim and rayrai <code class="docutils literal notranslate"><span class="pre">bin</span></code>
-directories to <code class="docutils literal notranslate"><span class="pre">Path</span></code>. Configure and build this source tree with examples
+directories to <code class="docutils literal notranslate"><span class="pre">Path</span></code>. Configure and build this public workspace with examples
 and <code class="docutils literal notranslate"><span class="pre">raisimPy</span></code> enabled:</p>
 <div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="n">cmake</span> <span class="n">-S</span> <span class="p">.</span> <span class="n">-B</span> <span class="n">build</span> <span class="n">-DRAISIM_EXAMPLE</span><span class="p">=</span><span class="n">ON</span> <span class="n">-DRAISIM_PY</span><span class="p">=</span><span class="n">ON</span>
-<span class="n">cmake</span> <span class="p">-</span><span class="n">-build</span> <span class="n">build</span> <span class="p">-</span><span class="n">-config</span> <span class="n">Release</span>
+<span class="n">cmake</span> <span class="p">-</span><span class="n">-build</span> <span class="n">build</span> <span class="p">-</span><span class="n">-config</span> <span class="n">Release</span> <span class="p">-</span><span class="n">-parallel</span> <span class="n">12</span>
 </pre></div>
 </div>
 </div></div>
@@ -240,15 +246,18 @@ and <code class="docutils literal notranslate"><span class="pre">raisimPy</span>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="nv">$HOME</span>/raisim2Lib
 <span class="nb">source</span><span class="w"> </span>./raisim_env.sh
 cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-DRAISIM_EXAMPLE<span class="o">=</span>ON<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-DRAISIM_PY<span class="o">=</span>ON
-cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>-j
+cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>--parallel<span class="w"> </span><span class="m">12</span>
 </pre></div>
 </div>
 <p>On macOS, prefer adding <code class="docutils literal notranslate"><span class="pre">-DCMAKE_BUILD_TYPE=Release</span></code> to the configure command
 for local example builds. If <code class="docutils literal notranslate"><span class="pre">raisim/</span></code> is missing or its version differs from
 <code class="docutils literal notranslate"><span class="pre">RAISIM_VERSION</span></code>, the configure step downloads the pinned macOS package.</p>
-<p>Installation is optional for running examples from the build tree. If you do
+<p>Installation is optional for running examples from the build tree. The install
+step copies package headers, libraries, CMake files, and bundled rayrai tools;
+it does not install the example executables built from <code class="docutils literal notranslate"><span class="pre">examples/</span></code>. If you do
 install, choose a prefix you can write to instead of relying on CMake’s default
 <code class="docutils literal notranslate"><span class="pre">/usr/local</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>--install<span class="w"> </span>build<span class="w"> </span>--prefix<span class="w"> </span><span class="nv">$HOME</span>/raisim2Lib/install
@@ -258,7 +267,7 @@ install, choose a prefix you can write to instead of relying on CMake’s defaul
 package prefixes from the unpacked <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> tree:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">RAISIM_ROOT</span><span class="o">=</span><span class="nv">$HOME</span>/raisim2Lib
 cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build<span class="w"> </span>-DCMAKE_PREFIX_PATH<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$RAISIM_ROOT</span><span class="s2">/raisim;</span><span class="nv">$RAISIM_ROOT</span><span class="s2">/rayrai&quot;</span>
-cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>-j
+cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>--parallel<span class="w"> </span><span class="m">12</span>
 </pre></div>
 </div>
 </section>
@@ -279,8 +288,8 @@ to the user-directory location above.</p>
 <p>rayrai is the supported visualizer for current RaiSim. There are two usage
 modes:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> connects to applications that publish a
-<code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> through <code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code>.</p></li>
+<li><p>The packaged <code class="docutils literal notranslate"><span class="pre">rayrai_raisim_tcp_viewer</span></code> connects to applications that
+publish a <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> through <code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code>.</p></li>
 <li><p>In-process rayrai examples create <code class="docutils literal notranslate"><span class="pre">raisin::RayraiWindow</span></code> directly for
 screenshots, RGB/depth rendering, PBR assets, HDR lighting, and offscreen
 workflows.</p></li>

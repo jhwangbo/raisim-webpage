@@ -15,17 +15,17 @@ Screenshot
    :alt: rayrai_pbr_texture_maps example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``rayrai_pbr_texture_maps``.
+CMake target: ``rayrai_pbr_texture_maps``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/rayrai_pbr_texture_maps
+   ./build-examples/examples/rayrai_pbr_texture_maps
 
 On Windows, run ``rayrai_pbr_texture_maps.exe`` instead.
 This example uses the in-process rayrai renderer (no external client required).

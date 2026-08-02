@@ -7,18 +7,18 @@ This page covers common issues when using the binary RaiSim distribution.
 Executable Not Found
 ====================
 
-When you build examples from the ``raisim2Lib`` source tree, CMake places them
+When you build examples from the public ``raisim2Lib`` workspace, CMake places them
 under the build directory:
 
 .. code-block:: bash
 
-    ./build/examples/primitive_grid
-    ./build/examples/rayrai_tcp_viewer
+    ./build-examples/examples/primitive_grid
+    ./build-examples/examples/rayrai_tcp_viewer
 
-Installed packages use ``<raisim-install>/bin/rayrai_tcp_viewer`` for the
-supported TCP viewer. The ``rayrai_tcp_viewer`` command is the examples
-source-tree target. If a command from old docs uses an ``example_`` prefix,
-check :doc:`Examples` for the current target name.
+The unpacked package uses ``rayrai/bin/rayrai_raisim_tcp_viewer`` for the
+prebuilt TCP viewer. ``rayrai_tcp_viewer`` is the public example target.
+If a command from old docs uses an ``example_`` prefix, check :doc:`Examples`
+for the current target name.
 
 Missing Shared Libraries
 ========================
@@ -76,10 +76,10 @@ machine provides a usable software or hardware OpenGL stack.
 Example Asset Missing
 =====================
 
-Examples expect their bundled assets to stay next to the installed package. If
+Examples expect their bundled assets to stay with the release workspace. If
 an example cannot find a URDF, mesh, texture, heightmap, or USD asset, verify
-that the package ``rsc`` or asset directory was copied together with ``bin`` and
-``lib``.
+that the top-level ``rsc`` directory exists and that CMake copied it to
+``build-examples/examples/rsc`` (or ``build-examples/bin/rsc`` on Windows).
 
 OpenUSD Runtime Or Plugin Missing
 =================================
@@ -90,6 +90,6 @@ USD mesh loading uses the bundled OpenUSD runtime. Keep the installed
 files on Windows.
 
 If an executable is launched from another directory, run the package environment
-script first so the runtime loader can find RaiSim and OpenUSD. Source builds
-fail during CMake configuration when the matching ``prebuilt/openusd`` runtime
-is missing; regenerate that prebuilt package instead of disabling USD support.
+script first so the runtime loader can find RaiSim and OpenUSD. If an OpenUSD
+runtime is missing from the public package, reinstall or upgrade the matching
+``raisim2Lib`` release instead of trying to rebuild the closed-source engine.

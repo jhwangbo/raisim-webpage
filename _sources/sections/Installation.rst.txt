@@ -9,7 +9,7 @@ This page covers installed package paths, environment variables, build commands
 for examples and ``raisimPy``, dependencies, and license activation for the
 binary RaiSim2 distribution. Get RaiSim2 from
 ``https://github.com/raisimTech/raisim2Lib``; it is distributed as binary
-libraries with headers, examples, rayrai tools, and documentation.
+libraries with headers, example sources, rayrai tools, and documentation.
 
 Dependencies
 ============
@@ -17,7 +17,8 @@ Dependencies
 Minimum requirements:
 
 * A supported 64-bit operating system.
-* A C++17-capable compiler when building your own application against RaiSim.
+* CMake 3.18 or newer for the top-level package workspace.
+* A C++20-capable compiler when building your own application against RaiSim.
 * OpenGL runtime support for rayrai.
 * SDL2 runtime libraries for rayrai on Linux or macOS when they are not bundled
   with the package.
@@ -40,29 +41,28 @@ Unpack the package to a local directory such as ``$HOME/raisim2Lib`` on
 Linux/macOS or ``C:\raisim`` on Windows. Current macOS packages are named
 ``macos-arm64-<version>.zip`` for Apple Silicon and
 ``macos-x86_64-<version>.zip`` for Intel. Keep the package directories
-together; examples and rayrai tools expect the bundled assets to remain next to
-the installed binaries.
+together; examples and rayrai tools resolve resources from the accompanying
+``rsc`` and package directories.
 
 Local Install Layout
 ====================
 
-Local installation is recommended so RaiSim does not conflict with unrelated
-system packages. The Linux installer uses:
-
-.. code-block:: bash
-
-    RAISIM_LOCAL_INSTALL_ROOT=${RAISIM_LOCAL_INSTALL_ROOT:-$HOME/raisim2Lib}
-
-The installer places the current architecture into:
+The unpacked release is already a usable local package tree. Its current flat
+layout is:
 
 .. code-block:: text
 
-    $RAISIM_LOCAL_INSTALL_ROOT/raisim
-    $RAISIM_LOCAL_INSTALL_ROOT/rayrai
+    <raisim2Lib>/raisim
+    <raisim2Lib>/rayrai
 
 RaiSim and rayrai are installed as CMake packages. Downstream projects that use
 only physics should point ``CMAKE_PREFIX_PATH`` at the RaiSim package prefix.
 Projects that use rayrai should include both prefixes.
+
+Older releases also supported architecture subdirectories such as
+``raisim/linux`` and ``rayrai/linux``. The current CMake and environment scripts
+still recognize that legacy layout, but new documentation and release archives
+use the flat prefixes above.
 
 Environment Setup
 =================
@@ -75,16 +75,19 @@ Environment Setup
         cd $HOME/raisim2Lib
         source ./raisim_env.sh
 
-    ``raisim_env.sh`` adds both ``raisim/lib`` and ``rayrai/lib`` to
-    ``LD_LIBRARY_PATH``. Configure and build this source tree with examples and
-    ``raisimPy`` enabled:
+    ``raisim_env.sh`` adds the matching RaiSim and rayrai library directories
+    to ``LD_LIBRARY_PATH``. Current flat packages use ``raisim/lib`` and
+    ``rayrai/lib``; legacy packages use the ``$RAISIM_OS/lib`` directories
+    below those prefixes. Configure and build this public workspace with
+    examples and ``raisimPy`` enabled:
 
     .. code-block:: bash
 
         cmake -S . -B build \
+          -DCMAKE_BUILD_TYPE=Release \
           -DRAISIM_EXAMPLE=ON \
           -DRAISIM_PY=ON
-        cmake --build build -j
+        cmake --build build --parallel 12
 
     ``RAISIM_EXAMPLE`` is enabled by default. ``RAISIM_PY`` must be enabled
     explicitly when you want the Python wrapper.
@@ -96,15 +99,17 @@ Environment Setup
         cd $HOME/raisim2Lib
         source ./raisim_env.sh
 
-    ``raisim_env.sh`` adds both ``raisim/lib`` and ``rayrai/lib`` to
-    ``DYLD_LIBRARY_PATH``. Configure and build this source tree in Release mode:
+    ``raisim_env.sh`` adds the matching RaiSim and rayrai library directories
+    to ``DYLD_LIBRARY_PATH``. It selects the legacy ``$RAISIM_OS/lib``
+    directories when present and otherwise uses the current flat ``lib``
+    directories. Configure and build this public workspace in Release mode:
 
     .. code-block:: bash
 
         cmake -S . -B build \
           -DCMAKE_BUILD_TYPE=Release \
           -DRAISIM_EXAMPLE=ON
-        cmake --build build -j
+        cmake --build build --parallel 12
 
     ``RAISIM_EXAMPLE`` is enabled by default. If ``raisim/`` is missing or its
     version differs from ``RAISIM_VERSION``, CMake downloads the pinned release
@@ -124,13 +129,13 @@ Environment Setup
   .. group-tab:: Windows
 
     Run ``raisim_env.bat`` or add the installed RaiSim and rayrai ``bin``
-    directories to ``Path``. Configure and build this source tree with examples
+    directories to ``Path``. Configure and build this public workspace with examples
     and ``raisimPy`` enabled:
 
     .. code-block:: powershell
 
         cmake -S . -B build -DRAISIM_EXAMPLE=ON -DRAISIM_PY=ON
-        cmake --build build --config Release
+        cmake --build build --config Release --parallel 12
 
 Build And Install
 =================
@@ -143,15 +148,18 @@ Use this command sequence when you want examples and ``raisimPy`` from the local
     cd $HOME/raisim2Lib
     source ./raisim_env.sh
     cmake -S . -B build \
+      -DCMAKE_BUILD_TYPE=Release \
       -DRAISIM_EXAMPLE=ON \
       -DRAISIM_PY=ON
-    cmake --build build -j
+    cmake --build build --parallel 12
 
 On macOS, prefer adding ``-DCMAKE_BUILD_TYPE=Release`` to the configure command
 for local example builds. If ``raisim/`` is missing or its version differs from
 ``RAISIM_VERSION``, the configure step downloads the pinned macOS package.
 
-Installation is optional for running examples from the build tree. If you do
+Installation is optional for running examples from the build tree. The install
+step copies package headers, libraries, CMake files, and bundled rayrai tools;
+it does not install the example executables built from ``examples/``. If you do
 install, choose a prefix you can write to instead of relying on CMake's default
 ``/usr/local``:
 
@@ -166,7 +174,7 @@ package prefixes from the unpacked ``raisim2Lib`` tree:
 
     export RAISIM_ROOT=$HOME/raisim2Lib
     cmake -S . -B build -DCMAKE_PREFIX_PATH="$RAISIM_ROOT/raisim;$RAISIM_ROOT/rayrai"
-    cmake --build build -j
+    cmake --build build --parallel 12
 
 Activation Key
 ==============
@@ -187,8 +195,8 @@ Rayrai
 rayrai is the supported visualizer for current RaiSim. There are two usage
 modes:
 
-* ``rayrai_tcp_viewer`` connects to applications that publish a
-  ``raisim::World`` through ``raisim::RaisimServer``.
+* The packaged ``rayrai_raisim_tcp_viewer`` connects to applications that
+  publish a ``raisim::World`` through ``raisim::RaisimServer``.
 * In-process rayrai examples create ``raisin::RayraiWindow`` directly for
   screenshots, RGB/depth rendering, PBR assets, HDR lighting, and offscreen
   workflows.

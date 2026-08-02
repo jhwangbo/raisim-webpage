@@ -12,17 +12,17 @@ Screenshot
    :alt: compound_object example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``compound_object``.
+CMake target: ``compound_object``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/compound_object
+   ./build-examples/examples/compound_object
 
 On Windows, run ``compound_object.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

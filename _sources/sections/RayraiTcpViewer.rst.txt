@@ -2,11 +2,12 @@
 Rayrai TCP Viewer
 #################
 
-The ``rayrai_tcp_viewer`` binary is the recommended visualizer for
-``RaisimServer`` simulations. It connects to a running server over TCP, renders
-the world with the full rayrai pipeline (PBR + IBL + post-process), and lets
-you interactively pause, step, force-poke, and reposition objects without
-touching the simulation code.
+The packaged ``rayrai_raisim_tcp_viewer`` binary is the recommended visualizer
+for ``RaisimServer`` simulations. The examples project builds the same workflow
+as the ``rayrai_tcp_viewer`` target. The viewer connects to a running server
+over TCP, renders the world with the full rayrai pipeline (PBR + IBL +
+post-process), and lets you interactively pause, step, force-poke, and
+reposition objects without touching the simulation code.
 
 This page covers the viewer application — its panels, controls, command-line
 options — plus the underlying wire format for writing custom clients. For
@@ -36,13 +37,13 @@ Quick start
 
    .. code-block:: bash
 
-       ./rayrai/<OS>/bin/rayrai_tcp_viewer
+       ./rayrai/bin/rayrai_raisim_tcp_viewer
 
 3. The viewer auto-connects to ``localhost:8080``. To point it at a different
    endpoint, pass ``--connect host:port`` or type into the host / port fields
    under the **Control** tab.
 
-Run ``rayrai_tcp_viewer --help`` for the full option list. On Windows
+Run ``rayrai_raisim_tcp_viewer --help`` for the full option list. On Windows
 use the ``.exe`` binary; the same TCP client and discovery paths are supported
 on Windows, Linux, and macOS.
 
@@ -232,9 +233,9 @@ side.
   units instead of normalizing them to the current frame's largest force.
 
 **Light and camera sliders.** Direct overrides of the renderer's main
-directional light and camera, equivalent to the C++ ``Light::setRotation``,
-``Light::setStrength``, and the ``RenderQualitySettings.mainLightAmbient``
-fields:
+directional light and camera. In C++, the corresponding state is
+``viewer.getLight().direction``, the light's ``diffuse``/``specular`` color
+terms, and ``RenderQualitySettings::mainLightAmbient``:
 
 * **Camera Speed** — WASD movement multiplier.
 * **Light Yaw / Light Pitch** — direction of the main directional light, in
@@ -531,12 +532,13 @@ builds, and dataset preview generation:
 
 .. code-block:: bash
 
+    source ./raisim_env.sh
+
     # 1) Start any RaisimServer example in the background.
-    LD_LIBRARY_PATH=$RAISIM_DIR/lib ./primitive_grid &
+    ./build-examples/examples/primitive_grid &
 
     # 2) Capture a 1280x720 PNG framed on the scene, then exit.
-    LD_LIBRARY_PATH=$RAYRAI_DIR/lib:$RAISIM_DIR/lib \\
-      ./rayrai_tcp_viewer \\
+    ./rayrai/bin/rayrai_raisim_tcp_viewer \\
         --connect 127.0.0.1:8080 \\
         --camera-lookat 14,-14,6,-1,-1,3 \\
         --screenshot out.png \\
@@ -690,7 +692,7 @@ Feature negotiation
 After connecting, the first server frame carries the negotiated feature
 bits. A custom client should AND those bits with ``kProtocolFeatureSimControl``
 once at startup, and grey out sim-control surfaces if the bit is not set —
-exactly what ``rayrai_tcp_viewer`` does internally via
+exactly what the TCP viewer does internally via
 ``RemoteScene::serverSupportsSimControl()``.
 
 See also

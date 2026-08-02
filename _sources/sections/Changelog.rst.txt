@@ -2,14 +2,20 @@
 Changelog
 #########
 
-Release-specific notes for RaiSim. The most recent release is at the top.
-Each version page summarises the user-visible changes — new features,
+Release-specific notes for RaiSim. An explicitly marked upcoming release is at
+the top, followed by the documented published releases in descending version
+order. Each version page summarises the user-visible changes — new features,
 behaviour changes, and bug fixes — without re-stating commit history.
+
+Package metadata is updated only when a release is published. Consequently,
+an upcoming changelog entry can be one version newer than the package version
+shown in the documentation title and reported by ``RAISIM_VERSION``.
 
 .. toctree::
    :maxdepth: 1
    :caption: Releases
 
+   changelog/v2.4.5
    changelog/v2.4.3
    changelog/v2.3.0
    changelog/v2.2.0
@@ -23,6 +29,10 @@ Versions at a glance
 
    * - Version
      - Headline
+   * - :doc:`v2.4.5 (upcoming) <changelog/v2.4.5>`
+     - Contact and collision correctness fixes; solver and articulated hot-path
+       improvements; safer path/MJCF/heightmap behavior; C++20 package exports
+       with Debug/Release coexistence; internal Engine 2 work is not shipped.
    * - :doc:`v2.4.3 <changelog/v2.4.3>`
      - Binary package version update; speed and code-cleanup work in RaiSim;
        expanded release-validation benchmarks; longer stress and actuated Atlas

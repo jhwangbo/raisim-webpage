@@ -133,7 +133,7 @@ Build and repository workflow
 
    * - Goal
      - Documentation
-   * - Build the source tree
+   * - Build the public distribution examples and wrappers
      - :doc:`QuickStart`, :doc:`BuildAndTest`
    * - Run C++ tests, benchmarks, and docs builds
      - :doc:`BuildAndTest`

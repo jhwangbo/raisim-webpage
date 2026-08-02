@@ -36,7 +36,7 @@ The general Blender exporter is installed in:
 
    $HOME/raisim2Lib/scripts/export_blender_scene.py
 
-It is copied from the source-tree helper used by the RayRai examples. The script is not
+It is copied from the public helper used by the RayRai examples. The script is not
 asset-specific. It exports renderable Blender objects, applies modifiers, preserves
 Z-up coordinates, writes glTF/GLB output, and emits a RayRai sidecar for Blender area
 lights that glTF cannot store directly.

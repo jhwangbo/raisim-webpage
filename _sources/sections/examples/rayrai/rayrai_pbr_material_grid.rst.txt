@@ -12,17 +12,17 @@ Screenshot
    :alt: rayrai_pbr_material_grid example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``rayrai_pbr_material_grid``.
+CMake target: ``rayrai_pbr_material_grid``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/rayrai_pbr_material_grid
+   ./build-examples/examples/rayrai_pbr_material_grid
 
 On Windows, run ``rayrai_pbr_material_grid.exe`` instead.
 This example uses the in-process rayrai renderer (no external client required).

@@ -2,119 +2,77 @@
 RaisimPy
 #############################
 
-RaisimPy is a nearly complete Python wrapper for RaiSim.
-It was initiated by Brian Delhaisse and now RaiSim Tech Inc. is continuing development.
-RaisimPy is distributed under the MIT license (but it depends on RaiSim).
-The installation instructions are given `here <https://raisim.com/sections/Installation.html>`__.
+RaisimPy is the nanobind-based Python wrapper built from the public
+``raisim2Lib/raisimPy`` sources. It follows the C++ RaiSim API closely while
+using NumPy arrays for vectors and matrices. The wrapper sources are MIT
+licensed; the RaiSim binary they use remains subject to the RaiSim license.
 
-The syntax of raisimPy is nearly identical to that of the C++ API except that it takes numpy arrays instead of Eigen vectors.
-Therefore, we do not provide separate documentation for the Python API.
+Build
+=====
 
-You can check the difference between RaiSim C++ and RaiSimPy in the following example.
+Build the wrapper with the same Python interpreter that will import it:
 
-.. tabs::
-  .. group-tab:: C++
+.. code-block:: bash
 
-    .. code-block:: cpp
+    cd /path/to/raisim2Lib
+    source ./raisim_env.sh
+    cmake -S . -B build-py \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DRAISIM_EXAMPLE=OFF \
+      -DRAISIM_PY=ON \
+      -DPython_EXECUTABLE="$(command -v python)"
+    cmake --build build-py --parallel 12
 
-        #include "raisim/World.hpp"
-        #include "raisim/RaisimServer.hpp"
+On Linux and macOS, the extension is emitted under ``build-py/raisimPy``. Run
+an example directly from the build tree with:
 
-        int main(int argc, char* argv[]) {
-          auto binaryPath = raisim::Path::setFromArgv(argv[0]);
-          raisim::World::setActivationKey(binaryPath.getDirectory() + "\\rsc\\activation.raisim");
+.. code-block:: bash
 
-          /// create raisim world
-          raisim::World world;
+    PYTHONPATH="$PWD/build-py/raisimPy${PYTHONPATH:+:$PYTHONPATH}" \
+      python raisimPy/examples/robots.py
 
-          /// create objects
-          auto ground = world.addGround();
+On Windows, select the intended configuration explicitly with
+``cmake --build build-py --config Release --parallel 12`` and add the directory
+containing ``raisimpy.pyd`` to ``PYTHONPATH``. Use the same Debug/Release
+configuration as the imported RaiSim binary selected by CMake.
 
-          /// launch raisim server
-          raisim::RaisimServer server(&world);
-          server.launchServer();
+Activation And Minimal Use
+==========================
 
-          auto visSphere = server.addVisualSphere("v_sphere", 1.0, 1, 1, 1, 1);
-          auto visBox = server.addVisualBox("v_box", 1, 1, 1, 1, 1, 1, 1);
-          auto visCylinder = server.addVisualCylinder("v_cylinder", 1, 1, 0, 1, 0, 1);
-          auto visCapsule = server.addVisualCapsule("v_capsule", 1, 0.5, 0, 0, 1, 1);
-          auto anymalB = server.addVisualArticulatedSystem("v_anymal", binaryPath.getDirectory() + "\\rsc\\anymal\\urdf\\anymal.urdf");
+``World.setActivationKey`` is the preferred spelling. ``World.setLicenseFile``
+remains as a compatibility alias.
 
-          visSphere->setPosition(2,0,0);
-          visCylinder->setPosition(0,2,0);
-          visCapsule->setPosition(2,2,0);
-          Eigen::VectorXd gc(19);
-          gc << 0, 0, 3.54, 1.0, 0.0, 0.0, 0.0, 0.03, 0.4, -0.8, -0.03, 0.4, -0.8, 0.03, -0.4, 0.8, -0.03, -0.4, 0.8;
-          anymalB->setGeneralizedCoordinate(gc);
-          anymalB->color = {0.5,0.0,0.0,0.5};
-          auto lines = server.addVisualPolyLine("lines");
-          lines->color = {0,0,1,1};
+.. code-block:: python
 
-          for( int i = 0; i < 100; i++)
-            lines->points.push_back({sin(i*0.1), cos(i*0.1), i*0.01});
+    import raisimpy as raisim
 
-          size_t counter = 0;
-          while (1) {
-            counter++;
-            visBox->color[2] = double((counter)%255+1)/256.;
-            visBox->setBoxSize(double((counter)%255+1)/256.+0.01, 1, 1);
-            visSphere->color[1] = double((counter)%255+1)/256.;
-            raisim::MSLEEP(2);
+    raisim.World.setActivationKey("/absolute/path/to/activation.raisim")
 
-            lines->color[2] = double((counter)%255+1)/256.;
-            lines->color[0] = 1. - lines->color[2];
-        //    server.integrateWorldThreadSafe();
-          }
+    world = raisim.World()
+    world.setTimeStep(0.001)
+    world.addGround()
+    ball = world.addSphere(0.2, 1.0)
+    ball.setPosition(0.0, 0.0, 1.0)
 
-          server.killServer();
-        }
+    server = raisim.RaisimServer(world)
+    server.launchServer(8080)
+    for _ in range(10_000):
+        server.integrateWorldThreadSafe()
+    server.killServer()
 
+Start ``rayrai/bin/rayrai_raisim_tcp_viewer`` in another terminal to view this
+server-based example.
 
-  .. group-tab:: Python
+Examples And API Coverage
+=========================
 
-    .. code-block:: python
+The current examples under ``raisimPy/examples`` cover articulated robots,
+heightmaps, constraints, charts, point clouds, instanced visuals, dynamic
+visual meshes, and server-side visual objects. The Python method names normally
+match C++, but the binding surface is defined by the files under
+``raisimPy/src``; a C++ method that is not bound there is not automatically
+available in Python.
 
-        import os
-        import numpy as np
-        import raisimpy as raisim
-        import math
-        import time
-
-        raisim.World.setLicenseFile(os.path.dirname(os.path.abspath(__file__)) + "/../../rsc/activation.raisim")
-        world = raisim.World()
-        ground = world.addGround()
-
-        # launch raisim server
-        server = raisim.RaisimServer(world)
-        server.launchServer(8080)
-
-        visSphere = server.addVisualSphere("v_sphere", 1, 1, 1, 1, 1)
-        visBox = server.addVisualBox("v_box", 1, 1, 1, 1, 1, 1, 1)
-        visCylinder = server.addVisualCylinder("v_cylinder", 1, 1, 0, 1, 0, 1)
-        visCapsule = server.addVisualCapsule("v_capsule", 1, 0.5, 0, 0, 1, 1)
-        laikago = server.addVisualArticulatedSystem("v_laikago", os.path.dirname(os.path.abspath(__file__)) + "/../../rsc/laikago/laikago.urdf")
-        laikago.setGeneralizedCoordinate(np.array([0, 0, 3.54, 1.0, 0.0, 0.0, 0.0, 0.03, 0.4, -0.8, -0.03, 0.4, -0.8, 0.03, -0.4, 0.8, -0.03, -0.4, 0.8]))
-        laikago.setColor(0.5, 0.0, 0.0, 0.5)
-
-        visSphere.setPosition(np.array([2, 0, 0]))
-        visCylinder.setPosition(np.array([0, 2, 0]))
-        visCapsule.setPosition(np.array([2, 2, 0]))
-
-        lines = server.addVisualPolyLine("lines")
-        lines.setColor(0, 0, 1, 1)
-
-        for i in range(0, 100):
-            lines.addPoint(np.array([math.sin(i * 0.1), math.cos(i * 0.1), i * 0.01]))
-
-        counter = 0
-
-        for i in range(500000):
-            counter = counter + 1
-            visBox.setColor(1, 1, (counter % 255 + 1) / 256., 1)
-            visSphere.setColor(1, (counter % 255 + 1) / 256., 1, 1)
-            lines.setColor(1 - (counter % 255 + 1) / 256., 1, (counter % 255 + 1) / 256., 1)
-            visBox.setBoxSize((counter % 255 + 1) / 256. + 0.01, 1, 1)
-            time.sleep(world.getTimeStep())
-
-        server.killServer()
-
+NumPy arrays passed to pose, state, force, and geometry methods must have the
+shape and dtype expected by that binding. Keep referenced RaiSim objects alive
+for as long as Python wrappers returned by the world or server are in use.

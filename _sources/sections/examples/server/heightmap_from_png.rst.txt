@@ -12,17 +12,17 @@ Screenshot
    :alt: heightmap_from_png example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``heightmap_from_png``.
+CMake target: ``heightmap_from_png``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/heightmap_from_png
+   ./build-examples/examples/heightmap_from_png
 
 On Windows, run ``heightmap_from_png.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

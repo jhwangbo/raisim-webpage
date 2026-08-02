@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Height Map &mdash; raisim 2.4.4 documentation</title>
+  <title>Height Map &mdash; raisim 2.4.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=68f46a9b" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=b1e24531"></script>
+      <script src="../_static/documentation_options.js?v=159ac128"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -78,6 +78,7 @@
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Height Map</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#runtime-updates">Runtime updates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example">Example</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="HeightMap_example_png.html">Height Map Using a PNG File</a></li>
 <li class="toctree-l3"><a class="reference internal" href="HeightMap_example_raw_values.html">Height Map Using Raw Values</a></li>
@@ -109,7 +110,7 @@
 <li class="toctree-l1"><a class="reference internal" href="RaisimEngine2.html">RaiSim Engine 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab</a></li>
 <li class="toctree-l1"><a class="reference internal" href="LegacyIntegrations.html">Legacy Integrations</a></li>
 </ul>
 
@@ -140,11 +141,29 @@
 <h1>Height Map<a class="headerlink" href="#height-map" title="Link to this heading"></a></h1>
 <p>A height map is a grid of points that are triangulated to form a surface.
 Since it is axis-aligned, collision checking is very efficient and it is a recommended way to create terrain.</p>
+<p>Heightmap collision requires identity orientation. Translating a heightmap is
+supported, but collision detection raises a fatal error and terminates the
+simulation process if a heightmap is rotated. This check is active in every
+build configuration. Use a mesh when the terrain surface itself must be
+rotated.</p>
 <p>You can get the following two properties from a height map instance:</p>
 <ul class="simple">
 <li><p>height: <code class="code docutils literal notranslate"><span class="pre">getHeight()</span></code></p></li>
 <li><p>normal vector: <code class="code docutils literal notranslate"><span class="pre">getNormal()</span></code></p></li>
 </ul>
+<section id="runtime-updates">
+<h2>Runtime updates<a class="headerlink" href="#runtime-updates" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">update(...)</span></code> changes the visual and collision height data. The supplied
+height vector must contain exactly <code class="docutils literal notranslate"><span class="pre">getXSamples()</span> <span class="pre">*</span> <span class="pre">getYSamples()</span></code> entries;
+an invalid-size update is ignored and leaves the existing map unchanged.</p>
+<p>For visualization-only streaming, <code class="docutils literal notranslate"><span class="pre">updateVisualHeight(...)</span></code> replaces the
+full visual height array and <code class="docutils literal notranslate"><span class="pre">updateVisualHeightPatch(...)</span></code> updates an
+inclusive rectangular sample range without rebuilding collision. The patch
+method receives the full row-major height array and copies only the requested
+range. Per-vertex colors use <code class="docutils literal notranslate"><span class="pre">setColor(...)</span></code>; after a full color map has been
+initialized, <code class="docutils literal notranslate"><span class="pre">setColorPatch(...)</span></code> updates a tightly packed rectangular color
+range.</p>
+</section>
 <section id="example">
 <h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">

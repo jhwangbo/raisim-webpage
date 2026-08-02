@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quick Start &mdash; raisim 2.4.4 documentation</title>
+  <title>Quick Start &mdash; raisim 2.4.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=68f46a9b" />
@@ -14,14 +14,14 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=b1e24531"></script>
+      <script src="../_static/documentation_options.js?v=159ac128"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Installation" href="Installation.html" />
-    <link rel="prev" title="RaiSim v2.4.4" href="../index.html" /> 
+    <link rel="prev" title="RaiSim v2.4.5" href="../index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -97,7 +97,7 @@
 <li class="toctree-l1"><a class="reference internal" href="RaisimEngine2.html">RaiSim Engine 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab</a></li>
 <li class="toctree-l1"><a class="reference internal" href="LegacyIntegrations.html">Legacy Integrations</a></li>
 </ul>
 
@@ -126,7 +126,7 @@
              
   <section id="quick-start">
 <h1>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h1>
-<p>This page gets an installed RaiSim binary package to a running example. For
+<p>This page gets an unpacked RaiSim binary package to a running example. For
 package layout, environment variables, and activation details, see
 <a class="reference internal" href="Installation.html"><span class="doc">Installation</span></a>.</p>
 <section id="install-and-activate-raisim">
@@ -137,17 +137,28 @@ the default location:</p>
 Windows:     C:\Users\&lt;YOUR-USERNAME&gt;\.raisim\activation.raisim
 </pre></div>
 </div>
-<p>The examples and rayrai tools are distributed as binaries. The commands below
-use <code class="docutils literal notranslate"><span class="pre">&lt;raisim-install&gt;/bin</span></code> for the directory containing those executables.</p>
+<p>Source the environment and build the examples from the release workspace:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/path/to/raisim2Lib
+<span class="nb">source</span><span class="w"> </span>./raisim_env.sh
+cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build-examples<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-DRAISIM_EXAMPLE<span class="o">=</span>ON
+cmake<span class="w"> </span>--build<span class="w"> </span>build-examples<span class="w"> </span>--parallel<span class="w"> </span><span class="m">12</span>
+</pre></div>
+</div>
+<p>On Linux and macOS, example executables are then under
+<code class="docutils literal notranslate"><span class="pre">build-examples/examples</span></code>. On Windows, configure without
+<code class="docutils literal notranslate"><span class="pre">CMAKE_BUILD_TYPE</span></code> and build with <code class="docutils literal notranslate"><span class="pre">--config</span> <span class="pre">Release</span></code>; executables are under
+<code class="docutils literal notranslate"><span class="pre">build-examples\\bin</span></code>.</p>
 </section>
 <section id="run-a-server-based-example">
 <h2>2. Run a server-based example<a class="headerlink" href="#run-a-server-based-example" title="Link to this heading"></a></h2>
-<p>Start <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> in one terminal:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/rayrai_tcp_viewer
+<p>Start the packaged TCP viewer in one terminal:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./rayrai/bin/rayrai_raisim_tcp_viewer
 </pre></div>
 </div>
 <p>Run a server example in another terminal:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/primitive_grid
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build-examples/examples/primitive_grid
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">primitive_grid</span></code> and the other server examples create a <code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code>
@@ -158,22 +169,22 @@ changes it.</p>
 <h2>3. Run an in-process rayrai example<a class="headerlink" href="#run-an-in-process-rayrai-example" title="Link to this heading"></a></h2>
 <p>Rayrai examples create their own window or offscreen OpenGL context and do not
 need the TCP viewer:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/rayrai_pbr_material_grid
-&lt;raisim-install&gt;/bin/rayrai_visual_asset_support
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build-examples/examples/rayrai_pbr_material_grid
+./build-examples/examples/rayrai_visual_asset_support
 </pre></div>
 </div>
 </section>
 <section id="run-a-non-visual-example">
 <h2>4. Run a non-visual example<a class="headerlink" href="#run-a-non-visual-example" title="Link to this heading"></a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/model_asset_pipeline
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build-examples/examples/model_asset_pipeline
 </pre></div>
 </div>
 </section>
 <section id="run-an-openusd-mesh-loading-example">
 <h2>5. Run an OpenUSD mesh-loading example<a class="headerlink" href="#run-an-openusd-mesh-loading-example" title="Link to this heading"></a></h2>
 <p>Start the TCP viewer, then run the ShadowHand USD example:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/rayrai_tcp_viewer
-&lt;raisim-install&gt;/bin/shadow_hand_usd_cube
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./rayrai/bin/rayrai_raisim_tcp_viewer
+./build-examples/examples/shadow_hand_usd_cube
 </pre></div>
 </div>
 </section>
@@ -196,7 +207,7 @@ viewer.</p></li>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../index.html" class="btn btn-neutral float-left" title="RaiSim v2.4.4" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../index.html" class="btn btn-neutral float-left" title="RaiSim v2.4.5" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="Installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

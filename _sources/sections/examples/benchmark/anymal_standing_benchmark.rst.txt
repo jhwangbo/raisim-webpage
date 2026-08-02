@@ -5,13 +5,13 @@ anymal_standing_benchmark
 ANYmal PD-standing contact workload. It reports simulation throughput and the
 average number of contacts.
 
-Installed executable: ``anymal_standing_benchmark``.
+CMake target: ``anymal_standing_benchmark``.
 
 Run it single-threaded for benchmark comparisons:
 
 .. code-block:: bash
 
-   OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 <raisim-install>/bin/anymal_standing_benchmark --fast
+   OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 ./build-examples/examples/anymal_standing_benchmark --fast
 
 On Windows, run ``anymal_standing_benchmark.exe`` instead.
 

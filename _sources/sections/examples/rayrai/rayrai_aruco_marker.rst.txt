@@ -11,17 +11,17 @@ Overview
 ========
 Uses an orthographic camera and flat lighting to render a textured mesh marker for detection-style pipelines. It is tuned for consistent marker appearance.
 
-Binary
+Target
 ======
-Installed executable: ``rayrai_aruco_marker``.
+CMake target: ``rayrai_aruco_marker``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/rayrai_aruco_marker
+   ./build-examples/examples/rayrai_aruco_marker
 
 On Windows, run ``rayrai_aruco_marker.exe`` instead.
 This example uses the in-process rayrai renderer (no external client required).

@@ -12,17 +12,17 @@ Screenshot
    :alt: length_constraints_newtons_cradle example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``length_constraints_newtons_cradle``.
+CMake target: ``length_constraints_newtons_cradle``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/length_constraints_newtons_cradle
+   ./build-examples/examples/length_constraints_newtons_cradle
 
 On Windows, run ``length_constraints_newtons_cradle.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

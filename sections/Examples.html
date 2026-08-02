@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Examples &mdash; raisim 2.4.4 documentation</title>
+  <title>Examples &mdash; raisim 2.4.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=68f46a9b" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=b1e24531"></script>
+      <script src="../_static/documentation_options.js?v=159ac128"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -72,6 +72,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#benchmark-examples">Benchmark Examples</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="examples/benchmark/articulated_system_benchmark.html">articulated_system_benchmark</a></li>
 <li class="toctree-l3"><a class="reference internal" href="examples/benchmark/anymal_standing_benchmark.html">anymal_standing_benchmark</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/server/island_sleep_benchmark.html">Island Sleep Benchmark</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#rayrai-tools-and-examples">Rayrai Tools And Examples</a><ul>
@@ -121,8 +122,11 @@
 <li class="toctree-l3"><a class="reference internal" href="examples/server/procedural_heightmap.html">Server Example: Procedural Heightmap</a></li>
 <li class="toctree-l3"><a class="reference internal" href="examples/server/ray_casting.html">Server Example: Ray Casting</a></li>
 <li class="toctree-l3"><a class="reference internal" href="examples/server/ray_scan_lidar.html">Server Example: Ray Scan LiDAR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/server/sensor_suite.html">Server Example: Sensor Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/server/sim_control_demo.html">Server Example: Sim Control Demo</a></li>
 <li class="toctree-l3"><a class="reference internal" href="examples/server/sphere_drop.html">Server Example: Sphere Drop</a></li>
 <li class="toctree-l3"><a class="reference internal" href="examples/server/spring_damper_joints.html">Server Example: Spring Damper Joints</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/server/synchronous_server_update.html">Server Example: Synchronous Server Update</a></li>
 <li class="toctree-l3"><a class="reference internal" href="examples/server/shadow_hand_usd_cube.html">Server Example: Shadow Hand USD Cube</a></li>
 <li class="toctree-l3"><a class="reference internal" href="examples/server/templated_tracked_robot.html">Server Example: Templated Tracked Robot</a></li>
 <li class="toctree-l3"><a class="reference internal" href="examples/server/visual_objects_showcase.html">Server Example: Visual Objects Showcase</a></li>
@@ -183,7 +187,7 @@
 <li class="toctree-l1"><a class="reference internal" href="RaisimEngine2.html">RaiSim Engine 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab</a></li>
 <li class="toctree-l1"><a class="reference internal" href="LegacyIntegrations.html">Legacy Integrations</a></li>
 </ul>
 
@@ -214,7 +218,10 @@
 <h1>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
-<p>The RaiSim binary distribution ships runnable C++ examples and rayrai tools.
+<p>The <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> distribution ships C++ example sources and prebuilt RaiSim
+and rayrai libraries. Build the examples with CMake; the install target does not
+copy those source-built executables. The distribution does include the prebuilt
+<code class="docutils literal notranslate"><span class="pre">rayrai_raisim_tcp_viewer</span></code> tool.
 Use server examples such as <code class="docutils literal notranslate"><span class="pre">primitive_grid</span></code>, rayrai examples such as
 <code class="docutils literal notranslate"><span class="pre">rayrai_pbr_material_grid</span></code>, and non-visual tools such as
 <code class="docutils literal notranslate"><span class="pre">model_asset_pipeline</span></code> to exercise RaiSim physics APIs, mesh import/export,
@@ -229,14 +236,14 @@ are no longer supported.</p>
 </section>
 <section id="run">
 <h2>Run<a class="headerlink" href="#run" title="Link to this heading"></a></h2>
-<p>Run examples from the installed package <code class="docutils literal notranslate"><span class="pre">bin</span></code> directory:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/primitive_grid
-&lt;raisim-install&gt;/bin/rayrai_pbr_material_grid
+<p>After the top-level build from <a class="reference internal" href="BuildAndTest.html"><span class="doc">Build, Test, and Benchmark</span></a>, run examples from the build
+tree:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build-examples/examples/primitive_grid
+./build-examples/examples/rayrai_pbr_material_grid
 </pre></div>
 </div>
-<p>On Windows, use the <code class="docutils literal notranslate"><span class="pre">.exe</span></code> executable from the installed package <code class="docutils literal notranslate"><span class="pre">bin</span></code>
-directory:</p>
-<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="n">C</span><span class="p">:\</span><span class="n">path</span><span class="p">\</span><span class="n">to</span><span class="p">\</span><span class="n">raisim</span><span class="p">\</span><span class="n">bin</span><span class="p">\</span><span class="n">primitive_grid</span><span class="p">.</span><span class="n">exe</span>
+<p>On Windows, use the <code class="docutils literal notranslate"><span class="pre">.exe</span></code> executable from <code class="docutils literal notranslate"><span class="pre">build-examples\\bin</span></code>:</p>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="p">.\</span><span class="n">build-examples</span><span class="p">\</span><span class="n">bin</span><span class="p">\</span><span class="n">primitive_grid</span><span class="p">.</span><span class="n">exe</span>
 </pre></div>
 </div>
 <p>If the runtime loader cannot find shared libraries, use the platform-specific
@@ -260,12 +267,12 @@ full workflow comparison.</p>
 <h3>RaisimServer examples<a class="headerlink" href="#raisimserver-examples" title="Link to this heading"></a></h3>
 <p>Server examples such as <code class="docutils literal notranslate"><span class="pre">primitive_grid</span></code> create a RaiSim world and publish it
 through <code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code>. They do not open a renderer window themselves.
-Start <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code>, then run the example:</p>
+Start the packaged viewer, then run the server example:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Terminal 1</span>
-&lt;raisim-install&gt;/bin/rayrai_tcp_viewer
+./rayrai/bin/rayrai_raisim_tcp_viewer
 
 <span class="c1"># Terminal 2</span>
-&lt;raisim-install&gt;/bin/primitive_grid
+./build-examples/examples/primitive_grid
 </pre></div>
 </div>
 <p>The default server port is <code class="docutils literal notranslate"><span class="pre">8080</span></code> unless the example changes it. Use this
@@ -277,7 +284,7 @@ RaisimServer application publishes.</p>
 <p>Examples such as <code class="docutils literal notranslate"><span class="pre">rayrai_pbr_material_grid</span></code>, <code class="docutils literal notranslate"><span class="pre">rayrai_pbr_texture_maps</span></code>, and
 <code class="docutils literal notranslate"><span class="pre">rayrai_visual_asset_support</span></code> create or use a <code class="docutils literal notranslate"><span class="pre">raisin::RayraiWindow</span></code>
 directly and render in process. They do not need the TCP viewer:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/rayrai_pbr_material_grid
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build-examples/examples/rayrai_pbr_material_grid
 </pre></div>
 </div>
 <p>Prefer these examples when you need camera images, GPU/offscreen rendering, PBR
@@ -294,7 +301,7 @@ window. <code class="docutils literal notranslate"><span class="pre">model_asset
 </section>
 <section id="example-layout">
 <h2>Example layout<a class="headerlink" href="#example-layout" title="Link to this heading"></a></h2>
-<p>The installed package groups examples by executable behavior:</p>
+<p>The examples project groups targets by executable behavior:</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 32.0%" />
@@ -307,7 +314,7 @@ window. <code class="docutils literal notranslate"><span class="pre">model_asset
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Server examples</p></td>
-<td><p>Installed examples for RaiSim physics, contact, terrain, sensor, robot,
+<td><p>Build targets for RaiSim physics, contact, terrain, sensor, robot,
 XML/MJCF, and OpenUSD scene workflows.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">rayrai_*</span></code></p></td>
@@ -374,8 +381,13 @@ package is too old to expose USD scene loading.</p></li>
 <li><p>Poly Haven and PBR asset examples require the corresponding assets under
 <code class="docutils literal notranslate"><span class="pre">rsc</span></code>.</p></li>
 </ul>
-<p>List available examples by inspecting the installed package <code class="docutils literal notranslate"><span class="pre">bin</span></code> directory:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ls<span class="w"> </span>&lt;raisim-install&gt;/bin
+<p>After building, list the example executables from the platform-specific output
+directory. Linux and macOS builds place them under <code class="docutils literal notranslate"><span class="pre">examples</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ls<span class="w"> </span>build-examples/examples/
+</pre></div>
+</div>
+<p>Windows builds place them under <code class="docutils literal notranslate"><span class="pre">bin</span></code>:</p>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="nb">Get-ChildItem</span> <span class="p">.\</span><span class="n">build-examples</span><span class="p">\</span><span class="n">bin</span><span class="p">\*.</span><span class="n">exe</span>
 </pre></div>
 </div>
 </section>
@@ -393,6 +405,7 @@ package is too old to expose USD scene loading.</p></li>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="examples/benchmark/articulated_system_benchmark.html">articulated_system_benchmark</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/benchmark/anymal_standing_benchmark.html">anymal_standing_benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/server/island_sleep_benchmark.html">Island Sleep Benchmark</a></li>
 </ul>
 </div>
 </section>
@@ -450,8 +463,11 @@ package is too old to expose USD scene loading.</p></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/server/procedural_heightmap.html">Server Example: Procedural Heightmap</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/server/ray_casting.html">Server Example: Ray Casting</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/server/ray_scan_lidar.html">Server Example: Ray Scan LiDAR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/server/sensor_suite.html">Server Example: Sensor Suite</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/server/sim_control_demo.html">Server Example: Sim Control Demo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/server/sphere_drop.html">Server Example: Sphere Drop</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/server/spring_damper_joints.html">Server Example: Spring Damper Joints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/server/synchronous_server_update.html">Server Example: Synchronous Server Update</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/server/shadow_hand_usd_cube.html">Server Example: Shadow Hand USD Cube</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/server/templated_tracked_robot.html">Server Example: Templated Tracked Robot</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/server/visual_objects_showcase.html">Server Example: Visual Objects Showcase</a></li>

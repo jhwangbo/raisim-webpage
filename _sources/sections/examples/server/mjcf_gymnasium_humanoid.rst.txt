@@ -15,7 +15,7 @@ Run:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/mjcf_gymnasium_humanoid
+   ./build-examples/examples/mjcf_gymnasium_humanoid
 
 Start ``rayrai_tcp_viewer`` in another terminal to visualize the server
 scene.

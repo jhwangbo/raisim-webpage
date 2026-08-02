@@ -12,17 +12,17 @@ Screenshot
    :alt: office1_scene example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``office1_scene``.
+CMake target: ``office1_scene``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/office1_scene
+   ./build-examples/examples/office1_scene
 
 On Windows, run ``office1_scene.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

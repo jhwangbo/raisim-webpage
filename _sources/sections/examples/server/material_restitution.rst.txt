@@ -12,17 +12,17 @@ Screenshot
    :alt: material_restitution example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``material_restitution``.
+CMake target: ``material_restitution``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/material_restitution
+   ./build-examples/examples/material_restitution
 
 On Windows, run ``material_restitution.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

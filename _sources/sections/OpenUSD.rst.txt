@@ -35,11 +35,10 @@ collision shapes in a single call:
     world.addGround();
     world.setTimeStep(0.0025);
 
-This unifies physics scene authoring on a single text/binary format that USD
-tooling — Isaac Sim, Omniverse, Blender's USD exporter, RaiSim's own
-:doc:`RaisimEngine2` editor — can produce and consume. Prefer it over
-hand-written XML when the scene is going to be authored by a tool or
-exchanged with other USD-native ecosystems.
+This unifies physics scene authoring on a single text/binary format that public
+USD tooling such as Isaac Sim, Omniverse, and Blender's USD exporter can
+produce and consume. Prefer it over hand-written XML when the scene is going
+to be authored by a tool or exchanged with other USD-native ecosystems.
 
 The same constructor still accepts a RaiSim ``.xml`` :doc:`world configuration
 file <WorldConfigurationFile>` or a MuJoCo ``.mjcf``; the file's extension
@@ -141,15 +140,15 @@ architecture. Start the TCP viewer, then run:
 
 .. code-block:: bash
 
-    <raisim-install>/bin/rayrai_tcp_viewer
-    <raisim-install>/bin/shadow_hand_usd_cube
+    ./rayrai/bin/rayrai_raisim_tcp_viewer
+    ./build-examples/examples/shadow_hand_usd_cube
 
 ``nvidia_usd_robots`` provides additional vetted Isaac Sim robot scenes:
 ``create3``, ``jetbot``, and ``ant``.
 
 .. code-block:: bash
 
-    <raisim-install>/bin/nvidia_usd_robots
+    ./build-examples/examples/nvidia_usd_robots
 
 On Windows, use the corresponding ``.exe`` binaries.
 

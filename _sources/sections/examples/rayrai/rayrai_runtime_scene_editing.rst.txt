@@ -17,20 +17,20 @@ Use this example when building reset, randomization, replay, or scripted scene
 editing workflows. It shows how to mutate a running world between simulation
 steps without reconstructing the whole world.
 
-Binary
+Target
 ======
-Installed executable: ``rayrai_runtime_scene_editing``.
+CMake target: ``rayrai_runtime_scene_editing``.
 
 This example is only built when the installed RaiSim package exposes the
 runtime scene editing APIs.
 
 Run
 ===
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/rayrai_runtime_scene_editing
+   ./build-examples/examples/rayrai_runtime_scene_editing
 
 On Windows, run ``rayrai_runtime_scene_editing.exe`` instead.
 This example uses the in-process rayrai renderer.

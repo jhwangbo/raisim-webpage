@@ -12,17 +12,17 @@ Screenshot
    :alt: mesh_stack example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``mesh_stack``.
+CMake target: ``mesh_stack``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/mesh_stack
+   ./build-examples/examples/mesh_stack
 
 On Windows, run ``mesh_stack.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

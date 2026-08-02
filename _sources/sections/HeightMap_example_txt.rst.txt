@@ -17,11 +17,13 @@ The numbers in the second line are height values.
 XML approach
 -----------------------------
 
-Run the example with:
+The matching asset is
+``rsc/xmlScripts/heightMaps/heightMapUsingTxt.xml``. Load it through the world
+configuration constructor in your application:
 
-.. code-block:: bash
+.. code-block:: cpp
 
-    ./xmlReader <PATH_TO_RAISIMLIB>/rsc/xmlScripts/heightMaps/heightMapUsingTxt.xml
+    raisim::World world("/path/to/raisim2Lib/rsc/xmlScripts/heightMaps/heightMapUsingTxt.xml");
 
 The XML file is constructed as follows:
 

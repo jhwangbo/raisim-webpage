@@ -2,7 +2,7 @@
 Quick Start
 #############################
 
-This page gets an installed RaiSim binary package to a running example. For
+This page gets an unpacked RaiSim binary package to a running example. For
 package layout, environment variables, and activation details, see
 :doc:`Installation`.
 
@@ -17,23 +17,36 @@ the default location:
     Linux/macOS: $HOME/.raisim/activation.raisim
     Windows:     C:\Users\<YOUR-USERNAME>\.raisim\activation.raisim
 
-The examples and rayrai tools are distributed as binaries. The commands below
-use ``<raisim-install>/bin`` for the directory containing those executables.
+Source the environment and build the examples from the release workspace:
+
+.. code-block:: bash
+
+    cd /path/to/raisim2Lib
+    source ./raisim_env.sh
+    cmake -S . -B build-examples \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DRAISIM_EXAMPLE=ON
+    cmake --build build-examples --parallel 12
+
+On Linux and macOS, example executables are then under
+``build-examples/examples``. On Windows, configure without
+``CMAKE_BUILD_TYPE`` and build with ``--config Release``; executables are under
+``build-examples\\bin``.
 
 2. Run a server-based example
 =============================
 
-Start ``rayrai_tcp_viewer`` in one terminal:
+Start the packaged TCP viewer in one terminal:
 
 .. code-block:: bash
 
-    <raisim-install>/bin/rayrai_tcp_viewer
+    ./rayrai/bin/rayrai_raisim_tcp_viewer
 
 Run a server example in another terminal:
 
 .. code-block:: bash
 
-    <raisim-install>/bin/primitive_grid
+    ./build-examples/examples/primitive_grid
 
 ``primitive_grid`` and the other server examples create a ``raisim::RaisimServer``
 scene. The viewer connects to the default port ``8080`` unless the application
@@ -47,15 +60,15 @@ need the TCP viewer:
 
 .. code-block:: bash
 
-    <raisim-install>/bin/rayrai_pbr_material_grid
-    <raisim-install>/bin/rayrai_visual_asset_support
+    ./build-examples/examples/rayrai_pbr_material_grid
+    ./build-examples/examples/rayrai_visual_asset_support
 
 4. Run a non-visual example
 ===========================
 
 .. code-block:: bash
 
-    <raisim-install>/bin/model_asset_pipeline
+    ./build-examples/examples/model_asset_pipeline
 
 5. Run an OpenUSD mesh-loading example
 ======================================
@@ -64,8 +77,8 @@ Start the TCP viewer, then run the ShadowHand USD example:
 
 .. code-block:: bash
 
-    <raisim-install>/bin/rayrai_tcp_viewer
-    <raisim-install>/bin/shadow_hand_usd_cube
+    ./rayrai/bin/rayrai_raisim_tcp_viewer
+    ./build-examples/examples/shadow_hand_usd_cube
 
 Next steps
 ==========

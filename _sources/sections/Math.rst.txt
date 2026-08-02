@@ -35,8 +35,9 @@ call APIs that take Eigen types (e.g. ``Eigen::Ref``).
 Alignment and ownership
 =============================
 * ``raisim::Mat``/``raisim::Vec`` are 32-byte aligned fixed-size POD-like types.
-  If you store them in standard containers, use a modern compiler/STL that
-  supports over-aligned allocation (C++17 or newer recommended).
+  Standard containers therefore need over-aligned allocation support. The
+  exported RaiSim target requires C++20, which provides the needed language and
+  standard-library baseline.
 * ``raisim::MatDyn``/``raisim::VecDyn`` allocate 32-byte aligned storage
   internally. Do not free their memory manually.
 * ``.e()`` returns a non-owning map. Its lifetime must not exceed the underlying

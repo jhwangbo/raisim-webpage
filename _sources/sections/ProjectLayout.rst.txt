@@ -9,8 +9,8 @@ so engine-internal benchmark sources and implementation files are not available
 here. This page maps the directories users most often need while installing the
 package and building examples.
 
-Source Directories
-==================
+Public Workspace Directories
+============================
 
 .. list-table::
    :header-rows: 1
@@ -25,8 +25,8 @@ Source Directories
      - Platform-specific binary rayrai package with the renderer library, TCP
        viewer runtime, headers, and CMake config files.
    * - ``examples``
-     - C++ example sources and their CMake project. Targets use installed
-       executable names such as ``primitive_grid`` and ``rayrai_tcp_viewer``.
+     - C++ example sources and their CMake project. CMake target names include
+       ``primitive_grid`` and ``rayrai_tcp_viewer``.
    * - ``rsc``
      - Runtime resources such as robot models, meshes, textures, USD/glTF
        assets, and example data.
@@ -44,7 +44,7 @@ Source Directories
 Build Directories
 =================
 
-Build directories are not part of the source tree. The docs use these names for
+Build directories are generated locally and are not part of the repository. The docs use these names for
 clarity:
 
 .. list-table::
@@ -62,16 +62,16 @@ clarity:
    * - ``build-docs``
      - CMake-driven docs build.
 
-On Linux and macOS, example executables built from ``raisim2Lib/examples`` are
-placed under the example build tree. Installed binary-package executables are
-under ``<raisim-install>/bin``. For example:
+On Linux and macOS, a top-level build places example executables under the
+``examples`` subdirectory of the build tree. The install target does not copy
+these source-built examples. The packaged TCP viewer is shipped separately
+under ``rayrai/bin``. For example:
 
 .. code-block:: bash
 
-    ./build-examples/primitive_grid
-    ./build-examples/rayrai_tcp_viewer
-    <raisim-install>/bin/primitive_grid
-    <raisim-install>/bin/rayrai_tcp_viewer
+    ./build-examples/examples/primitive_grid
+    ./build-examples/examples/rayrai_tcp_viewer
+    ./rayrai/bin/rayrai_raisim_tcp_viewer
 
 On Windows, CMake places runtime executables under ``<build-dir>/bin``.
 
@@ -83,12 +83,12 @@ user-facing interface.
 Installed Package Layout
 ========================
 
-A local install creates separate package prefixes for RaiSim and rayrai:
+The unpacked release contains separate package prefixes for RaiSim and rayrai:
 
 .. code-block:: text
 
-    $RAISIM_LOCAL_INSTALL_ROOT/raisim
-    $RAISIM_LOCAL_INSTALL_ROOT/rayrai
+    <raisim2Lib>/raisim
+    <raisim2Lib>/rayrai
 
 Downstream projects use ``CMAKE_PREFIX_PATH`` to find these installed packages.
 See :doc:`Installation` for environment setup and activation.

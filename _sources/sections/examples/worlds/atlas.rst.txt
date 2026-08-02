@@ -12,17 +12,17 @@ Screenshot
    :alt: atlas example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``atlas``.
+CMake target: ``atlas``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/atlas
+   ./build-examples/examples/atlas
 
 On Windows, run ``atlas.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

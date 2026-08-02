@@ -12,17 +12,17 @@ Screenshot
    :alt: material_static_friction example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``material_static_friction``.
+CMake target: ``material_static_friction``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/material_static_friction
+   ./build-examples/examples/material_static_friction
 
 On Windows, run ``material_static_friction.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

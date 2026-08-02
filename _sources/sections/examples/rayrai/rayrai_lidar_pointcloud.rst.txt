@@ -12,17 +12,17 @@ Screenshot
    :alt: rayrai_lidar_pointcloud example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``rayrai_lidar_pointcloud``.
+CMake target: ``rayrai_lidar_pointcloud``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/rayrai_lidar_pointcloud
+   ./build-examples/examples/rayrai_lidar_pointcloud
 
 On Windows, run ``rayrai_lidar_pointcloud.exe`` instead.
 This example uses the in-process rayrai renderer (no external client required).

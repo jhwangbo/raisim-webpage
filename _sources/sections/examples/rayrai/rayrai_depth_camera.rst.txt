@@ -16,17 +16,17 @@ Screenshot
    :alt: rayrai_depth_camera example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``rayrai_depth_camera``.
+CMake target: ``rayrai_depth_camera``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/rayrai_depth_camera
+   ./build-examples/examples/rayrai_depth_camera
 
 On Windows, run ``rayrai_depth_camera.exe`` instead.
 This example uses the in-process rayrai renderer (no external client required).

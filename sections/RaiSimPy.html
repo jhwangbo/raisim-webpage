@@ -6,23 +6,21 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RaisimPy &mdash; raisim 2.4.4 documentation</title>
+  <title>RaisimPy &mdash; raisim 2.4.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=a5c4661c" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=68f46a9b" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=b1e24531"></script>
+      <script src="../_static/documentation_options.js?v=159ac128"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script src="../_static/tabs.js?v=3030b3cb"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="RaisimMatlab Introduction" href="RaiSimMatlab.html" />
+    <link rel="next" title="RaisimMatlab" href="RaiSimMatlab.html" />
     <link rel="prev" title="RaisimGymTorch" href="RaisimGymTorch.html" /> 
 </head>
 
@@ -90,8 +88,13 @@
 <li class="toctree-l1"><a class="reference internal" href="RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimEngine2.html">RaiSim Engine 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">RaisimPy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">RaisimPy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#build">Build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#activation-and-minimal-use">Activation And Minimal Use</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#examples-and-api-coverage">Examples And API Coverage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab</a></li>
 <li class="toctree-l1"><a class="reference internal" href="LegacyIntegrations.html">Legacy Integrations</a></li>
 </ul>
 
@@ -120,113 +123,70 @@
              
   <section id="raisimpy">
 <h1>RaisimPy<a class="headerlink" href="#raisimpy" title="Link to this heading"></a></h1>
-<p>RaisimPy is a nearly complete Python wrapper for RaiSim.
-It was initiated by Brian Delhaisse and now RaiSim Tech Inc. is continuing development.
-RaisimPy is distributed under the MIT license (but it depends on RaiSim).
-The installation instructions are given <a class="reference external" href="https://raisim.com/sections/Installation.html">here</a>.</p>
-<p>The syntax of raisimPy is nearly identical to that of the C++ API except that it takes numpy arrays instead of Eigen vectors.
-Therefore, we do not provide separate documentation for the Python API.</p>
-<p>You can check the difference between RaiSim C++ and RaiSimPy in the following example.</p>
-<div class="sphinx-tabs docutils container">
-<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-Qysr" aria-selected="true" class="sphinx-tabs-tab group-tab" id="tab-0-Qysr" name="Qysr" role="tab" tabindex="0">C++</button><button aria-controls="panel-0-UHl0aG9u" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-0-UHl0aG9u" name="UHl0aG9u" role="tab" tabindex="-1">Python</button></div><div aria-labelledby="tab-0-Qysr" class="sphinx-tabs-panel group-tab" id="panel-0-Qysr" name="Qysr" role="tabpanel" tabindex="0"><div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;raisim/World.hpp&quot;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;raisim/RaisimServer.hpp&quot;</span>
-
-<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">binaryPath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">Path</span><span class="o">::</span><span class="n">setFromArgv</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
-<span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">::</span><span class="n">setActivationKey</span><span class="p">(</span><span class="n">binaryPath</span><span class="p">.</span><span class="n">getDirectory</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;</span><span class="se">\\</span><span class="s">rsc</span><span class="se">\\</span><span class="s">activation.raisim&quot;</span><span class="p">);</span>
-
-<span class="w">  </span><span class="c1">/// create raisim world</span>
-<span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
-
-<span class="w">  </span><span class="c1">/// create objects</span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">ground</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addGround</span><span class="p">();</span>
-
-<span class="w">  </span><span class="c1">/// launch raisim server</span>
-<span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">RaisimServer</span><span class="w"> </span><span class="n">server</span><span class="p">(</span><span class="o">&amp;</span><span class="n">world</span><span class="p">);</span>
-<span class="w">  </span><span class="n">server</span><span class="p">.</span><span class="n">launchServer</span><span class="p">();</span>
-
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">visSphere</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">server</span><span class="p">.</span><span class="n">addVisualSphere</span><span class="p">(</span><span class="s">&quot;v_sphere&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">visBox</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">server</span><span class="p">.</span><span class="n">addVisualBox</span><span class="p">(</span><span class="s">&quot;v_box&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">visCylinder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">server</span><span class="p">.</span><span class="n">addVisualCylinder</span><span class="p">(</span><span class="s">&quot;v_cylinder&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">visCapsule</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">server</span><span class="p">.</span><span class="n">addVisualCapsule</span><span class="p">(</span><span class="s">&quot;v_capsule&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">anymalB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">server</span><span class="p">.</span><span class="n">addVisualArticulatedSystem</span><span class="p">(</span><span class="s">&quot;v_anymal&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">binaryPath</span><span class="p">.</span><span class="n">getDirectory</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;</span><span class="se">\\</span><span class="s">rsc</span><span class="se">\\</span><span class="s">anymal</span><span class="se">\\</span><span class="s">urdf</span><span class="se">\\</span><span class="s">anymal.urdf&quot;</span><span class="p">);</span>
-
-<span class="w">  </span><span class="n">visSphere</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
-<span class="w">  </span><span class="n">visCylinder</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
-<span class="w">  </span><span class="n">visCapsule</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
-<span class="w">  </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="n">gc</span><span class="p">(</span><span class="mi">19</span><span class="p">);</span>
-<span class="w">  </span><span class="n">gc</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.54</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.03</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.8</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.03</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.8</span><span class="p">,</span><span class="w"> </span><span class="mf">0.03</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.4</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.03</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.4</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">;</span>
-<span class="w">  </span><span class="n">anymalB</span><span class="o">-&gt;</span><span class="n">setGeneralizedCoordinate</span><span class="p">(</span><span class="n">gc</span><span class="p">);</span>
-<span class="w">  </span><span class="n">anymalB</span><span class="o">-&gt;</span><span class="n">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.5</span><span class="p">};</span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">lines</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">server</span><span class="p">.</span><span class="n">addVisualPolyLine</span><span class="p">(</span><span class="s">&quot;lines&quot;</span><span class="p">);</span>
-<span class="w">  </span><span class="n">lines</span><span class="o">-&gt;</span><span class="n">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">};</span>
-
-<span class="w">  </span><span class="k">for</span><span class="p">(</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span>
-<span class="w">    </span><span class="n">lines</span><span class="o">-&gt;</span><span class="n">points</span><span class="p">.</span><span class="n">push_back</span><span class="p">({</span><span class="n">sin</span><span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="mf">0.1</span><span class="p">),</span><span class="w"> </span><span class="n">cos</span><span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="mf">0.1</span><span class="p">),</span><span class="w"> </span><span class="n">i</span><span class="o">*</span><span class="mf">0.01</span><span class="p">});</span>
-
-<span class="w">  </span><span class="kt">size_t</span><span class="w"> </span><span class="n">counter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">counter</span><span class="o">++</span><span class="p">;</span>
-<span class="w">    </span><span class="n">visBox</span><span class="o">-&gt;</span><span class="n">color</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">double</span><span class="p">((</span><span class="n">counter</span><span class="p">)</span><span class="o">%</span><span class="mi">255</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mf">256.</span><span class="p">;</span>
-<span class="w">    </span><span class="n">visBox</span><span class="o">-&gt;</span><span class="n">setBoxSize</span><span class="p">(</span><span class="kt">double</span><span class="p">((</span><span class="n">counter</span><span class="p">)</span><span class="o">%</span><span class="mi">255</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mf">256.</span><span class="o">+</span><span class="mf">0.01</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
-<span class="w">    </span><span class="n">visSphere</span><span class="o">-&gt;</span><span class="n">color</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">double</span><span class="p">((</span><span class="n">counter</span><span class="p">)</span><span class="o">%</span><span class="mi">255</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mf">256.</span><span class="p">;</span>
-<span class="w">    </span><span class="n">raisim</span><span class="o">::</span><span class="n">MSLEEP</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
-
-<span class="w">    </span><span class="n">lines</span><span class="o">-&gt;</span><span class="n">color</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">double</span><span class="p">((</span><span class="n">counter</span><span class="p">)</span><span class="o">%</span><span class="mi">255</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mf">256.</span><span class="p">;</span>
-<span class="w">    </span><span class="n">lines</span><span class="o">-&gt;</span><span class="n">color</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">lines</span><span class="o">-&gt;</span><span class="n">color</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
-<span class="c1">//    server.integrateWorldThreadSafe();</span>
-<span class="w">  </span><span class="p">}</span>
-
-<span class="w">  </span><span class="n">server</span><span class="p">.</span><span class="n">killServer</span><span class="p">();</span>
-<span class="p">}</span>
+<p>RaisimPy is the nanobind-based Python wrapper built from the public
+<code class="docutils literal notranslate"><span class="pre">raisim2Lib/raisimPy</span></code> sources. It follows the C++ RaiSim API closely while
+using NumPy arrays for vectors and matrices. The wrapper sources are MIT
+licensed; the RaiSim binary they use remains subject to the RaiSim license.</p>
+<section id="build">
+<h2>Build<a class="headerlink" href="#build" title="Link to this heading"></a></h2>
+<p>Build the wrapper with the same Python interpreter that will import it:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/path/to/raisim2Lib
+<span class="nb">source</span><span class="w"> </span>./raisim_env.sh
+cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build-py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-DRAISIM_EXAMPLE<span class="o">=</span>OFF<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-DRAISIM_PY<span class="o">=</span>ON<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-DPython_EXECUTABLE<span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>python<span class="k">)</span><span class="s2">&quot;</span>
+cmake<span class="w"> </span>--build<span class="w"> </span>build-py<span class="w"> </span>--parallel<span class="w"> </span><span class="m">12</span>
 </pre></div>
 </div>
-</div><div aria-labelledby="tab-0-UHl0aG9u" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-0-UHl0aG9u" name="UHl0aG9u" role="tabpanel" tabindex="0"><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">raisimpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">raisim</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<p>On Linux and macOS, the extension is emitted under <code class="docutils literal notranslate"><span class="pre">build-py/raisimPy</span></code>. Run
+an example directly from the build tree with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">PYTHONPATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PWD</span><span class="s2">/build-py/raisimPy</span><span class="si">${</span><span class="nv">PYTHONPATH</span><span class="p">:+:</span><span class="nv">$PYTHONPATH</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>python<span class="w"> </span>raisimPy/examples/robots.py
+</pre></div>
+</div>
+<p>On Windows, select the intended configuration explicitly with
+<code class="docutils literal notranslate"><span class="pre">cmake</span> <span class="pre">--build</span> <span class="pre">build-py</span> <span class="pre">--config</span> <span class="pre">Release</span> <span class="pre">--parallel</span> <span class="pre">12</span></code> and add the directory
+containing <code class="docutils literal notranslate"><span class="pre">raisimpy.pyd</span></code> to <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code>. Use the same Debug/Release
+configuration as the imported RaiSim binary selected by CMake.</p>
+</section>
+<section id="activation-and-minimal-use">
+<h2>Activation And Minimal Use<a class="headerlink" href="#activation-and-minimal-use" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">World.setActivationKey</span></code> is the preferred spelling. <code class="docutils literal notranslate"><span class="pre">World.setLicenseFile</span></code>
+remains as a compatibility alias.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">raisimpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">raisim</span>
 
-<span class="n">raisim</span><span class="o">.</span><span class="n">World</span><span class="o">.</span><span class="n">setLicenseFile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;/../../rsc/activation.raisim&quot;</span><span class="p">)</span>
+<span class="n">raisim</span><span class="o">.</span><span class="n">World</span><span class="o">.</span><span class="n">setActivationKey</span><span class="p">(</span><span class="s2">&quot;/absolute/path/to/activation.raisim&quot;</span><span class="p">)</span>
+
 <span class="n">world</span> <span class="o">=</span> <span class="n">raisim</span><span class="o">.</span><span class="n">World</span><span class="p">()</span>
-<span class="n">ground</span> <span class="o">=</span> <span class="n">world</span><span class="o">.</span><span class="n">addGround</span><span class="p">()</span>
+<span class="n">world</span><span class="o">.</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
+<span class="n">world</span><span class="o">.</span><span class="n">addGround</span><span class="p">()</span>
+<span class="n">ball</span> <span class="o">=</span> <span class="n">world</span><span class="o">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="n">ball</span><span class="o">.</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
 
-<span class="c1"># launch raisim server</span>
 <span class="n">server</span> <span class="o">=</span> <span class="n">raisim</span><span class="o">.</span><span class="n">RaisimServer</span><span class="p">(</span><span class="n">world</span><span class="p">)</span>
 <span class="n">server</span><span class="o">.</span><span class="n">launchServer</span><span class="p">(</span><span class="mi">8080</span><span class="p">)</span>
-
-<span class="n">visSphere</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">addVisualSphere</span><span class="p">(</span><span class="s2">&quot;v_sphere&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">visBox</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">addVisualBox</span><span class="p">(</span><span class="s2">&quot;v_box&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">visCylinder</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">addVisualCylinder</span><span class="p">(</span><span class="s2">&quot;v_cylinder&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">visCapsule</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">addVisualCapsule</span><span class="p">(</span><span class="s2">&quot;v_capsule&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">laikago</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">addVisualArticulatedSystem</span><span class="p">(</span><span class="s2">&quot;v_laikago&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;/../../rsc/laikago/laikago.urdf&quot;</span><span class="p">)</span>
-<span class="n">laikago</span><span class="o">.</span><span class="n">setGeneralizedCoordinate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">3.54</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.03</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]))</span>
-<span class="n">laikago</span><span class="o">.</span><span class="n">setColor</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
-
-<span class="n">visSphere</span><span class="o">.</span><span class="n">setPosition</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
-<span class="n">visCylinder</span><span class="o">.</span><span class="n">setPosition</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
-<span class="n">visCapsule</span><span class="o">.</span><span class="n">setPosition</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
-
-<span class="n">lines</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">addVisualPolyLine</span><span class="p">(</span><span class="s2">&quot;lines&quot;</span><span class="p">)</span>
-<span class="n">lines</span><span class="o">.</span><span class="n">setColor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">):</span>
-    <span class="n">lines</span><span class="o">.</span><span class="n">addPoint</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">),</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">),</span> <span class="n">i</span> <span class="o">*</span> <span class="mf">0.01</span><span class="p">]))</span>
-
-<span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
-
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">500000</span><span class="p">):</span>
-    <span class="n">counter</span> <span class="o">=</span> <span class="n">counter</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="n">visBox</span><span class="o">.</span><span class="n">setColor</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">counter</span> <span class="o">%</span> <span class="mi">255</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">256.</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">visSphere</span><span class="o">.</span><span class="n">setColor</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">counter</span> <span class="o">%</span> <span class="mi">255</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">256.</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">lines</span><span class="o">.</span><span class="n">setColor</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">counter</span> <span class="o">%</span> <span class="mi">255</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">256.</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">counter</span> <span class="o">%</span> <span class="mi">255</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">256.</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">visBox</span><span class="o">.</span><span class="n">setBoxSize</span><span class="p">((</span><span class="n">counter</span> <span class="o">%</span> <span class="mi">255</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">256.</span> <span class="o">+</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">world</span><span class="o">.</span><span class="n">getTimeStep</span><span class="p">())</span>
-
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10_000</span><span class="p">):</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">integrateWorldThreadSafe</span><span class="p">()</span>
 <span class="n">server</span><span class="o">.</span><span class="n">killServer</span><span class="p">()</span>
 </pre></div>
 </div>
-</div></div>
+<p>Start <code class="docutils literal notranslate"><span class="pre">rayrai/bin/rayrai_raisim_tcp_viewer</span></code> in another terminal to view this
+server-based example.</p>
+</section>
+<section id="examples-and-api-coverage">
+<h2>Examples And API Coverage<a class="headerlink" href="#examples-and-api-coverage" title="Link to this heading"></a></h2>
+<p>The current examples under <code class="docutils literal notranslate"><span class="pre">raisimPy/examples</span></code> cover articulated robots,
+heightmaps, constraints, charts, point clouds, instanced visuals, dynamic
+visual meshes, and server-side visual objects. The Python method names normally
+match C++, but the binding surface is defined by the files under
+<code class="docutils literal notranslate"><span class="pre">raisimPy/src</span></code>; a C++ method that is not bound there is not automatically
+available in Python.</p>
+<p>NumPy arrays passed to pose, state, force, and geometry methods must have the
+shape and dtype expected by that binding. Keep referenced RaiSim objects alive
+for as long as Python wrappers returned by the world or server are in use.</p>
+</section>
 </section>
 
 
@@ -234,7 +194,7 @@ Therefore, we do not provide separate documentation for the Python API.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="RaisimGymTorch.html" class="btn btn-neutral float-left" title="RaisimGymTorch" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="RaiSimMatlab.html" class="btn btn-neutral float-right" title="RaisimMatlab Introduction" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="RaiSimMatlab.html" class="btn btn-neutral float-right" title="RaisimMatlab" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -438,7 +438,7 @@ After a simulation loop, you can call ``raisim::ArticulatedSystem::getForceAtJoi
 
 Assuming that there are no joint position/velocity limit forces acting at the joint, you can compute the joint actuation as a dot product of the joint axis and the joint torque.
 The current articulated examples, such as ``anymal_pair`` and ``atlas``, show
-the current source layout for loading and stepping articulated systems.
+the public example workflow for loading and stepping articulated systems.
 
 PD Controller
 =============================

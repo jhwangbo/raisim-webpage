@@ -11,20 +11,20 @@ Use this example when preparing mesh assets for simulation. The mesh processing
 is intentionally done by the RaiSim asset APIs so application code only calls
 ``preprocessMesh``, ``addMesh``, and export helpers.
 
-Binary
+Target
 ======
-Installed executable: ``model_asset_pipeline``.
+CMake target: ``model_asset_pipeline``.
 
 This example is only built when the installed RaiSim package exposes
 ``raisim::Mesh::preprocessMesh`` and ``World::exportMeshAssetsToObj``.
 
 Run
 ===
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/model_asset_pipeline
+   ./build-examples/examples/model_asset_pipeline
 
 On Windows, run ``model_asset_pipeline.exe`` instead.
 This example is non-visual and prints the generated asset paths.

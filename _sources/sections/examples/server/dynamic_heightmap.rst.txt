@@ -13,17 +13,17 @@ Screenshot
    :alt: dynamic_heightmap example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``dynamic_heightmap``.
+CMake target: ``dynamic_heightmap``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/dynamic_heightmap
+   ./build-examples/examples/dynamic_heightmap
 
 On Windows, run ``dynamic_heightmap.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

@@ -12,17 +12,17 @@ Screenshot
    :alt: ray_scan_lidar example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``ray_scan_lidar``.
+CMake target: ``ray_scan_lidar``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/ray_scan_lidar
+   ./build-examples/examples/ray_scan_lidar
 
 On Windows, run ``ray_scan_lidar.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

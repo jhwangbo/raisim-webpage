@@ -12,17 +12,17 @@ Screenshot
    :alt: dzhanibekov_effect example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``dzhanibekov_effect``.
+CMake target: ``dzhanibekov_effect``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/dzhanibekov_effect
+   ./build-examples/examples/dzhanibekov_effect
 
 On Windows, run ``dzhanibekov_effect.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

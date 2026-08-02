@@ -96,13 +96,13 @@ brought in with ``importSceneLights(sceneFile, intensityScale)``, and
 ``promoteDominantAdditionalLightToMainShadowCaster()`` reassigns the strongest imported
 light to the main shadow path so the remaining shadow budget covers the rest.
 
-The main ``raisin::Light`` (returned by ``RayraiWindow::getLight()`` /
-``getMainLight()``) exposes ergonomic helpers for spotlight angles and point-light
+The main ``raisin::Light`` returned by ``RayraiWindow::getLight()`` exposes
+ergonomic helpers for spotlight angles and point-light
 range so callers do not have to set raw cosine/attenuation fields by hand:
 
 .. code-block:: cpp
 
-    auto& main = viewer.getMainLight();
+    auto& main = viewer.getLight();
     main.setSpotAngles(/*innerDeg=*/14.0f, /*outerDeg=*/28.0f);
     main.setRange(/*rangeMeters=*/12.0f);  // picks constant/linear/quadratic so
                                            // intensity ~1% at 12m, and sets

@@ -12,17 +12,17 @@ Screenshot
    :alt: rayrai_rgb_camera example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``rayrai_rgb_camera``.
+CMake target: ``rayrai_rgb_camera``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/rayrai_rgb_camera
+   ./build-examples/examples/rayrai_rgb_camera
 
 On Windows, run ``rayrai_rgb_camera.exe`` instead.
 This example uses the in-process rayrai renderer (no external client required).

@@ -163,9 +163,9 @@ The internal ``update`` call drives camera input and picking:
     // Cursor is in framebuffer coordinates of the render area
     viewer.update(width, height, isHovered, cursorX, cursorY, shouldClick);
 
-For explicit picking against any camera (typically the same one used to render
-the visible frame), call ``pickWithExternalCamera`` with the framebuffer
-pixel coordinates. A return value of ``0`` means nothing was hit:
+For custom visuals under the internal camera, ``pickTargetVisualAt`` resolves
+the pick id and returns the public ``Visuals*`` directly. A null pointer means
+nothing was hit:
 
 .. code-block:: cpp
 
@@ -177,16 +177,17 @@ pixel coordinates. A return value of ``0`` means nothing was hit:
       int fbX = static_cast<int>(pos.x - origin.x);
       int fbY = static_cast<int>(pos.y - origin.y);
 
-      uint32_t encoded = viewer.pickWithExternalCamera(viewer.getCamera(),
-                                                       fbX, fbY);
-      if (encoded != 0) {
-        // The encoded id is `RaisimObject::encodeId` / decode with the
-        // matching renderer helpers; for visuals you can look up by name in
-        // your own registry, or use the renderer's ``findVisualById`` /
-        // ``findObjectById`` accessors.
-        std::printf("picked id = %u\n", encoded);
+      if (auto* visual = viewer.pickTargetVisualAt(fbX, fbY)) {
+        viewer.setTargetVisual(visual);
       }
     }
+
+For an explicit camera, ``pickWithExternalCamera`` returns the encoded
+selection value (``0`` for no hit). The current public API does not expose an
+encoded-id-to-object lookup. Treat that value as opaque and maintain an
+application-side registry when external-camera picks must be correlated with
+application entities. Known custom visuals can still be retrieved by name with
+``getVisualObject(name)``.
 
 Picking renders a dedicated selection pass with a flat shader, so it is
 roughly as cheap as one MSAA-off pass of the scene. Use it on click events,
@@ -321,44 +322,43 @@ Async loading keeps the frame loop responsive on first import. The flag has
 no effect for assets that are already cached through
 ``RayraiGlobalAsset``.
 
-Heightmap visual textures
-=========================
-Heightmap visuals can carry application-specific color textures, overriding
-the default pattern resource for one heightmap at a time. Use
-``setHeightmapPatternResourcePath`` for a global override or
-``setHeightmapColorTextureOverride(name, width, height, rgb)`` for a per-name
-override that takes a contiguous RGB byte buffer. Patch updates are supported
-through ``updateHeightmapColorTextureOverridePatch`` (specify a min/max range
-in grid coordinates) so streaming visualizations can refresh dirty regions
-without re-uploading the full texture. Clear with
-``clearHeightmapColorTextureOverride(name)``.
+Heightmap appearance and streaming updates
+==========================================
+
+``setHeightmapPatternResourcePath`` applies one tiled albedo texture to every
+heightmap in the viewer. The matching
+``setHeightmapNormalResourcePath`` and ``setHeightmapHeightResourcePath``
+methods provide global normal and height/parallax textures. Passing an empty
+path clears the corresponding resource.
+
+Per-heightmap data is authored on ``raisim::HeightMap`` itself. Use
+``setColor`` for a full RGB color map, ``setColorPatch`` for a rectangular
+color patch after the full map has been initialized, and
+``updateVisualHeightPatch`` for a visualization-only height update. These
+updates are synchronized into the mirrored rayrai heightmap; they do not create
+a renderer-owned per-name texture override.
 
 .. code-block:: cpp
 
     auto* terrain = world->addHeightMap(/*sample_x=*/256, /*sample_y=*/256,
                                         /*size_x=*/40.0, /*size_y=*/40.0,
                                         /*centerX=*/0.0, /*centerY=*/0.0, heights);
-    terrain->setName("procedural_terrain");
+    viewer.setHeightmapPatternResourcePath("/path/to/terrain_albedo.png");
+    viewer.setHeightmapNormalResourcePath("/path/to/terrain_normal.png");
 
-    // Initial full-resolution colour upload (e.g. semantic class colour map).
-    const int W = 256, H = 256;
-    std::vector<unsigned char> rgb(W * H * 3);
-    fillSemanticColours(rgb.data(), W, H);
-    viewer.setHeightmapColorTextureOverride("procedural_terrain", W, H, rgb.data());
+    // Initialize one RGB value per height sample.
+    std::vector<raisim::ColorRGB> colors(256 * 256, {90, 130, 70});
+    terrain->setColor(colors);
 
-    // Later, after the simulation marked a 40×40 cell patch as dirty:
-    for (int y = dirtyMinY; y <= dirtyMaxY; ++y) {
-      for (int x = dirtyMinX; x <= dirtyMaxX; ++x) {
-        size_t idx = (y * W + x) * 3;
-        std::tie(rgb[idx], rgb[idx + 1], rgb[idx + 2]) = classColour(grid[y][x]);
-      }
+    // Patch bounds are inclusive; the patch vector is tightly packed.
+    constexpr size_t minX = 20, maxX = 59;
+    constexpr size_t minY = 30, maxY = 69;
+    std::vector<raisim::ColorRGB> patch(
+        (maxX - minX + 1) * (maxY - minY + 1), {210, 170, 70});
+    if (!terrain->setColorPatch(patch, minX, maxX, minY, maxY)) {
+      // Invalid bounds, patch size, or no initialized full color map.
     }
-    viewer.updateHeightmapColorTextureOverridePatch(
-        "procedural_terrain",
-        /*minX=*/dirtyMinX, /*maxX=*/dirtyMaxX,
-        /*minY=*/dirtyMinY, /*maxY=*/dirtyMaxY,
-        rgb.data());
 
-    // Clean up when the heightmap is destroyed.
-    viewer.clearHeightmapColorTextureOverride("procedural_terrain");
-
+``updateVisualHeightPatch`` also takes inclusive bounds, but its height input is
+the full row-major height array; only the requested region is copied. Call
+``update(...)`` instead when physics collision heights must change too.

@@ -17,17 +17,17 @@ headlessly) is regenerated as part of the documentation build:
    :alt: rolling and spinning friction demo — spheres and cylinders settling on a checkered ground
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``rayrai_rolling_spinning_friction``.
+CMake target: ``rayrai_rolling_spinning_friction``.
 
 Run
 ====
-Run the installed executable directly:
+Run the build-tree executable directly:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/rayrai_rolling_spinning_friction
+   ./build-examples/examples/rayrai_rolling_spinning_friction
 
 On Windows, use ``rayrai_rolling_spinning_friction.exe``. The example uses
 the in-process rayrai renderer and does not need a TCP viewer.
@@ -137,7 +137,7 @@ What to look for
 
 Full source
 ===========
-This is the complete example source, identical to the installed binary:
+This is the complete source used by the build-tree target:
 
 .. literalinclude:: ../../../../examples/src/rayrai/dynamics/rayrai_rolling_spinning_friction.cpp
    :language: cpp

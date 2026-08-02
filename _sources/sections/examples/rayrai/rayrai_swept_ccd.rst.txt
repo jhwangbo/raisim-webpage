@@ -15,20 +15,20 @@ ground with a deliberately large simulation time step.
 Use this example when tuning high-speed primitive contacts. It demonstrates the
 settings needed to reduce tunneling for supported swept CCD pairs.
 
-Binary
+Target
 ======
-Installed executable: ``rayrai_swept_ccd``.
+CMake target: ``rayrai_swept_ccd``.
 
 This example is only built when the installed RaiSim package exposes swept CCD
 settings in ``contact::ContactSettings``.
 
 Run
 ===
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/rayrai_swept_ccd
+   ./build-examples/examples/rayrai_swept_ccd
 
 On Windows, run ``rayrai_swept_ccd.exe`` instead.
 This example uses the in-process rayrai renderer.

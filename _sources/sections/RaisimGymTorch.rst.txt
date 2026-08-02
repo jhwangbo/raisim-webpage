@@ -83,7 +83,8 @@ To build the debug app, build your environment with
 
     python setup.py develop --Debug
 
-Then, the debug executable is created next to your pybind11 package (``raisimGymTorch/raisimGymTorch/env/bin``).
+Then, the debug executable is created next to your nanobind package
+(``raisimGymTorch/raisimGymTorch/env/bin``).
 If you use CLion (recommended), open the raisimGymTorch directory in CLion.
 It will automatically add the debug app executable.
 It provides a convenient GUI for debugging.
@@ -92,7 +93,7 @@ You can run the debug app as:
 
 .. code-block:: bash
 
-    ./debug_app_<environment name> <full path to rsc directory> <full path to the cfg file>
+    ./<environment name>_debug_app <full path to rsc directory> <full path to the cfg file>
 
 or add the arguments to the CLion run configuration.
 
@@ -101,7 +102,8 @@ Visual Studio compiled executables will not work if it links against a library b
 
 How does it work?
 =============================
-RaisimGymTorch wraps a C++ environment (i.e., ENVIRONMENT.hpp) as a Python library using pybind11.
+RaisimGymTorch wraps a C++ environment (i.e., ``Environment.hpp``) as a Python
+library using nanobind.
 When you call ``python3 setup.py develop``, all environments under ``raisimGymTorch/raisimGymTorch/env/envs`` are compiled.
 The compiled libraries are stored in ``raisimGymTorch/raisimGymTorch/env/bin``.
 
@@ -113,15 +115,18 @@ Your launch file (e.g., ``runner.py``) can be customized as needed.
 
 How to add a custom environment?
 ===================================
-You can copy ``raisimGymTorch/raisimGymTorch`` to another location.
-Delete the temporary directories ``build`` and ``raisim_gym_torch.egg-info`` (created when you run ``python setup.py develop``).
-To build in another directory, point CMake to RaiSim:
+Keep the top-level ``raisimGymTorch`` directory beside the current flat
+``raisim`` and ``rayrai`` package directories. Its CMake project discovers
+those sibling prefixes directly. After adding or copying an environment under
+``raisimGymTorch/raisimGymTorch/env/envs``, rebuild with:
 
 .. code-block:: bash
 
-    python setup.py develop --CMAKE_PREFIX_PATH <WHERE-YOU-HAVE-RAISIM>/raisim/<OS>
+    cd /path/to/raisim2Lib/raisimGymTorch
+    python setup.py develop
 
-Everything will work without further steps.
+Delete generated ``build`` and ``raisim_gym_torch.egg-info`` directories before
+a clean rebuild when changing Python interpreters or build configurations.
 However, if you want to keep multiple environments, you may want to rename a few items.
 
  * Package name: You can find it in ``setup.py`` (``name='raisim_gym_torch'``). This is the name you will find in ``site_packages`` directory of your anaconda environment.
@@ -140,7 +145,7 @@ If ``RaisimGymEnv`` is not general enough for you, you can also make ``ENVIRONME
 ``RaisimGymEnv`` is wrapped by ``VectorizedEnvironment``, which parallelizes the environment using OpenMP when OpenMP is available.
 You can consider it similar to ``VectorEnv`` in OpenAI Baselines, but RaisimGym parallelization happens in C++, which makes it orders of magnitude faster.
 
-``raisim_gym.cpp`` is a pybind11 wrapper for ``VectorizedEnvironment``.
+``raisim_gym.cpp`` is a nanobind wrapper for ``VectorizedEnvironment``.
 It defines the interface functions.
 
 Finally, ``RaisimGymVecEnv`` is a Python class that wraps a Python library created from ``raisim_gym.cpp``.

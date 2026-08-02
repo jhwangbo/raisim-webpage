@@ -6,17 +6,17 @@ Overview
 ========
 Stress-tests object lifecycle by creating many primitives, simulating briefly, and then removing them in a loop.
 
-Binary
+Target
 ======
-Installed executable: ``object_lifecycle_stress``.
+CMake target: ``object_lifecycle_stress``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/object_lifecycle_stress
+   ./build-examples/examples/object_lifecycle_stress
 
 On Windows, run ``object_lifecycle_stress.exe`` instead.
 This example runs headless and does not use RaisimServer.

@@ -12,17 +12,17 @@ Screenshot
    :alt: dynamic_object_addition example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``dynamic_object_addition``.
+CMake target: ``dynamic_object_addition``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/dynamic_object_addition
+   ./build-examples/examples/dynamic_object_addition
 
 On Windows, run ``dynamic_object_addition.exe`` instead.
 This example uses RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

@@ -14,7 +14,7 @@ Run:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/rayrai_visual_asset_support
+   ./build-examples/examples/rayrai_visual_asset_support
 
 This example opens an in-process rayrai window and does not require the TCP
 viewer.

@@ -7,11 +7,13 @@ Height Map Using Raw Values
 XML approach
 -----------------------------
 
-Run the example with:
+The matching asset is
+``rsc/xmlScripts/heightMaps/heightMapUsingRawValues.xml``. Load it through the
+world configuration constructor in your application:
 
-.. code-block:: bash
+.. code-block:: cpp
 
-    ./xmlReader <PATH_TO_RAISIMLIB>/rsc/xmlScripts/heightMaps/heightMapUsingRawValues.xml
+    raisim::World world("/path/to/raisim2Lib/rsc/xmlScripts/heightMaps/heightMapUsingRawValues.xml");
 
 The XML file is constructed as follows:
 
@@ -46,7 +48,10 @@ C++ approach
 
 .. code-block:: cpp
 
-  std::vector height = {1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0.5, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1};
-  auto heightMap = world.addHeightMap(5, 5, 10, 10, 0, 0, height);
+  std::vector<double> height = {
+    1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0.5, 0,
+    0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1
+  };
+  auto* heightMap = world.addHeightMap(5, 5, 10, 10, 0, 0, height);
 
 

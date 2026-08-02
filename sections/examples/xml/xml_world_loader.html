@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>XML Example: World Loader &mdash; raisim 2.4.4 documentation</title>
+  <title>XML Example: World Loader &mdash; raisim 2.4.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=68f46a9b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=b1e24531"></script>
+      <script src="../../../_static/documentation_options.js?v=159ac128"></script>
       <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -65,7 +65,7 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">XML Example: World Loader</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#overview">Overview</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#screenshot">Screenshot</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#binary">Binary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#target">Target</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#run">Run</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#details">Details</a></li>
 </ul>
@@ -113,7 +113,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../RaisimEngine2.html">RaiSim Engine 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../RaiSimPy.html">RaisimPy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../RaiSimMatlab.html">RaisimMatlab</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../LegacyIntegrations.html">Legacy Integrations</a></li>
 </ul>
 
@@ -145,33 +145,43 @@
 <h1>XML Example: World Loader<a class="headerlink" href="#xml-example-world-loader" title="Link to this heading"></a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
-<p>Loads a world directly from an XML file passed on the command line and runs a RaisimServer session. It also records a video, making it a reference for XML-driven scene loading and logging.</p>
+<p>Provides a small editable source template for loading a world XML file and
+running a <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> session. It is not a generic command-line XML
+loader: the shipped public example keeps its <code class="docutils literal notranslate"><span class="pre">xmlScript</span></code> constant empty and exits
+after printing an instruction.</p>
 </section>
 <section id="screenshot">
 <h2>Screenshot<a class="headerlink" href="#screenshot" title="Link to this heading"></a></h2>
 <img alt="../../../_images/heightMapUsingPNG.gif" src="../../../_images/heightMapUsingPNG.gif" />
 </section>
-<section id="binary">
-<h2>Binary<a class="headerlink" href="#binary" title="Link to this heading"></a></h2>
-<p>Installed executable: <code class="docutils literal notranslate"><span class="pre">xml_world_loader</span></code>.</p>
+<section id="target">
+<h2>Target<a class="headerlink" href="#target" title="Link to this heading"></a></h2>
+<p>CMake target: <code class="docutils literal notranslate"><span class="pre">xml_world_loader</span></code>.</p>
 </section>
 <section id="run">
 <h2>Run<a class="headerlink" href="#run" title="Link to this heading"></a></h2>
-<p>Run the installed executable:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/xml_world_loader<span class="w"> </span>/full/path/to/world.xml
+<p>To use the template, set <code class="docutils literal notranslate"><span class="pre">xmlScript</span></code> in
+<code class="docutils literal notranslate"><span class="pre">examples/src/xml/xml_world_loader.cpp</span></code> to a path relative to
+<code class="docutils literal notranslate"><span class="pre">rsc/xmlScripts</span></code>, rebuild the target, and run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>--build<span class="w"> </span>build-examples<span class="w"> </span>--target<span class="w"> </span>xml_world_loader<span class="w"> </span>--parallel<span class="w"> </span><span class="m">12</span>
+./build-examples/examples/xml_world_loader
 </pre></div>
 </div>
 <p>On Windows, run <code class="docutils literal notranslate"><span class="pre">xml_world_loader.exe</span></code> instead.
-The XML loader expects an absolute path to the world file.
 This example uses RaisimServer. Start <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> and connect to port 8080.</p>
 </section>
 <section id="details">
 <h2>Details<a class="headerlink" href="#details" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Loads a world directly from an XML path provided on the command line.</p></li>
-<li><p>Starts RaisimServer and records a video output file.</p></li>
-<li><p>Useful as a reference for XML-driven world creation.</p></li>
+<li><p>Resolves the selected file below the copied <code class="docutils literal notranslate"><span class="pre">rsc/xmlScripts</span></code> directory.</p></li>
+<li><p>Constructs <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> from that XML path and publishes it through
+<code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code>.</p></li>
+<li><p>Does not parse command-line arguments or record video in the shipped example.</p></li>
 </ul>
+<p>For application code that already has a path, construct the world directly:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">(</span><span class="s">&quot;/absolute/path/to/world.xml&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
 </section>
 </section>
 

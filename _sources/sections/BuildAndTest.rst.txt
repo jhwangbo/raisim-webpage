@@ -22,7 +22,8 @@ Common CMake options
    * - ``RAISIM_PY``
      - Build the Python wrapper.
    * - ``RAISIM_MATLAB``
-     - Build the MATLAB wrapper.
+     - Reserved compatibility option. The current public workspace does not
+       add a MATLAB wrapper subdirectory or build target.
    * - ``RAISIM_DOC``
      - Build documentation through CMake.
 
@@ -34,10 +35,10 @@ Build the package workspace with examples enabled:
 .. code-block:: bash
 
     cd /path/to/raisim2Lib
-    cmake -S . -B build \
+    cmake -S . -B build-examples \
       -DCMAKE_BUILD_TYPE=Release \
       -DRAISIM_EXAMPLE=ON
-    cmake --build build -j12
+    cmake --build build-examples -j12
 
 You can also build only the example CMake project against an installed RaiSim
 and rayrai package:
@@ -50,36 +51,52 @@ and rayrai package:
       -DRAYRAI_PREFIX=/path/to/rayrai
     cmake --build /tmp/raisim2lib-examples -j12
 
-Run examples from the installed package ``bin`` directory or from the example
-build directory:
+Run source-built examples from the build directory. They are not installed by
+the ``raisim2Lib`` install target:
 
 .. code-block:: bash
 
-    <raisim-install>/bin/rayrai_tcp_viewer
-    <raisim-install>/bin/primitive_grid
+    ./build-examples/examples/rayrai_tcp_viewer
+    ./build-examples/examples/primitive_grid
     /tmp/raisim2lib-examples/rayrai_tcp_viewer
     /tmp/raisim2lib-examples/primitive_grid
+
+The release package also includes the prebuilt viewer at
+``rayrai/bin/rayrai_raisim_tcp_viewer``. This is distinct from the
+``rayrai_tcp_viewer`` example target, although both provide the same viewer
+workflow.
+
+Debug and Release package variants
+==================================
+
+The current RaiSim package can contain Debug and Release libraries in one
+prefix. Its exported targets map a Debug consumer to the Debug library and
+Release, RelWithDebInfo, and MinSizeRel consumers to a non-Debug library.
+``RSDEBUG`` follows the selected binary automatically. If the prefix contains
+only one variant, every consumer configuration maps to that available variant;
+building a downstream project in Debug does not manufacture RaiSim debug
+assertions when only the Release library is installed.
 
 Timing examples
 ===============
 
 ``raisim2Lib`` includes standalone timing-oriented example executables. The
-full source-tree benchmark runner used for RaiSim release validation is not
-shipped in this binary-package workspace. Run package timing examples on one
-thread and repeat the same command several times when comparing package or scene
-changes:
+closed-source engine benchmark runner used for RaiSim release validation is not
+shipped in this public binary-package workspace. Run package timing examples on
+one thread and repeat the same command several times when comparing package or
+scene changes:
 
 .. code-block:: bash
 
-    cmake --build /tmp/raisim2lib-examples \
+    cmake --build build-examples \
       --target anymal_standing_benchmark articulated_system_benchmark \
                granular_media island_sleep_benchmark -j12
     OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
-      /tmp/raisim2lib-examples/anymal_standing_benchmark --fast
+      ./build-examples/examples/anymal_standing_benchmark --fast
     OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
-      /tmp/raisim2lib-examples/articulated_system_benchmark
+      ./build-examples/examples/articulated_system_benchmark
     OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
-      /tmp/raisim2lib-examples/island_sleep_benchmark --steps=12000
+      ./build-examples/examples/island_sleep_benchmark --steps=12000
 
 Use :doc:`Performance` for scene-level tuning guidance and for choosing a
 representative package example before changing solver settings or sensor

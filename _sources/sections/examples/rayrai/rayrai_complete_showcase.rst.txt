@@ -12,17 +12,17 @@ Screenshot
    :alt: rayrai_complete_showcase example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``rayrai_complete_showcase``.
+CMake target: ``rayrai_complete_showcase``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/rayrai_complete_showcase
+   ./build-examples/examples/rayrai_complete_showcase
 
 On Windows, run ``rayrai_complete_showcase.exe`` instead.
 This example uses the in-process rayrai renderer (no external client required).

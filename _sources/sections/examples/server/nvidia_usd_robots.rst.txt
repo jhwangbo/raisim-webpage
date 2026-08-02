@@ -19,9 +19,9 @@ The executable is generated only when CMake finds a RaiSim package with USD
 scene loading. RaiSim is expected to include OpenUSD on every supported
 architecture.
 
-Binary
+Target
 ======
-Installed executable when available: ``nvidia_usd_robots``.
+CMake target when available: ``nvidia_usd_robots``.
 
 Assets
 ======
@@ -37,7 +37,7 @@ Run the example:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/nvidia_usd_robots
+   ./build-examples/examples/nvidia_usd_robots
 
 On Windows, run ``nvidia_usd_robots.exe`` instead. This example uses
 RaisimServer. Start ``rayrai_tcp_viewer`` and connect to port 8080.

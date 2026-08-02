@@ -17,17 +17,17 @@ Screenshot
    :alt: rayrai_quality_lighting example
    :width: 100%
 
-Binary
+Target
 ======
-Installed executable: ``rayrai_quality_lighting``.
+CMake target: ``rayrai_quality_lighting``.
 
 Run
 ====
-Run the installed executable:
+Run the build-tree executable:
 
 .. code-block:: bash
 
-   <raisim-install>/bin/rayrai_quality_lighting
+   ./build-examples/examples/rayrai_quality_lighting
 
 On Windows, run ``rayrai_quality_lighting.exe`` instead. This example uses the
 in-process rayrai renderer and does not need the TCP viewer.

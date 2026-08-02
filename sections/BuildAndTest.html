@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Build, Test, and Benchmark &mdash; raisim 2.4.4 documentation</title>
+  <title>Build, Test, and Benchmark &mdash; raisim 2.4.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=68f46a9b" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=b1e24531"></script>
+      <script src="../_static/documentation_options.js?v=159ac128"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -54,6 +54,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Build, Test, and Benchmark</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#common-cmake-options">Common CMake options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#build-examples">Build examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#debug-and-release-package-variants">Debug and Release package variants</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#timing-examples">Timing examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#build-the-documentation">Build the documentation</a></li>
 </ul>
@@ -95,7 +96,7 @@
 <li class="toctree-l1"><a class="reference internal" href="RaisimEngine2.html">RaiSim Engine 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab</a></li>
 <li class="toctree-l1"><a class="reference internal" href="LegacyIntegrations.html">Legacy Integrations</a></li>
 </ul>
 
@@ -149,7 +150,8 @@ repository layout and build output paths, see <a class="reference internal" href
 <td><p>Build the Python wrapper.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RAISIM_MATLAB</span></code></p></td>
-<td><p>Build the MATLAB wrapper.</p></td>
+<td><p>Reserved compatibility option. The current public workspace does not
+add a MATLAB wrapper subdirectory or build target.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RAISIM_DOC</span></code></p></td>
 <td><p>Build documentation through CMake.</p></td>
@@ -161,10 +163,10 @@ repository layout and build output paths, see <a class="reference internal" href
 <h2>Build examples<a class="headerlink" href="#build-examples" title="Link to this heading"></a></h2>
 <p>Build the package workspace with examples enabled:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/path/to/raisim2Lib
-cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build-examples<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-DRAISIM_EXAMPLE<span class="o">=</span>ON
-cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>-j12
+cmake<span class="w"> </span>--build<span class="w"> </span>build-examples<span class="w"> </span>-j12
 </pre></div>
 </div>
 <p>You can also build only the example CMake project against an installed RaiSim
@@ -176,31 +178,45 @@ and rayrai package:</p>
 cmake<span class="w"> </span>--build<span class="w"> </span>/tmp/raisim2lib-examples<span class="w"> </span>-j12
 </pre></div>
 </div>
-<p>Run examples from the installed package <code class="docutils literal notranslate"><span class="pre">bin</span></code> directory or from the example
-build directory:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;raisim-install&gt;/bin/rayrai_tcp_viewer
-&lt;raisim-install&gt;/bin/primitive_grid
+<p>Run source-built examples from the build directory. They are not installed by
+the <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> install target:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build-examples/examples/rayrai_tcp_viewer
+./build-examples/examples/primitive_grid
 /tmp/raisim2lib-examples/rayrai_tcp_viewer
 /tmp/raisim2lib-examples/primitive_grid
 </pre></div>
 </div>
+<p>The release package also includes the prebuilt viewer at
+<code class="docutils literal notranslate"><span class="pre">rayrai/bin/rayrai_raisim_tcp_viewer</span></code>. This is distinct from the
+<code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> example target, although both provide the same viewer
+workflow.</p>
+</section>
+<section id="debug-and-release-package-variants">
+<h2>Debug and Release package variants<a class="headerlink" href="#debug-and-release-package-variants" title="Link to this heading"></a></h2>
+<p>The current RaiSim package can contain Debug and Release libraries in one
+prefix. Its exported targets map a Debug consumer to the Debug library and
+Release, RelWithDebInfo, and MinSizeRel consumers to a non-Debug library.
+<code class="docutils literal notranslate"><span class="pre">RSDEBUG</span></code> follows the selected binary automatically. If the prefix contains
+only one variant, every consumer configuration maps to that available variant;
+building a downstream project in Debug does not manufacture RaiSim debug
+assertions when only the Release library is installed.</p>
 </section>
 <section id="timing-examples">
 <h2>Timing examples<a class="headerlink" href="#timing-examples" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> includes standalone timing-oriented example executables. The
-full source-tree benchmark runner used for RaiSim release validation is not
-shipped in this binary-package workspace. Run package timing examples on one
-thread and repeat the same command several times when comparing package or scene
-changes:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>--build<span class="w"> </span>/tmp/raisim2lib-examples<span class="w"> </span><span class="se">\</span>
+closed-source engine benchmark runner used for RaiSim release validation is not
+shipped in this public binary-package workspace. Run package timing examples on
+one thread and repeat the same command several times when comparing package or
+scene changes:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>--build<span class="w"> </span>build-examples<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--target<span class="w"> </span>anymal_standing_benchmark<span class="w"> </span>articulated_system_benchmark<span class="w"> </span><span class="se">\</span>
 <span class="w">           </span>granular_media<span class="w"> </span>island_sleep_benchmark<span class="w"> </span>-j12
 <span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>/tmp/raisim2lib-examples/anymal_standing_benchmark<span class="w"> </span>--fast
+<span class="w">  </span>./build-examples/examples/anymal_standing_benchmark<span class="w"> </span>--fast
 <span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>/tmp/raisim2lib-examples/articulated_system_benchmark
+<span class="w">  </span>./build-examples/examples/articulated_system_benchmark
 <span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>/tmp/raisim2lib-examples/island_sleep_benchmark<span class="w"> </span>--steps<span class="o">=</span><span class="m">12000</span>
+<span class="w">  </span>./build-examples/examples/island_sleep_benchmark<span class="w"> </span>--steps<span class="o">=</span><span class="m">12000</span>
 </pre></div>
 </div>
 <p>Use <a class="reference internal" href="Performance.html"><span class="doc">Performance</span></a> for scene-level tuning guidance and for choosing a

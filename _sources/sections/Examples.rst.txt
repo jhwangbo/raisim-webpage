@@ -4,7 +4,10 @@ Examples
 
 Overview
 ========
-The RaiSim binary distribution ships runnable C++ examples and rayrai tools.
+The ``raisim2Lib`` distribution ships C++ example sources and prebuilt RaiSim
+and rayrai libraries. Build the examples with CMake; the install target does not
+copy those source-built executables. The distribution does include the prebuilt
+``rayrai_raisim_tcp_viewer`` tool.
 Use server examples such as ``primitive_grid``, rayrai examples such as
 ``rayrai_pbr_material_grid``, and non-visual tools such as
 ``model_asset_pipeline`` to exercise RaiSim physics APIs, mesh import/export,
@@ -25,19 +28,19 @@ are no longer supported.
 
 Run
 ===
-Run examples from the installed package ``bin`` directory:
+After the top-level build from :doc:`BuildAndTest`, run examples from the build
+tree:
 
 .. code-block:: bash
 
-    <raisim-install>/bin/primitive_grid
-    <raisim-install>/bin/rayrai_pbr_material_grid
+    ./build-examples/examples/primitive_grid
+    ./build-examples/examples/rayrai_pbr_material_grid
 
-On Windows, use the ``.exe`` executable from the installed package ``bin``
-directory:
+On Windows, use the ``.exe`` executable from ``build-examples\\bin``:
 
 .. code-block:: powershell
 
-    C:\path\to\raisim\bin\primitive_grid.exe
+    .\build-examples\bin\primitive_grid.exe
 
 If the runtime loader cannot find shared libraries, use the platform-specific
 environment setup before running examples:
@@ -65,15 +68,15 @@ RaisimServer examples
 ---------------------
 Server examples such as ``primitive_grid`` create a RaiSim world and publish it
 through ``raisim::RaisimServer``. They do not open a renderer window themselves.
-Start ``rayrai_tcp_viewer``, then run the example:
+Start the packaged viewer, then run the server example:
 
 .. code-block:: bash
 
     # Terminal 1
-    <raisim-install>/bin/rayrai_tcp_viewer
+    ./rayrai/bin/rayrai_raisim_tcp_viewer
 
     # Terminal 2
-    <raisim-install>/bin/primitive_grid
+    ./build-examples/examples/primitive_grid
 
 The default server port is ``8080`` unless the example changes it. Use this
 path when you want to inspect the same simulation data that a normal
@@ -87,7 +90,7 @@ directly and render in process. They do not need the TCP viewer:
 
 .. code-block:: bash
 
-    <raisim-install>/bin/rayrai_pbr_material_grid
+    ./build-examples/examples/rayrai_pbr_material_grid
 
 Prefer these examples when you need camera images, GPU/offscreen rendering, PBR
 materials, glTF visual import, or standalone rayrai feature inspection. USD
@@ -102,7 +105,7 @@ window. ``model_asset_pipeline`` writes preprocessed and exported OBJ files to
 
 Example layout
 ==============
-The installed package groups examples by executable behavior:
+The examples project groups targets by executable behavior:
 
 .. list-table::
    :header-rows: 1
@@ -111,7 +114,7 @@ The installed package groups examples by executable behavior:
    * - Group
      - Purpose
    * - Server examples
-     - Installed examples for RaiSim physics, contact, terrain, sensor, robot,
+     - Build targets for RaiSim physics, contact, terrain, sensor, robot,
        XML/MJCF, and OpenUSD scene workflows.
    * - ``rayrai_*``
      - rayrai tools and standalone renderer examples.
@@ -160,11 +163,18 @@ Some targets depend on bundled assets or platform runtime packages:
 * Poly Haven and PBR asset examples require the corresponding assets under
   ``rsc``.
 
-List available examples by inspecting the installed package ``bin`` directory:
+After building, list the example executables from the platform-specific output
+directory. Linux and macOS builds place them under ``examples``:
 
 .. code-block:: bash
 
-    ls <raisim-install>/bin
+    ls build-examples/examples/
+
+Windows builds place them under ``bin``:
+
+.. code-block:: powershell
+
+    Get-ChildItem .\build-examples\bin\*.exe
 
 Current Package Examples
 ========================
@@ -182,6 +192,7 @@ Benchmark Examples
 
    examples/benchmark/articulated_system_benchmark
    examples/benchmark/anymal_standing_benchmark
+   examples/server/island_sleep_benchmark
 
 Rayrai Tools And Examples
 =========================
@@ -239,8 +250,11 @@ Server Examples
    examples/server/procedural_heightmap
    examples/server/ray_casting
    examples/server/ray_scan_lidar
+   examples/server/sensor_suite
+   examples/server/sim_control_demo
    examples/server/sphere_drop
    examples/server/spring_damper_joints
+   examples/server/synchronous_server_update
    examples/server/shadow_hand_usd_cube
    examples/server/templated_tracked_robot
    examples/server/visual_objects_showcase
