@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Benchmark &mdash; raisim 2.4.5 documentation</title>
+  <title>Benchmark &mdash; raisim 2.4.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=68f46a9b" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=159ac128"></script>
+      <script src="../_static/documentation_options.js?v=22624b42"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -56,7 +56,8 @@
 <li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Benchmark</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#environment">Environment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#reproducing-measurements">Reproducing measurements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#build-the-benchmark-binary">Build the benchmark binary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-the-comparison">Run the comparison</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#what-the-benchmarks-simulate">What the benchmarks simulate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#results">Results</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#why-raisim-is-faster-here">Why RaiSim is faster here</a></li>
@@ -182,18 +183,34 @@ timestep, so the two engines simulate equivalent scenes.</p></td>
 </table>
 </div>
 </section>
-<section id="reproducing-measurements">
-<h2>Reproducing measurements<a class="headerlink" href="#reproducing-measurements" title="Link to this heading"></a></h2>
-<p>The unified RaiSim/MuJoCo comparison runner belongs to the closed-source RaiSim
-engine repository and is not included in public <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> releases. Public
-users therefore cannot rebuild that exact comparison binary from this
-repository.</p>
-<p>To measure the shipped binary on your own hardware, build the public
-timing-oriented examples in Release mode and run them one process and one
-thread at a time. See <a class="reference internal" href="BuildAndTest.html"><span class="doc">Build, Test, and Benchmark</span></a> and <a class="reference internal" href="Performance.html"><span class="doc">Performance</span></a> for commands,
-available targets, and comparison guidance. The table below records the
-maintainer-run environment and results; it is not a claim that the internal
-benchmark source is part of the public package.</p>
+<section id="build-the-benchmark-binary">
+<h2>Build the benchmark binary<a class="headerlink" href="#build-the-benchmark-binary" title="Link to this heading"></a></h2>
+<p>From the RaiSim source tree, configure a <code class="docutils literal notranslate"><span class="pre">Release</span></code> build with the benchmark
+suite and the MuJoCo comparison enabled, then build the <code class="docutils literal notranslate"><span class="pre">benchmarks</span></code> target:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build-benchmark<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-DRAISIM_BENCHMARK<span class="o">=</span>ON<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-DRAISIM_MUJOCO_BENCHMARK<span class="o">=</span>ON
+
+cmake<span class="w"> </span>--build<span class="w"> </span>build-benchmark<span class="w"> </span>--target<span class="w"> </span>benchmarks<span class="w"> </span>-j
+</pre></div>
+</div>
+<p>This produces <code class="docutils literal notranslate"><span class="pre">build-benchmark/benchmark/benchmarks</span></code>. <code class="docutils literal notranslate"><span class="pre">RAISIM_MUJOCO_BENCHMARK</span></code>
+fetches and builds MuJoCo from source, so the first configure/build is slower.</p>
+</section>
+<section id="run-the-comparison">
+<h2>Run the comparison<a class="headerlink" href="#run-the-comparison" title="Link to this heading"></a></h2>
+<p>Run the six benchmarks below with both backends. <code class="docutils literal notranslate"><span class="pre">--backend=both</span></code> runs each
+benchmark once with RaiSim and once with MuJoCo and prints a summary table with
+the per-engine wall-clock time and the speedup:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build-benchmark/benchmark/benchmarks<span class="w"> </span>--backend<span class="o">=</span>both<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-b<span class="w"> </span>chain20_speed<span class="w"> </span>-b<span class="w"> </span>heightmap_anymal_speed<span class="w"> </span>-b<span class="w"> </span>primitive_speed<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-b<span class="w"> </span>chain10_speed<span class="w"> </span>-b<span class="w"> </span>anymal_standing<span class="w"> </span>-b<span class="w"> </span>anymal_falling
+</pre></div>
+</div>
+<p>Each benchmark can also be run on its own, e.g.
+<code class="docutils literal notranslate"><span class="pre">benchmarks</span> <span class="pre">--backend=both</span> <span class="pre">-b</span> <span class="pre">anymal_standing</span></code>. No extra arguments are needed;
+the step counts in the table below are the built-in defaults.</p>
 </section>
 <section id="what-the-benchmarks-simulate">
 <h2>What the benchmarks simulate<a class="headerlink" href="#what-the-benchmarks-simulate" title="Link to this heading"></a></h2>

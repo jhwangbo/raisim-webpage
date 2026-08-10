@@ -47,20 +47,40 @@ configuration.
           configured with matching scene parameters and the same integration
           timestep, so the two engines simulate equivalent scenes.
 
-Reproducing measurements
-========================
+Build the benchmark binary
+==========================
 
-The unified RaiSim/MuJoCo comparison runner belongs to the closed-source RaiSim
-engine repository and is not included in public ``raisim2Lib`` releases. Public
-users therefore cannot rebuild that exact comparison binary from this
-repository.
+From the RaiSim source tree, configure a ``Release`` build with the benchmark
+suite and the MuJoCo comparison enabled, then build the ``benchmarks`` target:
 
-To measure the shipped binary on your own hardware, build the public
-timing-oriented examples in Release mode and run them one process and one
-thread at a time. See :doc:`BuildAndTest` and :doc:`Performance` for commands,
-available targets, and comparison guidance. The table below records the
-maintainer-run environment and results; it is not a claim that the internal
-benchmark source is part of the public package.
+.. code-block:: bash
+
+   cmake -S . -B build-benchmark \
+       -DCMAKE_BUILD_TYPE=Release \
+       -DRAISIM_BENCHMARK=ON \
+       -DRAISIM_MUJOCO_BENCHMARK=ON
+
+   cmake --build build-benchmark --target benchmarks -j
+
+This produces ``build-benchmark/benchmark/benchmarks``. ``RAISIM_MUJOCO_BENCHMARK``
+fetches and builds MuJoCo from source, so the first configure/build is slower.
+
+Run the comparison
+==================
+
+Run the six benchmarks below with both backends. ``--backend=both`` runs each
+benchmark once with RaiSim and once with MuJoCo and prints a summary table with
+the per-engine wall-clock time and the speedup:
+
+.. code-block:: bash
+
+   ./build-benchmark/benchmark/benchmarks --backend=both \
+       -b chain20_speed -b heightmap_anymal_speed -b primitive_speed \
+       -b chain10_speed -b anymal_standing -b anymal_falling
+
+Each benchmark can also be run on its own, e.g.
+``benchmarks --backend=both -b anymal_standing``. No extra arguments are needed;
+the step counts in the table below are the built-in defaults.
 
 What the benchmarks simulate
 ============================
