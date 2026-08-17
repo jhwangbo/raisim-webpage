@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sensors &mdash; raisim 2.4.6 documentation</title>
+  <title>Sensors &mdash; raisim 2.5.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=68f46a9b" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=22624b42"></script>
+      <script src="../_static/documentation_options.js?v=3c4615cf"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -106,8 +106,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim6Sensor19getFrameOrientationEv"><code class="docutils literal notranslate"><span class="pre">getFrameOrientation()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim6Sensor19getPosInSensorFrameEv"><code class="docutils literal notranslate"><span class="pre">getPosInSensorFrame()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim6Sensor19getOriInSensorFrameEv"><code class="docutils literal notranslate"><span class="pre">getOriInSensorFrame()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim6Sensor7getNameEv"><code class="docutils literal notranslate"><span class="pre">getName()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim6Sensor11getFullNameEv"><code class="docutils literal notranslate"><span class="pre">getFullName()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisim6Sensor7getNameEv"><code class="docutils literal notranslate"><span class="pre">getName()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisim6Sensor11getFullNameEv"><code class="docutils literal notranslate"><span class="pre">getFullName()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim6Sensor17getSensorSetModelEv"><code class="docutils literal notranslate"><span class="pre">getSensorSetModel()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim6Sensor15getSerialNumberEv"><code class="docutils literal notranslate"><span class="pre">getSerialNumber()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim6Sensor15setSerialNumberERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">setSerialNumber()</span></code></a></li>
@@ -149,7 +149,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#rgb-camera-api">RGB Camera API</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6raisim9RGBCameraE"><code class="docutils literal notranslate"><span class="pre">raisim::RGBCamera</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisim9RGBCamera13serializePropEPc"><code class="docutils literal notranslate"><span class="pre">serializeProp()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim9RGBCamera13getPropertiesEv"><code class="docutils literal notranslate"><span class="pre">getProperties()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisim9RGBCamera13getPropertiesEv"><code class="docutils literal notranslate"><span class="pre">getProperties()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim9RGBCamera13setPropertiesERK19RGBCameraProperties"><code class="docutils literal notranslate"><span class="pre">setProperties()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisim9RGBCamera14getImageBufferEv"><code class="docutils literal notranslate"><span class="pre">getImageBuffer()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim9RGBCamera14setImageBufferERKNSt6vectorIcEE"><code class="docutils literal notranslate"><span class="pre">setImageBuffer()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim9RGBCamera6updateER5World"><code class="docutils literal notranslate"><span class="pre">update()</span></code></a></li>
@@ -382,8 +383,10 @@ broadphase for the scan, then raycasts only the candidate bodies.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>For custom scanning patterns, use <code class="docutils literal notranslate"><span class="pre">World::rayTestLidar</span></code> directly. See
-<a class="reference internal" href="RayTest.html"><span class="doc">Ray Test</span></a> for the full argument list.</p>
+<p>For custom scanning patterns, use <code class="docutils literal notranslate"><span class="pre">World::rayTestLidar</span></code> directly. Yaw and
+pitch are each specified as <code class="docutils literal notranslate"><span class="pre">start</span> <span class="pre">angle,</span> <span class="pre">signed</span> <span class="pre">increment,</span> <span class="pre">count</span></code>. See
+<a class="reference internal" href="RayTest.html"><span class="doc">Ray Test</span></a> for the exact signature, sampling order, compact-output behavior,
+and performance considerations.</p>
 </section>
 <section id="imu">
 <h2>IMU<a class="headerlink" href="#imu" title="Link to this heading"></a></h2>
@@ -722,8 +725,8 @@ points, and timestamps without a visualizer, but it is the CPU fallback path.</p
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim6Sensor7getNameEv">
-<span id="_CPPv3N6raisim6Sensor7getNameEv"></span><span id="_CPPv2N6raisim6Sensor7getNameEv"></span><span id="raisim::Sensor::getName"></span><span class="target" id="classraisim_1_1Sensor_1a6fdf715dcb953a99f99316ebda46c2a2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getName</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim6Sensor7getNameEv" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim6Sensor7getNameEv">
+<span id="_CPPv3NK6raisim6Sensor7getNameEv"></span><span id="_CPPv2NK6raisim6Sensor7getNameEv"></span><span id="raisim::Sensor::getNameC"></span><span class="target" id="classraisim_1_1Sensor_1a00a685b3fbb9fe28283dfce3cc246065"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getName</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim6Sensor7getNameEv" title="Link to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The name of the sensor. This name is given in the sensor xml file </p>
@@ -732,8 +735,8 @@ points, and timestamps without a visualizer, but it is the CPU fallback path.</p
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim6Sensor11getFullNameEv">
-<span id="_CPPv3N6raisim6Sensor11getFullNameEv"></span><span id="_CPPv2N6raisim6Sensor11getFullNameEv"></span><span id="raisim::Sensor::getFullName"></span><span class="target" id="classraisim_1_1Sensor_1a372b3ca7581971672b35fcfd976e2f21"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getFullName</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim6Sensor11getFullNameEv" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim6Sensor11getFullNameEv">
+<span id="_CPPv3NK6raisim6Sensor11getFullNameEv"></span><span id="_CPPv2NK6raisim6Sensor11getFullNameEv"></span><span id="raisim::Sensor::getFullNameC"></span><span class="target" id="classraisim_1_1Sensor_1a9a2e8b6ab80141b59af5a32ddacfdee9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getFullName</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim6Sensor11getFullNameEv" title="Link to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The full name of the sensor. This name includes the sensor set’s name </p>
@@ -1080,7 +1083,7 @@ points, and timestamps without a visualizer, but it is the CPU fallback path.</p
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim11DepthCamera21DepthCameraProperties5widthE">
 <span id="_CPPv3N6raisim11DepthCamera21DepthCameraProperties5widthE"></span><span id="_CPPv2N6raisim11DepthCamera21DepthCameraProperties5widthE"></span><span id="raisim::DepthCamera::DepthCameraProperties::width__i"></span><span class="target" id="structraisim_1_1DepthCamera_1_1DepthCameraProperties_1accae0adbb673933d9c0936884ad1699d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">width</span></span></span><a class="headerlink" href="#_CPPv4N6raisim11DepthCamera21DepthCameraProperties5widthE" title="Link to this definition"></a><br /></dt>
-<dd><p>Image width in pixels. </p>
+<dd><p>Image width in pixels. PHY-090: safe defaults so direct construction cannot allocate a huge buffer or divide by zero before the loader fills real values. </p>
 </dd></dl>
 
 <dl class="cpp var">
@@ -1171,14 +1174,20 @@ points, and timestamps without a visualizer, but it is the CPU fallback path.</p
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim9RGBCamera13getPropertiesEv">
-<span id="_CPPv3N6raisim9RGBCamera13getPropertiesEv"></span><span id="_CPPv2N6raisim9RGBCamera13getPropertiesEv"></span><span id="raisim::RGBCamera::getProperties"></span><span class="target" id="classraisim_1_1RGBCamera_1aa8a51a89685f8c0d754dbbc54021d110"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim9RGBCamera19RGBCameraPropertiesE" title="raisim::RGBCamera::RGBCameraProperties"><span class="n"><span class="pre">RGBCameraProperties</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getProperties</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim9RGBCamera13getPropertiesEv" title="Link to this definition"></a><br /></dt>
-<dd><p>Return the camera properties. Any updates to the properties should be made before connection to the server </p>
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim9RGBCamera13getPropertiesEv">
+<span id="_CPPv3NK6raisim9RGBCamera13getPropertiesEv"></span><span id="_CPPv2NK6raisim9RGBCamera13getPropertiesEv"></span><span id="raisim::RGBCamera::getPropertiesC"></span><span class="target" id="classraisim_1_1RGBCamera_1a3844ce1d2d1e085f9f90d9fb63852e6d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim9RGBCamera19RGBCameraPropertiesE" title="raisim::RGBCamera::RGBCameraProperties"><span class="n"><span class="pre">RGBCameraProperties</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getProperties</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim9RGBCamera13getPropertiesEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return immutable camera properties. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>camera properties </p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim9RGBCamera13setPropertiesERK19RGBCameraProperties">
+<span id="_CPPv3N6raisim9RGBCamera13setPropertiesERK19RGBCameraProperties"></span><span id="_CPPv2N6raisim9RGBCamera13setPropertiesERK19RGBCameraProperties"></span><span id="raisim::RGBCamera::setProperties__RGBCameraPropertiesCR"></span><span class="target" id="classraisim_1_1RGBCamera_1afb2de097b73ab41b0eb44c175be1c308"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setProperties</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim9RGBCamera19RGBCameraPropertiesE" title="raisim::RGBCamera::RGBCameraProperties"><span class="n"><span class="pre">RGBCameraProperties</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">prop</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim9RGBCamera13setPropertiesERK19RGBCameraProperties" title="Link to this definition"></a><br /></dt>
+<dd><p>Replace camera properties transactionally and resize the dependent image buffer. Invalid properties leave the camera unchanged. </p>
 </dd></dl>
 
 <dl class="cpp function">

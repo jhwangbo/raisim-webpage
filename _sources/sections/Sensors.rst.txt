@@ -201,8 +201,10 @@ Typical robot-attached LiDAR update:
       scanW.push_back(p_WS + R_WS * p_S);
     }
 
-For custom scanning patterns, use ``World::rayTestLidar`` directly. See
-:doc:`RayTest` for the full argument list.
+For custom scanning patterns, use ``World::rayTestLidar`` directly. Yaw and
+pitch are each specified as ``start angle, signed increment, count``. See
+:doc:`RayTest` for the exact signature, sampling order, compact-output behavior,
+and performance considerations.
 
 
 IMU

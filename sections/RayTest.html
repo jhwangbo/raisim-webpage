@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ray Test &mdash; raisim 2.4.6 documentation</title>
+  <title>Ray Test &mdash; raisim 2.5.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=68f46a9b" />
@@ -14,9 +14,10 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=22624b42"></script>
+      <script src="../_static/documentation_options.js?v=3c4615cf"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -90,6 +91,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#batch-ray-tests-lidar">Batch ray tests (lidar)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#arguments-batched-lidar-scan">Arguments (batched lidar scan)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#performance-notes">Performance notes</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#details">Details</a><ul>
@@ -211,41 +213,110 @@ The default (-1) allows all groups.</p></li>
 </section>
 <section id="batch-ray-tests-lidar">
 <h2>Batch ray tests (lidar)<a class="headerlink" href="#batch-ray-tests-lidar" title="Link to this heading"></a></h2>
-<p>For spinning lidar-style scans, use <code class="code docutils literal notranslate"><span class="pre">World::rayTestLidar(...)</span></code> instead of
-calling <code class="code docutils literal notranslate"><span class="pre">rayTest(...)</span></code> for each ray. It is significantly faster because it:</p>
-<ul class="simple">
-<li><p>Performs a <strong>single frustum-based broadphase</strong> to collect candidate bodies for
-the whole scan (yaw/pitch/range window), instead of repeating a full world
-scan per ray.</p></li>
-<li><p>Reuses the internal ray body and avoids per-ray allocations.</p></li>
-<li><p>Performs per-ray AABB checks only on the prefiltered candidate list.</p></li>
-</ul>
-<p>Minimal example:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">AlignedAllocator</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">scan</span><span class="p">;</span>
+<p>For spinning lidar-style scans, <code class="code docutils literal notranslate"><span class="pre">World::rayTestLidar(...)</span></code> generates a
+rectangular yaw/pitch sampling pattern and performs the scan in one call.</p>
+<p>Signature (C++):</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">rayTestLidar</span><span class="p">(</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">Mat</span><span class="o">&lt;</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">rot</span><span class="p">,</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span>
+<span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">yawStartAngle</span><span class="p">,</span>
+<span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">yawIncrement</span><span class="p">,</span>
+<span class="w">    </span><span class="kt">size_t</span><span class="w"> </span><span class="n">yawCount</span><span class="p">,</span>
+<span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">pitchStartAngle</span><span class="p">,</span>
+<span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">pitchIncrement</span><span class="p">,</span>
+<span class="w">    </span><span class="kt">size_t</span><span class="w"> </span><span class="n">pitchCount</span><span class="p">,</span>
+<span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">rangeMin</span><span class="p">,</span>
+<span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">rangeMax</span><span class="p">,</span>
+<span class="w">    </span><span class="kt">size_t</span><span class="w"> </span><span class="n">objectId</span><span class="p">,</span>
+<span class="w">    </span><span class="kt">size_t</span><span class="w"> </span><span class="n">localId</span><span class="p">,</span>
+<span class="w">    </span><span class="n">CollisionGroup</span><span class="w"> </span><span class="n">collisionMask</span><span class="p">,</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">AlignedAllocator</span><span class="o">&lt;</span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="o">&gt;&gt;&amp;</span><span class="w"> </span><span class="n">scan</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Both angular axes use the same <code class="code docutils literal notranslate"><span class="pre">start</span> <span class="pre">angle,</span> <span class="pre">increment,</span> <span class="pre">count</span></code> convention.
+For sample indices <span class="math notranslate nohighlight">\(y\)</span> and <span class="math notranslate nohighlight">\(p\)</span>, the angles are</p>
+<div class="math notranslate nohighlight">
+\[\mathrm{yaw}(y) = \mathrm{yawStartAngle} + y\,\mathrm{yawIncrement}\]</div>
+<div class="math notranslate nohighlight">
+\[\mathrm{pitch}(p) = \mathrm{pitchStartAngle} + p\,\mathrm{pitchIncrement}\]</div>
+<p>where <span class="math notranslate nohighlight">\(0 \le y &lt; \mathrm{yawCount}\)</span> and
+<span class="math notranslate nohighlight">\(0 \le p &lt; \mathrm{pitchCount}\)</span>. Increments are signed: use a negative
+increment to scan an axis in the decreasing-angle direction. A single-sample
+axis normally uses an increment of zero. If either count is zero, <code class="code docutils literal notranslate"><span class="pre">scan</span></code>
+is cleared and no rays are cast.</p>
+<p>Minimal example for a complete yaw revolution with 16 pitch channels:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">constexpr</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">pi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3.14159265358979323846</span><span class="p">;</span>
+<span class="k">constexpr</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">yawCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1024</span><span class="p">;</span>
+<span class="k">constexpr</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">pitchCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">16</span><span class="p">;</span>
+<span class="k">constexpr</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">yawStartAngle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">pi</span><span class="p">;</span>
+<span class="k">constexpr</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">yawIncrement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">pi</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="kt">double</span><span class="p">(</span><span class="n">yawCount</span><span class="p">);</span>
+<span class="k">constexpr</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">pitchStartAngle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">-15.0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">pi</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">180.0</span><span class="p">;</span>
+<span class="k">constexpr</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">pitchEndAngle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">15.0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">pi</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">180.0</span><span class="p">;</span>
+<span class="k">constexpr</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">pitchIncrement</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="p">(</span><span class="n">pitchEndAngle</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">pitchStartAngle</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="kt">double</span><span class="p">(</span><span class="n">pitchCount</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">AlignedAllocator</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">scan</span><span class="p">;</span>
 <span class="n">world</span><span class="p">.</span><span class="n">rayTestLidar</span><span class="p">(</span><span class="n">rot</span><span class="p">,</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span>
-<span class="w">                   </span><span class="n">yawStartCount</span><span class="p">,</span><span class="w"> </span><span class="n">yawEndCount</span><span class="p">,</span><span class="w"> </span><span class="n">yawIncrement</span><span class="p">,</span><span class="w"> </span><span class="n">spinDirection</span><span class="p">,</span>
-<span class="w">                   </span><span class="n">pitchSamples</span><span class="p">,</span><span class="w"> </span><span class="n">pitchMinAngle</span><span class="p">,</span><span class="w"> </span><span class="n">pitchIncrement</span><span class="p">,</span>
+<span class="w">                   </span><span class="n">yawStartAngle</span><span class="p">,</span><span class="w"> </span><span class="n">yawIncrement</span><span class="p">,</span><span class="w"> </span><span class="n">yawCount</span><span class="p">,</span>
+<span class="w">                   </span><span class="n">pitchStartAngle</span><span class="p">,</span><span class="w"> </span><span class="n">pitchIncrement</span><span class="p">,</span><span class="w"> </span><span class="n">pitchCount</span><span class="p">,</span>
 <span class="w">                   </span><span class="n">rangeMin</span><span class="p">,</span><span class="w"> </span><span class="n">rangeMax</span><span class="p">,</span>
 <span class="w">                   </span><span class="n">objectId</span><span class="p">,</span><span class="w"> </span><span class="n">localId</span><span class="p">,</span><span class="w"> </span><span class="n">collisionMask</span><span class="p">,</span>
 <span class="w">                   </span><span class="n">scan</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>The output <code class="code docutils literal notranslate"><span class="pre">scan</span></code> contains hit points in the sensor frame (one per ray that hits).</p>
+<p>Yaw is the outer loop and pitch is the inner loop. Consequently, rays are
+generated in this order:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>(yaw[0], pitch[0]), (yaw[0], pitch[1]), ...,
+(yaw[1], pitch[0]), (yaw[1], pitch[1]), ...
+</pre></div>
+</div>
+<p>The output <code class="code docutils literal notranslate"><span class="pre">scan</span></code> contains hit points in the sensor frame. It is compact:
+only rays that hit contribute a point, so a miss does not create a placeholder
+entry and indices after a miss no longer map directly to angular sample indices.</p>
 <section id="arguments-batched-lidar-scan">
 <h3>Arguments (batched lidar scan)<a class="headerlink" href="#arguments-batched-lidar-scan" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p><code class="code docutils literal notranslate"><span class="pre">rot</span></code>: sensor orientation (sensor frame to world frame).</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">pos</span></code>: sensor position in world frame.</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">yawStartCount</span></code>, <code class="code docutils literal notranslate"><span class="pre">yawEndCount</span></code>, <code class="code docutils literal notranslate"><span class="pre">yawIncrement</span></code>: yaw sweep range
-and step (in radians). The scan iterates from start to end using <code class="code docutils literal notranslate"><span class="pre">spinDirection</span></code>.</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">spinDirection</span></code>: +1 or -1, controlling yaw sweep direction.</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">pitchSamples</span></code>, <code class="code docutils literal notranslate"><span class="pre">pitchMinAngle</span></code>, <code class="code docutils literal notranslate"><span class="pre">pitchIncrement</span></code>: pitch sampling
-configuration (in radians).</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">rangeMin</span></code>, <code class="code docutils literal notranslate"><span class="pre">rangeMax</span></code>: min/max range in meters.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">yawStartAngle</span></code>, <code class="code docutils literal notranslate"><span class="pre">yawIncrement</span></code>, <code class="code docutils literal notranslate"><span class="pre">yawCount</span></code>: first yaw angle,
+signed yaw step, and number of yaw samples.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">pitchStartAngle</span></code>, <code class="code docutils literal notranslate"><span class="pre">pitchIncrement</span></code>, <code class="code docutils literal notranslate"><span class="pre">pitchCount</span></code>: first pitch
+angle, signed pitch step, and number of pitch samples.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">rangeMin</span></code>, <code class="code docutils literal notranslate"><span class="pre">rangeMax</span></code>: minimum and maximum sensor-relative range
+in meters. Each collision ray starts at <code class="code docutils literal notranslate"><span class="pre">rangeMin</span></code> and has length
+<code class="code docutils literal notranslate"><span class="pre">rangeMax</span> <span class="pre">-</span> <span class="pre">rangeMin</span></code>.</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">objectId</span></code> / <code class="code docutils literal notranslate"><span class="pre">localId</span></code>: optional self-filter (same as <code class="code docutils literal notranslate"><span class="pre">rayTest</span></code>).</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">collisionMask</span></code>: collision mask to filter which groups the rays can hit.</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">scan</span></code>: output hit positions in the sensor frame.</p></li>
 </ul>
+</section>
+<section id="performance-notes">
+<h3>Performance notes<a class="headerlink" href="#performance-notes" title="Link to this heading"></a></h3>
+<p><code class="code docutils literal notranslate"><span class="pre">rayTestLidar</span></code> is optimized for repeated structured scans. It caches the
+sensor-frame directions and their normalized forms for an unchanged yaw/pitch
+pattern. In a sufficiently large, spatially sparse scene it also builds
+conservative angular candidate buckets, so each ray normally checks only nearby
+bodies. The buckets are reused while the scene, sensor pose, ranges, self-filter,
+and collision mask are unchanged; changes to any of those inputs invalidate the
+relevant cache. Bucket bounds are conservative and every retained candidate
+still goes through an exact shape intersection. Sphere candidates use the same
+quadratic roots and range rules as the contact engine but omit the unused
+contact-normal calculation. No path approximates hit positions.</p>
+<p>Dense or unsupported angular configurations automatically use the exact ray
+BVH instead. Small scenes use a scan-wide conservative cull and a compact flat
+candidate list. These fallbacks preserve the same closest-hit and compact-output
+semantics.</p>
+<p>The source-tree <code class="code docutils literal notranslate"><span class="pre">ray_lidar_comparison</span></code> benchmark compares both APIs using
+identical rays in a 100%-hit scan and verifies every hit position plus a timed
+checksum. Its default 256-by-16 configuration is also a performance regression
+check: <code class="code docutils literal notranslate"><span class="pre">rayTestLidar</span></code> must be faster than repeated <code class="code docutils literal notranslate"><span class="pre">rayTest</span></code> calls.
+Run it single-threaded with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>./build-benchmark/benchmark/benchmarks<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--bench<span class="w"> </span>ray_lidar_comparison<span class="w"> </span>--raisim<span class="w"> </span>--repeat<span class="o">=</span><span class="m">5</span>
+</pre></div>
+</div>
+<p>The relative speed still depends on scene layout, motion, filters, and scan
+shape, so benchmark the application workload when making performance decisions.</p>
 </section>
 </section>
 <section id="details">
@@ -371,7 +442,7 @@ along the ray. Use <code class="code docutils literal notranslate"><span class="
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim16RayCollisionList5beginEv">
-<span id="_CPPv3N6raisim16RayCollisionList5beginEv"></span><span id="_CPPv2N6raisim16RayCollisionList5beginEv"></span><span id="raisim::RayCollisionList::begin"></span><span class="target" id="classraisim_1_1RayCollisionList_1a0a6987850cf7e1bb23e90f5539e6e8b3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim16RayCollisionList8iteratorE" title="raisim::RayCollisionList::iterator"><span class="n"><span class="pre">iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">begin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16RayCollisionList5beginEv" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N6raisim16RayCollisionList5beginEv"></span><span id="_CPPv2N6raisim16RayCollisionList5beginEv"></span><span id="raisim::RayCollisionList::begin"></span><span class="target" id="classraisim_1_1RayCollisionList_1a0a6987850cf7e1bb23e90f5539e6e8b3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">iterator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">begin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16RayCollisionList5beginEv" title="Link to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Iterator to the first hit. </p>
@@ -381,7 +452,7 @@ along the ray. Use <code class="code docutils literal notranslate"><span class="
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim16RayCollisionList3endEv">
-<span id="_CPPv3N6raisim16RayCollisionList3endEv"></span><span id="_CPPv2N6raisim16RayCollisionList3endEv"></span><span id="raisim::RayCollisionList::end"></span><span class="target" id="classraisim_1_1RayCollisionList_1ae70d1bd6f3ad8f2baf9d93ded33384bc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim16RayCollisionList8iteratorE" title="raisim::RayCollisionList::iterator"><span class="n"><span class="pre">iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16RayCollisionList3endEv" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N6raisim16RayCollisionList3endEv"></span><span id="_CPPv2N6raisim16RayCollisionList3endEv"></span><span id="raisim::RayCollisionList::end"></span><span class="target" id="classraisim_1_1RayCollisionList_1ae70d1bd6f3ad8f2baf9d93ded33384bc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">iterator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16RayCollisionList3endEv" title="Link to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Iterator past the last hit. </p>
@@ -391,7 +462,7 @@ along the ray. Use <code class="code docutils literal notranslate"><span class="
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim16RayCollisionList4backEv">
-<span id="_CPPv3N6raisim16RayCollisionList4backEv"></span><span id="_CPPv2N6raisim16RayCollisionList4backEv"></span><span id="raisim::RayCollisionList::back"></span><span class="target" id="classraisim_1_1RayCollisionList_1af387b01af9cb1ea0ccf51a6aa6dff886"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim16RayCollisionList8iteratorE" title="raisim::RayCollisionList::iterator"><span class="n"><span class="pre">iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">back</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16RayCollisionList4backEv" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N6raisim16RayCollisionList4backEv"></span><span id="_CPPv2N6raisim16RayCollisionList4backEv"></span><span id="raisim::RayCollisionList::back"></span><span class="target" id="classraisim_1_1RayCollisionList_1af387b01af9cb1ea0ccf51a6aa6dff886"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">iterator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">back</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16RayCollisionList4backEv" title="Link to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Iterator to the last hit. </p>
@@ -434,9 +505,24 @@ along the ray. Use <code class="code docutils literal notranslate"><span class="
 
 </div>
 <dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16RayCollisionList8iteratorE">
-<span id="_CPPv3N6raisim16RayCollisionList8iteratorE"></span><span id="_CPPv2N6raisim16RayCollisionList8iteratorE"></span><span id="raisim::RayCollisionList::iterator"></span><span class="target" id="classraisim_1_1RayCollisionList_1_1iterator"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">iterator</span></span></span><a class="headerlink" href="#_CPPv4N6raisim16RayCollisionList8iteratorE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
+<dt class="sig sig-object cpp" id="_CPPv4I_bEN6raisim16RayCollisionList14basic_iteratorE">
+<span id="_CPPv3I_bEN6raisim16RayCollisionList14basic_iteratorE"></span><span id="_CPPv2I_bEN6raisim16RayCollisionList14basic_iteratorE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsConst</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classraisim_1_1RayCollisionList_1_1basic__iterator"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">basic_iterator</span></span></span><a class="headerlink" href="#_CPPv4I_bEN6raisim16RayCollisionList14basic_iteratorE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16RayCollisionList14basic_iteratorppEv">
+<span id="_CPPv3N6raisim16RayCollisionList14basic_iteratorppEv"></span><span id="_CPPv2N6raisim16RayCollisionList14basic_iteratorppEv"></span><span id="raisim::RayCollisionList::basic_iterator::inc-operator"></span><span class="target" id="classraisim_1_1RayCollisionList_1_1basic__iterator_1a5c01993bb28f808311e256f9c8311a6b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">self_type</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">++</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16RayCollisionList14basic_iteratorppEv" title="Link to this definition"></a><br /></dt>
+<dd><p>prefix: advance, then return the new (incremented) iterator </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16RayCollisionList14basic_iteratorppEi">
+<span id="_CPPv3N6raisim16RayCollisionList14basic_iteratorppEi"></span><span id="_CPPv2N6raisim16RayCollisionList14basic_iteratorppEi"></span><span id="raisim::RayCollisionList::basic_iterator::inc-operator__i"></span><span class="target" id="classraisim_1_1RayCollisionList_1_1basic__iterator_1a8aa22fae2bbf71332f70955ab3617aef"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">self_type</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">++</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16RayCollisionList14basic_iteratorppEi" title="Link to this definition"></a><br /></dt>
+<dd><p>postfix: return a copy of the pre-increment value </p>
+</dd></dl>
+
+</div>
+</dd></dl>
 
 </dd></dl>
 

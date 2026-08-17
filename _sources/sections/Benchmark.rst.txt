@@ -28,6 +28,10 @@ configuration.
         - macOS 26.5.1 (build ``25F80``), arm64.
       * - Compiler
         - Apple Clang 21.0.0 (Xcode toolchain), C++20, target ``arm64-apple-darwin``.
+      * - Benchmark run
+        - August 7, 2026, from clean RaiSim revision
+          ``84f7ad114f890aa31ca5255e5481393d61830895``
+          (``v0.4.1-1136-g84f7ad11``).
       * - RaiSim build
         - Current optimized RaiSim build, ``CMAKE_BUILD_TYPE=Release``
           (``-O3 -DNDEBUG``) with ``-mcpu=apple-m1``.
@@ -37,15 +41,18 @@ configuration.
       * - Threading
         - Single threaded. Both engines run the simulation loop on one core; no
           multi-threading or SIMD batching across bodies is used.
+          ``OMP_NUM_THREADS``, ``OPENBLAS_NUM_THREADS``, ``MKL_NUM_THREADS``,
+          and ``VECLIB_MAXIMUM_THREADS`` were all set to 1.
       * - Metric
         - Wall-clock seconds for the timed simulation loop of each scene (scene
           construction is excluded). Lower is better; ``Speedup (R/M)`` is the
           MuJoCo time divided by the RaiSim time.
       * - Settings
-        - Each benchmark uses its default arguments (the per-benchmark step counts
-          listed below). The RaiSim and MuJoCo variant of every benchmark is
-          configured with matching scene parameters and the same integration
-          timestep, so the two engines simulate equivalent scenes.
+        - Each benchmark/backend pair was run three times with its default
+          arguments (the per-benchmark step counts listed below). The table and
+          charts report the median; the table also shows the minimum and maximum.
+          The RaiSim and MuJoCo variants use matching scene parameters and the
+          same integration timestep, so the two engines simulate equivalent scenes.
 
 Build the benchmark binary
 ==========================
@@ -68,13 +75,13 @@ fetches and builds MuJoCo from source, so the first configure/build is slower.
 Run the comparison
 ==================
 
-Run the six benchmarks below with both backends. ``--backend=both`` runs each
-benchmark once with RaiSim and once with MuJoCo and prints a summary table with
-the per-engine wall-clock time and the speedup:
+Run the six benchmarks below with both backends. ``--backend=both`` selects
+RaiSim and MuJoCo, while ``--repeat 3`` runs every benchmark/backend pair three
+times and reports the median, minimum, and maximum wall-clock time:
 
 .. code-block:: bash
 
-   ./build-benchmark/benchmark/benchmarks --backend=both \
+   ./build-benchmark/benchmark/benchmarks --backend=both --repeat 3 \
        -b chain20_speed -b heightmap_anymal_speed -b primitive_speed \
        -b chain10_speed -b anymal_standing -b anymal_falling
 
@@ -139,13 +146,13 @@ coordinates the dynamics solves for. A floating base contributes 6 DOF
 Results
 =======
 
-RaiSim is faster than MuJoCo across these articulated-dynamics benchmarks.
-The charts below show both the absolute timings and the relative speedup.
+RaiSim is 2.59× to 6.23× faster than MuJoCo across these six workloads. The
+charts below show both the median timings and the relative speedup.
 
 .. container:: benchmark-graph-block
 
    .. figure:: ../image/benchmark_backend_times.svg
-      :alt: Bar chart comparing RaiSim and MuJoCo wall-clock times for the benchmark suite.
+      :alt: Bar chart comparing median RaiSim and MuJoCo wall-clock times for the benchmark suite.
       :width: 100%
 
 .. container:: benchmark-graph-block
@@ -156,38 +163,38 @@ The charts below show both the absolute timings and the relative speedup.
 
 .. container:: benchmark-table-block benchmark-table-results
 
-   .. list-table:: RaiSim vs MuJoCo (single thread, Apple M1, default args)
+   .. list-table:: RaiSim vs MuJoCo (seconds; median with min–max in parentheses)
       :header-rows: 1
-      :widths: 40 20 20 20
+      :widths: 34 26 26 14
 
       * - Benchmark
-        - RaiSim
-        - MuJoCo
+        - RaiSim median (min–max)
+        - MuJoCo median (min–max)
         - Speedup (R/M)
       * - Chain20 speed
-        - 0.434 s
-        - 2.708 s
-        - 6.24×
+        - 0.433 (0.433–0.434)
+        - 2.697 (2.694–2.700)
+        - 6.23×
       * - Heightmap ANYmal speed
-        - 1.035 s
-        - 4.371 s
-        - 4.22×
+        - 0.914 (0.913–0.916)
+        - 4.346 (4.339–4.375)
+        - 4.75×
       * - Primitive speed
-        - 3.037 s
-        - 10.678 s
-        - 3.52×
+        - 2.729 (2.664–2.744)
+        - 10.904 (10.793–11.076)
+        - 4.00×
       * - Chain10 speed
-        - 0.214 s
-        - 0.751 s
-        - 3.50×
+        - 0.214 (0.214–0.215)
+        - 0.739 (0.739–0.742)
+        - 3.46×
       * - ANYmal standing
-        - 3.855 s
-        - 11.580 s
-        - 3.00×
+        - 3.528 (3.515–3.560)
+        - 10.969 (10.968–11.359)
+        - 3.11×
       * - ANYmal falling
-        - 0.189 s
-        - 0.464 s
-        - 2.45×
+        - 0.171 (0.171–0.174)
+        - 0.444 (0.444–0.449)
+        - 2.59×
 
 Absolute times depend on hardware, compiler, and scene configuration, so treat
 them as relative magnitudes rather than fixed specifications.

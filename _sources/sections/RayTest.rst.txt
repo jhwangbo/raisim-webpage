@@ -70,42 +70,126 @@ To identify what was hit, check the returned :code:`RayCollisionList`.
 
 Batch ray tests (lidar)
 =======================
-For spinning lidar-style scans, use :code:`World::rayTestLidar(...)` instead of
-calling :code:`rayTest(...)` for each ray. It is significantly faster because it:
+For spinning lidar-style scans, :code:`World::rayTestLidar(...)` generates a
+rectangular yaw/pitch sampling pattern and performs the scan in one call.
 
-* Performs a **single frustum-based broadphase** to collect candidate bodies for
-  the whole scan (yaw/pitch/range window), instead of repeating a full world
-  scan per ray.
-* Reuses the internal ray body and avoids per-ray allocations.
-* Performs per-ray AABB checks only on the prefiltered candidate list.
-
-Minimal example:
+Signature (C++):
 
 .. code-block:: cpp
 
+    void rayTestLidar(
+        const Mat<3, 3>& rot,
+        const Vec<3>& pos,
+        double yawStartAngle,
+        double yawIncrement,
+        size_t yawCount,
+        double pitchStartAngle,
+        double pitchIncrement,
+        size_t pitchCount,
+        double rangeMin,
+        double rangeMax,
+        size_t objectId,
+        size_t localId,
+        CollisionGroup collisionMask,
+        std::vector<Vec<3>, AlignedAllocator<Vec<3>, 32>>& scan);
+
+Both angular axes use the same :code:`start angle, increment, count` convention.
+For sample indices :math:`y` and :math:`p`, the angles are
+
+.. math::
+
+    \mathrm{yaw}(y) = \mathrm{yawStartAngle} + y\,\mathrm{yawIncrement}
+
+.. math::
+
+    \mathrm{pitch}(p) = \mathrm{pitchStartAngle} + p\,\mathrm{pitchIncrement}
+
+where :math:`0 \le y < \mathrm{yawCount}` and
+:math:`0 \le p < \mathrm{pitchCount}`. Increments are signed: use a negative
+increment to scan an axis in the decreasing-angle direction. A single-sample
+axis normally uses an increment of zero. If either count is zero, :code:`scan`
+is cleared and no rays are cast.
+
+Minimal example for a complete yaw revolution with 16 pitch channels:
+
+.. code-block:: cpp
+
+    constexpr double pi = 3.14159265358979323846;
+    constexpr size_t yawCount = 1024;
+    constexpr size_t pitchCount = 16;
+    constexpr double yawStartAngle = -pi;
+    constexpr double yawIncrement = 2.0 * pi / double(yawCount);
+    constexpr double pitchStartAngle = -15.0 * pi / 180.0;
+    constexpr double pitchEndAngle = 15.0 * pi / 180.0;
+    constexpr double pitchIncrement =
+        (pitchEndAngle - pitchStartAngle) / double(pitchCount - 1);
+
     std::vector<raisim::Vec<3>, raisim::AlignedAllocator<raisim::Vec<3>, 32>> scan;
     world.rayTestLidar(rot, pos,
-                       yawStartCount, yawEndCount, yawIncrement, spinDirection,
-                       pitchSamples, pitchMinAngle, pitchIncrement,
+                       yawStartAngle, yawIncrement, yawCount,
+                       pitchStartAngle, pitchIncrement, pitchCount,
                        rangeMin, rangeMax,
                        objectId, localId, collisionMask,
                        scan);
 
-The output :code:`scan` contains hit points in the sensor frame (one per ray that hits).
+Yaw is the outer loop and pitch is the inner loop. Consequently, rays are
+generated in this order:
+
+.. code-block:: text
+
+    (yaw[0], pitch[0]), (yaw[0], pitch[1]), ...,
+    (yaw[1], pitch[0]), (yaw[1], pitch[1]), ...
+
+The output :code:`scan` contains hit points in the sensor frame. It is compact:
+only rays that hit contribute a point, so a miss does not create a placeholder
+entry and indices after a miss no longer map directly to angular sample indices.
 
 Arguments (batched lidar scan)
 ------------------------------
 * :code:`rot`: sensor orientation (sensor frame to world frame).
 * :code:`pos`: sensor position in world frame.
-* :code:`yawStartCount`, :code:`yawEndCount`, :code:`yawIncrement`: yaw sweep range
-  and step (in radians). The scan iterates from start to end using :code:`spinDirection`.
-* :code:`spinDirection`: +1 or -1, controlling yaw sweep direction.
-* :code:`pitchSamples`, :code:`pitchMinAngle`, :code:`pitchIncrement`: pitch sampling
-  configuration (in radians).
-* :code:`rangeMin`, :code:`rangeMax`: min/max range in meters.
+* :code:`yawStartAngle`, :code:`yawIncrement`, :code:`yawCount`: first yaw angle,
+  signed yaw step, and number of yaw samples.
+* :code:`pitchStartAngle`, :code:`pitchIncrement`, :code:`pitchCount`: first pitch
+  angle, signed pitch step, and number of pitch samples.
+* :code:`rangeMin`, :code:`rangeMax`: minimum and maximum sensor-relative range
+  in meters. Each collision ray starts at :code:`rangeMin` and has length
+  :code:`rangeMax - rangeMin`.
 * :code:`objectId` / :code:`localId`: optional self-filter (same as :code:`rayTest`).
 * :code:`collisionMask`: collision mask to filter which groups the rays can hit.
 * :code:`scan`: output hit positions in the sensor frame.
+
+Performance notes
+-----------------
+:code:`rayTestLidar` is optimized for repeated structured scans. It caches the
+sensor-frame directions and their normalized forms for an unchanged yaw/pitch
+pattern. In a sufficiently large, spatially sparse scene it also builds
+conservative angular candidate buckets, so each ray normally checks only nearby
+bodies. The buckets are reused while the scene, sensor pose, ranges, self-filter,
+and collision mask are unchanged; changes to any of those inputs invalidate the
+relevant cache. Bucket bounds are conservative and every retained candidate
+still goes through an exact shape intersection. Sphere candidates use the same
+quadratic roots and range rules as the contact engine but omit the unused
+contact-normal calculation. No path approximates hit positions.
+
+Dense or unsupported angular configurations automatically use the exact ray
+BVH instead. Small scenes use a scan-wide conservative cull and a compact flat
+candidate list. These fallbacks preserve the same closest-hit and compact-output
+semantics.
+
+The source-tree :code:`ray_lidar_comparison` benchmark compares both APIs using
+identical rays in a 100%-hit scan and verifies every hit position plus a timed
+checksum. Its default 256-by-16 configuration is also a performance regression
+check: :code:`rayTestLidar` must be faster than repeated :code:`rayTest` calls.
+Run it single-threaded with:
+
+.. code-block:: bash
+
+    OMP_NUM_THREADS=1 ./build-benchmark/benchmark/benchmarks \
+      --bench ray_lidar_comparison --raisim --repeat=5
+
+The relative speed still depends on scene layout, motion, filters, and scan
+shape, so benchmark the application workload when making performance decisions.
 
 
 Details
