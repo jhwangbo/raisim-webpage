@@ -9,7 +9,7 @@ This page covers installed package paths, environment variables, build commands
 for examples and ``raisimPy``, dependencies, and license activation for the
 binary RaiSim2 distribution. Get RaiSim2 from
 ``https://github.com/raisimTech/raisim2Lib``; it is distributed as binary
-libraries with headers, example sources, rayrai tools, and documentation.
+libraries with headers, example and rayrai viewer sources, and documentation.
 
 Dependencies
 ============
@@ -24,9 +24,9 @@ Minimum requirements:
   with the package.
 * Visual Studio 2019 or newer on Windows when compiling downstream C++ projects.
 
-The binary package includes RaiSim and rayrai libraries, headers, tools, and
-examples. See the license files distributed with the package for third-party
-license details.
+The binary package includes RaiSim and rayrai libraries, headers, examples, and
+viewer sources. See the license files distributed with the package for
+third-party license details.
 
 Download
 ========
@@ -41,8 +41,8 @@ Unpack the package to a local directory such as ``$HOME/raisim2Lib`` on
 Linux/macOS or ``C:\raisim`` on Windows. Current macOS packages are named
 ``macos-arm64-<version>.zip`` for Apple Silicon and
 ``macos-x86_64-<version>.zip`` for Intel. Keep the package directories
-together; examples and rayrai tools resolve resources from the accompanying
-``rsc`` and package directories.
+together; examples and source-built rayrai tools resolve resources from the
+accompanying ``rsc`` and package directories.
 
 Local Install Layout
 ====================
@@ -158,10 +158,10 @@ for local example builds. If ``raisim/`` is missing or its version differs from
 ``RAISIM_VERSION``, the configure step downloads the pinned macOS package.
 
 Installation is optional for running examples from the build tree. The install
-step copies package headers, libraries, CMake files, and bundled rayrai tools;
-it does not install the example executables built from ``examples/``. If you do
-install, choose a prefix you can write to instead of relying on CMake's default
-``/usr/local``:
+step copies package headers, libraries, and CMake files; it does not install the
+example executables built from ``examples/``, including ``rayrai_tcp_viewer``.
+If you do install, choose a prefix you can write to instead of relying on
+CMake's default ``/usr/local``:
 
 .. code-block:: bash
 
@@ -195,8 +195,8 @@ Rayrai
 rayrai is the supported visualizer for current RaiSim. There are two usage
 modes:
 
-* The packaged ``rayrai_raisim_tcp_viewer`` connects to applications that
-  publish a ``raisim::World`` through ``raisim::RaisimServer``.
+* The source-built ``rayrai_tcp_viewer`` connects to applications that publish
+  a ``raisim::World`` through ``raisim::RaisimServer``.
 * In-process rayrai examples create ``raisin::RayraiWindow`` directly for
   screenshots, RGB/depth rendering, PBR assets, HDR lighting, and offscreen
   workflows.

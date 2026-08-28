@@ -6,8 +6,8 @@ Overview
 ========
 The ``raisim2Lib`` distribution ships C++ example sources and prebuilt RaiSim
 and rayrai libraries. Build the examples with CMake; the install target does not
-copy those source-built executables. The distribution does include the prebuilt
-``rayrai_raisim_tcp_viewer`` tool.
+copy those source-built executables or provide a prebuilt TCP viewer. The
+``rayrai_tcp_viewer`` target builds the viewer from this repository's sources.
 Use server examples such as ``primitive_grid``, rayrai examples such as
 ``rayrai_pbr_material_grid``, and non-visual tools such as
 ``model_asset_pipeline`` to exercise RaiSim physics APIs, mesh import/export,
@@ -68,12 +68,12 @@ RaisimServer examples
 ---------------------
 Server examples such as ``primitive_grid`` create a RaiSim world and publish it
 through ``raisim::RaisimServer``. They do not open a renderer window themselves.
-Start the packaged viewer, then run the server example:
+Start the source-built viewer, then run the server example:
 
 .. code-block:: bash
 
     # Terminal 1
-    ./rayrai/bin/rayrai_raisim_tcp_viewer
+    ./build-examples/examples/rayrai_tcp_viewer
 
     # Terminal 2
     ./build-examples/examples/primitive_grid

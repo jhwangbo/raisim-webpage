@@ -60,8 +60,8 @@ remains as a compatibility alias.
         server.integrateWorldThreadSafe()
     server.killServer()
 
-Start ``rayrai/bin/rayrai_raisim_tcp_viewer`` in another terminal to view this
-server-based example.
+Start ``build-examples/examples/rayrai_tcp_viewer`` in another terminal to view
+this server-based example.
 
 Examples And API Coverage
 =========================

@@ -36,11 +36,11 @@ On Linux and macOS, example executables are then under
 2. Run a server-based example
 =============================
 
-Start the packaged TCP viewer in one terminal:
+Start the source-built TCP viewer in one terminal:
 
 .. code-block:: bash
 
-    ./rayrai/bin/rayrai_raisim_tcp_viewer
+    ./build-examples/examples/rayrai_tcp_viewer
 
 Run a server example in another terminal:
 
@@ -77,7 +77,7 @@ Start the TCP viewer, then run the ShadowHand USD example:
 
 .. code-block:: bash
 
-    ./rayrai/bin/rayrai_raisim_tcp_viewer
+    ./build-examples/examples/rayrai_tcp_viewer
     ./build-examples/examples/shadow_hand_usd_cube
 
 Next steps

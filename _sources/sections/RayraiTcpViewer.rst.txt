@@ -2,9 +2,10 @@
 Rayrai TCP Viewer
 #################
 
-The packaged ``rayrai_raisim_tcp_viewer`` binary is the recommended visualizer
-for ``RaisimServer`` simulations. The examples project builds the same workflow
-as the ``rayrai_tcp_viewer`` target. The viewer connects to a running server
+The source-built ``rayrai_tcp_viewer`` target is the recommended visualizer
+for ``RaisimServer`` simulations. The release package provides the rayrai
+library, while this repository owns and builds the viewer application from its
+checked-in sources. The viewer connects to a running server
 over TCP, renders the world with the full rayrai pipeline (PBR + IBL +
 post-process), and lets you interactively pause, step, force-poke, and
 reposition objects without touching the simulation code.
@@ -37,15 +38,15 @@ Quick start
 
    .. code-block:: bash
 
-       ./rayrai/bin/rayrai_raisim_tcp_viewer
+       ./build-examples/examples/rayrai_tcp_viewer
 
 3. The viewer auto-connects to ``localhost:8080``. To point it at a different
    endpoint, pass ``--connect host:port`` or type into the host / port fields
    under the **Control** tab.
 
-Run ``rayrai_raisim_tcp_viewer --help`` for the full option list. On Windows
-use the ``.exe`` binary; the same TCP client and discovery paths are supported
-on Windows, Linux, and macOS.
+Run ``./build-examples/examples/rayrai_tcp_viewer --help`` for the full option
+list. On Windows use ``.\build-examples\bin\rayrai_tcp_viewer.exe``; the same
+TCP client and discovery paths are supported on Windows, Linux, and macOS.
 
 Server discovery
 ================
@@ -538,7 +539,7 @@ builds, and dataset preview generation:
     ./build-examples/examples/primitive_grid &
 
     # 2) Capture a 1280x720 PNG framed on the scene, then exit.
-    ./rayrai/bin/rayrai_raisim_tcp_viewer \\
+    ./build-examples/examples/rayrai_tcp_viewer \\
         --connect 127.0.0.1:8080 \\
         --camera-lookat 14,-14,6,-1,-1,3 \\
         --screenshot out.png \\

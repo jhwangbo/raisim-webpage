@@ -17,11 +17,11 @@ CMake target: ``sensor_suite``.
 
 Source file: ``examples/src/server/sensor_suite.cpp``.
 
-Run the packaged viewer and then the build-tree example:
+Run the source-built viewer and then the build-tree example:
 
 .. code-block:: bash
 
-   ./rayrai/bin/rayrai_raisim_tcp_viewer
+   ./build-examples/examples/rayrai_tcp_viewer
    ./build-examples/examples/sensor_suite
 
 Details

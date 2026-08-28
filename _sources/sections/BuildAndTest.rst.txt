@@ -61,10 +61,9 @@ the ``raisim2Lib`` install target:
     /tmp/raisim2lib-examples/rayrai_tcp_viewer
     /tmp/raisim2lib-examples/primitive_grid
 
-The release package also includes the prebuilt viewer at
-``rayrai/bin/rayrai_raisim_tcp_viewer``. This is distinct from the
-``rayrai_tcp_viewer`` example target, although both provide the same viewer
-workflow.
+The release package does not include a prebuilt viewer. The
+``rayrai_tcp_viewer`` target is built from the viewer sources owned by this
+repository and links against the packaged RaiSim and rayrai libraries.
 
 Debug and Release package variants
 ==================================

@@ -15,8 +15,8 @@ under the build directory:
     ./build-examples/examples/primitive_grid
     ./build-examples/examples/rayrai_tcp_viewer
 
-The unpacked package uses ``rayrai/bin/rayrai_raisim_tcp_viewer`` for the
-prebuilt TCP viewer. ``rayrai_tcp_viewer`` is the public example target.
+The unpacked package does not include a prebuilt TCP viewer. Build the
+``rayrai_tcp_viewer`` example target and run it from the build tree.
 If a command from old docs uses an ``example_`` prefix, check :doc:`Examples`
 for the current target name.
 

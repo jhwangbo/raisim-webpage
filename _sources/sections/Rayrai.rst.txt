@@ -44,17 +44,17 @@ rayrai depends on SDL2, OpenGL, glbinding, glm, assimp, stb, and imgui. The
 current package uses the flat ``rayrai`` prefix and ships the headers,
 libraries, and CMake configuration for these dependencies there.
 
-Included binary (recommended)
-=============================
-For most users, the easiest way to use rayrai is the included TCP viewer
-binary at ``rayrai/bin/rayrai_raisim_tcp_viewer``. It connects to a
+Source-built TCP viewer (recommended)
+=====================================
+For most users, the easiest way to use rayrai is the source-built TCP viewer
+at ``build-examples/examples/rayrai_tcp_viewer``. It connects to a
 running ``RaisimServer`` and provides full PBR rendering, scene inspection,
 interactive pause / step / force application, screenshots, and session
 recording.
 
 .. code-block:: bash
 
-    ./rayrai/bin/rayrai_raisim_tcp_viewer
+    ./build-examples/examples/rayrai_tcp_viewer
 
 See :doc:`RayraiTcpViewer` for the full UI tour, command-line options,
 the sim-control workflow, authentication setup, and the wire-format

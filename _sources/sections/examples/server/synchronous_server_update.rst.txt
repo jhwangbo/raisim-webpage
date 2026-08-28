@@ -13,12 +13,12 @@ CMake target: ``synchronous_server_update``.
 
 Source file: ``examples/src/server/synchronous_server_update.cpp``.
 
-Run the build-tree example and connect with the packaged viewer:
+Run the build-tree example and connect with the source-built viewer:
 
 .. code-block:: bash
 
    ./build-examples/examples/synchronous_server_update
-   ./rayrai/bin/rayrai_raisim_tcp_viewer
+   ./build-examples/examples/rayrai_tcp_viewer
 
 Details
 =======

@@ -15,8 +15,7 @@ where rendering should happen.
    * - ``RaisimServer`` + TCP viewer
      - Your simulation should publish world state and a separate viewer should
        display it.
-     - ``raisim::RaisimServer`` and packaged
-       ``rayrai_raisim_tcp_viewer``
+     - ``raisim::RaisimServer`` and source-built ``rayrai_tcp_viewer``
    * - In-process rayrai
      - Your application needs direct access to OpenGL textures, RGB/depth
        images, screenshots, PBR assets, or custom UI embedding.
@@ -41,12 +40,12 @@ of the simulation process. Your application owns the world and starts a
       server.integrateWorldThreadSafe();
     }
 
-Start the packaged viewer in one sourced terminal:
+Start the source-built viewer in one sourced terminal:
 
 .. code-block:: bash
 
     source ./raisim_env.sh
-    ./rayrai/bin/rayrai_raisim_tcp_viewer
+    ./build-examples/examples/rayrai_tcp_viewer
 
 Then run a server-based example in another sourced terminal:
 

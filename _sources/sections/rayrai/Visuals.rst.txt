@@ -53,8 +53,7 @@ page includes a short explanation, CMake target, and build-tree usage.
 
 Quick map to the current rayrai-related targets:
 
-* ``rayrai_tcp_viewer``: source-built example target corresponding to the
-  packaged ``rayrai_raisim_tcp_viewer`` tool for ``raisim::RaisimServer``
+* ``rayrai_tcp_viewer``: source-built viewer for ``raisim::RaisimServer``
   scenes.
 * ``rayrai_basic_scene``: minimal ImGui + SDL2 app showing the standard update
   loop, custom visuals, and the offscreen render texture.

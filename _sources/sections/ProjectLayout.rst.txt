@@ -22,8 +22,8 @@ Public Workspace Directories
      - Platform-specific binary RaiSim package with headers, libraries, and
        CMake config files.
    * - ``rayrai``
-     - Platform-specific binary rayrai package with the renderer library, TCP
-       viewer runtime, headers, and CMake config files.
+     - Platform-specific binary rayrai package with the renderer library,
+       headers, and CMake config files.
    * - ``examples``
      - C++ example sources and their CMake project. CMake target names include
        ``primitive_grid`` and ``rayrai_tcp_viewer``.
@@ -64,14 +64,13 @@ clarity:
 
 On Linux and macOS, a top-level build places example executables under the
 ``examples`` subdirectory of the build tree. The install target does not copy
-these source-built examples. The packaged TCP viewer is shipped separately
-under ``rayrai/bin``. For example:
+these source-built examples, and the release package does not ship a separate
+prebuilt TCP viewer. For example:
 
 .. code-block:: bash
 
     ./build-examples/examples/primitive_grid
     ./build-examples/examples/rayrai_tcp_viewer
-    ./rayrai/bin/rayrai_raisim_tcp_viewer
 
 On Windows, CMake places runtime executables under ``<build-dir>/bin``.
 

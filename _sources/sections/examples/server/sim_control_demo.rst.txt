@@ -20,11 +20,11 @@ Source file: ``examples/src/server/sim_control_demo.cpp``.
 Run
 ===
 
-Start the packaged viewer and then the build-tree example:
+Start the source-built viewer and then the build-tree example:
 
 .. code-block:: bash
 
-   ./rayrai/bin/rayrai_raisim_tcp_viewer
+   ./build-examples/examples/rayrai_tcp_viewer
    ./build-examples/examples/sim_control_demo
 
 Select ``anymal`` or ``poke_box`` in the viewer. Use the Control tab to

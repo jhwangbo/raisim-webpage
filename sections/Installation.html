@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; raisim 2.5.0 documentation</title>
+  <title>Installation &mdash; raisim 2.5.4 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=a5c4661c" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=3c4615cf"></script>
+      <script src="../_static/documentation_options.js?v=c0370f68"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../_static/tabs.js?v=3030b3cb"></script>
@@ -137,7 +137,7 @@
 for examples and <code class="docutils literal notranslate"><span class="pre">raisimPy</span></code>, dependencies, and license activation for the
 binary RaiSim2 distribution. Get RaiSim2 from
 <code class="docutils literal notranslate"><span class="pre">https://github.com/raisimTech/raisim2Lib</span></code>; it is distributed as binary
-libraries with headers, example sources, rayrai tools, and documentation.</p>
+libraries with headers, example and rayrai viewer sources, and documentation.</p>
 </section>
 <section id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading"></a></h2>
@@ -151,9 +151,9 @@ libraries with headers, example sources, rayrai tools, and documentation.</p>
 with the package.</p></li>
 <li><p>Visual Studio 2019 or newer on Windows when compiling downstream C++ projects.</p></li>
 </ul>
-<p>The binary package includes RaiSim and rayrai libraries, headers, tools, and
-examples. See the license files distributed with the package for third-party
-license details.</p>
+<p>The binary package includes RaiSim and rayrai libraries, headers, examples, and
+viewer sources. See the license files distributed with the package for
+third-party license details.</p>
 </section>
 <section id="download">
 <h2>Download<a class="headerlink" href="#download" title="Link to this heading"></a></h2>
@@ -165,8 +165,8 @@ license details.</p>
 Linux/macOS or <code class="docutils literal notranslate"><span class="pre">C:\raisim</span></code> on Windows. Current macOS packages are named
 <code class="docutils literal notranslate"><span class="pre">macos-arm64-&lt;version&gt;.zip</span></code> for Apple Silicon and
 <code class="docutils literal notranslate"><span class="pre">macos-x86_64-&lt;version&gt;.zip</span></code> for Intel. Keep the package directories
-together; examples and rayrai tools resolve resources from the accompanying
-<code class="docutils literal notranslate"><span class="pre">rsc</span></code> and package directories.</p>
+together; examples and source-built rayrai tools resolve resources from the
+accompanying <code class="docutils literal notranslate"><span class="pre">rsc</span></code> and package directories.</p>
 </section>
 <section id="local-install-layout">
 <h2>Local Install Layout<a class="headerlink" href="#local-install-layout" title="Link to this heading"></a></h2>
@@ -256,10 +256,10 @@ cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"
 for local example builds. If <code class="docutils literal notranslate"><span class="pre">raisim/</span></code> is missing or its version differs from
 <code class="docutils literal notranslate"><span class="pre">RAISIM_VERSION</span></code>, the configure step downloads the pinned macOS package.</p>
 <p>Installation is optional for running examples from the build tree. The install
-step copies package headers, libraries, CMake files, and bundled rayrai tools;
-it does not install the example executables built from <code class="docutils literal notranslate"><span class="pre">examples/</span></code>. If you do
-install, choose a prefix you can write to instead of relying on CMake’s default
-<code class="docutils literal notranslate"><span class="pre">/usr/local</span></code>:</p>
+step copies package headers, libraries, and CMake files; it does not install the
+example executables built from <code class="docutils literal notranslate"><span class="pre">examples/</span></code>, including <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code>.
+If you do install, choose a prefix you can write to instead of relying on
+CMake’s default <code class="docutils literal notranslate"><span class="pre">/usr/local</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>--install<span class="w"> </span>build<span class="w"> </span>--prefix<span class="w"> </span><span class="nv">$HOME</span>/raisim2Lib/install
 </pre></div>
 </div>
@@ -288,8 +288,8 @@ to the user-directory location above.</p>
 <p>rayrai is the supported visualizer for current RaiSim. There are two usage
 modes:</p>
 <ul class="simple">
-<li><p>The packaged <code class="docutils literal notranslate"><span class="pre">rayrai_raisim_tcp_viewer</span></code> connects to applications that
-publish a <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> through <code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code>.</p></li>
+<li><p>The source-built <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> connects to applications that publish
+a <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> through <code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code>.</p></li>
 <li><p>In-process rayrai examples create <code class="docutils literal notranslate"><span class="pre">raisin::RayraiWindow</span></code> directly for
 screenshots, RGB/depth rendering, PBR assets, HDR lighting, and offscreen
 workflows.</p></li>
