@@ -17,6 +17,20 @@ applications that embed the renderer directly with
 for the in-process path. For the server-side API the viewer talks to,
 see :doc:`RaisimServer`.
 
+The viewer executable is not installed into either binary package. Its
+maintained sources live under ``examples/src/rayrai/tools`` and it is built by
+the examples CMake project. Running ``linux_install.sh``, ``mac_install.sh``,
+or ``win_install.ps1`` refreshes those sources from the matching release; build
+the ``rayrai_tcp_viewer`` target again afterward.
+
+.. figure:: ../image/rayrai/tcp_viewer/tcp_viewer_data_flow.svg
+   :width: 100%
+   :alt: TCP viewer connection, scene update, sensor, and control data flow
+
+   One TCP connection carries scene updates, interactive control requests, and
+   RGB/depth sensor requests. UDP beacons are only used to discover compatible
+   servers; a direct host and port always works without discovery.
+
 .. figure:: ../image/rayrai/tcp_viewer/tcp_viewer_primitives.png
    :width: 100%
    :alt: rayrai TCP viewer connected to primitive_grid
@@ -42,11 +56,107 @@ Quick start
 
 3. The viewer auto-connects to ``localhost:8080``. To point it at a different
    endpoint, pass ``--connect host:port`` or type into the host / port fields
-   under the **Control** tab.
+   in the **Connection** tab's endpoint popup.
 
 Run ``./build-examples/examples/rayrai_tcp_viewer --help`` for the full option
 list. On Windows use ``.\build-examples\bin\rayrai_tcp_viewer.exe``; the same
 TCP client and discovery paths are supported on Windows, Linux, and macOS.
+
+Desktop launcher (Linux)
+========================
+``scripts/install_rayrai_viewer_launcher.sh`` registers the viewer as a regular
+desktop application, so it can be started from the Activities overview or pinned
+to the GNOME / Ubuntu dock instead of a terminal:
+
+.. code-block:: bash
+
+   scripts/install_rayrai_viewer_launcher.sh              # install and pin
+   scripts/install_rayrai_viewer_launcher.sh --no-pin     # install only
+   scripts/install_rayrai_viewer_launcher.sh --uninstall  # remove everything
+
+It writes three things, all under the invoking user's ``~/.local`` — no root and
+no system-wide state — and re-running it is idempotent:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 42 58
+
+   * - Path
+     - Purpose
+   * - ``~/.local/bin/rayrai-tcp-viewer``
+     - Wrapper that sources ``raisim_env.sh`` before exec'ing the viewer. The
+       dock launches applications with a bare environment, so without it
+       ``raisim/lib`` and ``rayrai/lib`` are missing from ``LD_LIBRARY_PATH``
+       and the viewer exits immediately.
+   * - ``~/.local/share/applications/rayrai-tcp-viewer.desktop``
+     - The desktop entry. Its ``StartupWMClass`` matches the ``WM_CLASS`` the
+       wrapper sets, so a running viewer groups under the pinned icon rather
+       than appearing as a second dock entry.
+   * - ``~/.local/share/icons/hicolor/<size>/apps/rayrai-tcp-viewer.png``
+     - The RaiSim logo, centred on a rounded light-grey plate and written at
+       each icon size. Icon themes match a PNG to the directory it is stored in, so
+       the icon is rendered at exact sizes rather than copied as-is. The plate
+       is what makes the icon read as an application icon: the logo's lower
+       third is a transparent wordmark, so drawing it directly on the canvas
+       leaves the coloured mark sitting high with hard edges, and the dark
+       wordmark disappears against a dark dock. Without ImageMagick the script
+       falls back to an absolute ``Icon=`` path pointing at the raw logo.
+
+Useful options:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 28 72
+
+   * - Option
+     - Effect
+   * - ``--viewer PATH``
+     - Executable to launch. Defaults to
+       ``<repo>/build-examples/examples/rayrai_tcp_viewer``.
+   * - ``--repo PATH``
+     - Repository root, used to find ``raisim_env.sh`` and the logo.
+   * - ``--config CFG``
+     - Skip unless ``CFG`` is ``Release``. Used by the CMake hook below.
+   * - ``--icon-shape SHAPE``
+     - Plate shape behind the logo: ``rounded`` (default), ``circle`` or
+       ``square``.
+   * - ``--icon-background COLOR``
+     - Plate fill, as any colour ImageMagick accepts. Defaults to ``#dedede``;
+       pure white reads as a hard slab in the dock and gives the logo's own
+       white ribbon nothing to separate from.
+   * - ``--no-pin``
+     - Install the launcher without touching the dock favourites.
+   * - ``--uninstall``
+     - Remove the wrapper, desktop entry, icons and dock entry.
+
+The desktop entry also sets ``Path=`` to the directory holding the executable,
+and the wrapper steps out of any directory that contains a ``.raisim``
+directory. Both work around the same startup crash: the activation key is read
+from the relative path ``.raisim`` rather than ``$HOME/.raisim``, so starting
+the viewer with ``$HOME`` as the working directory — which is what a dock launch
+inherits — reads a directory as a file and aborts before the window appears.
+
+The launcher points at the build-tree executable, so re-run the script if the
+repository moves or the build directory is deleted.
+
+Installing it from the build
+----------------------------
+Configuring the examples with ``RAISIM_EXAMPLE_DESKTOP_LAUNCHER`` adds a
+post-build step that runs the script after every Release build of the
+``rayrai_tcp_viewer`` target, keeping the launcher pointed at the current
+executable:
+
+.. code-block:: bash
+
+   cmake -S . -B build-examples -DCMAKE_BUILD_TYPE=Release \
+     -DRAISIM_EXAMPLE_DESKTOP_LAUNCHER=ON
+
+The option is cached, so it stays enabled for that build tree until it is set
+back to ``OFF``. It defaults to ``OFF``: a build should not rearrange the dock
+of everyone who compiles the examples. The post-build step never fails a build —
+it exits quietly on non-Linux hosts, on non-Release configurations, and on
+machines with no graphical session, which keeps continuous integration
+unaffected.
 
 Server discovery
 ================
@@ -56,7 +166,7 @@ port ``59312``. With the default loopback bind, the beacon is sent to
 broadcast on the local network.
 
 The viewer listens on the same UDP port, keeps compatible protocol-version
-beacons in the **Control** tab endpoint dropdown, and removes stale entries
+beacons in the **Connection** tab endpoint dropdown, and removes stale entries
 after roughly eight seconds without another beacon. Discovery only fills the
 endpoint list; direct ``--connect host:port`` and manually typed endpoints
 still work when UDP broadcast is blocked.
@@ -72,6 +182,9 @@ Command-line options
 
    * - Option
      - Effect
+   * - ``--host HOST`` / ``--port PORT``
+     - Set the endpoint fields independently. Defaults are ``127.0.0.1`` and
+       ``8080``.
    * - ``--connect HOST:PORT``
      - Override the default ``127.0.0.1:8080`` endpoint.
    * - ``--auto-connect`` / ``--no-auto-connect``
@@ -84,6 +197,11 @@ Command-line options
      - Also run the heavier renderer content-frame warmup at startup. This is
        intended for demos or drag/drop inspection where the first loaded model
        should appear immediately.
+   * - ``--resource-dir PATH``
+     - Add a mesh/resource search directory. Repeat the option for multiple
+       directories.
+   * - ``--window-size WxH`` / ``--fullscreen``
+     - Set the initial window dimensions or start fullscreen desktop.
    * - ``--minimize-panels``
      - Start with both side panels collapsed (full-screen scene). Also via
        ``RAYRAI_TCP_VIEWER_MINIMIZE_PANELS``.
@@ -92,8 +210,15 @@ Command-line options
        screenshots and recorded demos.
    * - ``--auto-frame``
      - Automatically frame the scene after the first state update.
+   * - ``--camera-lookat px,py,pz,tx,ty,tz``
+     - Set an explicit camera position and target.
+   * - ``--camera-offset x,y,z``
+     - Set the follow-camera offset from its target.
+   * - ``--force-camera-lookat``
+     - Reapply ``--camera-lookat`` every frame instead of only at startup.
    * - ``--screenshot PATH``
-     - Save a single PNG to ``PATH`` and exit. Useful for headless rendering.
+     - Save the rendered scene texture to ``PATH`` after the first valid scene
+       frame, then exit. The PNG excludes ImGui panels and window decorations.
    * - ``--screenshot-dir PATH``
      - Directory used by the F12 hotkey and PNG sequence recording.
    * - ``--record-session PATH.rrtcs``
@@ -118,15 +243,17 @@ Command-line options
        this wall-clock limit.
    * - ``--exit-after SECONDS``
      - Exit after the given wall-clock duration.
+   * - ``--help``
+     - Print the authoritative option list for this build.
 
 UI layout
 =========
 .. figure:: ../image/rayrai/tcp_viewer/tcp_viewer_overview.png
    :width: 100%
-   :alt: rayrai TCP viewer with the Control tab expanded
+   :alt: rayrai TCP viewer with the Connection tab expanded
 
-   The viewer's left overlay opened on the **Control** tab while attached to
-   ``sim_control_demo``. The right side of the window is the rayrai-rendered
+   The viewer's left overlay opened on the **Connection** tab while attached to
+   ``dynamic_heightmap``. The right side of the window is the rayrai-rendered
    scene; the overlay floats above it with translucent background so the
    scene stays visible. The overlay auto-collapses to a small icon after
    3.5 s without hover — pass ``--keep-overlay-open`` to disable that
@@ -134,30 +261,30 @@ UI layout
 
 The viewer overlay has two compact panels:
 
-* **Left panel** — tabbed UI: **Control / Options / Render / Objects /
+* **Left panel** — tabbed UI: **Connection / Options / Render / Object /
   Diagnostics**. This is where every TCP-client setting lives.
 * **Right panel — Selected object inspector**. Appears when you click an
-  object in the scene or in the **Objects** tab. Shows read-only pose, body
+  object in the scene or in the **Object** tab. Shows read-only pose, body
   type, mesh/resource metadata, estimated velocity, and per-joint angles for
-  articulated systems. Editing controls live in the **Control** tab's
+  articulated systems. Editing controls live in the **Object** tab's
   selected-control section.
 
 Both panels are independently collapsible. Click the small chevron in the
 header, or pass ``--minimize-panels`` to start with both panels minimized.
 
-Control tab — widget reference
-------------------------------
+Connection tab — widget reference
+---------------------------------
 .. figure:: ../image/rayrai/tcp_viewer/tcp_viewer_control_panel.png
    :width: 60%
-   :alt: detail of the Control tab
+   :alt: detail of the Connection tab
 
-   Detail crop of the Control tab. Widget walkthrough below mirrors the
+   Detail crop of the Connection tab. Widget walkthrough below mirrors the
    layout top-to-bottom.
 
 **Connection row.**
 
-* **Host / port field** — type ``host:port`` directly, or pick a recent or
-  discovered entry from the dropdown chevron. Compatible ``RaisimServer``
+* **Endpoint dropdown** — enter host and port in the popup, save the endpoint,
+  or pick a recent or discovered server. Compatible ``RaisimServer``
   beacons include host, executable, bind mode, and connection status; newer
   incompatible protocol versions are filtered out. Persisted in
   ``$XDG_CONFIG_HOME/raisim/rayrai_tcp_viewer.json``.
@@ -194,20 +321,6 @@ Control tab — widget reference
 * **Frame Selected** — fit the currently-selected object only.
 * **Screenshot** — write a PNG to ``--screenshot-dir`` (see the **Options**
   tab to change the directory).
-
-**Simulation row.** Only enabled when the server has negotiated
-``PROTOCOL_FEATURE_SIM_CONTROL``. The viewer greys the icons out
-automatically against a legacy ``RaisimServer`` build; see
-``RemoteScene::serverSupportsSimControl()`` for the same flag from the client
-side.
-
-* **Pause / Resume** (orange ⏸ when running, green ▶ when paused) — sends
-  ``CR_PAUSE`` / ``CR_RESUME``. The server skips ``world_->integrate()``
-  but state streaming keeps running, so the camera, panels, and inspector
-  stay responsive while time is frozen.
-* **Step** — sends ``CR_STEP_N`` with ``stepCount = 1``. Advances one
-  ``world_->integrate()`` tick.
-* **Step 10** — same but ``stepCount = 10``. Hold the button to scrub.
 
 **Debug toggles.** Two-column grid of boolean toggles:
 
@@ -263,8 +376,8 @@ the TCP socket, so they apply to every connection:
 
 * **UI Scale** — global ImGui font / control scale. Persists across runs.
 * **Reset Scale** — restore the auto-detected DPI-derived default.
-* **Show collapsed logo** — toggle the small raisim badge that appears in
-  the panel header when minimized. Off for a more compact corner.
+* **Show collapsed logo** — toggle the small, 50%-opaque raisim badge that
+  appears in the top-left corner when the panel is minimized.
 * **Hover the collapsed header to open the panel** vs the legacy
   click-to-expand behaviour.
 * **Frame Scene / Frame Selected / Reset Camera** — camera framing shortcuts
@@ -314,40 +427,43 @@ documented in :doc:`rayrai/RenderQuality`, :doc:`rayrai/Lighting`,
   ``RenderQualitySettings.reflectiveGround*`` fields. On for High and Ultra
   by default.
 
-Objects tab
------------
-The **Objects** tab lists every selectable object the server has sent so
+Object tab
+----------
+The **Object** tab lists every selectable object the server has sent so
 far, with:
 
-* **Filter** field — case-insensitive substring match on the object name.
-* **Group by type** — fold the list into per-type sections
-  (single-body / articulated / heightmap / instanced visuals / point cloud).
-* **Hide collision shapes for all** — global toggle that propagates the
-  per-object **Show collision bodies** state across every entry. Useful when
-  you want a uniform x-ray view without ticking every object.
-* **Per-row click** — selects the object (same as clicking it in the scene).
-* **Per-row eye icon** — toggle visibility without removing the object.
+* **Filter** field — case-insensitive substring match on object name, type, or
+  tag.
+* **Sort** — name, type, or numeric tag. Type is the default, with name as the
+  stable tie-breaker.
+* **Group by type** — fold the type-sorted list into labelled sections.
+* **Hide collisions** — exclude collision-only rows from the list.
+* **Per-row icon and click** — shape/type-aware icons make rows scannable;
+  clicking a row selects the same object as clicking it in the scene.
+* **Ruler** — place A/B points from selections and display their distance.
+
+The lower half of this tab contains the negotiated simulation controls. Pause,
+resume, single-step, and ten-step remain responsive while state streaming
+continues. Selecting an object exposes force, torque, pose, and articulated
+generalized-coordinate editors when supported by that object and server.
 
 Diagnostics tab
 ---------------
 The **Diagnostics** tab is the field for *debugging* a connection rather
 than driving one:
 
-* **Packet history** — circular buffer of recent TCP frames with sizes,
-  feature bits, and parse status.
+* **Data transfer and round-trip graphs** — recent receive bandwidth plus
+  current/average/jitter/maximum request round-trip time. Presentation refresh
+  is capped at 5 Hz so diagnostics do not dominate rendering.
+* **Packet history** — recent live or replay frames with byte size, parse
+  status, object/visual counts, pending sensor count, and missing asset count.
 * **Asset resolution log** — every mesh / texture path the renderer asked
   for, with the directory it was found in or the error if not. Mirror of
-  the ``Assets unresolved`` count on the Control tab.
-* **Parse error log** — last N parse-error messages from
-  ``raisin_tcp_window``, including the byte offset where the parser gave up
-  and the message size in flight. Pair with **Verbose parsing** to
-  reproduce.
-* **Cache stats** — shader binary cache hits / misses / stores for the
-  current process. See :doc:`rayrai/Performance` for the underlying
-  ``Shader::binaryCacheStats()`` API.
-* **Data transfer target** — graph recent receive bandwidth and set the
-  target TCP update request rate between 15 and 120 Hz. This is the runtime
-  equivalent of ``--update-rate``.
+  the ``Assets unresolved`` count on the Connection tab.
+* **Target update rate** — set the TCP update request rate between 15 and
+  120 Hz. This is the runtime equivalent of ``--update-rate``.
+* **Server metadata** — inspect executable, host, bind mode, and status from
+  compatible discovery beacons.
 * **Security note** — the viewer reminds you that TCP traffic is plain and
   unauthenticated; use loopback, SSH/VPN, or a trusted network.
 
@@ -360,11 +476,17 @@ The right-side panel only appears when an object is selected. Top-to-bottom:
 * **Position / Orientation** — current streamed pose in world coordinates.
 * **Velocity** — estimated linear speed and angular speed when enough samples
   are available.
+* **Live signals** — rolling linear-speed, angular-speed,
+  generalized-speed, and per-object contact-count plots. Contact counts require
+  the negotiated contact-object-tags feature.
 * **Joint angles** (articulated systems only) — read-only angle table from the
-  selected articulated body. Use the **Control** tab's generalized-coordinate
+  selected articulated body. Use the **Object** tab's generalized-coordinate
   editor when you want to send ``CR_SET_GC``.
 * **Mesh / resource metadata** — mesh file and resolved resource directory when
   available.
+* **Sensors tab** — RGB, depth, IMU, and spinning-LiDAR metadata. RGB/depth
+  entries show render timing and the latest preview; camera entries can toggle
+  a frustum in the main scene.
 
 Sim control workflow
 ====================
@@ -373,7 +495,7 @@ Sim control workflow
    :alt: rayrai TCP viewer with sim_control_demo
 
    The viewer attached to the ``sim_control_demo`` example. Clicking
-   *Pause* in the Control tab sends a ``CR_PAUSE`` request to the server;
+   *Pause* in the Object tab sends a ``CR_PAUSE`` request to the server;
    the next ``world_->integrate()`` is skipped while state streaming keeps
    running. *Step* and *Step 10* push one or ten single-tick advances.
 
@@ -413,11 +535,53 @@ step or resume tick actually integrates the world.
 
 Access control
 ==============
-There is no authentication or capability handshake — if the TCP connection
-is open, the client can issue any sim-control request the server supports.
+There is no authentication or per-client authorization — if the TCP connection
+is open, the client can issue any sim-control request negotiated by both ends.
 The bind address is the only access control: ``RaisimServer`` binds to
 ``127.0.0.1`` by default. Call ``server.setBindLoopbackOnly(false)`` only on
 trusted networks (see :doc:`RaisimServer` for details).
+
+.. _tcp-viewer-sensor-round-trip:
+
+RGB/depth sensor round trip
+===========================
+The TCP viewer can service ``MeasurementSource::MANUAL`` RGB and depth cameras
+owned by an articulated system. This is a request/response path, not a passive
+preview of a server-side image:
+
+.. figure:: ../image/rayrai/tcp_viewer/tcp_viewer_sensor_round_trip.svg
+   :width: 100%
+   :alt: RGB and depth camera request and response sequence
+
+   ``RaisimServer`` requests a camera update when its update period elapses.
+   The viewer renders the current streamed scene using that camera's pose,
+   intrinsics, lens model, resolution, and clipping planes, then returns BGRA
+   pixels or metric depth values. The server validates the entire response
+   before atomically updating sensor buffers and timestamps.
+
+The selected-object panel adds a **Sensors (N)** tab when the object declares
+sensors. It reports source, resolution, clipping range, sample counts, render
+time, and the latest RGB/depth preview. **Show frustum** adds a non-detectable
+camera frustum to the main view; the depth frustum uses the configured far
+range, while the RGB display frustum is capped at 10 m for readability.
+
+Important details:
+
+* Only manual RGB/depth cameras are rendered and returned by the viewer. IMU
+  and spinning LiDAR measurements remain server/RaiSim-side, although their
+  metadata appears in the sensor tab.
+* The render uses the camera's streamed lens model, including fisheye
+  intrinsics. RGB returns four bytes per pixel in the server-compatible BGRA
+  layout; depth returns one metric ``float`` per pixel.
+* The server checks parent tag, full sensor name, type, dimensions, payload
+  size, and trailing bytes before changing any sensor state.
+* Keep the viewer running while application code consumes manual sensor
+  buffers. Until the first response arrives, those buffers do not contain a
+  current rendered measurement.
+* A message such as ``Refusing RGB sensor update without a complete render``
+  indicates that the viewer source and rayrai package are out of sync. Rerun
+  the platform install script, rebuild ``rayrai_tcp_viewer`` from
+  ``build-examples``, and launch that build-tree executable.
 
 Screenshots and recording
 =========================
@@ -434,6 +598,11 @@ Screenshots and recording
 * **Session recording** — see ``--record-session`` / ``--replay-session``.
   Recorded sessions store the raw TCP frames, so you can re-render a run
   later at any quality preset.
+
+F12, ``--screenshot``, and PNG-sequence recording capture the rayrai scene
+texture. They intentionally exclude ImGui overlays and operating-system window
+decorations. Capture the application window with a desktop capture tool when
+documenting the Connection/Object/Diagnostics UI itself.
 
 Articulated-system inspector mode
 =================================
@@ -465,16 +634,16 @@ same renderer; disconnect first if you want to inspect a file.
 
 Objects and selection
 =====================
-Click any object in the scene or in the **Objects** tab list to select it.
+Click any object in the scene or in the **Object** tab list to select it.
 The right-side inspector shows:
 
 * Object name, tag, body type
 * World-space position and orientation
 * For articulated systems: joint names and current joint angles
-* Toggleable collision-body visibility per-object
+* Rolling motion/contact plots and a Sensors tab when those data are available
 
-The **Objects** tab supports group-by-type, name filtering, and a
-collision-hide toggle that propagates to every selectable object at once.
+The **Object** tab supports group-by-type, name/type/tag filtering, multiple
+sort modes, and a collision-row filter.
 
 Rendering settings
 ==================
@@ -487,9 +656,10 @@ options.
 
 Diagnostics
 ===========
-The **Diagnostics** tab shows live packet history, asset resolution status
-(useful when meshes can't be found), and per-frame parse-error logs. Useful
-when developing custom clients or chasing mesh-path issues.
+The **Diagnostics** tab shows receive-rate and round-trip graphs, packet parse
+status, asset resolution, server beacon metadata, and the adjustable update
+target. Use **Verbose parsing** in the Connection tab when developing custom
+clients or chasing malformed frames.
 
 Wire format
 ===========
@@ -500,8 +670,8 @@ unsupported protocol versions with a clear error instead of attempting to
 parse an incompatible stream.
 
 Current feature bits cover the explicit header, deformable delta streaming,
-and sim control. Deformable objects send mesh topology during initialization
-or topology changes; ordinary update frames send vertex positions only. This
+sim control, and contact ownership tags. Deformable objects send mesh topology
+during initialization or topology changes; ordinary update frames send vertex positions only. This
 keeps dynamic cloth/cube streaming cheaper while avoiding binary compression
 until network bandwidth is measured as a bottleneck.
 
@@ -512,7 +682,8 @@ The protocol constants live in ``rayrai/RaisimTcpCommon.hpp`` (namespace
 * ``kProtocolVersion`` — the current wire version. Mismatched versions cause
   the viewer to disconnect with a versioned-protocol error.
 * ``kProtocolFeatureExplicitHeader``, ``kProtocolFeatureDeformableDelta``,
-  and ``kProtocolFeatureSimControl`` — the currently-negotiated feature bits;
+  ``kProtocolFeatureSimControl``, and ``kProtocolFeatureContactObjectTags`` —
+  the currently-negotiated feature bits;
   ``kProtocolSupportedFeatures`` is the OR of all bits this build understands.
 * ``kMaxMessageBytes`` — maximum accepted message size (default 64 MiB),
   overridable at build time via the
@@ -524,12 +695,12 @@ an ``int32_t`` total-frame-size header (including the 4-byte header itself).
 Scene strings use ``int32_t`` lengths; sensor-response names use ``uint64_t``
 lengths to remain ABI-compatible with the legacy ``RaisimServer`` protocol.
 
-Headless screenshot recipe
-==========================
-The same binary runs without a window manager when invoked with
-``--screenshot``. The viewer connects, waits for the first valid scene
-update, captures one PNG, and exits — useful for CI smoke tests, doc
-builds, and dataset preview generation:
+Automated scene screenshot recipe
+=================================
+With a working OpenGL display (a desktop session or a virtual display such as
+Xvfb), ``--screenshot`` connects, waits for the first valid scene update,
+captures one scene-only PNG, and exits. The viewer still creates its SDL/OpenGL
+window and is not a display-free renderer:
 
 .. code-block:: bash
 
@@ -547,9 +718,8 @@ builds, and dataset preview generation:
         --wait-for-server 8 \\
         --exit-after 5
 
-The two screenshots on this page were generated exactly this way. Combine
-``--minimize-panels`` for clean shots, or omit it to capture the overlay
-panels.
+``--minimize-panels`` affects the live window but not the scene-only PNG.
+Use an operating-system window capture when the UI itself is the subject.
 
 Embedding the server in your application
 ========================================

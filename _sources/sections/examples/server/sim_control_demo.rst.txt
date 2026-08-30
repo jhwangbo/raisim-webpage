@@ -27,7 +27,7 @@ Start the source-built viewer and then the build-tree example:
    ./build-examples/examples/rayrai_tcp_viewer
    ./build-examples/examples/sim_control_demo
 
-Select ``anymal`` or ``poke_box`` in the viewer. Use the Control tab to
+Select ``anymal`` or ``poke_box`` in the viewer. Use the Object tab to
 pause/resume/step, or use the force and pose tools described in
 :doc:`../../RayraiTcpViewer`.
 

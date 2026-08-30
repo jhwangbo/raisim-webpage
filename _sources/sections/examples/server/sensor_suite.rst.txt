@@ -28,8 +28,12 @@ Details
 =======
 - Loads ANYmal with RGB, depth, IMU, and LiDAR sensors.
 - Configures the RGB and depth cameras with ``MeasurementSource::MANUAL``.
-  The source includes a commented switch to RaiSim CPU depth for the front
-  depth camera.
+  The TCP viewer renders these requested camera frames, returns BGRA/metric
+  depth buffers to ``RaisimServer``, and displays previews in the selected
+  ANYmal object's **Sensors** tab. The source includes a commented switch to
+  RaiSim CPU depth for the front depth camera.
+- Select ANYmal, open **Sensors**, and use **Show frustum** to inspect camera
+  pose and range in the main scene.
 - Converts a depth array to 3D points and reads the RaiSim LiDAR/IMU sensors.
 - Streams a rolling LiDAR point cloud and two diagnostic points through
   ``RaisimServer``.

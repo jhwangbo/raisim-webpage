@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Visualization &mdash; raisim 2.5.4 documentation</title>
+  <title>Visualization &mdash; raisim 2.5.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=68f46a9b" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=c0370f68"></script>
+      <script src="../_static/documentation_options.js?v=644f8b71"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -176,12 +176,14 @@ of the simulation process. Your application owns the world and starts a
 </pre></div>
 </div>
 <p>The viewer connects to port <code class="docutils literal notranslate"><span class="pre">8080</span></code> by default. Use this workflow for normal
-debug visualization, object inspection, and interactive camera control.</p>
-<p>Important boundary: the TCP viewer only receives world state. It does not render
-RGB/depth frames back into RaiSim sensors. For RGB/depth sensor buffers, prefer
-in-process rayrai with <code class="docutils literal notranslate"><span class="pre">Sensor::MeasurementSource::MANUAL</span></code>. Use RaiSim-side
-CPU depth only when rayrai is unavailable or a deterministic headless ray-query
-fallback is explicitly required.</p>
+debug visualization, object inspection, interactive camera control, and
+viewer-rendered manual RGB/depth cameras. Camera requests and completed BGRA or
+metric-depth buffers share the same TCP session as scene updates.</p>
+<p>Use in-process rayrai when the application must own the OpenGL context, access
+textures without a network round trip, include custom render-only objects, or
+continue producing camera frames without a viewer process. Use RaiSim-side CPU
+depth when rayrai is unavailable or a deterministic headless ray-query fallback
+is explicitly required.</p>
 </section>
 <section id="in-process-rayrai">
 <h2>In-Process rayrai<a class="headerlink" href="#in-process-rayrai" title="Link to this heading"></a></h2>

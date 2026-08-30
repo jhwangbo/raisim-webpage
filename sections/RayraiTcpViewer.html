@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rayrai TCP Viewer &mdash; raisim 2.5.4 documentation</title>
+  <title>Rayrai TCP Viewer &mdash; raisim 2.5.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=68f46a9b" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=c0370f68"></script>
+      <script src="../_static/documentation_options.js?v=644f8b71"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -87,13 +87,17 @@
 <li class="toctree-l1"><a class="reference internal" href="Rayrai.html">rayrai Visualizer</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Rayrai TCP Viewer</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#quick-start">Quick start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#desktop-launcher-linux">Desktop launcher (Linux)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#installing-it-from-the-build">Installing it from the build</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#server-discovery">Server discovery</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#command-line-options">Command-line options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ui-layout">UI layout</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#control-tab-widget-reference">Control tab — widget reference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#connection-tab-widget-reference">Connection tab — widget reference</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#options-tab">Options tab</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#render-tab">Render tab</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#objects-tab">Objects tab</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#object-tab">Object tab</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#diagnostics-tab">Diagnostics tab</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#right-side-inspector">Right-side inspector</a></li>
 </ul>
@@ -101,13 +105,14 @@
 <li class="toctree-l2"><a class="reference internal" href="#sim-control-workflow">Sim control workflow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#force-pose-application">Force / pose application</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#access-control">Access control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rgb-depth-sensor-round-trip">RGB/depth sensor round trip</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#screenshots-and-recording">Screenshots and recording</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#articulated-system-inspector-mode">Articulated-system inspector mode</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#objects-and-selection">Objects and selection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#rendering-settings">Rendering settings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#diagnostics">Diagnostics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#wire-format">Wire format</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#headless-screenshot-recipe">Headless screenshot recipe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#automated-scene-screenshot-recipe">Automated scene screenshot recipe</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#embedding-the-server-in-your-application">Embedding the server in your application</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#writing-a-custom-client">Writing a custom client</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#driving-the-simulation-from-a-custom-client">Driving the simulation from a custom client</a></li>
@@ -186,54 +191,74 @@ applications that embed the renderer directly with
 <code class="docutils literal notranslate"><span class="pre">raisin::RayraiWindow</span></code>, this binary is not used; see <a class="reference internal" href="Rayrai.html"><span class="doc">rayrai Visualizer</span></a>
 for the in-process path. For the server-side API the viewer talks to,
 see <a class="reference internal" href="RaisimServer.html"><span class="doc">Raisim Server</span></a>.</p>
+<p>The viewer executable is not installed into either binary package. Its
+maintained sources live under <code class="docutils literal notranslate"><span class="pre">examples/src/rayrai/tools</span></code> and it is built by
+the examples CMake project. Running <code class="docutils literal notranslate"><span class="pre">linux_install.sh</span></code>, <code class="docutils literal notranslate"><span class="pre">mac_install.sh</span></code>,
+or <code class="docutils literal notranslate"><span class="pre">win_install.ps1</span></code> refreshes those sources from the matching release; build
+the <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> target again afterward.</p>
 <figure class="align-default" id="id1">
+<a class="reference internal image-reference" href="../_images/tcp_viewer_data_flow.svg"><img alt="TCP viewer connection, scene update, sensor, and control data flow" src="../_images/tcp_viewer_data_flow.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">One TCP connection carries scene updates, interactive control requests, and
+RGB/depth sensor requests. UDP beacons are only used to discover compatible
+servers; a direct host and port always works without discovery.</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<figure class="align-default" id="id2">
 <a class="reference internal image-reference" href="../_images/tcp_viewer_primitives.png"><img alt="rayrai TCP viewer connected to primitive_grid" src="../_images/tcp_viewer_primitives.png" style="width: 100%;" />
 </a>
 <figcaption>
 <p><span class="caption-text">The viewer connected to the <code class="docutils literal notranslate"><span class="pre">primitive_grid</span></code> example. The same rayrai
 PBR pipeline is used as the in-process <code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code>: procedural sky,
 directional shadows, and the reflective checker ground used by the
-Balanced, High, and Ultra presets.</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+Balanced, High, and Ultra presets.</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <nav class="contents local" id="contents">
 <ul class="simple">
-<li><p><a class="reference internal" href="#quick-start" id="id5">Quick start</a></p></li>
-<li><p><a class="reference internal" href="#server-discovery" id="id6">Server discovery</a></p></li>
-<li><p><a class="reference internal" href="#command-line-options" id="id7">Command-line options</a></p></li>
-<li><p><a class="reference internal" href="#ui-layout" id="id8">UI layout</a></p>
+<li><p><a class="reference internal" href="#quick-start" id="id7">Quick start</a></p></li>
+<li><p><a class="reference internal" href="#desktop-launcher-linux" id="id8">Desktop launcher (Linux)</a></p>
 <ul>
-<li><p><a class="reference internal" href="#control-tab-widget-reference" id="id9">Control tab — widget reference</a></p></li>
-<li><p><a class="reference internal" href="#options-tab" id="id10">Options tab</a></p></li>
-<li><p><a class="reference internal" href="#render-tab" id="id11">Render tab</a></p></li>
-<li><p><a class="reference internal" href="#objects-tab" id="id12">Objects tab</a></p></li>
-<li><p><a class="reference internal" href="#diagnostics-tab" id="id13">Diagnostics tab</a></p></li>
-<li><p><a class="reference internal" href="#right-side-inspector" id="id14">Right-side inspector</a></p></li>
+<li><p><a class="reference internal" href="#installing-it-from-the-build" id="id9">Installing it from the build</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#sim-control-workflow" id="id15">Sim control workflow</a></p></li>
-<li><p><a class="reference internal" href="#force-pose-application" id="id16">Force / pose application</a></p></li>
-<li><p><a class="reference internal" href="#access-control" id="id17">Access control</a></p></li>
-<li><p><a class="reference internal" href="#screenshots-and-recording" id="id18">Screenshots and recording</a></p></li>
-<li><p><a class="reference internal" href="#articulated-system-inspector-mode" id="id19">Articulated-system inspector mode</a></p></li>
-<li><p><a class="reference internal" href="#objects-and-selection" id="id20">Objects and selection</a></p></li>
-<li><p><a class="reference internal" href="#rendering-settings" id="id21">Rendering settings</a></p></li>
-<li><p><a class="reference internal" href="#diagnostics" id="id22">Diagnostics</a></p></li>
-<li><p><a class="reference internal" href="#wire-format" id="id23">Wire format</a></p></li>
-<li><p><a class="reference internal" href="#headless-screenshot-recipe" id="id24">Headless screenshot recipe</a></p></li>
-<li><p><a class="reference internal" href="#embedding-the-server-in-your-application" id="id25">Embedding the server in your application</a></p></li>
-<li><p><a class="reference internal" href="#writing-a-custom-client" id="id26">Writing a custom client</a></p>
+<li><p><a class="reference internal" href="#server-discovery" id="id10">Server discovery</a></p></li>
+<li><p><a class="reference internal" href="#command-line-options" id="id11">Command-line options</a></p></li>
+<li><p><a class="reference internal" href="#ui-layout" id="id12">UI layout</a></p>
 <ul>
-<li><p><a class="reference internal" href="#driving-the-simulation-from-a-custom-client" id="id27">Driving the simulation from a custom client</a></p></li>
-<li><p><a class="reference internal" href="#feature-negotiation" id="id28">Feature negotiation</a></p></li>
+<li><p><a class="reference internal" href="#connection-tab-widget-reference" id="id13">Connection tab — widget reference</a></p></li>
+<li><p><a class="reference internal" href="#options-tab" id="id14">Options tab</a></p></li>
+<li><p><a class="reference internal" href="#render-tab" id="id15">Render tab</a></p></li>
+<li><p><a class="reference internal" href="#object-tab" id="id16">Object tab</a></p></li>
+<li><p><a class="reference internal" href="#diagnostics-tab" id="id17">Diagnostics tab</a></p></li>
+<li><p><a class="reference internal" href="#right-side-inspector" id="id18">Right-side inspector</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#see-also" id="id29">See also</a></p></li>
-<li><p><a class="reference internal" href="#api" id="id30">API</a></p></li>
+<li><p><a class="reference internal" href="#sim-control-workflow" id="id19">Sim control workflow</a></p></li>
+<li><p><a class="reference internal" href="#force-pose-application" id="id20">Force / pose application</a></p></li>
+<li><p><a class="reference internal" href="#access-control" id="id21">Access control</a></p></li>
+<li><p><a class="reference internal" href="#rgb-depth-sensor-round-trip" id="id22">RGB/depth sensor round trip</a></p></li>
+<li><p><a class="reference internal" href="#screenshots-and-recording" id="id23">Screenshots and recording</a></p></li>
+<li><p><a class="reference internal" href="#articulated-system-inspector-mode" id="id24">Articulated-system inspector mode</a></p></li>
+<li><p><a class="reference internal" href="#objects-and-selection" id="id25">Objects and selection</a></p></li>
+<li><p><a class="reference internal" href="#rendering-settings" id="id26">Rendering settings</a></p></li>
+<li><p><a class="reference internal" href="#diagnostics" id="id27">Diagnostics</a></p></li>
+<li><p><a class="reference internal" href="#wire-format" id="id28">Wire format</a></p></li>
+<li><p><a class="reference internal" href="#automated-scene-screenshot-recipe" id="id29">Automated scene screenshot recipe</a></p></li>
+<li><p><a class="reference internal" href="#embedding-the-server-in-your-application" id="id30">Embedding the server in your application</a></p></li>
+<li><p><a class="reference internal" href="#writing-a-custom-client" id="id31">Writing a custom client</a></p>
+<ul>
+<li><p><a class="reference internal" href="#driving-the-simulation-from-a-custom-client" id="id32">Driving the simulation from a custom client</a></p></li>
+<li><p><a class="reference internal" href="#feature-negotiation" id="id33">Feature negotiation</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#see-also" id="id34">See also</a></p></li>
+<li><p><a class="reference internal" href="#api" id="id35">API</a></p></li>
 </ul>
 </nav>
 <section id="quick-start">
-<h2><a class="toc-backref" href="#id5" role="doc-backlink">Quick start</a><a class="headerlink" href="#quick-start" title="Link to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Quick start</a><a class="headerlink" href="#quick-start" title="Link to this heading"></a></h2>
 <ol class="arabic">
 <li><p>Start any <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> example. The server listens on <code class="docutils literal notranslate"><span class="pre">127.0.0.1:8080</span></code>
 by default.</p></li>
@@ -244,28 +269,59 @@ by default.</p></li>
 </li>
 <li><p>The viewer auto-connects to <code class="docutils literal notranslate"><span class="pre">localhost:8080</span></code>. To point it at a different
 endpoint, pass <code class="docutils literal notranslate"><span class="pre">--connect</span> <span class="pre">host:port</span></code> or type into the host / port fields
-under the <strong>Control</strong> tab.</p></li>
+in the <strong>Connection</strong> tab’s endpoint popup.</p></li>
 </ol>
 <p>Run <code class="docutils literal notranslate"><span class="pre">./build-examples/examples/rayrai_tcp_viewer</span> <span class="pre">--help</span></code> for the full option
 list. On Windows use <code class="docutils literal notranslate"><span class="pre">.\build-examples\bin\rayrai_tcp_viewer.exe</span></code>; the same
 TCP client and discovery paths are supported on Windows, Linux, and macOS.</p>
 </section>
-<section id="server-discovery">
-<h2><a class="toc-backref" href="#id6" role="doc-backlink">Server discovery</a><a class="headerlink" href="#server-discovery" title="Link to this heading"></a></h2>
-<p>While running, <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> sends a UDP discovery beacon once per second to
-port <code class="docutils literal notranslate"><span class="pre">59312</span></code>. With the default loopback bind, the beacon is sent to
-<code class="docutils literal notranslate"><span class="pre">127.0.0.1</span></code>. After <code class="docutils literal notranslate"><span class="pre">server.setBindLoopbackOnly(false)</span></code>, the beacon is
-broadcast on the local network.</p>
-<p>The viewer listens on the same UDP port, keeps compatible protocol-version
-beacons in the <strong>Control</strong> tab endpoint dropdown, and removes stale entries
-after roughly eight seconds without another beacon. Discovery only fills the
-endpoint list; direct <code class="docutils literal notranslate"><span class="pre">--connect</span> <span class="pre">host:port</span></code> and manually typed endpoints
-still work when UDP broadcast is blocked.</p>
-<p>For cross-machine connections on Windows, allow both the TCP server port
-(default <code class="docutils literal notranslate"><span class="pre">8080</span></code>) and UDP discovery port <code class="docutils literal notranslate"><span class="pre">59312</span></code> through the firewall.</p>
-</section>
-<section id="command-line-options">
-<h2><a class="toc-backref" href="#id7" role="doc-backlink">Command-line options</a><a class="headerlink" href="#command-line-options" title="Link to this heading"></a></h2>
+<section id="desktop-launcher-linux">
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">Desktop launcher (Linux)</a><a class="headerlink" href="#desktop-launcher-linux" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">scripts/install_rayrai_viewer_launcher.sh</span></code> registers the viewer as a regular
+desktop application, so it can be started from the Activities overview or pinned
+to the GNOME / Ubuntu dock instead of a terminal:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>scripts/install_rayrai_viewer_launcher.sh<span class="w">              </span><span class="c1"># install and pin</span>
+scripts/install_rayrai_viewer_launcher.sh<span class="w"> </span>--no-pin<span class="w">     </span><span class="c1"># install only</span>
+scripts/install_rayrai_viewer_launcher.sh<span class="w"> </span>--uninstall<span class="w">  </span><span class="c1"># remove everything</span>
+</pre></div>
+</div>
+<p>It writes three things, all under the invoking user’s <code class="docutils literal notranslate"><span class="pre">~/.local</span></code> — no root and
+no system-wide state — and re-running it is idempotent:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 42.0%" />
+<col style="width: 58.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Path</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">~/.local/bin/rayrai-tcp-viewer</span></code></p></td>
+<td><p>Wrapper that sources <code class="docutils literal notranslate"><span class="pre">raisim_env.sh</span></code> before exec’ing the viewer. The
+dock launches applications with a bare environment, so without it
+<code class="docutils literal notranslate"><span class="pre">raisim/lib</span></code> and <code class="docutils literal notranslate"><span class="pre">rayrai/lib</span></code> are missing from <code class="docutils literal notranslate"><span class="pre">LD_LIBRARY_PATH</span></code>
+and the viewer exits immediately.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">~/.local/share/applications/rayrai-tcp-viewer.desktop</span></code></p></td>
+<td><p>The desktop entry. Its <code class="docutils literal notranslate"><span class="pre">StartupWMClass</span></code> matches the <code class="docutils literal notranslate"><span class="pre">WM_CLASS</span></code> the
+wrapper sets, so a running viewer groups under the pinned icon rather
+than appearing as a second dock entry.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">~/.local/share/icons/hicolor/&lt;size&gt;/apps/rayrai-tcp-viewer.png</span></code></p></td>
+<td><p>The RaiSim logo, centred on a rounded light-grey plate and written at
+each icon size. Icon themes match a PNG to the directory it is stored in, so
+the icon is rendered at exact sizes rather than copied as-is. The plate
+is what makes the icon read as an application icon: the logo’s lower
+third is a transparent wordmark, so drawing it directly on the canvas
+leaves the coloured mark sitting high with hard edges, and the dark
+wordmark disappears against a dark dock. Without ImageMagick the script
+falls back to an absolute <code class="docutils literal notranslate"><span class="pre">Icon=</span></code> path pointing at the raw logo.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Useful options:</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 28.0%" />
@@ -277,35 +333,136 @@ still work when UDP broadcast is blocked.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--connect</span> <span class="pre">HOST:PORT</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--viewer</span> <span class="pre">PATH</span></code></p></td>
+<td><p>Executable to launch. Defaults to
+<code class="docutils literal notranslate"><span class="pre">&lt;repo&gt;/build-examples/examples/rayrai_tcp_viewer</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--repo</span> <span class="pre">PATH</span></code></p></td>
+<td><p>Repository root, used to find <code class="docutils literal notranslate"><span class="pre">raisim_env.sh</span></code> and the logo.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--config</span> <span class="pre">CFG</span></code></p></td>
+<td><p>Skip unless <code class="docutils literal notranslate"><span class="pre">CFG</span></code> is <code class="docutils literal notranslate"><span class="pre">Release</span></code>. Used by the CMake hook below.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--icon-shape</span> <span class="pre">SHAPE</span></code></p></td>
+<td><p>Plate shape behind the logo: <code class="docutils literal notranslate"><span class="pre">rounded</span></code> (default), <code class="docutils literal notranslate"><span class="pre">circle</span></code> or
+<code class="docutils literal notranslate"><span class="pre">square</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--icon-background</span> <span class="pre">COLOR</span></code></p></td>
+<td><p>Plate fill, as any colour ImageMagick accepts. Defaults to <code class="docutils literal notranslate"><span class="pre">#dedede</span></code>;
+pure white reads as a hard slab in the dock and gives the logo’s own
+white ribbon nothing to separate from.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--no-pin</span></code></p></td>
+<td><p>Install the launcher without touching the dock favourites.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--uninstall</span></code></p></td>
+<td><p>Remove the wrapper, desktop entry, icons and dock entry.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The desktop entry also sets <code class="docutils literal notranslate"><span class="pre">Path=</span></code> to the directory holding the executable,
+and the wrapper steps out of any directory that contains a <code class="docutils literal notranslate"><span class="pre">.raisim</span></code>
+directory. Both work around the same startup crash: the activation key is read
+from the relative path <code class="docutils literal notranslate"><span class="pre">.raisim</span></code> rather than <code class="docutils literal notranslate"><span class="pre">$HOME/.raisim</span></code>, so starting
+the viewer with <code class="docutils literal notranslate"><span class="pre">$HOME</span></code> as the working directory — which is what a dock launch
+inherits — reads a directory as a file and aborts before the window appears.</p>
+<p>The launcher points at the build-tree executable, so re-run the script if the
+repository moves or the build directory is deleted.</p>
+<section id="installing-it-from-the-build">
+<h3><a class="toc-backref" href="#id9" role="doc-backlink">Installing it from the build</a><a class="headerlink" href="#installing-it-from-the-build" title="Link to this heading"></a></h3>
+<p>Configuring the examples with <code class="docutils literal notranslate"><span class="pre">RAISIM_EXAMPLE_DESKTOP_LAUNCHER</span></code> adds a
+post-build step that runs the script after every Release build of the
+<code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> target, keeping the launcher pointed at the current
+executable:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build-examples<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-DRAISIM_EXAMPLE_DESKTOP_LAUNCHER<span class="o">=</span>ON
+</pre></div>
+</div>
+<p>The option is cached, so it stays enabled for that build tree until it is set
+back to <code class="docutils literal notranslate"><span class="pre">OFF</span></code>. It defaults to <code class="docutils literal notranslate"><span class="pre">OFF</span></code>: a build should not rearrange the dock
+of everyone who compiles the examples. The post-build step never fails a build —
+it exits quietly on non-Linux hosts, on non-Release configurations, and on
+machines with no graphical session, which keeps continuous integration
+unaffected.</p>
+</section>
+</section>
+<section id="server-discovery">
+<h2><a class="toc-backref" href="#id10" role="doc-backlink">Server discovery</a><a class="headerlink" href="#server-discovery" title="Link to this heading"></a></h2>
+<p>While running, <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> sends a UDP discovery beacon once per second to
+port <code class="docutils literal notranslate"><span class="pre">59312</span></code>. With the default loopback bind, the beacon is sent to
+<code class="docutils literal notranslate"><span class="pre">127.0.0.1</span></code>. After <code class="docutils literal notranslate"><span class="pre">server.setBindLoopbackOnly(false)</span></code>, the beacon is
+broadcast on the local network.</p>
+<p>The viewer listens on the same UDP port, keeps compatible protocol-version
+beacons in the <strong>Connection</strong> tab endpoint dropdown, and removes stale entries
+after roughly eight seconds without another beacon. Discovery only fills the
+endpoint list; direct <code class="docutils literal notranslate"><span class="pre">--connect</span> <span class="pre">host:port</span></code> and manually typed endpoints
+still work when UDP broadcast is blocked.</p>
+<p>For cross-machine connections on Windows, allow both the TCP server port
+(default <code class="docutils literal notranslate"><span class="pre">8080</span></code>) and UDP discovery port <code class="docutils literal notranslate"><span class="pre">59312</span></code> through the firewall.</p>
+</section>
+<section id="command-line-options">
+<h2><a class="toc-backref" href="#id11" role="doc-backlink">Command-line options</a><a class="headerlink" href="#command-line-options" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.0%" />
+<col style="width: 72.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Effect</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--host</span> <span class="pre">HOST</span></code> / <code class="docutils literal notranslate"><span class="pre">--port</span> <span class="pre">PORT</span></code></p></td>
+<td><p>Set the endpoint fields independently. Defaults are <code class="docutils literal notranslate"><span class="pre">127.0.0.1</span></code> and
+<code class="docutils literal notranslate"><span class="pre">8080</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--connect</span> <span class="pre">HOST:PORT</span></code></p></td>
 <td><p>Override the default <code class="docutils literal notranslate"><span class="pre">127.0.0.1:8080</span></code> endpoint.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--auto-connect</span></code> / <code class="docutils literal notranslate"><span class="pre">--no-auto-connect</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--auto-connect</span></code> / <code class="docutils literal notranslate"><span class="pre">--no-auto-connect</span></code></p></td>
 <td><p>Whether to dial the server on launch. Also controlled by env var
 <code class="docutils literal notranslate"><span class="pre">RAYRAI_TCP_VIEWER_AUTO_CONNECT</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--no-pre-warm</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--no-pre-warm</span></code></p></td>
 <td><p>Skip the targeted shader prewarm pass. Startup is shorter, but the
 first content frame may pay shader compile cost.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--warm-at-startup</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--warm-at-startup</span></code></p></td>
 <td><p>Also run the heavier renderer content-frame warmup at startup. This is
 intended for demos or drag/drop inspection where the first loaded model
 should appear immediately.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--minimize-panels</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--resource-dir</span> <span class="pre">PATH</span></code></p></td>
+<td><p>Add a mesh/resource search directory. Repeat the option for multiple
+directories.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--window-size</span> <span class="pre">WxH</span></code> / <code class="docutils literal notranslate"><span class="pre">--fullscreen</span></code></p></td>
+<td><p>Set the initial window dimensions or start fullscreen desktop.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--minimize-panels</span></code></p></td>
 <td><p>Start with both side panels collapsed (full-screen scene). Also via
 <code class="docutils literal notranslate"><span class="pre">RAYRAI_TCP_VIEWER_MINIMIZE_PANELS</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--keep-overlay-open</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--keep-overlay-open</span></code></p></td>
 <td><p>Disable auto-collapse of the left overlay. Useful for documentation
 screenshots and recorded demos.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--auto-frame</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--auto-frame</span></code></p></td>
 <td><p>Automatically frame the scene after the first state update.</p></td>
 </tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--camera-lookat</span> <span class="pre">px,py,pz,tx,ty,tz</span></code></p></td>
+<td><p>Set an explicit camera position and target.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--camera-offset</span> <span class="pre">x,y,z</span></code></p></td>
+<td><p>Set the follow-camera offset from its target.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--force-camera-lookat</span></code></p></td>
+<td><p>Reapply <code class="docutils literal notranslate"><span class="pre">--camera-lookat</span></code> every frame instead of only at startup.</p></td>
+</tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--screenshot</span> <span class="pre">PATH</span></code></p></td>
-<td><p>Save a single PNG to <code class="docutils literal notranslate"><span class="pre">PATH</span></code> and exit. Useful for headless rendering.</p></td>
+<td><p>Save the rendered scene texture to <code class="docutils literal notranslate"><span class="pre">PATH</span></code> after the first valid scene
+frame, then exit. The PNG excludes ImGui panels and window decorations.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--screenshot-dir</span> <span class="pre">PATH</span></code></p></td>
 <td><p>Directory used by the F12 hotkey and PNG sequence recording.</p></td>
@@ -342,49 +499,52 @@ this wall-clock limit.</p></td>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--exit-after</span> <span class="pre">SECONDS</span></code></p></td>
 <td><p>Exit after the given wall-clock duration.</p></td>
 </tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--help</span></code></p></td>
+<td><p>Print the authoritative option list for this build.</p></td>
+</tr>
 </tbody>
 </table>
 </section>
 <section id="ui-layout">
-<h2><a class="toc-backref" href="#id8" role="doc-backlink">UI layout</a><a class="headerlink" href="#ui-layout" title="Link to this heading"></a></h2>
-<figure class="align-default" id="id2">
-<a class="reference internal image-reference" href="../_images/tcp_viewer_overview.png"><img alt="rayrai TCP viewer with the Control tab expanded" src="../_images/tcp_viewer_overview.png" style="width: 100%;" />
+<h2><a class="toc-backref" href="#id12" role="doc-backlink">UI layout</a><a class="headerlink" href="#ui-layout" title="Link to this heading"></a></h2>
+<figure class="align-default" id="id3">
+<a class="reference internal image-reference" href="../_images/tcp_viewer_overview.png"><img alt="rayrai TCP viewer with the Connection tab expanded" src="../_images/tcp_viewer_overview.png" style="width: 100%;" />
 </a>
 <figcaption>
-<p><span class="caption-text">The viewer’s left overlay opened on the <strong>Control</strong> tab while attached to
-<code class="docutils literal notranslate"><span class="pre">sim_control_demo</span></code>. The right side of the window is the rayrai-rendered
+<p><span class="caption-text">The viewer’s left overlay opened on the <strong>Connection</strong> tab while attached to
+<code class="docutils literal notranslate"><span class="pre">dynamic_heightmap</span></code>. The right side of the window is the rayrai-rendered
 scene; the overlay floats above it with translucent background so the
 scene stays visible. The overlay auto-collapses to a small icon after
 3.5 s without hover — pass <code class="docutils literal notranslate"><span class="pre">--keep-overlay-open</span></code> to disable that
-behaviour for screenshots or demos.</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
+behaviour for screenshots or demos.</span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <p>The viewer overlay has two compact panels:</p>
 <ul class="simple">
-<li><p><strong>Left panel</strong> — tabbed UI: <strong>Control / Options / Render / Objects /
+<li><p><strong>Left panel</strong> — tabbed UI: <strong>Connection / Options / Render / Object /
 Diagnostics</strong>. This is where every TCP-client setting lives.</p></li>
 <li><p><strong>Right panel — Selected object inspector</strong>. Appears when you click an
-object in the scene or in the <strong>Objects</strong> tab. Shows read-only pose, body
+object in the scene or in the <strong>Object</strong> tab. Shows read-only pose, body
 type, mesh/resource metadata, estimated velocity, and per-joint angles for
-articulated systems. Editing controls live in the <strong>Control</strong> tab’s
+articulated systems. Editing controls live in the <strong>Object</strong> tab’s
 selected-control section.</p></li>
 </ul>
 <p>Both panels are independently collapsible. Click the small chevron in the
 header, or pass <code class="docutils literal notranslate"><span class="pre">--minimize-panels</span></code> to start with both panels minimized.</p>
-<section id="control-tab-widget-reference">
-<h3><a class="toc-backref" href="#id9" role="doc-backlink">Control tab — widget reference</a><a class="headerlink" href="#control-tab-widget-reference" title="Link to this heading"></a></h3>
-<figure class="align-default" id="id3">
-<a class="reference internal image-reference" href="../_images/tcp_viewer_control_panel.png"><img alt="detail of the Control tab" src="../_images/tcp_viewer_control_panel.png" style="width: 60%;" />
+<section id="connection-tab-widget-reference">
+<h3><a class="toc-backref" href="#id13" role="doc-backlink">Connection tab — widget reference</a><a class="headerlink" href="#connection-tab-widget-reference" title="Link to this heading"></a></h3>
+<figure class="align-default" id="id4">
+<a class="reference internal image-reference" href="../_images/tcp_viewer_control_panel.png"><img alt="detail of the Connection tab" src="../_images/tcp_viewer_control_panel.png" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-text">Detail crop of the Control tab. Widget walkthrough below mirrors the
-layout top-to-bottom.</span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
+<p><span class="caption-text">Detail crop of the Connection tab. Widget walkthrough below mirrors the
+layout top-to-bottom.</span><a class="headerlink" href="#id4" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <p><strong>Connection row.</strong></p>
 <ul class="simple">
-<li><p><strong>Host / port field</strong> — type <code class="docutils literal notranslate"><span class="pre">host:port</span></code> directly, or pick a recent or
-discovered entry from the dropdown chevron. Compatible <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code>
+<li><p><strong>Endpoint dropdown</strong> — enter host and port in the popup, save the endpoint,
+or pick a recent or discovered server. Compatible <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code>
 beacons include host, executable, bind mode, and connection status; newer
 incompatible protocol versions are filtered out. Persisted in
 <code class="docutils literal notranslate"><span class="pre">$XDG_CONFIG_HOME/raisim/rayrai_tcp_viewer.json</span></code>.</p></li>
@@ -421,20 +581,6 @@ Same as the keyboard shortcut <code class="docutils literal notranslate"><span c
 <li><p><strong>Frame Selected</strong> — fit the currently-selected object only.</p></li>
 <li><p><strong>Screenshot</strong> — write a PNG to <code class="docutils literal notranslate"><span class="pre">--screenshot-dir</span></code> (see the <strong>Options</strong>
 tab to change the directory).</p></li>
-</ul>
-<p><strong>Simulation row.</strong> Only enabled when the server has negotiated
-<code class="docutils literal notranslate"><span class="pre">PROTOCOL_FEATURE_SIM_CONTROL</span></code>. The viewer greys the icons out
-automatically against a legacy <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> build; see
-<code class="docutils literal notranslate"><span class="pre">RemoteScene::serverSupportsSimControl()</span></code> for the same flag from the client
-side.</p>
-<ul class="simple">
-<li><p><strong>Pause / Resume</strong> (orange ⏸ when running, green ▶ when paused) — sends
-<code class="docutils literal notranslate"><span class="pre">CR_PAUSE</span></code> / <code class="docutils literal notranslate"><span class="pre">CR_RESUME</span></code>. The server skips <code class="docutils literal notranslate"><span class="pre">world_-&gt;integrate()</span></code>
-but state streaming keeps running, so the camera, panels, and inspector
-stay responsive while time is frozen.</p></li>
-<li><p><strong>Step</strong> — sends <code class="docutils literal notranslate"><span class="pre">CR_STEP_N</span></code> with <code class="docutils literal notranslate"><span class="pre">stepCount</span> <span class="pre">=</span> <span class="pre">1</span></code>. Advances one
-<code class="docutils literal notranslate"><span class="pre">world_-&gt;integrate()</span></code> tick.</p></li>
-<li><p><strong>Step 10</strong> — same but <code class="docutils literal notranslate"><span class="pre">stepCount</span> <span class="pre">=</span> <span class="pre">10</span></code>. Hold the button to scrub.</p></li>
 </ul>
 <p><strong>Debug toggles.</strong> Two-column grid of boolean toggles:</p>
 <ul class="simple">
@@ -484,14 +630,14 @@ search list. The same list can be passed up-front via <code class="docutils lite
 <span class="pre">PATH</span></code> (repeatable).</p>
 </section>
 <section id="options-tab">
-<h3><a class="toc-backref" href="#id10" role="doc-backlink">Options tab</a><a class="headerlink" href="#options-tab" title="Link to this heading"></a></h3>
+<h3><a class="toc-backref" href="#id14" role="doc-backlink">Options tab</a><a class="headerlink" href="#options-tab" title="Link to this heading"></a></h3>
 <p>The <strong>Options</strong> tab houses <em>viewer-local</em> preferences — they don’t go over
 the TCP socket, so they apply to every connection:</p>
 <ul class="simple">
 <li><p><strong>UI Scale</strong> — global ImGui font / control scale. Persists across runs.</p></li>
 <li><p><strong>Reset Scale</strong> — restore the auto-detected DPI-derived default.</p></li>
-<li><p><strong>Show collapsed logo</strong> — toggle the small raisim badge that appears in
-the panel header when minimized. Off for a more compact corner.</p></li>
+<li><p><strong>Show collapsed logo</strong> — toggle the small, 50%-opaque raisim badge that
+appears in the top-left corner when the panel is minimized.</p></li>
 <li><p><strong>Hover the collapsed header to open the panel</strong> vs the legacy
 click-to-expand behaviour.</p></li>
 <li><p><strong>Frame Scene / Frame Selected / Reset Camera</strong> — camera framing shortcuts
@@ -512,7 +658,7 @@ Replay sessions also expose pause, single-step, restart, and speed controls.</p>
 </ul>
 </section>
 <section id="render-tab">
-<h3><a class="toc-backref" href="#id11" role="doc-backlink">Render tab</a><a class="headerlink" href="#render-tab" title="Link to this heading"></a></h3>
+<h3><a class="toc-backref" href="#id15" role="doc-backlink">Render tab</a><a class="headerlink" href="#render-tab" title="Link to this heading"></a></h3>
 <p>The <strong>Render</strong> tab is the rayrai pipeline configuration mirror — every knob
 documented in <a class="reference internal" href="rayrai/RenderQuality.html"><span class="doc">Render quality, tone mapping, color grading</span></a>, <a class="reference internal" href="rayrai/Lighting.html"><span class="doc">Lighting, shadows, and HDR/IBL</span></a>,
 <a class="reference internal" href="rayrai/PostProcess.html"><span class="doc">Post-process effects</span></a>, and <a class="reference internal" href="rayrai/Weather.html"><span class="doc">Weather and atmospherics</span></a>:</p>
@@ -543,47 +689,49 @@ server-side weather to None if you want viewer-only authoring.</p></li>
 by default.</p></li>
 </ul>
 </section>
-<section id="objects-tab">
-<h3><a class="toc-backref" href="#id12" role="doc-backlink">Objects tab</a><a class="headerlink" href="#objects-tab" title="Link to this heading"></a></h3>
-<p>The <strong>Objects</strong> tab lists every selectable object the server has sent so
+<section id="object-tab">
+<h3><a class="toc-backref" href="#id16" role="doc-backlink">Object tab</a><a class="headerlink" href="#object-tab" title="Link to this heading"></a></h3>
+<p>The <strong>Object</strong> tab lists every selectable object the server has sent so
 far, with:</p>
 <ul class="simple">
-<li><p><strong>Filter</strong> field — case-insensitive substring match on the object name.</p></li>
-<li><p><strong>Group by type</strong> — fold the list into per-type sections
-(single-body / articulated / heightmap / instanced visuals / point cloud).</p></li>
-<li><p><strong>Hide collision shapes for all</strong> — global toggle that propagates the
-per-object <strong>Show collision bodies</strong> state across every entry. Useful when
-you want a uniform x-ray view without ticking every object.</p></li>
-<li><p><strong>Per-row click</strong> — selects the object (same as clicking it in the scene).</p></li>
-<li><p><strong>Per-row eye icon</strong> — toggle visibility without removing the object.</p></li>
+<li><p><strong>Filter</strong> field — case-insensitive substring match on object name, type, or
+tag.</p></li>
+<li><p><strong>Sort</strong> — name, type, or numeric tag. Type is the default, with name as the
+stable tie-breaker.</p></li>
+<li><p><strong>Group by type</strong> — fold the type-sorted list into labelled sections.</p></li>
+<li><p><strong>Hide collisions</strong> — exclude collision-only rows from the list.</p></li>
+<li><p><strong>Per-row icon and click</strong> — shape/type-aware icons make rows scannable;
+clicking a row selects the same object as clicking it in the scene.</p></li>
+<li><p><strong>Ruler</strong> — place A/B points from selections and display their distance.</p></li>
 </ul>
+<p>The lower half of this tab contains the negotiated simulation controls. Pause,
+resume, single-step, and ten-step remain responsive while state streaming
+continues. Selecting an object exposes force, torque, pose, and articulated
+generalized-coordinate editors when supported by that object and server.</p>
 </section>
 <section id="diagnostics-tab">
-<h3><a class="toc-backref" href="#id13" role="doc-backlink">Diagnostics tab</a><a class="headerlink" href="#diagnostics-tab" title="Link to this heading"></a></h3>
+<h3><a class="toc-backref" href="#id17" role="doc-backlink">Diagnostics tab</a><a class="headerlink" href="#diagnostics-tab" title="Link to this heading"></a></h3>
 <p>The <strong>Diagnostics</strong> tab is the field for <em>debugging</em> a connection rather
 than driving one:</p>
 <ul class="simple">
-<li><p><strong>Packet history</strong> — circular buffer of recent TCP frames with sizes,
-feature bits, and parse status.</p></li>
+<li><p><strong>Data transfer and round-trip graphs</strong> — recent receive bandwidth plus
+current/average/jitter/maximum request round-trip time. Presentation refresh
+is capped at 5 Hz so diagnostics do not dominate rendering.</p></li>
+<li><p><strong>Packet history</strong> — recent live or replay frames with byte size, parse
+status, object/visual counts, pending sensor count, and missing asset count.</p></li>
 <li><p><strong>Asset resolution log</strong> — every mesh / texture path the renderer asked
 for, with the directory it was found in or the error if not. Mirror of
-the <code class="docutils literal notranslate"><span class="pre">Assets</span> <span class="pre">unresolved</span></code> count on the Control tab.</p></li>
-<li><p><strong>Parse error log</strong> — last N parse-error messages from
-<code class="docutils literal notranslate"><span class="pre">raisin_tcp_window</span></code>, including the byte offset where the parser gave up
-and the message size in flight. Pair with <strong>Verbose parsing</strong> to
-reproduce.</p></li>
-<li><p><strong>Cache stats</strong> — shader binary cache hits / misses / stores for the
-current process. See <a class="reference internal" href="rayrai/Performance.html"><span class="doc">Performance notes and the C++ API reference</span></a> for the underlying
-<code class="docutils literal notranslate"><span class="pre">Shader::binaryCacheStats()</span></code> API.</p></li>
-<li><p><strong>Data transfer target</strong> — graph recent receive bandwidth and set the
-target TCP update request rate between 15 and 120 Hz. This is the runtime
-equivalent of <code class="docutils literal notranslate"><span class="pre">--update-rate</span></code>.</p></li>
+the <code class="docutils literal notranslate"><span class="pre">Assets</span> <span class="pre">unresolved</span></code> count on the Connection tab.</p></li>
+<li><p><strong>Target update rate</strong> — set the TCP update request rate between 15 and
+120 Hz. This is the runtime equivalent of <code class="docutils literal notranslate"><span class="pre">--update-rate</span></code>.</p></li>
+<li><p><strong>Server metadata</strong> — inspect executable, host, bind mode, and status from
+compatible discovery beacons.</p></li>
 <li><p><strong>Security note</strong> — the viewer reminds you that TCP traffic is plain and
 unauthenticated; use loopback, SSH/VPN, or a trusted network.</p></li>
 </ul>
 </section>
 <section id="right-side-inspector">
-<h3><a class="toc-backref" href="#id14" role="doc-backlink">Right-side inspector</a><a class="headerlink" href="#right-side-inspector" title="Link to this heading"></a></h3>
+<h3><a class="toc-backref" href="#id18" role="doc-backlink">Right-side inspector</a><a class="headerlink" href="#right-side-inspector" title="Link to this heading"></a></h3>
 <p>The right-side panel only appears when an object is selected. Top-to-bottom:</p>
 <ul class="simple">
 <li><p><strong>Object name and stable id</strong> (<code class="docutils literal notranslate"><span class="pre">Object::Id</span></code> from the world).</p></li>
@@ -591,24 +739,30 @@ unauthenticated; use loopback, SSH/VPN, or a trusted network.</p></li>
 <li><p><strong>Position / Orientation</strong> — current streamed pose in world coordinates.</p></li>
 <li><p><strong>Velocity</strong> — estimated linear speed and angular speed when enough samples
 are available.</p></li>
+<li><p><strong>Live signals</strong> — rolling linear-speed, angular-speed,
+generalized-speed, and per-object contact-count plots. Contact counts require
+the negotiated contact-object-tags feature.</p></li>
 <li><p><strong>Joint angles</strong> (articulated systems only) — read-only angle table from the
-selected articulated body. Use the <strong>Control</strong> tab’s generalized-coordinate
+selected articulated body. Use the <strong>Object</strong> tab’s generalized-coordinate
 editor when you want to send <code class="docutils literal notranslate"><span class="pre">CR_SET_GC</span></code>.</p></li>
 <li><p><strong>Mesh / resource metadata</strong> — mesh file and resolved resource directory when
 available.</p></li>
+<li><p><strong>Sensors tab</strong> — RGB, depth, IMU, and spinning-LiDAR metadata. RGB/depth
+entries show render timing and the latest preview; camera entries can toggle
+a frustum in the main scene.</p></li>
 </ul>
 </section>
 </section>
 <section id="sim-control-workflow">
-<h2><a class="toc-backref" href="#id15" role="doc-backlink">Sim control workflow</a><a class="headerlink" href="#sim-control-workflow" title="Link to this heading"></a></h2>
-<figure class="align-default" id="id4">
+<h2><a class="toc-backref" href="#id19" role="doc-backlink">Sim control workflow</a><a class="headerlink" href="#sim-control-workflow" title="Link to this heading"></a></h2>
+<figure class="align-default" id="id5">
 <a class="reference internal image-reference" href="../_images/tcp_viewer_anymal.png"><img alt="rayrai TCP viewer with sim_control_demo" src="../_images/tcp_viewer_anymal.png" style="width: 100%;" />
 </a>
 <figcaption>
 <p><span class="caption-text">The viewer attached to the <code class="docutils literal notranslate"><span class="pre">sim_control_demo</span></code> example. Clicking
-<em>Pause</em> in the Control tab sends a <code class="docutils literal notranslate"><span class="pre">CR_PAUSE</span></code> request to the server;
+<em>Pause</em> in the Object tab sends a <code class="docutils literal notranslate"><span class="pre">CR_PAUSE</span></code> request to the server;
 the next <code class="docutils literal notranslate"><span class="pre">world_-&gt;integrate()</span></code> is skipped while state streaming keeps
-running. <em>Step</em> and <em>Step 10</em> push one or ten single-tick advances.</span><a class="headerlink" href="#id4" title="Link to this image"></a></p>
+running. <em>Step</em> and <em>Step 10</em> push one or ten single-tick advances.</span><a class="headerlink" href="#id5" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <p>The Pause / Step buttons send <code class="docutils literal notranslate"><span class="pre">CR_PAUSE</span></code> / <code class="docutils literal notranslate"><span class="pre">CR_RESUME</span></code> / <code class="docutils literal notranslate"><span class="pre">CR_STEP_N</span></code>
@@ -627,7 +781,7 @@ any client that speaks <code class="docutils literal notranslate"><span class="p
 in <code class="docutils literal notranslate"><span class="pre">rayrai/RaisimTcpCommon.hpp</span></code>.</p>
 </section>
 <section id="force-pose-application">
-<h2><a class="toc-backref" href="#id16" role="doc-backlink">Force / pose application</a><a class="headerlink" href="#force-pose-application" title="Link to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id20" role="doc-backlink">Force / pose application</a><a class="headerlink" href="#force-pose-application" title="Link to this heading"></a></h2>
 <p>Shift + left-drag on the selected object sends <code class="docutils literal notranslate"><span class="pre">CR_APPLY_FORCE</span></code> for the
 duration of the drag. The drag anchor is stored in the selected body’s local
 frame, so the force application point follows the body as it moves. The
@@ -643,15 +797,55 @@ server is paused, a queued force is refreshed but is not applied until a
 step or resume tick actually integrates the world.</p>
 </section>
 <section id="access-control">
-<h2><a class="toc-backref" href="#id17" role="doc-backlink">Access control</a><a class="headerlink" href="#access-control" title="Link to this heading"></a></h2>
-<p>There is no authentication or capability handshake — if the TCP connection
-is open, the client can issue any sim-control request the server supports.
+<h2><a class="toc-backref" href="#id21" role="doc-backlink">Access control</a><a class="headerlink" href="#access-control" title="Link to this heading"></a></h2>
+<p>There is no authentication or per-client authorization — if the TCP connection
+is open, the client can issue any sim-control request negotiated by both ends.
 The bind address is the only access control: <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> binds to
 <code class="docutils literal notranslate"><span class="pre">127.0.0.1</span></code> by default. Call <code class="docutils literal notranslate"><span class="pre">server.setBindLoopbackOnly(false)</span></code> only on
 trusted networks (see <a class="reference internal" href="RaisimServer.html"><span class="doc">Raisim Server</span></a> for details).</p>
 </section>
+<section id="rgb-depth-sensor-round-trip">
+<span id="tcp-viewer-sensor-round-trip"></span><h2><a class="toc-backref" href="#id22" role="doc-backlink">RGB/depth sensor round trip</a><a class="headerlink" href="#rgb-depth-sensor-round-trip" title="Link to this heading"></a></h2>
+<p>The TCP viewer can service <code class="docutils literal notranslate"><span class="pre">MeasurementSource::MANUAL</span></code> RGB and depth cameras
+owned by an articulated system. This is a request/response path, not a passive
+preview of a server-side image:</p>
+<figure class="align-default" id="id6">
+<a class="reference internal image-reference" href="../_images/tcp_viewer_sensor_round_trip.svg"><img alt="RGB and depth camera request and response sequence" src="../_images/tcp_viewer_sensor_round_trip.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> requests a camera update when its update period elapses.
+The viewer renders the current streamed scene using that camera’s pose,
+intrinsics, lens model, resolution, and clipping planes, then returns BGRA
+pixels or metric depth values. The server validates the entire response
+before atomically updating sensor buffers and timestamps.</span><a class="headerlink" href="#id6" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>The selected-object panel adds a <strong>Sensors (N)</strong> tab when the object declares
+sensors. It reports source, resolution, clipping range, sample counts, render
+time, and the latest RGB/depth preview. <strong>Show frustum</strong> adds a non-detectable
+camera frustum to the main view; the depth frustum uses the configured far
+range, while the RGB display frustum is capped at 10 m for readability.</p>
+<p>Important details:</p>
+<ul class="simple">
+<li><p>Only manual RGB/depth cameras are rendered and returned by the viewer. IMU
+and spinning LiDAR measurements remain server/RaiSim-side, although their
+metadata appears in the sensor tab.</p></li>
+<li><p>The render uses the camera’s streamed lens model, including fisheye
+intrinsics. RGB returns four bytes per pixel in the server-compatible BGRA
+layout; depth returns one metric <code class="docutils literal notranslate"><span class="pre">float</span></code> per pixel.</p></li>
+<li><p>The server checks parent tag, full sensor name, type, dimensions, payload
+size, and trailing bytes before changing any sensor state.</p></li>
+<li><p>Keep the viewer running while application code consumes manual sensor
+buffers. Until the first response arrives, those buffers do not contain a
+current rendered measurement.</p></li>
+<li><p>A message such as <code class="docutils literal notranslate"><span class="pre">Refusing</span> <span class="pre">RGB</span> <span class="pre">sensor</span> <span class="pre">update</span> <span class="pre">without</span> <span class="pre">a</span> <span class="pre">complete</span> <span class="pre">render</span></code>
+indicates that the viewer source and rayrai package are out of sync. Rerun
+the platform install script, rebuild <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> from
+<code class="docutils literal notranslate"><span class="pre">build-examples</span></code>, and launch that build-tree executable.</p></li>
+</ul>
+</section>
 <section id="screenshots-and-recording">
-<h2><a class="toc-backref" href="#id18" role="doc-backlink">Screenshots and recording</a><a class="headerlink" href="#screenshots-and-recording" title="Link to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id23" role="doc-backlink">Screenshots and recording</a><a class="headerlink" href="#screenshots-and-recording" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p><strong>F12</strong> — capture a PNG to the configured screenshot directory.</p></li>
 <li><p><strong>F11</strong> — toggle fullscreen desktop mode.</p></li>
@@ -667,9 +861,13 @@ angle measurement. Left-click places measurement points.</p></li>
 Recorded sessions store the raw TCP frames, so you can re-render a run
 later at any quality preset.</p></li>
 </ul>
+<p>F12, <code class="docutils literal notranslate"><span class="pre">--screenshot</span></code>, and PNG-sequence recording capture the rayrai scene
+texture. They intentionally exclude ImGui overlays and operating-system window
+decorations. Capture the application window with a desktop capture tool when
+documenting the Connection/Object/Diagnostics UI itself.</p>
 </section>
 <section id="articulated-system-inspector-mode">
-<h2><a class="toc-backref" href="#id19" role="doc-backlink">Articulated-system inspector mode</a><a class="headerlink" href="#articulated-system-inspector-mode" title="Link to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id24" role="doc-backlink">Articulated-system inspector mode</a><a class="headerlink" href="#articulated-system-inspector-mode" title="Link to this heading"></a></h2>
 <p>While the viewer is <em>not</em> connected to a server, you can drag a URDF (<code class="docutils literal notranslate"><span class="pre">.urdf</span></code>)
 or MuJoCo XML (<code class="docutils literal notranslate"><span class="pre">.xml</span></code>/<code class="docutils literal notranslate"><span class="pre">.mjcf</span></code>) file from your file manager onto the viewer
 window. The file content is sniffed for a <code class="docutils literal notranslate"><span class="pre">&lt;mujoco</span></code> root marker; if present
@@ -696,20 +894,20 @@ active so that the streamed scene and the local robot don’t fight over the
 same renderer; disconnect first if you want to inspect a file.</p>
 </section>
 <section id="objects-and-selection">
-<h2><a class="toc-backref" href="#id20" role="doc-backlink">Objects and selection</a><a class="headerlink" href="#objects-and-selection" title="Link to this heading"></a></h2>
-<p>Click any object in the scene or in the <strong>Objects</strong> tab list to select it.
+<h2><a class="toc-backref" href="#id25" role="doc-backlink">Objects and selection</a><a class="headerlink" href="#objects-and-selection" title="Link to this heading"></a></h2>
+<p>Click any object in the scene or in the <strong>Object</strong> tab list to select it.
 The right-side inspector shows:</p>
 <ul class="simple">
 <li><p>Object name, tag, body type</p></li>
 <li><p>World-space position and orientation</p></li>
 <li><p>For articulated systems: joint names and current joint angles</p></li>
-<li><p>Toggleable collision-body visibility per-object</p></li>
+<li><p>Rolling motion/contact plots and a Sensors tab when those data are available</p></li>
 </ul>
-<p>The <strong>Objects</strong> tab supports group-by-type, name filtering, and a
-collision-hide toggle that propagates to every selectable object at once.</p>
+<p>The <strong>Object</strong> tab supports group-by-type, name/type/tag filtering, multiple
+sort modes, and a collision-row filter.</p>
 </section>
 <section id="rendering-settings">
-<h2><a class="toc-backref" href="#id21" role="doc-backlink">Rendering settings</a><a class="headerlink" href="#rendering-settings" title="Link to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id26" role="doc-backlink">Rendering settings</a><a class="headerlink" href="#rendering-settings" title="Link to this heading"></a></h2>
 <p>The <strong>Render</strong> tab exposes the rayrai pipeline controls covered in detail in
 <a class="reference internal" href="rayrai/RenderQuality.html"><span class="doc">Render quality, tone mapping, color grading</span></a>, <a class="reference internal" href="rayrai/Lighting.html"><span class="doc">Lighting, shadows, and HDR/IBL</span></a>,
 <a class="reference internal" href="rayrai/PostProcess.html"><span class="doc">Post-process effects</span></a>, and <a class="reference internal" href="rayrai/Weather.html"><span class="doc">Weather and atmospherics</span></a>: quality preset, FXAA,
@@ -718,21 +916,22 @@ reflection-probe / planar-reflection toggles, and PBR material/tone-mapping
 options.</p>
 </section>
 <section id="diagnostics">
-<h2><a class="toc-backref" href="#id22" role="doc-backlink">Diagnostics</a><a class="headerlink" href="#diagnostics" title="Link to this heading"></a></h2>
-<p>The <strong>Diagnostics</strong> tab shows live packet history, asset resolution status
-(useful when meshes can’t be found), and per-frame parse-error logs. Useful
-when developing custom clients or chasing mesh-path issues.</p>
+<h2><a class="toc-backref" href="#id27" role="doc-backlink">Diagnostics</a><a class="headerlink" href="#diagnostics" title="Link to this heading"></a></h2>
+<p>The <strong>Diagnostics</strong> tab shows receive-rate and round-trip graphs, packet parse
+status, asset resolution, server beacon metadata, and the adjustable update
+target. Use <strong>Verbose parsing</strong> in the Connection tab when developing custom
+clients or chasing malformed frames.</p>
 </section>
 <section id="wire-format">
-<h2><a class="toc-backref" href="#id23" role="doc-backlink">Wire format</a><a class="headerlink" href="#wire-format" title="Link to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id28" role="doc-backlink">Wire format</a><a class="headerlink" href="#wire-format" title="Link to this heading"></a></h2>
 <p>The Rayrai TCP viewer protocol is explicitly versioned. The current viewer
 sends a protocol header with feature bits before each request, and the
 server replies with the negotiated feature set. A viewer rejects newer
 unsupported protocol versions with a clear error instead of attempting to
 parse an incompatible stream.</p>
 <p>Current feature bits cover the explicit header, deformable delta streaming,
-and sim control. Deformable objects send mesh topology during initialization
-or topology changes; ordinary update frames send vertex positions only. This
+sim control, and contact ownership tags. Deformable objects send mesh topology
+during initialization or topology changes; ordinary update frames send vertex positions only. This
 keeps dynamic cloth/cube streaming cheaper while avoiding binary compression
 until network bandwidth is measured as a bottleneck.</p>
 <p>The protocol constants live in <code class="docutils literal notranslate"><span class="pre">rayrai/RaisimTcpCommon.hpp</span></code> (namespace
@@ -742,7 +941,8 @@ until network bandwidth is measured as a bottleneck.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">kProtocolVersion</span></code> — the current wire version. Mismatched versions cause
 the viewer to disconnect with a versioned-protocol error.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">kProtocolFeatureExplicitHeader</span></code>, <code class="docutils literal notranslate"><span class="pre">kProtocolFeatureDeformableDelta</span></code>,
-and <code class="docutils literal notranslate"><span class="pre">kProtocolFeatureSimControl</span></code> — the currently-negotiated feature bits;
+<code class="docutils literal notranslate"><span class="pre">kProtocolFeatureSimControl</span></code>, and <code class="docutils literal notranslate"><span class="pre">kProtocolFeatureContactObjectTags</span></code> —
+the currently-negotiated feature bits;
 <code class="docutils literal notranslate"><span class="pre">kProtocolSupportedFeatures</span></code> is the OR of all bits this build understands.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">kMaxMessageBytes</span></code> — maximum accepted message size (default 64 MiB),
 overridable at build time via the
@@ -754,12 +954,12 @@ an <code class="docutils literal notranslate"><span class="pre">int32_t</span></
 Scene strings use <code class="docutils literal notranslate"><span class="pre">int32_t</span></code> lengths; sensor-response names use <code class="docutils literal notranslate"><span class="pre">uint64_t</span></code>
 lengths to remain ABI-compatible with the legacy <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> protocol.</p>
 </section>
-<section id="headless-screenshot-recipe">
-<h2><a class="toc-backref" href="#id24" role="doc-backlink">Headless screenshot recipe</a><a class="headerlink" href="#headless-screenshot-recipe" title="Link to this heading"></a></h2>
-<p>The same binary runs without a window manager when invoked with
-<code class="docutils literal notranslate"><span class="pre">--screenshot</span></code>. The viewer connects, waits for the first valid scene
-update, captures one PNG, and exits — useful for CI smoke tests, doc
-builds, and dataset preview generation:</p>
+<section id="automated-scene-screenshot-recipe">
+<h2><a class="toc-backref" href="#id29" role="doc-backlink">Automated scene screenshot recipe</a><a class="headerlink" href="#automated-scene-screenshot-recipe" title="Link to this heading"></a></h2>
+<p>With a working OpenGL display (a desktop session or a virtual display such as
+Xvfb), <code class="docutils literal notranslate"><span class="pre">--screenshot</span></code> connects, waits for the first valid scene update,
+captures one scene-only PNG, and exits. The viewer still creates its SDL/OpenGL
+window and is not a display-free renderer:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>./raisim_env.sh
 
 <span class="c1"># 1) Start any RaisimServer example in the background.</span>
@@ -775,12 +975,11 @@ builds, and dataset preview generation:</p>
 <span class="w">    </span>--exit-after<span class="w"> </span><span class="m">5</span>
 </pre></div>
 </div>
-<p>The two screenshots on this page were generated exactly this way. Combine
-<code class="docutils literal notranslate"><span class="pre">--minimize-panels</span></code> for clean shots, or omit it to capture the overlay
-panels.</p>
+<p><code class="docutils literal notranslate"><span class="pre">--minimize-panels</span></code> affects the live window but not the scene-only PNG.
+Use an operating-system window capture when the UI itself is the subject.</p>
 </section>
 <section id="embedding-the-server-in-your-application">
-<h2><a class="toc-backref" href="#id25" role="doc-backlink">Embedding the server in your application</a><a class="headerlink" href="#embedding-the-server-in-your-application" title="Link to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id30" role="doc-backlink">Embedding the server in your application</a><a class="headerlink" href="#embedding-the-server-in-your-application" title="Link to this heading"></a></h2>
 <p>Wire the server up on the simulation side with three lines and a tick
 callback that runs under the world mutex:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;raisim/RaisimServer.hpp&quot;</span>
@@ -816,7 +1015,7 @@ for a runnable showcase (<code class="docutils literal notranslate"><span class=
 surface end-to-end).</p>
 </section>
 <section id="writing-a-custom-client">
-<h2><a class="toc-backref" href="#id26" role="doc-backlink">Writing a custom client</a><a class="headerlink" href="#writing-a-custom-client" title="Link to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id31" role="doc-backlink">Writing a custom client</a><a class="headerlink" href="#writing-a-custom-client" title="Link to this heading"></a></h2>
 <p>The header <code class="docutils literal notranslate"><span class="pre">rayrai/RaisimTcpCommon.hpp</span></code> exposes everything a custom client
 needs: the <code class="docutils literal notranslate"><span class="pre">TcpClient</span></code> socket helper, <code class="docutils literal notranslate"><span class="pre">BufferReader</span></code> for parsing, the
 <code class="docutils literal notranslate"><span class="pre">ClientRequestType</span></code> enum (CR_PAUSE / CR_RESUME / CR_STEP_N / CR_APPLY_FORCE
@@ -857,7 +1056,7 @@ versions or unsupported feature bits are reported via <code class="docutils lite
 the bytes at offset 0; the server will not send a payload it knows the
 client cannot parse.</p>
 <section id="driving-the-simulation-from-a-custom-client">
-<h3><a class="toc-backref" href="#id27" role="doc-backlink">Driving the simulation from a custom client</a><a class="headerlink" href="#driving-the-simulation-from-a-custom-client" title="Link to this heading"></a></h3>
+<h3><a class="toc-backref" href="#id32" role="doc-backlink">Driving the simulation from a custom client</a><a class="headerlink" href="#driving-the-simulation-from-a-custom-client" title="Link to this heading"></a></h3>
 <p>Pause / step / force / pose are batched onto the same update frame the
 viewer normally pulls. Each <code class="docutils literal notranslate"><span class="pre">SimControlRequest</span></code> is a tagged union — only
 the fields relevant to <code class="docutils literal notranslate"><span class="pre">type</span></code> are read by the encoder:</p>
@@ -909,7 +1108,7 @@ populates internally, so a custom Python or C# client built on top of
 shipped viewer’s Pause / Step / force / pose surface.</p>
 </section>
 <section id="feature-negotiation">
-<h3><a class="toc-backref" href="#id28" role="doc-backlink">Feature negotiation</a><a class="headerlink" href="#feature-negotiation" title="Link to this heading"></a></h3>
+<h3><a class="toc-backref" href="#id33" role="doc-backlink">Feature negotiation</a><a class="headerlink" href="#feature-negotiation" title="Link to this heading"></a></h3>
 <p>After connecting, the first server frame carries the negotiated feature
 bits. A custom client should AND those bits with <code class="docutils literal notranslate"><span class="pre">kProtocolFeatureSimControl</span></code>
 once at startup, and grey out sim-control surfaces if the bit is not set —
@@ -918,7 +1117,7 @@ exactly what the TCP viewer does internally via
 </section>
 </section>
 <section id="see-also">
-<h2><a class="toc-backref" href="#id29" role="doc-backlink">See also</a><a class="headerlink" href="#see-also" title="Link to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id34" role="doc-backlink">See also</a><a class="headerlink" href="#see-also" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="Rayrai.html"><span class="doc">rayrai Visualizer</span></a> — in-process rayrai renderer and visualization APIs.</p></li>
 <li><p><a class="reference internal" href="RaisimServer.html"><span class="doc">Raisim Server</span></a> — server-side API including the sim-control surface.</p></li>
@@ -928,7 +1127,7 @@ in-process rayrai.</p></li>
 </ul>
 </section>
 <section id="api">
-<h2><a class="toc-backref" href="#id30" role="doc-backlink">API</a><a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id35" role="doc-backlink">API</a><a class="headerlink" href="#api" title="Link to this heading"></a></h2>
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin10tcp_viewer12BufferReaderE">
 <span id="_CPPv3N6raisin10tcp_viewer12BufferReaderE"></span><span id="_CPPv2N6raisin10tcp_viewer12BufferReaderE"></span><span id="raisin::tcp_viewer::BufferReader"></span><span class="target" id="structraisin_1_1tcp__viewer_1_1BufferReader"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BufferReader</span></span></span><a class="headerlink" href="#_CPPv4N6raisin10tcp_viewer12BufferReaderE" title="Link to this definition"></a><br /></dt>

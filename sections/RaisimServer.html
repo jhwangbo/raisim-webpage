@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Raisim Server &mdash; raisim 2.5.4 documentation</title>
+  <title>Raisim Server &mdash; raisim 2.5.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=68f46a9b" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=c0370f68"></script>
+      <script src="../_static/documentation_options.js?v=644f8b71"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -283,14 +283,18 @@ Call <code class="docutils literal notranslate"><span class="pre">killServer()</
 </section>
 <section id="sensor-measurements">
 <h2>Sensor measurements<a class="headerlink" href="#sensor-measurements" title="Link to this heading"></a></h2>
-<p>RaiSim does not support sensor measurement updates from a visualizer.
-<code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> streams the world state to visualizer clients, but it does not
-request RGB or depth frames back from TCP visualizers and does not write
-visualizer-rendered data into RaiSim sensor buffers.</p>
-<p>Use <code class="docutils literal notranslate"><span class="pre">Sensor::MeasurementSource::RAISIM</span></code> for sensors that RaiSim can compute
-from the physics world, such as IMU, spinning LiDAR, and depth-camera CPU ray
-updates. Use <code class="docutils literal notranslate"><span class="pre">Sensor::MeasurementSource::MANUAL</span></code> when user code or an
-in-process renderer writes the sensor buffer.</p>
+<p><code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> can request manual RGB/depth measurements from the current
+rayrai TCP viewer. When a <code class="docutils literal notranslate"><span class="pre">MeasurementSource::MANUAL</span></code> camera reaches its
+update period, the normal scene response includes its pose, lens model,
+resolution, and clipping range. The viewer renders a complete camera pass and
+returns BGRA pixels or metric depth values in a <code class="docutils literal notranslate"><span class="pre">REQUEST_SENSOR_UPDATE</span></code>
+frame. The server validates every entry before replacing sensor buffers and
+updating timestamps.</p>
+<p>IMU and spinning LiDAR remain RaiSim-side measurements; their metadata is
+streamed for inspection but the viewer does not return their samples. Use
+<code class="docutils literal notranslate"><span class="pre">MeasurementSource::RAISIM</span></code> for RaiSim-computed sensors and manual RGB/depth
+when the connected viewer should provide the render. See
+<a class="reference internal" href="RayraiTcpViewer.html#tcp-viewer-sensor-round-trip"><span class="std std-ref">RGB/depth sensor round trip</span></a> on the TCP viewer page.</p>
 </section>
 <section id="synchronous-updates-optional">
 <h2>Synchronous updates (optional)<a class="headerlink" href="#synchronous-updates-optional" title="Link to this heading"></a></h2>
@@ -315,8 +319,10 @@ client may pause / resume / step the simulation and push external forces,
 torques, body poses, and articulated-system generalized coordinates over the
 wire. The server applies no authentication — if the connection is open, the
 client can drive it. See <a class="reference internal" href="#interactive-sim-control">Interactive sim control</a> below.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PROTOCOL_FEATURE_CONTACT_OBJECT_TAGS</span></code>: each streamed contact identifies
+both participating objects, enabling per-object contact counts and plots.</p></li>
 </ul>
-<p>The rayrai TCP viewer negotiates all three flags automatically. Custom clients
+<p>The rayrai TCP viewer negotiates all four flags automatically. Custom clients
 can opt into any flag through the <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> and <code class="docutils literal notranslate"><span class="pre">RaisimTcpCommon</span></code>
 headers.</p>
 </section>
@@ -324,7 +330,7 @@ headers.</p>
 <span id="id1"></span><h2>Interactive sim control<a class="headerlink" href="#interactive-sim-control" title="Link to this heading"></a></h2>
 <p>When the <code class="docutils literal notranslate"><span class="pre">SIM_CONTROL</span></code> feature is negotiated, a connected client (such as
 <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code>) can drive the simulation from its UI rather than
-just observing it. The viewer’s <strong>Control</strong> tab gets a <em>Simulation</em> row with
+just observing it. The viewer’s <strong>Object</strong> tab gets a <em>Simulation</em> row with
 icon-text buttons for Pause / Resume / Step / Step 10.</p>
 <p>Client requests added by this feature:</p>
 <ul class="simple">
@@ -338,9 +344,9 @@ point on a body. Drained at the next integration tick.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">CR_SET_POSE</span></code> — teleport a single-body object to a position + quaternion.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">CR_SET_GC</span></code> — set the generalized coordinate of an articulated system.</p></li>
 </ul>
-<p>There is no authentication or capability handshake — if the connection is open,
-the client can issue any of these requests. The bind address is the only
-access control the server provides:</p>
+<p>There is no authentication or per-client authorization — if the connection is
+open, the client can issue any request negotiated by both ends. The bind
+address is the only access control the server provides:</p>
 <p>The same pause / step state is reachable from your own simulation code,
 so a headless server can drive its own loop:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">server</span><span class="p">.</span><span class="n">pauseSimulation</span><span class="p">();</span>
@@ -404,7 +410,7 @@ visibility with:</p>
 </div>
 <p>Treat this as a security boundary — once the server is reachable from a wider
 network, every client on that network can pause / step / force-apply /
-spawn-remove. There is no token or capability handshake to fall back on.</p>
+spawn-remove. There is no token or authorization layer to fall back on.</p>
 </section>
 <section id="discovery-beacons">
 <h2>Discovery beacons<a class="headerlink" href="#discovery-beacons" title="Link to this heading"></a></h2>
@@ -412,7 +418,7 @@ spawn-remove. There is no token or capability handshake to fall back on.</p>
 beacon once per second on port <code class="docutils literal notranslate"><span class="pre">59312</span></code>. The beacon payload contains the
 RaiSim TCP protocol version, TCP port, host name, executable name, bind mode
 (<code class="docutils literal notranslate"><span class="pre">loopback</span></code> or <code class="docutils literal notranslate"><span class="pre">all</span></code>), and connection status. <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code>
-uses these beacons to populate the detected-server list in its <strong>Control</strong>
+uses these beacons to populate the detected-server list in its <strong>Connection</strong>
 tab.</p>
 <p>With the default loopback bind, beacons are sent only to <code class="docutils literal notranslate"><span class="pre">127.0.0.1</span></code>. After
 <code class="docutils literal notranslate"><span class="pre">server.setBindLoopbackOnly(false)</span></code>, they are broadcast on the local network
@@ -495,7 +501,7 @@ TCP connection still works.</p>
 <span id="_CPPv3N6raisim12RaisimServer12launchServerEi"></span><span id="_CPPv2N6raisim12RaisimServer12launchServerEi"></span><span id="raisim::RaisimServer::launchServer__i"></span><span class="target" id="classraisim_1_1RaisimServer_1a60a67d4307f008baafd5e88d921cd4fb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">launchServer</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">port</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">8080</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim12RaisimServer12launchServerEi" title="Link to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>port</strong> – <strong>[in]</strong> port number to stream start spinning. While running, the server emits UDP discovery beacons on port 59312 so rayrai_raisim_tcp_viewer can list compatible endpoints. </p>
+<dd class="field-odd"><p><strong>port</strong> – <strong>[in]</strong> port number to stream start spinning. While running, the server emits UDP discovery beacons on port 59312 so rayrai_tcp_viewer can list compatible endpoints. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -1071,10 +1077,10 @@ TCP connection still works.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim12RaisimServer17needsSensorUpdateEv">
 <span id="_CPPv3N6raisim12RaisimServer17needsSensorUpdateEv"></span><span id="_CPPv2N6raisim12RaisimServer17needsSensorUpdateEv"></span><span id="raisim::RaisimServer::needsSensorUpdate"></span><span class="target" id="classraisim_1_1RaisimServer_1a4cf73289738339792d72d30e7214389f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">needsSensorUpdate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim12RaisimServer17needsSensorUpdateEv" title="Link to this definition"></a><br /></dt>
-<dd><p>RaiSim does not support sensor measurement updates from visualizers. </p>
+<dd><p>Check whether a manual RGB/depth camera is due for an update from the visualizer. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>false </p>
+<dd class="field-odd"><p>true when at least one supported camera needs an update </p>
 </dd>
 </dl>
 </dd></dl>

@@ -26,6 +26,10 @@ Common CMake options
        add a MATLAB wrapper subdirectory or build target.
    * - ``RAISIM_DOC``
      - Build documentation through CMake.
+   * - ``RAISIM_EXAMPLE_DESKTOP_LAUNCHER``
+     - Linux only. After each Release build of ``rayrai_tcp_viewer``, install a
+       desktop launcher for it and pin it to the GNOME / Ubuntu dock. Disabled
+       by default; see :doc:`RayraiTcpViewer`.
 
 Build examples
 ==============

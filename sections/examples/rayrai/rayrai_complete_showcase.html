@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rayrai Example: Complete Showcase &mdash; raisim 2.5.4 documentation</title>
+  <title>Rayrai Example: Complete Showcase &mdash; raisim 2.5.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=68f46a9b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=c0370f68"></script>
+      <script src="../../../_static/documentation_options.js?v=644f8b71"></script>
       <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -66,6 +66,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#target">Target</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#run">Run</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#details">Details</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#frame-capture">Frame capture</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_blender_scene_import.html">rayrai_blender_scene_import</a></li>
@@ -189,6 +190,57 @@ This example uses the in-process rayrai renderer (no external client required).<
 <li><p>Updates LiDAR scans into a point cloud and renders RGB/depth sensors.</p></li>
 <li><p>Shows camera frustums and raw sensor buffers in ImGui.</p></li>
 </ul>
+</section>
+<section id="frame-capture">
+<h2>Frame capture<a class="headerlink" href="#frame-capture" title="Link to this heading"></a></h2>
+<p>The example can write its rendered frames (scene plus the sensor panels) to disk
+so the documentation GIF can be regenerated. Capture is off unless
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_SHOWCASE_CAPTURE_DIR</span></code> is set; a normal run never reads the framebuffer
+back. Frames are written as binary PPM, which <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> reads directly.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 40.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Environment variable</p></th>
+<th class="head"><p>Effect</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RAYRAI_SHOWCASE_CAPTURE_DIR</span></code></p></td>
+<td><p>Output directory. Setting it enables capture; the example exits once the
+requested frame count is written.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RAYRAI_SHOWCASE_CAPTURE_FRAMES</span></code></p></td>
+<td><p>Number of frames to write (default 150).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RAYRAI_SHOWCASE_CAPTURE_SKIP</span></code></p></td>
+<td><p>Rendered frames to skip before capturing (default 90), so assets and
+sensor buffers are populated in the first captured frame.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RAYRAI_SHOWCASE_CAPTURE_EVERY</span></code></p></td>
+<td><p>Capture every <code class="docutils literal notranslate"><span class="pre">N</span></code>-th frame (default 1). The loop advances one physics
+step per rendered frame, so a stride above 1 is what keeps the captured
+sequence from playing back in slow motion. At the default 5 ms time step,
+stride 16 puts 80 ms of simulation in every frame, which is exactly real
+time at 12.5 fps.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">RAYRAI_SHOWCASE_CAPTURE_DIR</span><span class="o">=</span>/tmp/showcase_frames<span class="w"> </span><span class="se">\</span>
+<span class="nv">RAYRAI_SHOWCASE_CAPTURE_FRAMES</span><span class="o">=</span><span class="m">75</span><span class="w"> </span><span class="se">\</span>
+<span class="nv">RAYRAI_SHOWCASE_CAPTURE_SKIP</span><span class="o">=</span><span class="m">120</span><span class="w"> </span><span class="se">\</span>
+<span class="nv">RAYRAI_SHOWCASE_CAPTURE_EVERY</span><span class="o">=</span><span class="m">16</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>./build-examples/examples/rayrai_complete_showcase
+
+ffmpeg<span class="w"> </span>-framerate<span class="w"> </span><span class="m">12</span>.5<span class="w"> </span>-i<span class="w"> </span>/tmp/showcase_frames/frame_%04d.ppm<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-filter_complex<span class="w"> </span><span class="s2">&quot;[0:v] scale=954:540:flags=lanczos,split [a][b];\</span>
+<span class="s2">                   [a] palettegen=stats_mode=diff [p];\</span>
+<span class="s2">                   [b][p] paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-loop<span class="w"> </span><span class="m">0</span><span class="w"> </span>docs/image/rayrai_complete_showcase.gif
+</pre></div>
+</div>
 </section>
 </section>
 

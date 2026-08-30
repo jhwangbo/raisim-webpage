@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Performance notes and the C++ API reference &mdash; raisim 2.5.4 documentation</title>
+  <title>Performance notes and the C++ API reference &mdash; raisim 2.5.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=68f46a9b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=c0370f68"></script>
+      <script src="../../_static/documentation_options.js?v=644f8b71"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -299,6 +299,45 @@ program took on first use, how many are linked so far), call
 <span id="_CPPv3N6raisin12RayraiWindowE"></span><span id="_CPPv2N6raisin12RayraiWindowE"></span><span id="raisin::RayraiWindow"></span><span class="target" id="classraisin_1_1RayraiWindow"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RayraiWindow</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindowE" title="Link to this definition"></a><br /></dt>
 <dd><p>Offscreen renderer and visual scene manager for raisim. </p>
 <p><a class="reference internal" href="#classraisin_1_1RayraiWindow"><span class="std std-ref">RayraiWindow</span></a> maintains an internal <a class="reference internal" href="#classraisin_1_1Camera"><span class="std std-ref">Camera</span></a>, shader set, and a set of visual objects that can be rendered into an offscreen texture. It can render raisim world objects, custom visuals, point clouds, and coordinate frames.</p>
+<section id="classraisin_1_1RayraiWindow_1autotoc_md0_1s1">
+<h4><a class="headerlink" href="#classraisin_1_1RayraiWindow_1autotoc_md0_1s1" title="Link to this heading"></a></h4>
+<section id="classraisin_1_1RayraiWindow_1autotoc_md0">
+<span id="classraisin_1_1RayraiWindow_1autotoc_md0_1s1"></span><h5>Quick start<a class="headerlink" href="#classraisin_1_1RayraiWindow_1autotoc_md0" title="Link to this heading"></a></h5>
+<div class="highlight-default notranslate" id="classraisin_1_1RayraiWindow_1autotoc_md0"><div class="highlight"><pre><span></span><span class="n">auto</span> <span class="n">world</span> <span class="o">=</span> <span class="n">std</span><span class="p">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">raisim</span><span class="p">::</span><span class="n">World</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="n">world</span><span class="o">-&gt;</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">);</span>
+
+<span class="n">raisin</span><span class="p">::</span><span class="n">RayraiWindow</span> <span class="n">renderer</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="mi">1280</span><span class="p">,</span> <span class="mi">720</span><span class="p">);</span>
+
+<span class="o">//</span> <span class="n">Add</span> <span class="n">a</span> <span class="n">free</span><span class="o">-</span><span class="n">standing</span> <span class="n">visual</span> <span class="n">using</span> <span class="n">the</span> <span class="n">glm</span><span class="p">::</span><span class="n">vec4</span> <span class="n">colour</span> <span class="n">overload</span><span class="o">.</span>
+<span class="n">renderer</span><span class="o">.</span><span class="n">addVisualSphere</span><span class="p">(</span><span class="s2">&quot;marker&quot;</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="n">glm</span><span class="p">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">1.0</span><span class="n">f</span><span class="p">,</span> <span class="mf">0.0</span><span class="n">f</span><span class="p">,</span> <span class="mf">0.0</span><span class="n">f</span><span class="p">,</span> <span class="mf">1.0</span><span class="n">f</span><span class="p">));</span>
+
+<span class="o">//</span> <span class="p">(</span><span class="n">Optional</span><span class="p">)</span> <span class="n">IBL</span><span class="p">:</span> <span class="n">one</span> <span class="n">struct</span> <span class="n">instead</span> <span class="n">of</span> <span class="n">four</span> <span class="n">GL</span> <span class="n">handles</span><span class="o">.</span>
+<span class="n">auto</span> <span class="n">env</span> <span class="o">=</span> <span class="n">raisin</span><span class="p">::</span><span class="n">PbrEnvironment</span><span class="p">::</span><span class="n">loadFromHdrFile</span><span class="p">(</span><span class="s2">&quot;studio.hdr&quot;</span><span class="p">);</span>
+
+<span class="o">//</span> <span class="n">Drive</span> <span class="n">the</span> <span class="n">simulation</span> <span class="ow">and</span> <span class="n">render</span> <span class="n">one</span> <span class="n">frame</span><span class="o">.</span>
+<span class="n">world</span><span class="o">-&gt;</span><span class="n">integrate</span><span class="p">();</span>
+<span class="n">renderer</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1280</span><span class="p">,</span> <span class="mi">720</span><span class="p">,</span> <span class="n">false</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">false</span><span class="p">);</span>
+<span class="n">unsigned</span> <span class="nb">int</span> <span class="n">textureId</span> <span class="o">=</span> <span class="n">renderer</span><span class="o">.</span><span class="n">getImageTexture</span><span class="p">();</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="classraisin_1_1RayraiWindow_1autotoc_md1_1s1">
+<h4><a class="headerlink" href="#classraisin_1_1RayraiWindow_1autotoc_md1_1s1" title="Link to this heading"></a></h4>
+<section id="classraisin_1_1RayraiWindow_1autotoc_md1">
+<span id="classraisin_1_1RayraiWindow_1autotoc_md1_1s1"></span><h5>Lifetime<a class="headerlink" href="#classraisin_1_1RayraiWindow_1autotoc_md1" title="Link to this heading"></a></h5>
+<p id="classraisin_1_1RayraiWindow_1autotoc_md1">The window does not own the world. The <code class="docutils literal notranslate"><a class="reference internal" href="../WorldSystem.html#classraisim_1_1World"><span class="std std-ref"><span class="pre">raisim::World</span></span></a></code> passed to the constructor must outlive the window. Either constructor signature is acceptable; the <code class="docutils literal notranslate"><span class="pre">shared_ptr</span></code> overload uses a non-owning deleter internally.</p>
+</section>
+</section>
+<section id="classraisin_1_1RayraiWindow_1autotoc_md2_1s1">
+<h4><a class="headerlink" href="#classraisin_1_1RayraiWindow_1autotoc_md2_1s1" title="Link to this heading"></a></h4>
+<section id="classraisin_1_1RayraiWindow_1autotoc_md2">
+<span id="classraisin_1_1RayraiWindow_1autotoc_md2_1s1"></span><h5>Error model<a class="headerlink" href="#classraisin_1_1RayraiWindow_1autotoc_md2" title="Link to this heading"></a></h5>
+<p id="classraisin_1_1RayraiWindow_1autotoc_md2">Mutation methods that target an entity by name (e.g. <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RayraiWindow_1a9d3c0046701cd62d5182a9c978bfa2a9"><span class="std std-ref"><span class="pre">removeVisualObject()</span></span></a></code>, <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RayraiWindow_1a689478117fbfa4943f9571e7cb86cf7b"><span class="std std-ref"><span class="pre">clearAdditionalLights()</span></span></a></code>) are <strong>silent no-ops</strong> when the target does not exist. They never throw and never return failure. Callers can issue the call unconditionally without a prior existence check.</p>
+<p>Resource creation methods (<code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RayraiWindow_1a4ecb5d13393d61c7f71c45dfd9094525"><span class="std std-ref"><span class="pre">loadTextureWithTiling</span></span></a></code>, <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RayraiWindow_1ad6742c31a9c0585e117eb45764cf49a1"><span class="std std-ref"><span class="pre">loadHdrEquirectangularCubemap</span></span></a></code>, <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RayraiWindow_1a7aee1644671e281d222696db145a199c"><span class="std std-ref"><span class="pre">addVisualMesh</span></span></a></code>, …) signal failure with a zero handle or a null <code class="docutils literal notranslate"><span class="pre">shared_ptr</span></code> and log an error to stderr.</p>
+<p>Threading-mode mismatch at construction is fatal (<code class="docutils literal notranslate"><span class="pre">RSFATAL</span></code>). </p>
+</section>
+</section>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
 <dl class="cpp enum-class">
@@ -334,7 +373,7 @@ program took on first use, how many are linked so far), call
 <li><p><strong>world</strong> – Shared world pointer used for pulling object state. </p></li>
 <li><p><strong>width</strong> – Initial render target width. </p></li>
 <li><p><strong>height</strong> – Initial render target height. </p></li>
-<li><p><strong>threadingMode</strong> – Concurrency contract — see ThreadingMode. </p></li>
+<li><p><strong>threadingMode</strong> – Concurrency contract — see <a class="reference internal" href="#classraisin_1_1RayraiWindow_1ac60a9fed4737e2679b298f856c2f0625"><span class="std std-ref">ThreadingMode</span></a>. </p></li>
 <li><p><strong>shaderCompileThreadCount</strong> – Driver-side shader compile threads (passed to <code class="docutils literal notranslate"><span class="pre">glMaxShaderCompilerThreadsARB</span></code>). Defaults to 1 (single-threaded) to match rayrai’s overall single-threaded default; raise this only when the host application explicitly opts into multi-threading. </p></li>
 <li><p><strong>shaderBinaryCacheEnabled</strong> – When true, compiled shader programs are persisted under <code class="docutils literal notranslate"><span class="pre">shaderBinaryCacheDirectory</span></code> and reused on next run, skipping driver compile entirely for unchanged GLSL/driver. </p></li>
 <li><p><strong>shaderBinaryCacheDirectory</strong> – Explicit cache directory. Empty selects the default <code class="docutils literal notranslate"><span class="pre">$HOME/.raisim/rayrai</span></code> location. </p></li>
@@ -354,7 +393,7 @@ program took on first use, how many are linked so far), call
 <li><p><strong>world</strong> – World reference used for pulling object state. </p></li>
 <li><p><strong>width</strong> – Initial render target width. </p></li>
 <li><p><strong>height</strong> – Initial render target height. </p></li>
-<li><p><strong>threadingMode</strong> – Concurrency contract — see ThreadingMode. </p></li>
+<li><p><strong>threadingMode</strong> – Concurrency contract — see <a class="reference internal" href="#classraisin_1_1RayraiWindow_1ac60a9fed4737e2679b298f856c2f0625"><span class="std std-ref">ThreadingMode</span></a>. </p></li>
 <li><p><strong>shaderCompileThreadCount</strong> – Driver-side shader compile threads (passed to <code class="docutils literal notranslate"><span class="pre">glMaxShaderCompilerThreadsARB</span></code>). Defaults to 1 (single-threaded) to match rayrai’s overall single-threaded default; raise this only when the host application explicitly opts into multi-threading. </p></li>
 <li><p><strong>shaderBinaryCacheEnabled</strong> – When true, compiled shader programs are persisted under <code class="docutils literal notranslate"><span class="pre">shaderBinaryCacheDirectory</span></code> and reused on next run, skipping driver compile entirely for unchanged GLSL/driver. </p></li>
 <li><p><strong>shaderBinaryCacheDirectory</strong> – Explicit cache directory. Empty selects the default <code class="docutils literal notranslate"><span class="pre">$HOME/.raisim/rayrai</span></code> location. </p></li>
@@ -1088,7 +1127,7 @@ Prefer <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8907af
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow14makeVisualMeshENSt6stringENSt6stringE">
 <span id="_CPPv3N6raisin12RayraiWindow14makeVisualMeshENSt6stringENSt6stringE"></span><span id="_CPPv2N6raisin12RayraiWindow14makeVisualMeshENSt6stringENSt6stringE"></span><span id="raisin::RayraiWindow::makeVisualMesh__ss.ss"></span><span class="target" id="classraisin_1_1RayraiWindow_1a6e724dc356de87e45a1b8cfb6807d65b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisin12RayraiWindow17VisualMeshBuilderE" title="raisin::RayraiWindow::VisualMeshBuilder"><span class="n"><span class="pre">VisualMeshBuilder</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">makeVisualMesh</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">meshFile</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow14makeVisualMeshENSt6stringENSt6stringE" title="Link to this definition"></a><br /></dt>
-<dd><p>Start a fluent build of an <code class="docutils literal notranslate"><span class="pre">addVisualMesh</span></code> visual. See <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RayraiWindow_1_1VisualMeshBuilder"><span class="std std-ref"><span class="pre">VisualMeshBuilder</span></span></a></code>. </p>
+<dd><p>Start a fluent build of an <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RayraiWindow_1a7aee1644671e281d222696db145a199c"><span class="std std-ref"><span class="pre">addVisualMesh</span></span></a></code> visual. See <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RayraiWindow_1_1VisualMeshBuilder"><span class="std std-ref"><span class="pre">VisualMeshBuilder</span></span></a></code>. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -1298,8 +1337,8 @@ Prefer <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8907af
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow24renderDepthPlaneDistanceERN6raisim11DepthCameraER6CameraP6Shader">
-<span id="_CPPv3N6raisin12RayraiWindow24renderDepthPlaneDistanceERN6raisim11DepthCameraER6CameraP6Shader"></span><span id="_CPPv2N6raisin12RayraiWindow24renderDepthPlaneDistanceERN6raisim11DepthCameraER6CameraP6Shader"></span><span id="raisin::RayraiWindow::renderDepthPlaneDistance__raisim::DepthCameraR.CameraR.ShaderP"></span><span class="target" id="classraisin_1_1RayraiWindow_1a428c279189f2748b4a4c0d49d396ef25"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">renderDepthPlaneDistance</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../Sensors.html#_CPPv4N6raisim11DepthCameraE" title="raisim::DepthCamera"><span class="n"><span class="pre">DepthCamera</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">sensorCam</span></span>, <a class="reference internal" href="#_CPPv4N6raisin6CameraE" title="raisin::Camera"><span class="n"><span class="pre">Camera</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">cam</span></span>, <span class="n"><span class="pre">Shader</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">depthPlaneOverride</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow24renderDepthPlaneDistanceERN6raisim11DepthCameraER6CameraP6Shader" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow24renderDepthPlaneDistanceERN6raisim11DepthCameraER6CameraP6Shaderbb">
+<span id="_CPPv3N6raisin12RayraiWindow24renderDepthPlaneDistanceERN6raisim11DepthCameraER6CameraP6Shaderbb"></span><span id="_CPPv2N6raisin12RayraiWindow24renderDepthPlaneDistanceERN6raisim11DepthCameraER6CameraP6Shaderbb"></span><span id="raisin::RayraiWindow::renderDepthPlaneDistance__raisim::DepthCameraR.CameraR.ShaderP.b.b"></span><span class="target" id="classraisin_1_1RayraiWindow_1a735bbfb87d5147455054e9b8a4f56389"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">renderDepthPlaneDistance</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../Sensors.html#_CPPv4N6raisim11DepthCameraE" title="raisim::DepthCamera"><span class="n"><span class="pre">DepthCamera</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">sensorCam</span></span>, <a class="reference internal" href="#_CPPv4N6raisin6CameraE" title="raisin::Camera"><span class="n"><span class="pre">Camera</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">cam</span></span>, <span class="n"><span class="pre">Shader</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">depthPlaneOverride</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">drawVisualizationObjects</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">visualizationObjectsMustBeDetectable</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow24renderDepthPlaneDistanceERN6raisim11DepthCameraER6CameraP6Shaderbb" title="Link to this definition"></a><br /></dt>
 <dd><p>Render a linear depth plane for a raisim depth camera. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1307,20 +1346,24 @@ Prefer <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8907af
 <li><p><strong>sensorCam</strong> – Raisim depth camera. </p></li>
 <li><p><strong>cam</strong> – Render camera to use. </p></li>
 <li><p><strong>depthPlaneOverride</strong> – Optional shader override. </p></li>
+<li><p><strong>drawVisualizationObjects</strong> – Include custom and instanced visuals. </p></li>
+<li><p><strong>visualizationObjectsMustBeDetectable</strong> – When true, include only visualization objects marked detectable; when false, include all visualization objects. </p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow24renderDepthPlaneDistanceER6CameraP6Shader">
-<span id="_CPPv3N6raisin12RayraiWindow24renderDepthPlaneDistanceER6CameraP6Shader"></span><span id="_CPPv2N6raisin12RayraiWindow24renderDepthPlaneDistanceER6CameraP6Shader"></span><span id="raisin::RayraiWindow::renderDepthPlaneDistance__CameraR.ShaderP"></span><span class="target" id="classraisin_1_1RayraiWindow_1a53faa39067ee4e15ea605a25c7275235"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">renderDepthPlaneDistance</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6raisin6CameraE" title="raisin::Camera"><span class="n"><span class="pre">Camera</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">cam</span></span>, <span class="n"><span class="pre">Shader</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">depthPlaneOverride</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow24renderDepthPlaneDistanceER6CameraP6Shader" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow24renderDepthPlaneDistanceER6CameraP6Shaderbb">
+<span id="_CPPv3N6raisin12RayraiWindow24renderDepthPlaneDistanceER6CameraP6Shaderbb"></span><span id="_CPPv2N6raisin12RayraiWindow24renderDepthPlaneDistanceER6CameraP6Shaderbb"></span><span id="raisin::RayraiWindow::renderDepthPlaneDistance__CameraR.ShaderP.b.b"></span><span class="target" id="classraisin_1_1RayraiWindow_1a884a3e0b630ef6a56bf1cb1f2cb49cd2"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">renderDepthPlaneDistance</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6raisin6CameraE" title="raisin::Camera"><span class="n"><span class="pre">Camera</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">cam</span></span>, <span class="n"><span class="pre">Shader</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">depthPlaneOverride</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">drawVisualizationObjects</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">visualizationObjectsMustBeDetectable</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow24renderDepthPlaneDistanceER6CameraP6Shaderbb" title="Link to this definition"></a><br /></dt>
 <dd><p>Render a linear depth plane with a given camera. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>cam</strong> – Render camera to use. </p></li>
 <li><p><strong>depthPlaneOverride</strong> – Optional shader override. </p></li>
+<li><p><strong>drawVisualizationObjects</strong> – Include custom and instanced visuals. </p></li>
+<li><p><strong>visualizationObjectsMustBeDetectable</strong> – When true, include only visualization objects marked detectable; when false, include all visualization objects. </p></li>
 </ul>
 </dd>
 </dl>
@@ -1536,7 +1579,7 @@ Prefer <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8907af
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow16warmupNextShaderERb">
 <span id="_CPPv3N6raisin12RayraiWindow16warmupNextShaderERb"></span><span id="_CPPv2N6raisin12RayraiWindow16warmupNextShaderERb"></span><span id="raisin::RayraiWindow::warmupNextShader__bR"></span><span class="target" id="classraisin_1_1RayraiWindow_1a72263fbd3f72edbae15185daac1fe96a"></span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">warmupNextShader</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">done</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow16warmupNextShaderERb" title="Link to this definition"></a><br /></dt>
 <dd><p>Compile one not-yet-compiled built-in shader program, if any. </p>
-<p>Returns the number of milliseconds spent compiling (0 if no work was done). The output flag <code class="docutils literal notranslate"><span class="pre">done</span></code> is set to true when every registered program has been compiled at least once. Iterates all registered programs — most of which an application typically doesn’t use; prefer <code class="docutils literal notranslate"><span class="pre">compileShaderByName</span></code> to pre-warm just the heavy shaders your active scene actually exercises. Must be called on the thread that owns the GL context. </p>
+<p>Returns the number of milliseconds spent compiling (0 if no work was done). The output flag <code class="docutils literal notranslate"><span class="pre">done</span></code> is set to true when every registered program has been compiled at least once. Iterates all registered programs — most of which an application typically doesn’t use; prefer <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RayraiWindow_1a2c71064a0b16f2fe24eef049c013ac01"><span class="std std-ref"><span class="pre">compileShaderByName</span></span></a></code> to pre-warm just the heavy shaders your active scene actually exercises. Must be called on the thread that owns the GL context. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -1969,162 +2012,10 @@ Prefer <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8907af
 
 </div>
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow37CaptureFilteredReflectionProbeOptionsE">
-<span id="_CPPv3N6raisin12RayraiWindow37CaptureFilteredReflectionProbeOptionsE"></span><span id="_CPPv2N6raisin12RayraiWindow37CaptureFilteredReflectionProbeOptionsE"></span><span id="raisin::RayraiWindow::CaptureFilteredReflectionProbeOptions"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1CaptureFilteredReflectionProbeOptions"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CaptureFilteredReflectionProbeOptions</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow37CaptureFilteredReflectionProbeOptionsE" title="Link to this definition"></a><br /></dt>
-<dd><p>Options bundle for <code class="docutils literal notranslate"><span class="pre">captureFilteredReflectionProbe</span></code>; replaces the three positional overloads with a single struct so callers do not have to remember which overload accepts which knob. </p>
-</dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow39ConservativeOcclusionCullingDiagnosticsE">
-<span id="_CPPv3N6raisin12RayraiWindow39ConservativeOcclusionCullingDiagnosticsE"></span><span id="_CPPv2N6raisin12RayraiWindow39ConservativeOcclusionCullingDiagnosticsE"></span><span id="raisin::RayraiWindow::ConservativeOcclusionCullingDiagnostics"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ConservativeOcclusionCullingDiagnostics"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ConservativeOcclusionCullingDiagnostics</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow39ConservativeOcclusionCullingDiagnosticsE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow16DebugPassCaptureE">
-<span id="_CPPv3N6raisin12RayraiWindow16DebugPassCaptureE"></span><span id="_CPPv2N6raisin12RayraiWindow16DebugPassCaptureE"></span><span id="raisin::RayraiWindow::DebugPassCapture"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1DebugPassCapture"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DebugPassCapture</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow16DebugPassCaptureE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow16DebugPassCapture4rgbaE">
-<span id="_CPPv3N6raisin12RayraiWindow16DebugPassCapture4rgbaE"></span><span id="_CPPv2N6raisin12RayraiWindow16DebugPassCapture4rgbaE"></span><span id="raisin::RayraiWindow::DebugPassCapture::rgba__std::vector:unsigned-c:"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1DebugPassCapture_1a2b407ee32a77269fbc15b9740610710b"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rgba</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow16DebugPassCapture4rgbaE" title="Link to this definition"></a><br /></dt>
-<dd><p>RGBA8 pixels in top-left row order, ready for PNG writers. </p>
-</dd></dl>
-
-</div>
-</dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow24DirectionalShadowCascadeE">
-<span id="_CPPv3N6raisin12RayraiWindow24DirectionalShadowCascadeE"></span><span id="_CPPv2N6raisin12RayraiWindow24DirectionalShadowCascadeE"></span><span id="raisin::RayraiWindow::DirectionalShadowCascade"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1DirectionalShadowCascade"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DirectionalShadowCascade</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow24DirectionalShadowCascadeE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow28DirectionalShadowCascadePlanE">
-<span id="_CPPv3N6raisin12RayraiWindow28DirectionalShadowCascadePlanE"></span><span id="_CPPv2N6raisin12RayraiWindow28DirectionalShadowCascadePlanE"></span><span id="raisin::RayraiWindow::DirectionalShadowCascadePlan"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1DirectionalShadowCascadePlan"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DirectionalShadowCascadePlan</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow28DirectionalShadowCascadePlanE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow28DynamicQualityRecommendationE">
-<span id="_CPPv3N6raisin12RayraiWindow28DynamicQualityRecommendationE"></span><span id="_CPPv2N6raisin12RayraiWindow28DynamicQualityRecommendationE"></span><span id="raisin::RayraiWindow::DynamicQualityRecommendation"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1DynamicQualityRecommendation"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DynamicQualityRecommendation</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow28DynamicQualityRecommendationE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow26EnvironmentSidecarSettingsE">
-<span id="_CPPv3N6raisin12RayraiWindow26EnvironmentSidecarSettingsE"></span><span id="_CPPv2N6raisin12RayraiWindow26EnvironmentSidecarSettingsE"></span><span id="raisin::RayraiWindow::EnvironmentSidecarSettings"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1EnvironmentSidecarSettings"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EnvironmentSidecarSettings</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow26EnvironmentSidecarSettingsE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow22ExposureRecommendationE">
-<span id="_CPPv3N6raisin12RayraiWindow22ExposureRecommendationE"></span><span id="_CPPv2N6raisin12RayraiWindow22ExposureRecommendationE"></span><span id="raisin::RayraiWindow::ExposureRecommendation"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ExposureRecommendation"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ExposureRecommendation</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow22ExposureRecommendationE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow18ExternalFrameCacheE">
-<span id="_CPPv3N6raisin12RayraiWindow18ExternalFrameCacheE"></span><span id="_CPPv2N6raisin12RayraiWindow18ExternalFrameCacheE"></span><span id="raisin::RayraiWindow::ExternalFrameCache"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ExternalFrameCache"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ExternalFrameCache</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow18ExternalFrameCacheE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow24FoliageRenderDiagnosticsE">
-<span id="_CPPv3N6raisin12RayraiWindow24FoliageRenderDiagnosticsE"></span><span id="_CPPv2N6raisin12RayraiWindow24FoliageRenderDiagnosticsE"></span><span id="raisin::RayraiWindow::FoliageRenderDiagnostics"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1FoliageRenderDiagnostics"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FoliageRenderDiagnostics</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow24FoliageRenderDiagnosticsE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow24ImportVisualSceneOptionsE">
-<span id="_CPPv3N6raisin12RayraiWindow24ImportVisualSceneOptionsE"></span><span id="_CPPv2N6raisin12RayraiWindow24ImportVisualSceneOptionsE"></span><span id="raisin::RayraiWindow::ImportVisualSceneOptions"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ImportVisualSceneOptions"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ImportVisualSceneOptions</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow24ImportVisualSceneOptionsE" title="Link to this definition"></a><br /></dt>
-<dd><p>Options bundle for <code class="docutils literal notranslate"><span class="pre">importVisualScene</span></code>; collapses the seven trailing optional parameters from the flat-argument overload into a struct that is easier to read and to evolve without breaking call sites. </p>
-</dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow35MaterialTextureBudgetRecommendationE">
-<span id="_CPPv3N6raisin12RayraiWindow35MaterialTextureBudgetRecommendationE"></span><span id="_CPPv2N6raisin12RayraiWindow35MaterialTextureBudgetRecommendationE"></span><span id="raisin::RayraiWindow::MaterialTextureBudgetRecommendation"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1MaterialTextureBudgetRecommendation"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaterialTextureBudgetRecommendation</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow35MaterialTextureBudgetRecommendationE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow15ReflectionProbeE">
-<span id="_CPPv3N6raisin12RayraiWindow15ReflectionProbeE"></span><span id="_CPPv2N6raisin12RayraiWindow15ReflectionProbeE"></span><span id="raisin::RayraiWindow::ReflectionProbe"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbe"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbe</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow15ReflectionProbeE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow20ReflectionProbeBlendE">
-<span id="_CPPv3N6raisin12RayraiWindow20ReflectionProbeBlendE"></span><span id="_CPPv2N6raisin12RayraiWindow20ReflectionProbeBlendE"></span><span id="raisin::RayraiWindow::ReflectionProbeBlend"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeBlend"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbeBlend</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow20ReflectionProbeBlendE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow27ReflectionProbeCaptureFrameE">
-<span id="_CPPv3N6raisin12RayraiWindow27ReflectionProbeCaptureFrameE"></span><span id="_CPPv2N6raisin12RayraiWindow27ReflectionProbeCaptureFrameE"></span><span id="raisin::RayraiWindow::ReflectionProbeCaptureFrame"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeCaptureFrame"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbeCaptureFrame</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow27ReflectionProbeCaptureFrameE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow30ReflectionProbeCaptureSettingsE">
-<span id="_CPPv3N6raisin12RayraiWindow30ReflectionProbeCaptureSettingsE"></span><span id="_CPPv2N6raisin12RayraiWindow30ReflectionProbeCaptureSettingsE"></span><span id="raisin::RayraiWindow::ReflectionProbeCaptureSettings"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeCaptureSettings"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbeCaptureSettings</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow30ReflectionProbeCaptureSettingsE" title="Link to this definition"></a><br /></dt>
-<dd><p>Explicit static reflection-probe capture settings. </p>
-<p>Probe capture is never automatic. Applications call <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8ece669182a6aab4216e0c98ffa7d8c0"><span class="std std-ref">captureReflectionProbeCubemap()</span></a> when they want a bounded real-time local reflection approximation. Custom visuals, instanced visuals, and point clouds are captured only when their draw toggles are enabled and they are marked detectable. </p>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow30ReflectionProbeCaptureSettings24drawVisualizationObjectsE">
-<span id="_CPPv3N6raisin12RayraiWindow30ReflectionProbeCaptureSettings24drawVisualizationObjectsE"></span><span id="_CPPv2N6raisin12RayraiWindow30ReflectionProbeCaptureSettings24drawVisualizationObjectsE"></span><span id="raisin::RayraiWindow::ReflectionProbeCaptureSettings::drawVisualizationObjects__b"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeCaptureSettings_1a33be4322cdde24122091b79a00c19eea"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">drawVisualizationObjects</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow30ReflectionProbeCaptureSettings24drawVisualizationObjectsE" title="Link to this definition"></a><br /></dt>
-<dd><p>Draw custom visuals and instanced visuals that are marked detectable. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow30ReflectionProbeCaptureSettings15drawPointCloudsE">
-<span id="_CPPv3N6raisin12RayraiWindow30ReflectionProbeCaptureSettings15drawPointCloudsE"></span><span id="_CPPv2N6raisin12RayraiWindow30ReflectionProbeCaptureSettings15drawPointCloudsE"></span><span id="raisin::RayraiWindow::ReflectionProbeCaptureSettings::drawPointClouds__b"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeCaptureSettings_1a318222c2baee8623c2188f8f55fabb72"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">drawPointClouds</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow30ReflectionProbeCaptureSettings15drawPointCloudsE" title="Link to this definition"></a><br /></dt>
-<dd><p>Draw point clouds that are marked detectable. </p>
-</dd></dl>
-
-</div>
-</dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow24ReflectionProbeDebugItemE">
-<span id="_CPPv3N6raisin12RayraiWindow24ReflectionProbeDebugItemE"></span><span id="_CPPv2N6raisin12RayraiWindow24ReflectionProbeDebugItemE"></span><span id="raisin::RayraiWindow::ReflectionProbeDebugItem"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeDebugItem"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbeDebugItem</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow24ReflectionProbeDebugItemE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow34ReflectionProbeDebugOverlaySummaryE">
-<span id="_CPPv3N6raisin12RayraiWindow34ReflectionProbeDebugOverlaySummaryE"></span><span id="_CPPv2N6raisin12RayraiWindow34ReflectionProbeDebugOverlaySummaryE"></span><span id="raisin::RayraiWindow::ReflectionProbeDebugOverlaySummary"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeDebugOverlaySummary"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbeDebugOverlaySummary</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow34ReflectionProbeDebugOverlaySummaryE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow24ReflectionProbeDebugViewE">
-<span id="_CPPv3N6raisin12RayraiWindow24ReflectionProbeDebugViewE"></span><span id="_CPPv2N6raisin12RayraiWindow24ReflectionProbeDebugViewE"></span><span id="raisin::RayraiWindow::ReflectionProbeDebugView"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeDebugView"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbeDebugView</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow24ReflectionProbeDebugViewE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow29ReflectionProbeFilterSettingsE">
-<span id="_CPPv3N6raisin12RayraiWindow29ReflectionProbeFilterSettingsE"></span><span id="_CPPv2N6raisin12RayraiWindow29ReflectionProbeFilterSettingsE"></span><span id="raisin::RayraiWindow::ReflectionProbeFilterSettings"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeFilterSettings"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbeFilterSettings</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow29ReflectionProbeFilterSettingsE" title="Link to this definition"></a><br /></dt>
-<dd><p>Explicit CPU filtering settings for captured local reflection probes. </p>
-<p>Filtering is a load-time/manual Ultra operation. Fast/Balanced do not allocate or run this unless the application calls <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a372464ad3616f4e93182e5df8d8f5118"><span class="std std-ref">captureFilteredReflectionProbe()</span></a>. </p>
-</dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow34ReflectionProbePlacementSuggestionE">
-<span id="_CPPv3N6raisin12RayraiWindow34ReflectionProbePlacementSuggestionE"></span><span id="_CPPv2N6raisin12RayraiWindow34ReflectionProbePlacementSuggestionE"></span><span id="raisin::RayraiWindow::ReflectionProbePlacementSuggestion"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbePlacementSuggestion"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbePlacementSuggestion</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow34ReflectionProbePlacementSuggestionE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow32ReflectionProbeSidecarLoadResultE">
-<span id="_CPPv3N6raisin12RayraiWindow32ReflectionProbeSidecarLoadResultE"></span><span id="_CPPv2N6raisin12RayraiWindow32ReflectionProbeSidecarLoadResultE"></span><span id="raisin::RayraiWindow::ReflectionProbeSidecarLoadResult"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeSidecarLoadResult"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbeSidecarLoadResult</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow32ReflectionProbeSidecarLoadResultE" title="Link to this definition"></a><br /></dt>
-<dd><p>Result bundle for the struct-returning <code class="docutils literal notranslate"><span class="pre">loadReflectionProbeSidecar</span></code> overload. </p>
-<p>Returned by value so callers do not have to thread <code class="docutils literal notranslate"><span class="pre">&amp;settings</span></code> and <code class="docutils literal notranslate"><span class="pre">&amp;loadedSidecarPath</span></code> out-parameters; the <code class="docutils literal notranslate"><span class="pre">loadedSidecarPath</span></code> is empty when no sidecar file was found. </p>
-</dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow27ReflectionProbeSidecarProbeE">
-<span id="_CPPv3N6raisin12RayraiWindow27ReflectionProbeSidecarProbeE"></span><span id="_CPPv2N6raisin12RayraiWindow27ReflectionProbeSidecarProbeE"></span><span id="raisin::RayraiWindow::ReflectionProbeSidecarProbe"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeSidecarProbe"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbeSidecarProbe</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow27ReflectionProbeSidecarProbeE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow30ReflectionProbeSidecarSettingsE">
-<span id="_CPPv3N6raisin12RayraiWindow30ReflectionProbeSidecarSettingsE"></span><span id="_CPPv2N6raisin12RayraiWindow30ReflectionProbeSidecarSettingsE"></span><span id="raisin::RayraiWindow::ReflectionProbeSidecarSettings"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeSidecarSettings"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbeSidecarSettings</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow30ReflectionProbeSidecarSettingsE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow15RenderOverridesE">
 <span id="_CPPv3N6raisin12RayraiWindow15RenderOverridesE"></span><span id="_CPPv2N6raisin12RayraiWindow15RenderOverridesE"></span><span id="raisin::RayraiWindow::RenderOverrides"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1RenderOverrides"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RenderOverrides</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow15RenderOverridesE" title="Link to this definition"></a><br /></dt>
 <dd><p>Override shaders and rendering toggles when using external cameras. </p>
-<p>For <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Camera"><span class="std std-ref"><span class="pre">Camera</span></span></a></code>-based external renders, <code class="docutils literal notranslate"><span class="pre">drawVisualizationObjects</span></code> and <code class="docutils literal notranslate"><span class="pre">drawPointClouds</span></code> enable only custom visuals, instanced visuals, and point clouds marked <code class="docutils literal notranslate"><a class="reference internal" href="#namespaceraisin_1ae61c1b3422ee207a93b8d270eadaf402aeef9fc6a14d765b49eea3959ff70b049"><span class="std std-ref"><span class="pre">VisualCategory::Detectable</span></span></a></code>. Non-detectable helper geometry remains visible in the normal interactive viewer but is skipped by these capture paths. The RaiSim RGB/depth sensor-camera overloads disable custom visualization objects and point clouds entirely, regardless of these toggles. </p>
+<p>For <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Camera"><span class="std std-ref"><span class="pre">Camera</span></span></a></code>-based external renders, <code class="docutils literal notranslate"><a class="reference internal" href="#structraisin_1_1RayraiWindow_1_1RenderOverrides_1a0a4c863c3f60f7c504e24ef814296f9b"><span class="std std-ref"><span class="pre">drawVisualizationObjects</span></span></a></code> and <code class="docutils literal notranslate"><a class="reference internal" href="#structraisin_1_1RayraiWindow_1_1RenderOverrides_1ad6923f429f877a6ecbe611aef91d5c9e"><span class="std std-ref"><span class="pre">drawPointClouds</span></span></a></code> enable only custom visuals, instanced visuals, and point clouds marked <code class="docutils literal notranslate"><a class="reference internal" href="#namespaceraisin_1ae61c1b3422ee207a93b8d270eadaf402aeef9fc6a14d765b49eea3959ff70b049"><span class="std std-ref"><span class="pre">VisualCategory::Detectable</span></span></a></code>. Non-detectable helper geometry remains visible in the normal interactive viewer but is skipped by these capture paths. The RaiSim RGB/depth sensor-camera overloads disable custom visualization objects and point clouds entirely, regardless of these toggles. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
@@ -2227,18 +2118,42 @@ Prefer <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8907af
 </dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow20RenderPassAccountingE">
-<span id="_CPPv3N6raisin12RayraiWindow20RenderPassAccountingE"></span><span id="_CPPv2N6raisin12RayraiWindow20RenderPassAccountingE"></span><span id="raisin::RayraiWindow::RenderPassAccounting"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1RenderPassAccounting"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RenderPassAccounting</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow20RenderPassAccountingE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow19SupersampledCaptureE">
+<span id="_CPPv3N6raisin12RayraiWindow19SupersampledCaptureE"></span><span id="_CPPv2N6raisin12RayraiWindow19SupersampledCaptureE"></span><span id="raisin::RayraiWindow::SupersampledCapture"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1SupersampledCapture"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SupersampledCapture</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow19SupersampledCaptureE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow16RenderPassTimingE">
-<span id="_CPPv3N6raisin12RayraiWindow16RenderPassTimingE"></span><span id="_CPPv2N6raisin12RayraiWindow16RenderPassTimingE"></span><span id="raisin::RayraiWindow::RenderPassTiming"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1RenderPassTiming"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RenderPassTiming</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow16RenderPassTimingE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow16DebugPassCaptureE">
+<span id="_CPPv3N6raisin12RayraiWindow16DebugPassCaptureE"></span><span id="_CPPv2N6raisin12RayraiWindow16DebugPassCaptureE"></span><span id="raisin::RayraiWindow::DebugPassCapture"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1DebugPassCapture"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DebugPassCapture</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow16DebugPassCaptureE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow16DebugPassCapture4rgbaE">
+<span id="_CPPv3N6raisin12RayraiWindow16DebugPassCapture4rgbaE"></span><span id="_CPPv2N6raisin12RayraiWindow16DebugPassCapture4rgbaE"></span><span id="raisin::RayraiWindow::DebugPassCapture::rgba__std::vector:unsigned-c:"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1DebugPassCapture_1a2b407ee32a77269fbc15b9740610710b"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rgba</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow16DebugPassCapture4rgbaE" title="Link to this definition"></a><br /></dt>
+<dd><p>RGBA8 pixels in top-left row order, ready for PNG writers. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow20RgbaLuminanceMetricsE">
+<span id="_CPPv3N6raisin12RayraiWindow20RgbaLuminanceMetricsE"></span><span id="_CPPv2N6raisin12RayraiWindow20RgbaLuminanceMetricsE"></span><span id="raisin::RayraiWindow::RgbaLuminanceMetrics"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1RgbaLuminanceMetrics"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RgbaLuminanceMetrics</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow20RgbaLuminanceMetricsE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow22RgbaCalibrationMetricsE">
-<span id="_CPPv3N6raisin12RayraiWindow22RgbaCalibrationMetricsE"></span><span id="_CPPv2N6raisin12RayraiWindow22RgbaCalibrationMetricsE"></span><span id="raisin::RayraiWindow::RgbaCalibrationMetrics"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1RgbaCalibrationMetrics"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RgbaCalibrationMetrics</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow22RgbaCalibrationMetricsE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow22ExposureRecommendationE">
+<span id="_CPPv3N6raisin12RayraiWindow22ExposureRecommendationE"></span><span id="_CPPv2N6raisin12RayraiWindow22ExposureRecommendationE"></span><span id="raisin::RayraiWindow::ExposureRecommendation"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ExposureRecommendation"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ExposureRecommendation</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow22ExposureRecommendationE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow22RgbaLuminanceHistogramE">
+<span id="_CPPv3N6raisin12RayraiWindow22RgbaLuminanceHistogramE"></span><span id="_CPPv2N6raisin12RayraiWindow22RgbaLuminanceHistogramE"></span><span id="raisin::RayraiWindow::RgbaLuminanceHistogram"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1RgbaLuminanceHistogram"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RgbaLuminanceHistogram</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow22RgbaLuminanceHistogramE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow19RgbaOutputTransformE">
+<span id="_CPPv3N6raisin12RayraiWindow19RgbaOutputTransformE"></span><span id="_CPPv2N6raisin12RayraiWindow19RgbaOutputTransformE"></span><span id="raisin::RayraiWindow::RgbaOutputTransform"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1RgbaOutputTransform"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RgbaOutputTransform</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow19RgbaOutputTransformE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
@@ -2252,23 +2167,92 @@ Prefer <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8907af
 <dd></dd></dl>
 
 <dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow22RgbaCalibrationMetricsE">
+<span id="_CPPv3N6raisin12RayraiWindow22RgbaCalibrationMetricsE"></span><span id="_CPPv2N6raisin12RayraiWindow22RgbaCalibrationMetricsE"></span><span id="raisin::RayraiWindow::RgbaCalibrationMetrics"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1RgbaCalibrationMetrics"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RgbaCalibrationMetrics</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow22RgbaCalibrationMetricsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow29RgbaCalibrationRecommendationE">
 <span id="_CPPv3N6raisin12RayraiWindow29RgbaCalibrationRecommendationE"></span><span id="_CPPv2N6raisin12RayraiWindow29RgbaCalibrationRecommendationE"></span><span id="raisin::RayraiWindow::RgbaCalibrationRecommendation"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1RgbaCalibrationRecommendation"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RgbaCalibrationRecommendation</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow29RgbaCalibrationRecommendationE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow22RgbaLuminanceHistogramE">
-<span id="_CPPv3N6raisin12RayraiWindow22RgbaLuminanceHistogramE"></span><span id="_CPPv2N6raisin12RayraiWindow22RgbaLuminanceHistogramE"></span><span id="raisin::RayraiWindow::RgbaLuminanceHistogram"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1RgbaLuminanceHistogram"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RgbaLuminanceHistogram</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow22RgbaLuminanceHistogramE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow30ReflectionProbeCaptureSettingsE">
+<span id="_CPPv3N6raisin12RayraiWindow30ReflectionProbeCaptureSettingsE"></span><span id="_CPPv2N6raisin12RayraiWindow30ReflectionProbeCaptureSettingsE"></span><span id="raisin::RayraiWindow::ReflectionProbeCaptureSettings"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeCaptureSettings"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbeCaptureSettings</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow30ReflectionProbeCaptureSettingsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Explicit static reflection-probe capture settings. </p>
+<p>Probe capture is never automatic. Applications call <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8ece669182a6aab4216e0c98ffa7d8c0"><span class="std std-ref">captureReflectionProbeCubemap()</span></a> when they want a bounded real-time local reflection approximation. Custom visuals, instanced visuals, and point clouds are captured only when their draw toggles are enabled and they are marked detectable. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow30ReflectionProbeCaptureSettings24drawVisualizationObjectsE">
+<span id="_CPPv3N6raisin12RayraiWindow30ReflectionProbeCaptureSettings24drawVisualizationObjectsE"></span><span id="_CPPv2N6raisin12RayraiWindow30ReflectionProbeCaptureSettings24drawVisualizationObjectsE"></span><span id="raisin::RayraiWindow::ReflectionProbeCaptureSettings::drawVisualizationObjects__b"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeCaptureSettings_1a33be4322cdde24122091b79a00c19eea"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">drawVisualizationObjects</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow30ReflectionProbeCaptureSettings24drawVisualizationObjectsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Draw custom visuals and instanced visuals that are marked detectable. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow30ReflectionProbeCaptureSettings15drawPointCloudsE">
+<span id="_CPPv3N6raisin12RayraiWindow30ReflectionProbeCaptureSettings15drawPointCloudsE"></span><span id="_CPPv2N6raisin12RayraiWindow30ReflectionProbeCaptureSettings15drawPointCloudsE"></span><span id="raisin::RayraiWindow::ReflectionProbeCaptureSettings::drawPointClouds__b"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeCaptureSettings_1a318222c2baee8623c2188f8f55fabb72"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">drawPointClouds</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow30ReflectionProbeCaptureSettings15drawPointCloudsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Draw point clouds that are marked detectable. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow29ReflectionProbeFilterSettingsE">
+<span id="_CPPv3N6raisin12RayraiWindow29ReflectionProbeFilterSettingsE"></span><span id="_CPPv2N6raisin12RayraiWindow29ReflectionProbeFilterSettingsE"></span><span id="raisin::RayraiWindow::ReflectionProbeFilterSettings"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeFilterSettings"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbeFilterSettings</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow29ReflectionProbeFilterSettingsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Explicit CPU filtering settings for captured local reflection probes. </p>
+<p>Filtering is a load-time/manual Ultra operation. Fast/Balanced do not allocate or run this unless the application calls <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a372464ad3616f4e93182e5df8d8f5118"><span class="std std-ref">captureFilteredReflectionProbe()</span></a>. </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow27ReflectionProbeSidecarProbeE">
+<span id="_CPPv3N6raisin12RayraiWindow27ReflectionProbeSidecarProbeE"></span><span id="_CPPv2N6raisin12RayraiWindow27ReflectionProbeSidecarProbeE"></span><span id="raisin::RayraiWindow::ReflectionProbeSidecarProbe"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeSidecarProbe"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbeSidecarProbe</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow27ReflectionProbeSidecarProbeE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow20RgbaLuminanceMetricsE">
-<span id="_CPPv3N6raisin12RayraiWindow20RgbaLuminanceMetricsE"></span><span id="_CPPv2N6raisin12RayraiWindow20RgbaLuminanceMetricsE"></span><span id="raisin::RayraiWindow::RgbaLuminanceMetrics"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1RgbaLuminanceMetrics"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RgbaLuminanceMetrics</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow20RgbaLuminanceMetricsE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow30ReflectionProbeSidecarSettingsE">
+<span id="_CPPv3N6raisin12RayraiWindow30ReflectionProbeSidecarSettingsE"></span><span id="_CPPv2N6raisin12RayraiWindow30ReflectionProbeSidecarSettingsE"></span><span id="raisin::RayraiWindow::ReflectionProbeSidecarSettings"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeSidecarSettings"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbeSidecarSettings</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow30ReflectionProbeSidecarSettingsE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow19RgbaOutputTransformE">
-<span id="_CPPv3N6raisin12RayraiWindow19RgbaOutputTransformE"></span><span id="_CPPv2N6raisin12RayraiWindow19RgbaOutputTransformE"></span><span id="raisin::RayraiWindow::RgbaOutputTransform"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1RgbaOutputTransform"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RgbaOutputTransform</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow19RgbaOutputTransformE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow26EnvironmentSidecarSettingsE">
+<span id="_CPPv3N6raisin12RayraiWindow26EnvironmentSidecarSettingsE"></span><span id="_CPPv2N6raisin12RayraiWindow26EnvironmentSidecarSettingsE"></span><span id="raisin::RayraiWindow::EnvironmentSidecarSettings"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1EnvironmentSidecarSettings"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EnvironmentSidecarSettings</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow26EnvironmentSidecarSettingsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow22WeatherSidecarSettingsE">
+<span id="_CPPv3N6raisin12RayraiWindow22WeatherSidecarSettingsE"></span><span id="_CPPv2N6raisin12RayraiWindow22WeatherSidecarSettingsE"></span><span id="raisin::RayraiWindow::WeatherSidecarSettings"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1WeatherSidecarSettings"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">WeatherSidecarSettings</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow22WeatherSidecarSettingsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow15ReflectionProbeE">
+<span id="_CPPv3N6raisin12RayraiWindow15ReflectionProbeE"></span><span id="_CPPv2N6raisin12RayraiWindow15ReflectionProbeE"></span><span id="raisin::RayraiWindow::ReflectionProbe"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbe"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbe</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow15ReflectionProbeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow20ReflectionProbeBlendE">
+<span id="_CPPv3N6raisin12RayraiWindow20ReflectionProbeBlendE"></span><span id="_CPPv2N6raisin12RayraiWindow20ReflectionProbeBlendE"></span><span id="raisin::RayraiWindow::ReflectionProbeBlend"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeBlend"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbeBlend</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow20ReflectionProbeBlendE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow34ReflectionProbePlacementSuggestionE">
+<span id="_CPPv3N6raisin12RayraiWindow34ReflectionProbePlacementSuggestionE"></span><span id="_CPPv2N6raisin12RayraiWindow34ReflectionProbePlacementSuggestionE"></span><span id="raisin::RayraiWindow::ReflectionProbePlacementSuggestion"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbePlacementSuggestion"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbePlacementSuggestion</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow34ReflectionProbePlacementSuggestionE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow24ReflectionProbeDebugItemE">
+<span id="_CPPv3N6raisin12RayraiWindow24ReflectionProbeDebugItemE"></span><span id="_CPPv2N6raisin12RayraiWindow24ReflectionProbeDebugItemE"></span><span id="raisin::RayraiWindow::ReflectionProbeDebugItem"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeDebugItem"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbeDebugItem</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow24ReflectionProbeDebugItemE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow24ReflectionProbeDebugViewE">
+<span id="_CPPv3N6raisin12RayraiWindow24ReflectionProbeDebugViewE"></span><span id="_CPPv2N6raisin12RayraiWindow24ReflectionProbeDebugViewE"></span><span id="raisin::RayraiWindow::ReflectionProbeDebugView"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeDebugView"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbeDebugView</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow24ReflectionProbeDebugViewE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow34ReflectionProbeDebugOverlaySummaryE">
+<span id="_CPPv3N6raisin12RayraiWindow34ReflectionProbeDebugOverlaySummaryE"></span><span id="_CPPv2N6raisin12RayraiWindow34ReflectionProbeDebugOverlaySummaryE"></span><span id="raisin::RayraiWindow::ReflectionProbeDebugOverlaySummary"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeDebugOverlaySummary"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbeDebugOverlaySummary</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow34ReflectionProbeDebugOverlaySummaryE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
@@ -2277,18 +2261,13 @@ Prefer <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8907af
 <dd></dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow23ShaderWarmupDiagnosticsE">
-<span id="_CPPv3N6raisin12RayraiWindow23ShaderWarmupDiagnosticsE"></span><span id="_CPPv2N6raisin12RayraiWindow23ShaderWarmupDiagnosticsE"></span><span id="raisin::RayraiWindow::ShaderWarmupDiagnostics"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ShaderWarmupDiagnostics"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ShaderWarmupDiagnostics</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow23ShaderWarmupDiagnosticsE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow16RenderPassTimingE">
+<span id="_CPPv3N6raisin12RayraiWindow16RenderPassTimingE"></span><span id="_CPPv2N6raisin12RayraiWindow16RenderPassTimingE"></span><span id="raisin::RayraiWindow::RenderPassTiming"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1RenderPassTiming"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RenderPassTiming</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow16RenderPassTimingE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow15ShadowAtlasPlanE">
-<span id="_CPPv3N6raisin12RayraiWindow15ShadowAtlasPlanE"></span><span id="_CPPv2N6raisin12RayraiWindow15ShadowAtlasPlanE"></span><span id="raisin::RayraiWindow::ShadowAtlasPlan"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ShadowAtlasPlan"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ShadowAtlasPlan</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow15ShadowAtlasPlanE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow15ShadowAtlasTileE">
-<span id="_CPPv3N6raisin12RayraiWindow15ShadowAtlasTileE"></span><span id="_CPPv2N6raisin12RayraiWindow15ShadowAtlasTileE"></span><span id="raisin::RayraiWindow::ShadowAtlasTile"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ShadowAtlasTile"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ShadowAtlasTile</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow15ShadowAtlasTileE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow24FoliageRenderDiagnosticsE">
+<span id="_CPPv3N6raisin12RayraiWindow24FoliageRenderDiagnosticsE"></span><span id="_CPPv2N6raisin12RayraiWindow24FoliageRenderDiagnosticsE"></span><span id="raisin::RayraiWindow::FoliageRenderDiagnostics"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1FoliageRenderDiagnostics"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FoliageRenderDiagnostics</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow24FoliageRenderDiagnosticsE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
@@ -2297,8 +2276,18 @@ Prefer <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8907af
 <dd></dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow25ShadowDebugOverlaySummaryE">
-<span id="_CPPv3N6raisin12RayraiWindow25ShadowDebugOverlaySummaryE"></span><span id="_CPPv2N6raisin12RayraiWindow25ShadowDebugOverlaySummaryE"></span><span id="raisin::RayraiWindow::ShadowDebugOverlaySummary"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ShadowDebugOverlaySummary"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ShadowDebugOverlaySummary</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow25ShadowDebugOverlaySummaryE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow28DynamicQualityRecommendationE">
+<span id="_CPPv3N6raisin12RayraiWindow28DynamicQualityRecommendationE"></span><span id="_CPPv2N6raisin12RayraiWindow28DynamicQualityRecommendationE"></span><span id="raisin::RayraiWindow::DynamicQualityRecommendation"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1DynamicQualityRecommendation"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DynamicQualityRecommendation</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow28DynamicQualityRecommendationE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow20RenderPassAccountingE">
+<span id="_CPPv3N6raisin12RayraiWindow20RenderPassAccountingE"></span><span id="_CPPv2N6raisin12RayraiWindow20RenderPassAccountingE"></span><span id="raisin::RayraiWindow::RenderPassAccounting"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1RenderPassAccounting"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RenderPassAccounting</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow20RenderPassAccountingE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow18ExternalFrameCacheE">
+<span id="_CPPv3N6raisin12RayraiWindow18ExternalFrameCacheE"></span><span id="_CPPv2N6raisin12RayraiWindow18ExternalFrameCacheE"></span><span id="raisin::RayraiWindow::ExternalFrameCache"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ExternalFrameCache"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ExternalFrameCache</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow18ExternalFrameCacheE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
@@ -2307,8 +2296,8 @@ Prefer <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8907af
 <dd></dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow19SupersampledCaptureE">
-<span id="_CPPv3N6raisin12RayraiWindow19SupersampledCaptureE"></span><span id="_CPPv2N6raisin12RayraiWindow19SupersampledCaptureE"></span><span id="raisin::RayraiWindow::SupersampledCapture"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1SupersampledCapture"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SupersampledCapture</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow19SupersampledCaptureE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow19TransparentDrawItemE">
+<span id="_CPPv3N6raisin12RayraiWindow19TransparentDrawItemE"></span><span id="_CPPv2N6raisin12RayraiWindow19TransparentDrawItemE"></span><span id="raisin::RayraiWindow::TransparentDrawItem"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1TransparentDrawItem"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TransparentDrawItem</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow19TransparentDrawItemE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
@@ -2317,15 +2306,74 @@ Prefer <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8907af
 <dd></dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow19TransparentDrawItemE">
-<span id="_CPPv3N6raisin12RayraiWindow19TransparentDrawItemE"></span><span id="_CPPv2N6raisin12RayraiWindow19TransparentDrawItemE"></span><span id="raisin::RayraiWindow::TransparentDrawItem"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1TransparentDrawItem"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TransparentDrawItem</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow19TransparentDrawItemE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow24DirectionalShadowCascadeE">
+<span id="_CPPv3N6raisin12RayraiWindow24DirectionalShadowCascadeE"></span><span id="_CPPv2N6raisin12RayraiWindow24DirectionalShadowCascadeE"></span><span id="raisin::RayraiWindow::DirectionalShadowCascade"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1DirectionalShadowCascade"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DirectionalShadowCascade</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow24DirectionalShadowCascadeE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow28DirectionalShadowCascadePlanE">
+<span id="_CPPv3N6raisin12RayraiWindow28DirectionalShadowCascadePlanE"></span><span id="_CPPv2N6raisin12RayraiWindow28DirectionalShadowCascadePlanE"></span><span id="raisin::RayraiWindow::DirectionalShadowCascadePlan"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1DirectionalShadowCascadePlan"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DirectionalShadowCascadePlan</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow28DirectionalShadowCascadePlanE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow15ShadowAtlasTileE">
+<span id="_CPPv3N6raisin12RayraiWindow15ShadowAtlasTileE"></span><span id="_CPPv2N6raisin12RayraiWindow15ShadowAtlasTileE"></span><span id="raisin::RayraiWindow::ShadowAtlasTile"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ShadowAtlasTile"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ShadowAtlasTile</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow15ShadowAtlasTileE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow15ShadowAtlasPlanE">
+<span id="_CPPv3N6raisin12RayraiWindow15ShadowAtlasPlanE"></span><span id="_CPPv2N6raisin12RayraiWindow15ShadowAtlasPlanE"></span><span id="raisin::RayraiWindow::ShadowAtlasPlan"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ShadowAtlasPlan"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ShadowAtlasPlan</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow15ShadowAtlasPlanE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow25ShadowDebugOverlaySummaryE">
+<span id="_CPPv3N6raisin12RayraiWindow25ShadowDebugOverlaySummaryE"></span><span id="_CPPv2N6raisin12RayraiWindow25ShadowDebugOverlaySummaryE"></span><span id="raisin::RayraiWindow::ShadowDebugOverlaySummary"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ShadowDebugOverlaySummary"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ShadowDebugOverlaySummary</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow25ShadowDebugOverlaySummaryE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow39ConservativeOcclusionCullingDiagnosticsE">
+<span id="_CPPv3N6raisin12RayraiWindow39ConservativeOcclusionCullingDiagnosticsE"></span><span id="_CPPv2N6raisin12RayraiWindow39ConservativeOcclusionCullingDiagnosticsE"></span><span id="raisin::RayraiWindow::ConservativeOcclusionCullingDiagnostics"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ConservativeOcclusionCullingDiagnostics"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ConservativeOcclusionCullingDiagnostics</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow39ConservativeOcclusionCullingDiagnosticsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow23ShaderWarmupDiagnosticsE">
+<span id="_CPPv3N6raisin12RayraiWindow23ShaderWarmupDiagnosticsE"></span><span id="_CPPv2N6raisin12RayraiWindow23ShaderWarmupDiagnosticsE"></span><span id="raisin::RayraiWindow::ShaderWarmupDiagnostics"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ShaderWarmupDiagnostics"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ShaderWarmupDiagnostics</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow23ShaderWarmupDiagnosticsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow35MaterialTextureBudgetRecommendationE">
+<span id="_CPPv3N6raisin12RayraiWindow35MaterialTextureBudgetRecommendationE"></span><span id="_CPPv2N6raisin12RayraiWindow35MaterialTextureBudgetRecommendationE"></span><span id="raisin::RayraiWindow::MaterialTextureBudgetRecommendation"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1MaterialTextureBudgetRecommendation"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaterialTextureBudgetRecommendation</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow35MaterialTextureBudgetRecommendationE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow27ReflectionProbeCaptureFrameE">
+<span id="_CPPv3N6raisin12RayraiWindow27ReflectionProbeCaptureFrameE"></span><span id="_CPPv2N6raisin12RayraiWindow27ReflectionProbeCaptureFrameE"></span><span id="raisin::RayraiWindow::ReflectionProbeCaptureFrame"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeCaptureFrame"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbeCaptureFrame</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow27ReflectionProbeCaptureFrameE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow37CaptureFilteredReflectionProbeOptionsE">
+<span id="_CPPv3N6raisin12RayraiWindow37CaptureFilteredReflectionProbeOptionsE"></span><span id="_CPPv2N6raisin12RayraiWindow37CaptureFilteredReflectionProbeOptionsE"></span><span id="raisin::RayraiWindow::CaptureFilteredReflectionProbeOptions"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1CaptureFilteredReflectionProbeOptions"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CaptureFilteredReflectionProbeOptions</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow37CaptureFilteredReflectionProbeOptionsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Options bundle for <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RayraiWindow_1a372464ad3616f4e93182e5df8d8f5118"><span class="std std-ref"><span class="pre">captureFilteredReflectionProbe</span></span></a></code>; replaces the three positional overloads with a single struct so callers do not have to remember which overload accepts which knob. </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow32ReflectionProbeSidecarLoadResultE">
+<span id="_CPPv3N6raisin12RayraiWindow32ReflectionProbeSidecarLoadResultE"></span><span id="_CPPv2N6raisin12RayraiWindow32ReflectionProbeSidecarLoadResultE"></span><span id="raisin::RayraiWindow::ReflectionProbeSidecarLoadResult"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ReflectionProbeSidecarLoadResult"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReflectionProbeSidecarLoadResult</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow32ReflectionProbeSidecarLoadResultE" title="Link to this definition"></a><br /></dt>
+<dd><p>Result bundle for the struct-returning <code class="docutils literal notranslate"><span class="pre">loadReflectionProbeSidecar</span></code> overload. </p>
+<p>Returned by value so callers do not have to thread <code class="docutils literal notranslate"><span class="pre">&amp;</span><span class="pre">settings</span></code> and <code class="docutils literal notranslate"><span class="pre">&amp;</span><span class="pre">loadedSidecarPath</span></code> out-parameters; the <code class="docutils literal notranslate"><span class="pre">loadedSidecarPath</span></code> is empty when no sidecar file was found. </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow24ImportVisualSceneOptionsE">
+<span id="_CPPv3N6raisin12RayraiWindow24ImportVisualSceneOptionsE"></span><span id="_CPPv2N6raisin12RayraiWindow24ImportVisualSceneOptionsE"></span><span id="raisin::RayraiWindow::ImportVisualSceneOptions"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ImportVisualSceneOptions"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ImportVisualSceneOptions</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow24ImportVisualSceneOptionsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Options bundle for <code class="docutils literal notranslate"><span class="pre">importVisualScene</span></code>; collapses the seven trailing optional parameters from the flat-argument overload into a struct that is easier to read and to evolve without breaking call sites. </p>
+</dd></dl>
 
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow17VisualMeshBuilderE">
 <span id="_CPPv3N6raisin12RayraiWindow17VisualMeshBuilderE"></span><span id="_CPPv2N6raisin12RayraiWindow17VisualMeshBuilderE"></span><span id="raisin::RayraiWindow::VisualMeshBuilder"></span><span class="target" id="classraisin_1_1RayraiWindow_1_1VisualMeshBuilder"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VisualMeshBuilder</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow17VisualMeshBuilderE" title="Link to this definition"></a><br /></dt>
-<dd><p>Fluent builder for <code class="docutils literal notranslate"><span class="pre">addVisualMesh</span></code>. </p>
-<p>Collects scale/position/orientation/material and flags up front; <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RayraiWindow_1_1VisualMeshBuilder_1a5288715ce43f0b485f1d7b4ffdee11fd"><span class="std std-ref"><span class="pre">add()</span></span></a></code> creates the visual via the corresponding <code class="docutils literal notranslate"><span class="pre">addVisualMesh</span></code> overload, then applies the deferred state via the existing setters and returns the <code class="docutils literal notranslate"><span class="pre">shared_ptr&lt;</span><a class="reference internal" href="#classraisin_1_1Visuals"><span class="std std-ref"><span class="pre">Visuals</span></span></a><span class="pre">&gt;</span></code>. Setters on the returned visual still work for runtime mutations after creation.</p>
+<dd><p>Fluent builder for <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RayraiWindow_1a7aee1644671e281d222696db145a199c"><span class="std std-ref"><span class="pre">addVisualMesh</span></span></a></code>. </p>
+<p>Collects scale/position/orientation/material and flags up front; <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RayraiWindow_1_1VisualMeshBuilder_1a5288715ce43f0b485f1d7b4ffdee11fd"><span class="std std-ref"><span class="pre">add()</span></span></a></code> creates the visual via the corresponding <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RayraiWindow_1a7aee1644671e281d222696db145a199c"><span class="std std-ref"><span class="pre">addVisualMesh</span></span></a></code> overload, then applies the deferred state via the existing setters and returns the <code class="docutils literal notranslate"><span class="pre">shared_ptr&lt;</span><a class="reference internal" href="#classraisin_1_1Visuals"><span class="std std-ref"><span class="pre">Visuals</span></span></a><span class="pre">&gt;</span></code>. Setters on the returned visual still work for runtime mutations after creation.</p>
 <p>Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">auto</span> <span class="n">v</span> <span class="o">=</span> <span class="n">renderer</span><span class="o">.</span><span class="n">makeVisualMesh</span><span class="p">(</span><span class="s2">&quot;rusty&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
   <span class="o">.</span><span class="n">scale</span><span class="p">({</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">})</span>
   <span class="o">.</span><span class="n">position</span><span class="p">({</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">})</span>
@@ -2349,11 +2397,6 @@ Prefer <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8907af
 
 </div>
 </dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow22WeatherSidecarSettingsE">
-<span id="_CPPv3N6raisin12RayraiWindow22WeatherSidecarSettingsE"></span><span id="_CPPv2N6raisin12RayraiWindow22WeatherSidecarSettingsE"></span><span id="raisin::RayraiWindow::WeatherSidecarSettings"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1WeatherSidecarSettings"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">WeatherSidecarSettings</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow22WeatherSidecarSettingsE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
 
 </dd></dl>
 
@@ -3082,7 +3125,7 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin6Camera8positionE">
 <span id="_CPPv3N6raisin6Camera8positionE"></span><span id="_CPPv2N6raisin6Camera8positionE"></span><span id="raisin::Camera::position__glm::vec3"></span><span class="target" id="classraisin_1_1Camera_1ac64d559706cbc7ed613f25c7f9c5af43"></span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec3</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">position</span></span></span><a class="headerlink" href="#_CPPv4N6raisin6Camera8positionE" title="Link to this definition"></a><br /></dt>
 <dd><p><a class="reference internal" href="#classraisin_1_1Camera"><span class="std std-ref">Camera</span></a> pose and view parameters (public for quick access). </p>
-<p>Distances are in world units (typically metres). Angles in degrees unless the field name ends in <code class="docutils literal notranslate"><span class="pre">Rad</span></code>. <code class="docutils literal notranslate"><span class="pre">nearPlane</span></code>/<code class="docutils literal notranslate"><span class="pre">farPlane</span></code> and <code class="docutils literal notranslate"><span class="pre">zNear</span></code>/<code class="docutils literal notranslate"><span class="pre">zFar</span></code> are aliased pairs from earlier API revisions; prefer <code class="docutils literal notranslate"><span class="pre">nearPlane</span></code>/<code class="docutils literal notranslate"><span class="pre">farPlane</span></code> in new code (the duplicate aliases will be retired). </p>
+<p>Distances are in world units (typically metres). Angles in degrees unless the field name ends in <code class="docutils literal notranslate"><span class="pre">Rad</span></code>. <code class="docutils literal notranslate"><span class="pre">nearPlane</span></code>/<code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Camera_1a367330868d4222b72d8fae2cb866c4bd"><span class="std std-ref"><span class="pre">farPlane</span></span></a></code> and <code class="docutils literal notranslate"><span class="pre">zNear</span></code>/<code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Camera_1a2ee2f85637f6aa6766962a90deb5d8bb"><span class="std std-ref"><span class="pre">zFar</span></span></a></code> are aliased pairs from earlier API revisions; prefer <code class="docutils literal notranslate"><span class="pre">nearPlane</span></code>/<code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Camera_1a367330868d4222b72d8fae2cb866c4bd"><span class="std std-ref"><span class="pre">farPlane</span></span></a></code> in new code (the duplicate aliases will be retired). </p>
 </dd></dl>
 
 <dl class="cpp var">
@@ -3727,7 +3770,7 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin7Visuals19setMaterialOverrideENSt10shared_ptrI8MaterialEE">
 <span id="_CPPv3N6raisin7Visuals19setMaterialOverrideENSt10shared_ptrI8MaterialEE"></span><span id="_CPPv2N6raisin7Visuals19setMaterialOverrideENSt10shared_ptrI8MaterialEE"></span><span id="raisin::Visuals::setMaterialOverride__std::shared_ptr:Material:"></span><span class="target" id="classraisin_1_1Visuals_1a4a2898cdfe3a0556632d6fb3ef1c58ec"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setMaterialOverride</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6raisin8MaterialE" title="raisin::Material"><span class="n"><span class="pre">Material</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">material</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin7Visuals19setMaterialOverrideENSt10shared_ptrI8MaterialEE" title="Link to this definition"></a><br /></dt>
 <dd><p>Override the visual’s draw material with a shared instance. </p>
-<p><strong>Ownership.</strong> The same <code class="docutils literal notranslate"><span class="pre">shared_ptr&lt;</span><a class="reference internal" href="#classraisin_1_1Material"><span class="std std-ref"><span class="pre">Material</span></span></a><span class="pre">&gt;</span></code> may be held by any number of other visuals — <code class="docutils literal notranslate"><span class="pre">setMaterialOverride</span></code> does not deep-copy. Mutating the pointed-to material from any holder is observed by every visual that shares it. If you want an in-place edit that affects only this visual, call the <code class="docutils literal notranslate"><span class="pre">const</span> <a class="reference internal" href="#classraisin_1_1Material"><span class="std std-ref"><span class="pre">Material</span></span></a><span class="pre">&amp;</span></code> overload (which copies into a new shared instance) or grab a fresh copy via <code class="docutils literal notranslate"><span class="pre">*materialOverride()</span></code> and push it back through <code class="docutils literal notranslate"><span class="pre">setMaterialOverride(</span><a class="reference internal" href="#classraisin_1_1Material"><span class="std std-ref"><span class="pre">Material</span></span></a><span class="pre">{...})</span></code>. </p>
+<p><strong>Ownership.</strong> The same <code class="docutils literal notranslate"><span class="pre">shared_ptr&lt;</span><a class="reference internal" href="#classraisin_1_1Material"><span class="std std-ref"><span class="pre">Material</span></span></a><span class="pre">&gt;</span></code> may be held by any number of other visuals — <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Visuals_1a4a2898cdfe3a0556632d6fb3ef1c58ec"><span class="std std-ref"><span class="pre">setMaterialOverride</span></span></a></code> does not deep-copy. Mutating the pointed-to material from any holder is observed by every visual that shares it. If you want an in-place edit that affects only this visual, call the <code class="docutils literal notranslate"><span class="pre">const</span> <a class="reference internal" href="#classraisin_1_1Material"><span class="std std-ref"><span class="pre">Material</span></span></a><span class="pre">&amp;</span></code> overload (which copies into a new shared instance) or grab a fresh copy via <code class="docutils literal notranslate"><span class="pre">*materialOverride()</span></code> and push it back through <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Visuals_1a4a2898cdfe3a0556632d6fb3ef1c58ec"><span class="std std-ref"><span class="pre">setMaterialOverride</span></span></a><span class="pre">(</span><a class="reference internal" href="#classraisin_1_1Material"><span class="std std-ref"><span class="pre">Material</span></span></a><span class="pre">{...})</span></code>. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -3741,7 +3784,7 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin7Visuals23mutableMaterialOverrideEv">
 <span id="_CPPv3N6raisin7Visuals23mutableMaterialOverrideEv"></span><span id="_CPPv2N6raisin7Visuals23mutableMaterialOverrideEv"></span><span id="raisin::Visuals::mutableMaterialOverride"></span><span class="target" id="classraisin_1_1Visuals_1ab3791b788d5b1f12a2bbc19fed586d3a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisin8MaterialE" title="raisin::Material"><span class="n"><span class="pre">Material</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">mutableMaterialOverride</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin7Visuals23mutableMaterialOverrideEv" title="Link to this definition"></a><br /></dt>
 <dd><p>Mutable accessor for the override material. </p>
-<p>Honest companion to <code class="docutils literal notranslate"><span class="pre">setMaterialOverride(std::shared_ptr&lt;</span><a class="reference internal" href="#classraisin_1_1Material"><span class="std std-ref"><span class="pre">Material</span></span></a><span class="pre">&gt;)</span></code>: if the material is shared with other visuals, edits made through this pointer are visible on all of them. </p>
+<p>Honest companion to <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Visuals_1a4a2898cdfe3a0556632d6fb3ef1c58ec"><span class="std std-ref"><span class="pre">setMaterialOverride</span></span></a><span class="pre">(std::shared_ptr&lt;</span><a class="reference internal" href="#classraisin_1_1Material"><span class="std std-ref"><span class="pre">Material</span></span></a><span class="pre">&gt;)</span></code>: if the material is shared with other visuals, edits made through this pointer are visible on all of them. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -3954,6 +3997,11 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 
 </div>
 <dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin7Visuals16MaterialSortKeysE">
+<span id="_CPPv3N6raisin7Visuals16MaterialSortKeysE"></span><span id="_CPPv2N6raisin7Visuals16MaterialSortKeysE"></span><span id="raisin::Visuals::MaterialSortKeys"></span><span class="target" id="structraisin_1_1Visuals_1_1MaterialSortKeys"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaterialSortKeys</span></span></span><a class="headerlink" href="#_CPPv4N6raisin7Visuals16MaterialSortKeysE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin7Visuals23FrameCacheMaterialStateE">
 <span id="_CPPv3N6raisin7Visuals23FrameCacheMaterialStateE"></span><span id="_CPPv2N6raisin7Visuals23FrameCacheMaterialStateE"></span><span id="raisin::Visuals::FrameCacheMaterialState"></span><span class="target" id="structraisin_1_1Visuals_1_1FrameCacheMaterialState"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FrameCacheMaterialState</span></span></span><a class="headerlink" href="#_CPPv4N6raisin7Visuals23FrameCacheMaterialStateE" title="Link to this definition"></a><br /></dt>
 <dd><p>Summarize static frame-cache material state in one mesh traversal. </p>
@@ -3962,11 +4010,6 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin7Visuals27FrameCacheMaterialStateMemoE">
 <span id="_CPPv3N6raisin7Visuals27FrameCacheMaterialStateMemoE"></span><span id="_CPPv2N6raisin7Visuals27FrameCacheMaterialStateMemoE"></span><span id="raisin::Visuals::FrameCacheMaterialStateMemo"></span><span class="target" id="classraisin_1_1Visuals_1_1FrameCacheMaterialStateMemo"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FrameCacheMaterialStateMemo</span></span></span><a class="headerlink" href="#_CPPv4N6raisin7Visuals27FrameCacheMaterialStateMemoE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin7Visuals16MaterialSortKeysE">
-<span id="_CPPv3N6raisin7Visuals16MaterialSortKeysE"></span><span id="_CPPv2N6raisin7Visuals16MaterialSortKeysE"></span><span id="raisin::Visuals::MaterialSortKeys"></span><span class="target" id="structraisin_1_1Visuals_1_1MaterialSortKeys"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaterialSortKeys</span></span></span><a class="headerlink" href="#_CPPv4N6raisin7Visuals16MaterialSortKeysE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -4565,23 +4608,8 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 
 </div>
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals34AsyncFoliageClusterPrepDiagnosticsE">
-<span id="_CPPv3N6raisin16InstancedVisuals34AsyncFoliageClusterPrepDiagnosticsE"></span><span id="_CPPv2N6raisin16InstancedVisuals34AsyncFoliageClusterPrepDiagnosticsE"></span><span id="raisin::InstancedVisuals::AsyncFoliageClusterPrepDiagnostics"></span><span class="target" id="structraisin_1_1InstancedVisuals_1_1AsyncFoliageClusterPrepDiagnostics"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsyncFoliageClusterPrepDiagnostics</span></span></span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals34AsyncFoliageClusterPrepDiagnosticsE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals26FoliageImpostorDiagnosticsE">
-<span id="_CPPv3N6raisin16InstancedVisuals26FoliageImpostorDiagnosticsE"></span><span id="_CPPv2N6raisin16InstancedVisuals26FoliageImpostorDiagnosticsE"></span><span id="raisin::InstancedVisuals::FoliageImpostorDiagnostics"></span><span class="target" id="structraisin_1_1InstancedVisuals_1_1FoliageImpostorDiagnostics"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FoliageImpostorDiagnostics</span></span></span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals26FoliageImpostorDiagnosticsE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals22FoliageWindDiagnosticsE">
-<span id="_CPPv3N6raisin16InstancedVisuals22FoliageWindDiagnosticsE"></span><span id="_CPPv2N6raisin16InstancedVisuals22FoliageWindDiagnosticsE"></span><span id="raisin::InstancedVisuals::FoliageWindDiagnostics"></span><span class="target" id="structraisin_1_1InstancedVisuals_1_1FoliageWindDiagnostics"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FoliageWindDiagnostics</span></span></span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals22FoliageWindDiagnosticsE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals21GpuHizOcclusionConfigE">
-<span id="_CPPv3N6raisin16InstancedVisuals21GpuHizOcclusionConfigE"></span><span id="_CPPv2N6raisin16InstancedVisuals21GpuHizOcclusionConfigE"></span><span id="raisin::InstancedVisuals::GpuHizOcclusionConfig"></span><span class="target" id="structraisin_1_1InstancedVisuals_1_1GpuHizOcclusionConfig"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GpuHizOcclusionConfig</span></span></span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals21GpuHizOcclusionConfigE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals12InstanceSpecE">
+<span id="_CPPv3N6raisin16InstancedVisuals12InstanceSpecE"></span><span id="_CPPv2N6raisin16InstancedVisuals12InstanceSpecE"></span><span id="raisin::InstancedVisuals::InstanceSpec"></span><span class="target" id="structraisin_1_1InstancedVisuals_1_1InstanceSpec"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InstanceSpec</span></span></span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals12InstanceSpecE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
@@ -4590,18 +4618,33 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dd></dd></dl>
 
 <dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals22FoliageWindDiagnosticsE">
+<span id="_CPPv3N6raisin16InstancedVisuals22FoliageWindDiagnosticsE"></span><span id="_CPPv2N6raisin16InstancedVisuals22FoliageWindDiagnosticsE"></span><span id="raisin::InstancedVisuals::FoliageWindDiagnostics"></span><span class="target" id="structraisin_1_1InstancedVisuals_1_1FoliageWindDiagnostics"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FoliageWindDiagnostics</span></span></span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals22FoliageWindDiagnosticsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals27ShadowFoliageLodDiagnosticsE">
+<span id="_CPPv3N6raisin16InstancedVisuals27ShadowFoliageLodDiagnosticsE"></span><span id="_CPPv2N6raisin16InstancedVisuals27ShadowFoliageLodDiagnosticsE"></span><span id="raisin::InstancedVisuals::ShadowFoliageLodDiagnostics"></span><span class="target" id="structraisin_1_1InstancedVisuals_1_1ShadowFoliageLodDiagnostics"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ShadowFoliageLodDiagnostics</span></span></span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals27ShadowFoliageLodDiagnosticsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals26FoliageImpostorDiagnosticsE">
+<span id="_CPPv3N6raisin16InstancedVisuals26FoliageImpostorDiagnosticsE"></span><span id="_CPPv2N6raisin16InstancedVisuals26FoliageImpostorDiagnosticsE"></span><span id="raisin::InstancedVisuals::FoliageImpostorDiagnostics"></span><span class="target" id="structraisin_1_1InstancedVisuals_1_1FoliageImpostorDiagnostics"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FoliageImpostorDiagnostics</span></span></span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals26FoliageImpostorDiagnosticsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals37HierarchicalFoliageClusterDiagnosticsE">
 <span id="_CPPv3N6raisin16InstancedVisuals37HierarchicalFoliageClusterDiagnosticsE"></span><span id="_CPPv2N6raisin16InstancedVisuals37HierarchicalFoliageClusterDiagnosticsE"></span><span id="raisin::InstancedVisuals::HierarchicalFoliageClusterDiagnostics"></span><span class="target" id="structraisin_1_1InstancedVisuals_1_1HierarchicalFoliageClusterDiagnostics"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HierarchicalFoliageClusterDiagnostics</span></span></span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals37HierarchicalFoliageClusterDiagnosticsE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals12InstanceSpecE">
-<span id="_CPPv3N6raisin16InstancedVisuals12InstanceSpecE"></span><span id="_CPPv2N6raisin16InstancedVisuals12InstanceSpecE"></span><span id="raisin::InstancedVisuals::InstanceSpec"></span><span class="target" id="structraisin_1_1InstancedVisuals_1_1InstanceSpec"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InstanceSpec</span></span></span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals12InstanceSpecE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals34AsyncFoliageClusterPrepDiagnosticsE">
+<span id="_CPPv3N6raisin16InstancedVisuals34AsyncFoliageClusterPrepDiagnosticsE"></span><span id="_CPPv2N6raisin16InstancedVisuals34AsyncFoliageClusterPrepDiagnosticsE"></span><span id="raisin::InstancedVisuals::AsyncFoliageClusterPrepDiagnostics"></span><span class="target" id="structraisin_1_1InstancedVisuals_1_1AsyncFoliageClusterPrepDiagnostics"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsyncFoliageClusterPrepDiagnostics</span></span></span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals34AsyncFoliageClusterPrepDiagnosticsE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals31SceneInstancedDrawListCandidateE">
-<span id="_CPPv3N6raisin16InstancedVisuals31SceneInstancedDrawListCandidateE"></span><span id="_CPPv2N6raisin16InstancedVisuals31SceneInstancedDrawListCandidateE"></span><span id="raisin::InstancedVisuals::SceneInstancedDrawListCandidate"></span><span class="target" id="structraisin_1_1InstancedVisuals_1_1SceneInstancedDrawListCandidate"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SceneInstancedDrawListCandidate</span></span></span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals31SceneInstancedDrawListCandidateE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals21GpuHizOcclusionConfigE">
+<span id="_CPPv3N6raisin16InstancedVisuals21GpuHizOcclusionConfigE"></span><span id="_CPPv2N6raisin16InstancedVisuals21GpuHizOcclusionConfigE"></span><span id="raisin::InstancedVisuals::GpuHizOcclusionConfig"></span><span class="target" id="structraisin_1_1InstancedVisuals_1_1GpuHizOcclusionConfig"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GpuHizOcclusionConfig</span></span></span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals21GpuHizOcclusionConfigE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
@@ -4610,8 +4653,8 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dd></dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals27ShadowFoliageLodDiagnosticsE">
-<span id="_CPPv3N6raisin16InstancedVisuals27ShadowFoliageLodDiagnosticsE"></span><span id="_CPPv2N6raisin16InstancedVisuals27ShadowFoliageLodDiagnosticsE"></span><span id="raisin::InstancedVisuals::ShadowFoliageLodDiagnostics"></span><span class="target" id="structraisin_1_1InstancedVisuals_1_1ShadowFoliageLodDiagnostics"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ShadowFoliageLodDiagnostics</span></span></span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals27ShadowFoliageLodDiagnosticsE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals31SceneInstancedDrawListCandidateE">
+<span id="_CPPv3N6raisin16InstancedVisuals31SceneInstancedDrawListCandidateE"></span><span id="_CPPv2N6raisin16InstancedVisuals31SceneInstancedDrawListCandidateE"></span><span id="raisin::InstancedVisuals::SceneInstancedDrawListCandidate"></span><span class="target" id="structraisin_1_1InstancedVisuals_1_1SceneInstancedDrawListCandidate"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SceneInstancedDrawListCandidate</span></span></span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals31SceneInstancedDrawListCandidateE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -4982,15 +5025,15 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 
 </div>
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin6assimp20AsyncModelLoadResultE">
-<span id="_CPPv3N6raisin6assimp20AsyncModelLoadResultE"></span><span id="_CPPv2N6raisin6assimp20AsyncModelLoadResultE"></span><span id="raisin::assimp::AsyncModelLoadResult"></span><span class="target" id="structraisin_1_1assimp_1_1AsyncModelLoadResult"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsyncModelLoadResult</span></span></span><a class="headerlink" href="#_CPPv4N6raisin6assimp20AsyncModelLoadResultE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin6assimp16FallbackMaterialE">
+<span id="_CPPv3N6raisin6assimp16FallbackMaterialE"></span><span id="_CPPv2N6raisin6assimp16FallbackMaterialE"></span><span id="raisin::assimp::FallbackMaterial"></span><span class="target" id="structraisin_1_1assimp_1_1FallbackMaterial"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FallbackMaterial</span></span></span><a class="headerlink" href="#_CPPv4N6raisin6assimp16FallbackMaterialE" title="Link to this definition"></a><br /></dt>
 <dd><div class="docutils container">
 <em>#include &lt;AssimpMeshLoader.hpp&gt;</em></div>
 </dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin6assimp16FallbackMaterialE">
-<span id="_CPPv3N6raisin6assimp16FallbackMaterialE"></span><span id="_CPPv2N6raisin6assimp16FallbackMaterialE"></span><span id="raisin::assimp::FallbackMaterial"></span><span class="target" id="structraisin_1_1assimp_1_1FallbackMaterial"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FallbackMaterial</span></span></span><a class="headerlink" href="#_CPPv4N6raisin6assimp16FallbackMaterialE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin6assimp20AsyncModelLoadResultE">
+<span id="_CPPv3N6raisin6assimp20AsyncModelLoadResultE"></span><span id="_CPPv2N6raisin6assimp20AsyncModelLoadResultE"></span><span id="raisin::assimp::AsyncModelLoadResult"></span><span class="target" id="structraisin_1_1assimp_1_1AsyncModelLoadResult"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsyncModelLoadResult</span></span></span><a class="headerlink" href="#_CPPv4N6raisin6assimp20AsyncModelLoadResultE" title="Link to this definition"></a><br /></dt>
 <dd><div class="docutils container">
 <em>#include &lt;AssimpMeshLoader.hpp&gt;</em></div>
 </dd></dl>
@@ -5134,8 +5177,8 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin10PointCloud17notifyDataChangedEv">
 <span id="_CPPv3N6raisin10PointCloud17notifyDataChangedEv"></span><span id="_CPPv2N6raisin10PointCloud17notifyDataChangedEv"></span><span id="raisin::PointCloud::notifyDataChanged"></span><span class="target" id="classraisin_1_1PointCloud_1a68c0f288cc76407b6f906b3b3ab33dc0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">notifyDataChanged</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin10PointCloud17notifyDataChangedEv" title="Link to this definition"></a><br /></dt>
-<dd><p>Bump the render revision after a direct mutation of <code class="docutils literal notranslate"><span class="pre">positions</span></code> or <code class="docutils literal notranslate"><span class="pre">colors</span></code>. </p>
-<p><code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1PointCloud_1a743dd7af2cb7c008a3160d14adbfc4ab"><span class="std std-ref"><span class="pre">setCategory()</span></span></a></code>, <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1PointCloud_1aea5fbb926fb0cfb5210b5b7f2f811ddd"><span class="std std-ref"><span class="pre">enable()</span></span></a></code>, <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1PointCloud_1ac819089cb1927ee7790452d845910ae6"><span class="std std-ref"><span class="pre">setMaxRenderedPoints()</span></span></a></code> already bump the revision themselves; this method is for the public <code class="docutils literal notranslate"><span class="pre">positions</span></code> / <code class="docutils literal notranslate"><span class="pre">colors</span></code> vectors, which the setter pattern does not cover. </p>
+<dd><p>Bump the render revision after a direct mutation of <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1PointCloud_1a3f46781cd640e81f4fa0f602fa5fa6b6"><span class="std std-ref"><span class="pre">positions</span></span></a></code> or <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1PointCloud_1a88c74ef5755c05cf3febe2a82e7fdef6"><span class="std std-ref"><span class="pre">colors</span></span></a></code>. </p>
+<p><code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1PointCloud_1a743dd7af2cb7c008a3160d14adbfc4ab"><span class="std std-ref"><span class="pre">setCategory()</span></span></a></code>, <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1PointCloud_1aea5fbb926fb0cfb5210b5b7f2f811ddd"><span class="std std-ref"><span class="pre">enable()</span></span></a></code>, <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1PointCloud_1ac819089cb1927ee7790452d845910ae6"><span class="std std-ref"><span class="pre">setMaxRenderedPoints()</span></span></a></code> already bump the revision themselves; this method is for the public <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1PointCloud_1a3f46781cd640e81f4fa0f602fa5fa6b6"><span class="std std-ref"><span class="pre">positions</span></span></a></code> / <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1PointCloud_1a88c74ef5755c05cf3febe2a82e7fdef6"><span class="std std-ref"><span class="pre">colors</span></span></a></code> vectors, which the setter pattern does not cover. </p>
 </dd></dl>
 
 </div>
@@ -5235,7 +5278,7 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin13CameraFrustumE">
 <span id="_CPPv3N6raisin13CameraFrustumE"></span><span id="_CPPv2N6raisin13CameraFrustumE"></span><span id="raisin::CameraFrustum"></span><span class="target" id="classraisin_1_1CameraFrustum"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CameraFrustum</span></span></span><a class="headerlink" href="#_CPPv4N6raisin13CameraFrustumE" title="Link to this definition"></a><br /></dt>
-<dd><p>Visual helper that renders a camera frustum volume. </p>
+<dd><p>Visual helper that renders camera frustum edges. </p>
 <p>The frustum mesh is updated from either a rayrai <a class="reference internal" href="#classraisin_1_1Camera"><span class="std std-ref">Camera</span></a> or a raisim DepthCamera and rendered using a <a class="reference internal" href="#classraisin_1_1Visuals"><span class="std std-ref">Visuals</span></a> instance. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
@@ -5247,7 +5290,7 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>visual</strong> – <a class="reference internal" href="#classraisin_1_1Visuals"><span class="std std-ref">Visuals</span></a> object used for rendering. </p></li>
-<li><p><strong>mesh</strong> – OpenGL mesh representing the frustum volume. </p></li>
+<li><p><strong>mesh</strong> – OpenGL line mesh representing the frustum edges. </p></li>
 </ul>
 </dd>
 </dl>
@@ -5271,6 +5314,25 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>depthCam</strong> – Source depth camera. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin13CameraFrustum17updatePerspectiveERKN3glm4vec3ERKN3glm4quatEffff">
+<span id="_CPPv3N6raisin13CameraFrustum17updatePerspectiveERKN3glm4vec3ERKN3glm4quatEffff"></span><span id="_CPPv2N6raisin13CameraFrustum17updatePerspectiveERKN3glm4vec3ERKN3glm4quatEffff"></span><span id="raisin::CameraFrustum::updatePerspective__glm::vec3CR.glm::quatCR.float.float.float.float"></span><span class="target" id="classraisin_1_1CameraFrustum_1a87ebb71b70f924e8918649236864d782"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">updatePerspective</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec3</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">position</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">quat</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">orientation</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">horizontalFov</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">aspect</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nearDistance</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">farDistance</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin13CameraFrustum17updatePerspectiveERKN3glm4vec3ERKN3glm4quatEffff" title="Link to this definition"></a><br /></dt>
+<dd><p>Update a perspective frustum from an explicit world-space sensor pose. </p>
+<p>The sensor convention is local +X forward and local +Z up, matching RaiSim RGB and depth cameras.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>position</strong> – Sensor position in world coordinates. </p></li>
+<li><p><strong>orientation</strong> – Sensor-to-world orientation. </p></li>
+<li><p><strong>horizontalFov</strong> – Horizontal field of view in radians. </p></li>
+<li><p><strong>aspect</strong> – Image width divided by image height. </p></li>
+<li><p><strong>nearDistance</strong> – Near-plane distance. </p></li>
+<li><p><strong>farDistance</strong> – Far-plane distance used to size the visualization. </p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -5321,7 +5383,7 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin14VisualCategoryE">
 <span id="_CPPv3N6raisin14VisualCategoryE"></span><span id="_CPPv2N6raisin14VisualCategoryE"></span><span class="target" id="namespaceraisin_1ae61c1b3422ee207a93b8d270eadaf402"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">raisin</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">VisualCategory</span></span></span><a class="headerlink" href="#_CPPv4N6raisin14VisualCategoryE" title="Link to this definition"></a><br /></dt>
 <dd><p>Render-category flag for user-created visuals and point clouds. </p>
-<p><code class="docutils literal notranslate"><span class="pre">VisualCategory</span></code> is render metadata. Rayrai uses it when a render policy asks for only capture/detection-visible helper geometry, for example external camera renders, capture paths that reuse external-camera rendering, detectable-only point-cloud rendering, and picking or shadow candidate passes that explicitly require detectable visualization objects.</p>
+<p><code class="docutils literal notranslate"><a class="reference internal" href="#namespaceraisin_1ae61c1b3422ee207a93b8d270eadaf402"><span class="std std-ref"><span class="pre">VisualCategory</span></span></a></code> is render metadata. Rayrai uses it when a render policy asks for only capture/detection-visible helper geometry, for example external camera renders, capture paths that reuse external-camera rendering, detectable-only point-cloud rendering, and picking or shadow candidate passes that explicitly require detectable visualization objects.</p>
 <p>This flag does not create a physics body, collision shape, dynamics object, or semantic label, and it does not hide an object from the normal interactive viewer. User-created <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Visuals"><span class="std std-ref"><span class="pre">Visuals</span></span></a></code>, <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1InstancedVisuals"><span class="std std-ref"><span class="pre">InstancedVisuals</span></span></a></code>, <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1PointCloud"><span class="std std-ref"><span class="pre">PointCloud</span></span></a></code>, and helpers built on top of <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Visuals"><span class="std std-ref"><span class="pre">Visuals</span></span></a></code> default to <code class="docutils literal notranslate"><span class="pre">NotDetectable</span></code> so debug overlays, camera frustums, axes, labels, and other viewer-only aids do not contaminate external-camera or generated capture images.</p>
 <p>Set a visual to <code class="docutils literal notranslate"><span class="pre">Detectable</span></code> when it should be included in those capture/detection render passes. RaiSim world objects are not controlled by this enum; they follow their own wrapper visibility and the active render pass policy. The RaiSim RGB/depth sensor-camera overloads intentionally disable custom visualization objects and point clouds regardless of this flag. </p>
 <p><em>Values:</em></p>
@@ -5402,7 +5464,7 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin5Light8setRangeEf">
 <span id="_CPPv3N6raisin5Light8setRangeEf"></span><span id="_CPPv2N6raisin5Light8setRangeEf"></span><span id="raisin::Light::setRange__float"></span><span class="target" id="classraisin_1_1Light_1ae3ca9ee7809061f9578b8984f1dbd682"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setRange</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">rangeMeters</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin5Light8setRangeEf" title="Link to this definition"></a><br /></dt>
 <dd><p>Set point-light range in metres by computing reasonable attenuation. </p>
-<p>Picks an inverse-quadratic falloff such that intensity drops to ~1% at the requested radius. Use this instead of writing <code class="docutils literal notranslate"><span class="pre">constant</span></code>/<code class="docutils literal notranslate"><span class="pre">linear</span></code>/ <code class="docutils literal notranslate"><span class="pre">quadratic</span></code> by hand. Sets <code class="docutils literal notranslate"><span class="pre">radius</span></code> to the requested value as a culling hint.</p>
+<p>Picks an inverse-quadratic falloff such that intensity drops to ~1% at the requested radius. Use this instead of writing <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Light_1af2dc997d998e1ca44b757b187d5c64f6"><span class="std std-ref"><span class="pre">constant</span></span></a></code>/<code class="docutils literal notranslate"><span class="pre">linear</span></code>/ <code class="docutils literal notranslate"><span class="pre">quadratic</span></code> by hand. Sets <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Light_1a22927611cd42d885f0ecb5a1ea03f1fe"><span class="std std-ref"><span class="pre">radius</span></span></a></code> to the requested value as a culling hint.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>rangeMeters</strong> – Distance at which the light contribution becomes negligible. </p>
@@ -5547,7 +5609,7 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin5Light8constantE">
 <span id="_CPPv3N6raisin5Light8constantE"></span><span id="_CPPv2N6raisin5Light8constantE"></span><span id="raisin::Light::constant__float"></span><span class="target" id="classraisin_1_1Light_1af2dc997d998e1ca44b757b187d5c64f6"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">constant</span></span></span><a class="headerlink" href="#_CPPv4N6raisin5Light8constantE" title="Link to this definition"></a><br /></dt>
 <dd><p>Attenuation parameters for point lights. </p>
-<p>Standard inverse-quadratic falloff: <code class="docutils literal notranslate"><span class="pre">intensity</span> <span class="pre">/</span> <span class="pre">(constant</span> <span class="pre">+</span> <span class="pre">linear*r</span> <span class="pre">+</span> <span class="pre">quadratic*r²)</span></code> where <code class="docutils literal notranslate"><span class="pre">r</span></code> is in metres. Use <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Light_1ae3ca9ee7809061f9578b8984f1dbd682"><span class="std std-ref"><span class="pre">setRange()</span></span></a></code> for a more ergonomic alternative. </p>
+<p>Standard inverse-quadratic falloff: <code class="docutils literal notranslate"><span class="pre">intensity</span> <span class="pre">/</span> <span class="pre">(</span><a class="reference internal" href="#classraisin_1_1Light_1af2dc997d998e1ca44b757b187d5c64f6"><span class="std std-ref"><span class="pre">constant</span></span></a> <span class="pre">+</span> <span class="pre">linear*r</span> <span class="pre">+</span> <span class="pre">quadratic*r²)</span></code> where <code class="docutils literal notranslate"><span class="pre">r</span></code> is in metres. Use <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Light_1ae3ca9ee7809061f9578b8984f1dbd682"><span class="std std-ref"><span class="pre">setRange()</span></span></a></code> for a more ergonomic alternative. </p>
 </dd></dl>
 
 <dl class="cpp var">
@@ -5819,7 +5881,7 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin8Material12ShadingModelE">
 <span id="_CPPv3N6raisin8Material12ShadingModelE"></span><span id="_CPPv2N6raisin8Material12ShadingModelE"></span><span class="target" id="classraisin_1_1Material_1a1cdd498bfd68810a2dac28912646594a"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ShadingModel</span></span></span><a class="headerlink" href="#_CPPv4N6raisin8Material12ShadingModelE" title="Link to this definition"></a><br /></dt>
 <dd><p>Higher-level shading-model selection. </p>
-<p>Collapses the three orthogonal <code class="docutils literal notranslate"><span class="pre">DiffuseMode</span></code> / <code class="docutils literal notranslate"><span class="pre">SpecularMode</span></code> / <code class="docutils literal notranslate"><span class="pre">unlit</span></code> controls that the underlying material exposes for fine-grained control into the small set of choices most callers actually want. Use <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Material_1ad11d0ac24bd2fe9070e1d5e09b39f05f"><span class="std std-ref"><span class="pre">setShadingModel()</span></span></a></code> to write the corresponding low-level fields and <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Material_1acd243c516ab3892580392bf8adcf6f74"><span class="std std-ref"><span class="pre">shadingModel()</span></span></a></code> to read back a best-effort classification. </p>
+<p>Collapses the three orthogonal <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Material_1ae5f3bff5823b5a7dc945112ba86fe0b4"><span class="std std-ref"><span class="pre">DiffuseMode</span></span></a></code> / <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Material_1a71ecb5c41c5d1d48cce61a989fd6ed62"><span class="std std-ref"><span class="pre">SpecularMode</span></span></a></code> / <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Material_1a258eaae7ea4ddbe3f27435d9c8ce2395"><span class="std std-ref"><span class="pre">unlit</span></span></a></code> controls that the underlying material exposes for fine-grained control into the small set of choices most callers actually want. Use <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Material_1ad11d0ac24bd2fe9070e1d5e09b39f05f"><span class="std std-ref"><span class="pre">setShadingModel()</span></span></a></code> to write the corresponding low-level fields and <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Material_1acd243c516ab3892580392bf8adcf6f74"><span class="std std-ref"><span class="pre">shadingModel()</span></span></a></code> to read back a best-effort classification. </p>
 <p><em>Values:</em></p>
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin8Material12ShadingModel8StandardE">
@@ -6211,15 +6273,15 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin8Material15setShadingModelE12ShadingModel">
 <span id="_CPPv3N6raisin8Material15setShadingModelE12ShadingModel"></span><span id="_CPPv2N6raisin8Material15setShadingModelE12ShadingModel"></span><span id="raisin::Material::setShadingModel__ShadingModel"></span><span class="target" id="classraisin_1_1Material_1ad11d0ac24bd2fe9070e1d5e09b39f05f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setShadingModel</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6raisin8Material12ShadingModelE" title="raisin::Material::ShadingModel"><span class="n"><span class="pre">ShadingModel</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">model</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin8Material15setShadingModelE12ShadingModel" title="Link to this definition"></a><br /></dt>
-<dd><p>Write <code class="docutils literal notranslate"><span class="pre">diffuseMode</span></code>, <code class="docutils literal notranslate"><span class="pre">specularMode</span></code>, and <code class="docutils literal notranslate"><span class="pre">unlit</span></code> from a high-level model. </p>
-<p>Helper for the common case where callers want “PBR/Lambert/Toon/Unlit” rather than picking a <code class="docutils literal notranslate"><span class="pre">DiffuseMode</span></code> + <code class="docutils literal notranslate"><span class="pre">SpecularMode</span></code> pair and remembering to clear the <code class="docutils literal notranslate"><span class="pre">unlit</span></code> flag. </p>
+<dd><p>Write <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Material_1afd504e811bf743a2c60cf2b72d55d20d"><span class="std std-ref"><span class="pre">diffuseMode</span></span></a></code>, <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Material_1a5782b8f28302d696d14bbd9e90660732"><span class="std std-ref"><span class="pre">specularMode</span></span></a></code>, and <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Material_1a258eaae7ea4ddbe3f27435d9c8ce2395"><span class="std std-ref"><span class="pre">unlit</span></span></a></code> from a high-level model. </p>
+<p>Helper for the common case where callers want “PBR/Lambert/Toon/Unlit” rather than picking a <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Material_1ae5f3bff5823b5a7dc945112ba86fe0b4"><span class="std std-ref"><span class="pre">DiffuseMode</span></span></a></code> + <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Material_1a71ecb5c41c5d1d48cce61a989fd6ed62"><span class="std std-ref"><span class="pre">SpecularMode</span></span></a></code> pair and remembering to clear the <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Material_1a258eaae7ea4ddbe3f27435d9c8ce2395"><span class="std std-ref"><span class="pre">unlit</span></span></a></code> flag. </p>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisin8Material12shadingModelEv">
 <span id="_CPPv3NK6raisin8Material12shadingModelEv"></span><span id="_CPPv2NK6raisin8Material12shadingModelEv"></span><span id="raisin::Material::shadingModelC"></span><span class="target" id="classraisin_1_1Material_1acd243c516ab3892580392bf8adcf6f74"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisin8Material12ShadingModelE" title="raisin::Material::ShadingModel"><span class="n"><span class="pre">ShadingModel</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shadingModel</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin8Material12shadingModelEv" title="Link to this definition"></a><br /></dt>
 <dd><p>Read back a best-effort high-level shading model classification. </p>
-<p>Returns <code class="docutils literal notranslate"><span class="pre">Unlit</span></code> when the <code class="docutils literal notranslate"><span class="pre">unlit</span></code> flag is set, otherwise picks the closest <code class="docutils literal notranslate"><span class="pre">Standard</span></code>/<code class="docutils literal notranslate"><span class="pre">Lambert</span></code>/<code class="docutils literal notranslate"><span class="pre">Toon</span></code> based on the current <code class="docutils literal notranslate"><span class="pre">diffuseMode</span></code> / <code class="docutils literal notranslate"><span class="pre">specularMode</span></code>. Mixed combinations (e.g. Lambert+Toon) fall back to <code class="docutils literal notranslate"><span class="pre">Lambert</span></code>. </p>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">Unlit</span></code> when the <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Material_1a258eaae7ea4ddbe3f27435d9c8ce2395"><span class="std std-ref"><span class="pre">unlit</span></span></a></code> flag is set, otherwise picks the closest <code class="docutils literal notranslate"><span class="pre">Standard</span></code>/<code class="docutils literal notranslate"><span class="pre">Lambert</span></code>/<code class="docutils literal notranslate"><span class="pre">Toon</span></code> based on the current <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Material_1afd504e811bf743a2c60cf2b72d55d20d"><span class="std std-ref"><span class="pre">diffuseMode</span></span></a></code> / <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Material_1a5782b8f28302d696d14bbd9e90660732"><span class="std std-ref"><span class="pre">specularMode</span></span></a></code>. Mixed combinations (e.g. Lambert+Toon) fall back to <code class="docutils literal notranslate"><span class="pre">Lambert</span></code>. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -6232,7 +6294,7 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin8Material16setAlphaSettingsERK13AlphaSettings">
 <span id="_CPPv3N6raisin8Material16setAlphaSettingsERK13AlphaSettings"></span><span id="_CPPv2N6raisin8Material16setAlphaSettingsERK13AlphaSettings"></span><span id="raisin::Material::setAlphaSettings__AlphaSettingsCR"></span><span class="target" id="classraisin_1_1Material_1a1540d51a88a6143b0f9ab07a2acf3421"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setAlphaSettings</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisin8Material13AlphaSettingsE" title="raisin::Material::AlphaSettings"><span class="n"><span class="pre">AlphaSettings</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">s</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin8Material16setAlphaSettingsERK13AlphaSettings" title="Link to this definition"></a><br /></dt>
-<dd><p>Write <code class="docutils literal notranslate"><span class="pre">alphaMode</span></code>, <code class="docutils literal notranslate"><span class="pre">blendMode</span></code>, <code class="docutils literal notranslate"><span class="pre">alphaAntialiasing</span></code> from one struct. </p>
+<dd><p>Write <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Material_1a60dce970fe4e6d8431e3cc86bd614afd"><span class="std std-ref"><span class="pre">alphaMode</span></span></a></code>, <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Material_1a49ce320b6d2dddd9b39262b4e52f5519"><span class="std std-ref"><span class="pre">blendMode</span></span></a></code>, <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Material_1a1b4203addefe0f308a34a6952b553791"><span class="std std-ref"><span class="pre">alphaAntialiasing</span></span></a></code> from one struct. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -7643,14 +7705,14 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin8Material3pbrENSt6stringERKN3glm4vec4Eff">
 <span id="_CPPv3N6raisin8Material3pbrENSt6stringERKN3glm4vec4Eff"></span><span id="_CPPv2N6raisin8Material3pbrENSt6stringERKN3glm4vec4Eff"></span><span id="raisin::Material::pbr__ss.glm::vec4CR.float.float"></span><span class="target" id="classraisin_1_1Material_1a7d087b9331909017597d0f574d6103bb"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisin8MaterialE" title="raisin::Material"><span class="n"><span class="pre">Material</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pbr</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec4</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">baseColor</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">metallic</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.0f</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">roughness</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.5f</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin8Material3pbrENSt6stringERKN3glm4vec4Eff" title="Link to this definition"></a><br /></dt>
 <dd><p>Build a metallic/roughness PBR material with sensible defaults. </p>
-<p>Sets <code class="docutils literal notranslate"><span class="pre">type</span> <span class="pre">=</span> <a class="reference internal" href="#classraisin_1_1Material_1ad3ed82be2038ea6e6a6712d28ac69dffaf8357427a3733ebed1a8647f3d5fa31b"><span class="std std-ref"><span class="pre">Type::PBR</span></span></a></code>, the albedo tint, metallic, and roughness factors; leaves all texture slots empty. Provide an IBL environment separately via <code class="docutils literal notranslate"><span class="pre">Visuals::setPbrEnvironment(...)</span></code> if you want indirect lighting. </p>
+<p>Sets <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Material_1a41f7e418a6776b0e7236ecee9732b9e6"><span class="std std-ref"><span class="pre">type</span></span></a> <span class="pre">=</span> <a class="reference internal" href="#classraisin_1_1Material_1ad3ed82be2038ea6e6a6712d28ac69dffaf8357427a3733ebed1a8647f3d5fa31b"><span class="std std-ref"><span class="pre">Type::PBR</span></span></a></code>, the albedo tint, metallic, and roughness factors; leaves all texture slots empty. Provide an IBL environment separately via <code class="docutils literal notranslate"><span class="pre">Visuals::setPbrEnvironment(...)</span></code> if you want indirect lighting. </p>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin8Material10unlitColorENSt6stringERKN3glm4vec4E">
 <span id="_CPPv3N6raisin8Material10unlitColorENSt6stringERKN3glm4vec4E"></span><span id="_CPPv2N6raisin8Material10unlitColorENSt6stringERKN3glm4vec4E"></span><span id="raisin::Material::unlitColor__ss.glm::vec4CR"></span><span class="target" id="classraisin_1_1Material_1a6d49c1ac50e607a5f21d1c21ea4417f5"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisin8MaterialE" title="raisin::Material"><span class="n"><span class="pre">Material</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">unlitColor</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec4</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">color</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec4</span></span><span class="p"><span class="pre">(</span></span><span class="m"><span class="pre">1.0f</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin8Material10unlitColorENSt6stringERKN3glm4vec4E" title="Link to this definition"></a><br /></dt>
 <dd><p>Build an unlit material that ignores scene lighting. </p>
-<p>Useful for HUD elements, debug visuals, holograms, light-emitting decals. Named <code class="docutils literal notranslate"><span class="pre">unlitColor</span></code> rather than <code class="docutils literal notranslate"><span class="pre">unlit</span></code> to avoid colliding with the <code class="docutils literal notranslate"><span class="pre">bool</span> <span class="pre">unlit</span></code> data member. </p>
+<p>Useful for HUD elements, debug visuals, holograms, light-emitting decals. Named <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Material_1a6d49c1ac50e607a5f21d1c21ea4417f5"><span class="std std-ref"><span class="pre">unlitColor</span></span></a></code> rather than <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Material_1a258eaae7ea4ddbe3f27435d9c8ce2395"><span class="std std-ref"><span class="pre">unlit</span></span></a></code> to avoid colliding with the <code class="docutils literal notranslate"><span class="pre">bool</span> <a class="reference internal" href="#classraisin_1_1Material_1a258eaae7ea4ddbe3f27435d9c8ce2395"><span class="std std-ref"><span class="pre">unlit</span></span></a></code> data member. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -7693,6 +7755,16 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 
 </div>
 <dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin8Material11UvTransformE">
+<span id="_CPPv3N6raisin8Material11UvTransformE"></span><span id="_CPPv2N6raisin8Material11UvTransformE"></span><span id="raisin::Material::UvTransform"></span><span class="target" id="structraisin_1_1Material_1_1UvTransform"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">UvTransform</span></span></span><a class="headerlink" href="#_CPPv4N6raisin8Material11UvTransformE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin8Material18TextureBindingInfoE">
+<span id="_CPPv3N6raisin8Material18TextureBindingInfoE"></span><span id="_CPPv2N6raisin8Material18TextureBindingInfoE"></span><span id="raisin::Material::TextureBindingInfo"></span><span class="target" id="structraisin_1_1Material_1_1TextureBindingInfo"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TextureBindingInfo</span></span></span><a class="headerlink" href="#_CPPv4N6raisin8Material18TextureBindingInfoE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin8Material13AlphaSettingsE">
 <span id="_CPPv3N6raisin8Material13AlphaSettingsE"></span><span id="_CPPv2N6raisin8Material13AlphaSettingsE"></span><span id="raisin::Material::AlphaSettings"></span><span class="target" id="structraisin_1_1Material_1_1AlphaSettings"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AlphaSettings</span></span></span><a class="headerlink" href="#_CPPv4N6raisin8Material13AlphaSettingsE" title="Link to this definition"></a><br /></dt>
 <dd><p>Grouped alpha-handling configuration. </p>
@@ -7714,26 +7786,16 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 </dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin8Material18TextureBindingInfoE">
-<span id="_CPPv3N6raisin8Material18TextureBindingInfoE"></span><span id="_CPPv2N6raisin8Material18TextureBindingInfoE"></span><span id="raisin::Material::TextureBindingInfo"></span><span class="target" id="structraisin_1_1Material_1_1TextureBindingInfo"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TextureBindingInfo</span></span></span><a class="headerlink" href="#_CPPv4N6raisin8Material18TextureBindingInfoE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin8Material26VertexDisplacementSettingsE">
+<span id="_CPPv3N6raisin8Material26VertexDisplacementSettingsE"></span><span id="_CPPv2N6raisin8Material26VertexDisplacementSettingsE"></span><span id="raisin::Material::VertexDisplacementSettings"></span><span class="target" id="structraisin_1_1Material_1_1VertexDisplacementSettings"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VertexDisplacementSettings</span></span></span><a class="headerlink" href="#_CPPv4N6raisin8Material26VertexDisplacementSettingsE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin8Material15TextureSlotInfoE">
 <span id="_CPPv3N6raisin8Material15TextureSlotInfoE"></span><span id="_CPPv2N6raisin8Material15TextureSlotInfoE"></span><span id="raisin::Material::TextureSlotInfo"></span><span class="target" id="structraisin_1_1Material_1_1TextureSlotInfo"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TextureSlotInfo</span></span></span><a class="headerlink" href="#_CPPv4N6raisin8Material15TextureSlotInfoE" title="Link to this definition"></a><br /></dt>
 <dd><p>Static per-slot metadata for the TextureSlot enum. </p>
-<p>Bundles the data that would otherwise live as parallel tables in Material.cpp: human-facing name, whether the slot carries sRGB color (so loaders pick the right internal format), and whether the slot is tracked in <code class="docutils literal notranslate"><span class="pre">textureUvTransforms[]</span></code> so callers can iterate slots without a hardcoded list. </p>
+<p>Bundles the data that would otherwise live as parallel tables in Material.cpp: human-facing name, whether the slot carries sRGB color (so loaders pick the right internal format), and whether the slot is tracked in <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Material_1a86598ce2040c7917fbdae519bc3bbb18"><span class="std std-ref"><span class="pre">textureUvTransforms</span></span></a><span class="pre">[]</span></code> so callers can iterate slots without a hardcoded list. </p>
 </dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin8Material11UvTransformE">
-<span id="_CPPv3N6raisin8Material11UvTransformE"></span><span id="_CPPv2N6raisin8Material11UvTransformE"></span><span id="raisin::Material::UvTransform"></span><span class="target" id="structraisin_1_1Material_1_1UvTransform"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">UvTransform</span></span></span><a class="headerlink" href="#_CPPv4N6raisin8Material11UvTransformE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin8Material26VertexDisplacementSettingsE">
-<span id="_CPPv3N6raisin8Material26VertexDisplacementSettingsE"></span><span id="_CPPv2N6raisin8Material26VertexDisplacementSettingsE"></span><span id="raisin::Material::VertexDisplacementSettings"></span><span class="target" id="structraisin_1_1Material_1_1VertexDisplacementSettings"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VertexDisplacementSettings</span></span></span><a class="headerlink" href="#_CPPv4N6raisin8Material26VertexDisplacementSettingsE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
 
 </dd></dl>
 
@@ -7764,10 +7826,16 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin21RenderQualitySettings6presetE19RenderQualityPreset">
 <span id="_CPPv3N6raisin21RenderQualitySettings6presetE19RenderQualityPreset"></span><span id="_CPPv2N6raisin21RenderQualitySettings6presetE19RenderQualityPreset"></span><span id="raisin::RenderQualitySettings::preset__RenderQualityPreset"></span><span class="target" id="structraisin_1_1RenderQualitySettings_1af380de4a521e5f99998123f97fea53bb"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisin21RenderQualitySettingsE" title="raisin::RenderQualitySettings"><span class="n"><span class="pre">RenderQualitySettings</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">preset</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6raisin19RenderQualityPresetE" title="raisin::RenderQualityPreset"><span class="n"><span class="pre">RenderQualityPreset</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin21RenderQualitySettings6presetE19RenderQualityPreset" title="Link to this definition"></a><br /></dt>
 <dd><p>Build a <code class="docutils literal notranslate"><a class="reference internal" href="#structraisin_1_1RenderQualitySettings"><span class="std std-ref"><span class="pre">RenderQualitySettings</span></span></a></code> for the given preset. </p>
-<p>Companion to the existing <code class="docutils literal notranslate"><span class="pre">RenderQualityPreset</span></code> enum so the type that names the presets can also produce them. Delegates to <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RayraiWindow_1a84bdb4434d51285f87c107196f2f360b"><span class="std std-ref"><span class="pre">RayraiWindow::defaultRenderQualitySettings()</span></span></a></code> defined in RayraiWindow.cpp. </p>
+<p>Companion to the existing <code class="docutils literal notranslate"><a class="reference internal" href="#namespaceraisin_1ade6028223d4166aeee4e4a726a057b51"><span class="std std-ref"><span class="pre">RenderQualityPreset</span></span></a></code> enum so the type that names the presets can also produce them. Delegates to <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RayraiWindow_1a84bdb4434d51285f87c107196f2f360b"><span class="std std-ref"><span class="pre">RayraiWindow::defaultRenderQualitySettings()</span></span></a></code> defined in RayraiWindow.cpp. </p>
 </dd></dl>
 
 </div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin21RenderQualitySettings15ShadowsSettingsE">
+<span id="_CPPv3N6raisin21RenderQualitySettings15ShadowsSettingsE"></span><span id="_CPPv2N6raisin21RenderQualitySettings15ShadowsSettingsE"></span><span id="raisin::RenderQualitySettings::ShadowsSettings"></span><span class="target" id="structraisin_1_1RenderQualitySettings_1_1ShadowsSettings"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ShadowsSettings</span></span></span><a class="headerlink" href="#_CPPv4N6raisin21RenderQualitySettings15ShadowsSettingsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Directional / additional / point shadow controls. </p>
+</dd></dl>
+
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin21RenderQualitySettings13BloomSettingsE">
 <span id="_CPPv3N6raisin21RenderQualitySettings13BloomSettingsE"></span><span id="_CPPv2N6raisin21RenderQualitySettings13BloomSettingsE"></span><span id="raisin::RenderQualitySettings::BloomSettings"></span><span class="target" id="structraisin_1_1RenderQualitySettings_1_1BloomSettings"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BloomSettings</span></span></span><a class="headerlink" href="#_CPPv4N6raisin21RenderQualitySettings13BloomSettingsE" title="Link to this definition"></a><br /></dt>
@@ -7787,9 +7855,9 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 </dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin21RenderQualitySettings15ShadowsSettingsE">
-<span id="_CPPv3N6raisin21RenderQualitySettings15ShadowsSettingsE"></span><span id="_CPPv2N6raisin21RenderQualitySettings15ShadowsSettingsE"></span><span id="raisin::RenderQualitySettings::ShadowsSettings"></span><span class="target" id="structraisin_1_1RenderQualitySettings_1_1ShadowsSettings"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ShadowsSettings</span></span></span><a class="headerlink" href="#_CPPv4N6raisin21RenderQualitySettings15ShadowsSettingsE" title="Link to this definition"></a><br /></dt>
-<dd><p>Directional / additional / point shadow controls. </p>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin21RenderQualitySettings19ToneMappingSettingsE">
+<span id="_CPPv3N6raisin21RenderQualitySettings19ToneMappingSettingsE"></span><span id="_CPPv2N6raisin21RenderQualitySettings19ToneMappingSettingsE"></span><span id="raisin::RenderQualitySettings::ToneMappingSettings"></span><span class="target" id="structraisin_1_1RenderQualitySettings_1_1ToneMappingSettings"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToneMappingSettings</span></span></span><a class="headerlink" href="#_CPPv4N6raisin21RenderQualitySettings19ToneMappingSettingsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Tone-mapping + color-grade controls. </p>
 </dd></dl>
 
 <dl class="cpp struct">
@@ -7798,19 +7866,13 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dd><p>Temporal antialiasing controls. </p>
 </dd></dl>
 
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin21RenderQualitySettings19ToneMappingSettingsE">
-<span id="_CPPv3N6raisin21RenderQualitySettings19ToneMappingSettingsE"></span><span id="_CPPv2N6raisin21RenderQualitySettings19ToneMappingSettingsE"></span><span id="raisin::RenderQualitySettings::ToneMappingSettings"></span><span class="target" id="structraisin_1_1RenderQualitySettings_1_1ToneMappingSettings"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToneMappingSettings</span></span></span><a class="headerlink" href="#_CPPv4N6raisin21RenderQualitySettings19ToneMappingSettingsE" title="Link to this definition"></a><br /></dt>
-<dd><p>Tone-mapping + color-grade controls. </p>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin15RenderOverridesE">
 <span id="_CPPv3N6raisin15RenderOverridesE"></span><span id="_CPPv2N6raisin15RenderOverridesE"></span><span id="raisin::RenderOverrides"></span><span class="target" id="structraisin_1_1RenderOverrides"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RenderOverrides</span></span></span><a class="headerlink" href="#_CPPv4N6raisin15RenderOverridesE" title="Link to this definition"></a><br /></dt>
 <dd><p>Override shaders and rendering toggles when using external cameras. </p>
-<p>For <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Camera"><span class="std std-ref"><span class="pre">Camera</span></span></a></code>-based external renders, <code class="docutils literal notranslate"><span class="pre">drawVisualizationObjects</span></code> and <code class="docutils literal notranslate"><span class="pre">drawPointClouds</span></code> enable only custom visuals, instanced visuals, and point clouds marked <code class="docutils literal notranslate"><a class="reference internal" href="#namespaceraisin_1ae61c1b3422ee207a93b8d270eadaf402aeef9fc6a14d765b49eea3959ff70b049"><span class="std std-ref"><span class="pre">VisualCategory::Detectable</span></span></a></code>. Non-detectable helper geometry remains visible in the normal interactive viewer but is skipped by these capture paths. The RaiSim RGB/depth sensor-camera overloads disable custom visualization objects and point clouds entirely, regardless of these toggles. </p>
+<p>For <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Camera"><span class="std std-ref"><span class="pre">Camera</span></span></a></code>-based external renders, <code class="docutils literal notranslate"><a class="reference internal" href="#structraisin_1_1RenderOverrides_1aefdb7197d62121468ec8f85e9c48d77f"><span class="std std-ref"><span class="pre">drawVisualizationObjects</span></span></a></code> and <code class="docutils literal notranslate"><a class="reference internal" href="#structraisin_1_1RenderOverrides_1a28616469ab7b3d8f1a22c6ac67db8b33"><span class="std std-ref"><span class="pre">drawPointClouds</span></span></a></code> enable only custom visuals, instanced visuals, and point clouds marked <code class="docutils literal notranslate"><a class="reference internal" href="#namespaceraisin_1ae61c1b3422ee207a93b8d270eadaf402aeef9fc6a14d765b49eea3959ff70b049"><span class="std std-ref"><span class="pre">VisualCategory::Detectable</span></span></a></code>. Non-detectable helper geometry remains visible in the normal interactive viewer but is skipped by these capture paths. The RaiSim RGB/depth sensor-camera overloads disable custom visualization objects and point clouds entirely, regardless of these toggles. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
@@ -8396,7 +8458,7 @@ points and the fast-path boundaries for those APIs.</p>
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisin12RaisimObject7isValidEv">
 <span id="_CPPv3NK6raisin12RaisimObject7isValidEv"></span><span id="_CPPv2NK6raisin12RaisimObject7isValidEv"></span><span id="raisin::RaisimObject::isValidC"></span><span class="target" id="classraisin_1_1RaisimObject_1afc6219307acc0bef478f9e6fe7be3dab"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isValid</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin12RaisimObject7isValidEv" title="Link to this definition"></a><br /></dt>
 <dd><p>True when this wrapper still references a live <a class="reference internal" href="../Object.html#classraisim_1_1Object"><span class="std std-ref">raisim::Object</span></a>. </p>
-<p><code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RaisimObject"><span class="std std-ref"><span class="pre">RaisimObject</span></span></a></code> does not own the underlying raisim object; if the world it came from is destroyed or the object removed, the cached pointer becomes dangling. Public mutators (<code class="docutils literal notranslate"><span class="pre">updateAppearance</span></code>, <code class="docutils literal notranslate"><span class="pre">updateHeightMapVisual</span></code>, <code class="docutils literal notranslate"><span class="pre">configureGroundMaterial</span></code>) early-return when <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RaisimObject_1afc6219307acc0bef478f9e6fe7be3dab"><span class="std std-ref"><span class="pre">isValid()</span></span></a></code> is false so callers don’t have to track lifetime themselves. Clear the underlying pointer via <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RaisimObject_1a8474875f8a9e4ddaa4c80d84411a8f15"><span class="std std-ref"><span class="pre">invalidate()</span></span></a></code> when the source object is removed. </p>
+<p><code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RaisimObject"><span class="std std-ref"><span class="pre">RaisimObject</span></span></a></code> does not own the underlying raisim object; if the world it came from is destroyed or the object removed, the cached pointer becomes dangling. Public mutators (<code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RaisimObject_1abe1078973d57c7ff995f8cbd88117fa8"><span class="std std-ref"><span class="pre">updateAppearance</span></span></a></code>, <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RaisimObject_1ade39b2b856ca028d87d787ccebf5ceae"><span class="std std-ref"><span class="pre">updateHeightMapVisual</span></span></a></code>, <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RaisimObject_1a9bf34fecd2b05fd71c2a371490d3456b"><span class="std std-ref"><span class="pre">configureGroundMaterial</span></span></a></code>) early-return when <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RaisimObject_1afc6219307acc0bef478f9e6fe7be3dab"><span class="std std-ref"><span class="pre">isValid()</span></span></a></code> is false so callers don’t have to track lifetime themselves. Clear the underlying pointer via <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RaisimObject_1a8474875f8a9e4ddaa4c80d84411a8f15"><span class="std std-ref"><span class="pre">invalidate()</span></span></a></code> when the source object is removed. </p>
 </dd></dl>
 
 <dl class="cpp function">

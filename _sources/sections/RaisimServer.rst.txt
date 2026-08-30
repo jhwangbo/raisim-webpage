@@ -46,15 +46,19 @@ Call ``killServer()`` to stop the server thread and disconnect the client.
 
 Sensor measurements
 ==================================
-RaiSim does not support sensor measurement updates from a visualizer.
-``RaisimServer`` streams the world state to visualizer clients, but it does not
-request RGB or depth frames back from TCP visualizers and does not write
-visualizer-rendered data into RaiSim sensor buffers.
+``RaisimServer`` can request manual RGB/depth measurements from the current
+rayrai TCP viewer. When a ``MeasurementSource::MANUAL`` camera reaches its
+update period, the normal scene response includes its pose, lens model,
+resolution, and clipping range. The viewer renders a complete camera pass and
+returns BGRA pixels or metric depth values in a ``REQUEST_SENSOR_UPDATE``
+frame. The server validates every entry before replacing sensor buffers and
+updating timestamps.
 
-Use ``Sensor::MeasurementSource::RAISIM`` for sensors that RaiSim can compute
-from the physics world, such as IMU, spinning LiDAR, and depth-camera CPU ray
-updates. Use ``Sensor::MeasurementSource::MANUAL`` when user code or an
-in-process renderer writes the sensor buffer.
+IMU and spinning LiDAR remain RaiSim-side measurements; their metadata is
+streamed for inspection but the viewer does not return their samples. Use
+``MeasurementSource::RAISIM`` for RaiSim-computed sensors and manual RGB/depth
+when the connected viewer should provide the render. See
+:ref:`tcp-viewer-sensor-round-trip` on the TCP viewer page.
 
 Synchronous updates (optional)
 ==============================
@@ -79,8 +83,10 @@ rather than misparsing the stream. The current feature flags are:
   torques, body poses, and articulated-system generalized coordinates over the
   wire. The server applies no authentication — if the connection is open, the
   client can drive it. See `Interactive sim control`_ below.
+* ``PROTOCOL_FEATURE_CONTACT_OBJECT_TAGS``: each streamed contact identifies
+  both participating objects, enabling per-object contact counts and plots.
 
-The rayrai TCP viewer negotiates all three flags automatically. Custom clients
+The rayrai TCP viewer negotiates all four flags automatically. Custom clients
 can opt into any flag through the ``RaisimServer`` and ``RaisimTcpCommon``
 headers.
 
@@ -90,7 +96,7 @@ Interactive sim control
 =======================
 When the ``SIM_CONTROL`` feature is negotiated, a connected client (such as
 ``rayrai_tcp_viewer``) can drive the simulation from its UI rather than
-just observing it. The viewer's **Control** tab gets a *Simulation* row with
+just observing it. The viewer's **Object** tab gets a *Simulation* row with
 icon-text buttons for Pause / Resume / Step / Step 10.
 
 Client requests added by this feature:
@@ -105,9 +111,9 @@ Client requests added by this feature:
 * ``CR_SET_POSE`` — teleport a single-body object to a position + quaternion.
 * ``CR_SET_GC`` — set the generalized coordinate of an articulated system.
 
-There is no authentication or capability handshake — if the connection is open,
-the client can issue any of these requests. The bind address is the only
-access control the server provides:
+There is no authentication or per-client authorization — if the connection is
+open, the client can issue any request negotiated by both ends. The bind
+address is the only access control the server provides:
 
 The same pause / step state is reachable from your own simulation code,
 so a headless server can drive its own loop:
@@ -181,7 +187,7 @@ visibility with:
 
 Treat this as a security boundary — once the server is reachable from a wider
 network, every client on that network can pause / step / force-apply /
-spawn-remove. There is no token or capability handshake to fall back on.
+spawn-remove. There is no token or authorization layer to fall back on.
 
 Discovery beacons
 =================
@@ -189,7 +195,7 @@ While the server is running, ``RaisimServer`` advertises itself with a UDP
 beacon once per second on port ``59312``. The beacon payload contains the
 RaiSim TCP protocol version, TCP port, host name, executable name, bind mode
 (``loopback`` or ``all``), and connection status. ``rayrai_tcp_viewer``
-uses these beacons to populate the detected-server list in its **Control**
+uses these beacons to populate the detected-server list in its **Connection**
 tab.
 
 With the default loopback bind, beacons are sent only to ``127.0.0.1``. After

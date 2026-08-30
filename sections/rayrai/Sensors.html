@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sensors and depth/LiDAR &mdash; raisim 2.5.4 documentation</title>
+  <title>Sensors and depth/LiDAR &mdash; raisim 2.5.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=68f46a9b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=c0370f68"></script>
+      <script src="../../_static/documentation_options.js?v=644f8b71"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -203,8 +203,8 @@ longer RGB/depth readback example.</p>
 protocol header with feature bits before each request, and the server replies with the
 negotiated feature set. A viewer rejects newer unsupported protocol versions with a clear
 error instead of attempting to parse an incompatible stream.</p>
-<p>Current feature bits cover the explicit header, deformable delta streaming, and sim
-control. Deformable objects send mesh topology during initialization or topology
+<p>Current feature bits cover the explicit header, deformable delta streaming, sim
+control, and contact ownership tags. Deformable objects send mesh topology during initialization or topology
 changes; ordinary update frames send vertex positions only. This keeps dynamic
 cloth/cube streaming cheaper while avoiding binary compression until network bandwidth
 is measured as a bottleneck. Sim-control messages share the same feature-negotiated
@@ -216,7 +216,8 @@ request path.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">kProtocolVersion</span></code> — the current wire version. Mismatched versions cause
 the viewer to disconnect with a versioned-protocol error.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">kProtocolFeatureExplicitHeader</span></code>, <code class="docutils literal notranslate"><span class="pre">kProtocolFeatureDeformableDelta</span></code>,
-and <code class="docutils literal notranslate"><span class="pre">kProtocolFeatureSimControl</span></code> — the currently-negotiated feature bits;
+<code class="docutils literal notranslate"><span class="pre">kProtocolFeatureSimControl</span></code>, and <code class="docutils literal notranslate"><span class="pre">kProtocolFeatureContactObjectTags</span></code> —
+the currently-negotiated feature bits;
 <code class="docutils literal notranslate"><span class="pre">kProtocolSupportedFeatures</span></code> is the OR of all bits this build understands.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">kMaxMessageBytes</span></code> — maximum accepted message size (default 64 MiB),
 overridable at build time via the
@@ -230,7 +231,7 @@ lengths to remain ABI-compatible with the legacy <code class="docutils literal n
 <p>Custom TCP clients should use <code class="docutils literal notranslate"><span class="pre">raisin::tcp_viewer::BufferReader</span></code> to decode
 frames. It is a non-owning view over the received byte buffer with bounds-
 checked accessors:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisin</span><span class="o">::</span><span class="n">tcp_viewer</span><span class="o">::</span><span class="n">BufferReader</span><span class="w"> </span><span class="nf">reader</span><span class="p">(</span><span class="n">buffer</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">buffer</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisin</span><span class="o">::</span><span class="n">tcp_viewer</span><span class="o">::</span><span class="n">BufferReader</span><span class="w"> </span><span class="nf">reader</span><span class="p">(</span><span class="n">buffer</span><span class="p">);</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reader</span><span class="p">.</span><span class="n">read</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">();</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">features</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reader</span><span class="p">.</span><span class="n">read</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span><span class="o">&gt;</span><span class="p">();</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reader</span><span class="p">.</span><span class="n">readString</span><span class="p">();</span>
@@ -243,6 +244,12 @@ checked accessors:</p>
 <p>Each read advances <code class="docutils literal notranslate"><span class="pre">reader.offset()</span></code> and sets <code class="docutils literal notranslate"><span class="pre">reader.ok</span> <span class="pre">=</span> <span class="pre">false</span></code> if there
 is not enough data left, so callers can decode an entire frame and check
 <code class="docutils literal notranslate"><span class="pre">ok</span></code> at the end rather than after every field.</p>
+<p>The current viewer also services <code class="docutils literal notranslate"><span class="pre">MeasurementSource::MANUAL</span></code> RGB/depth
+requests received in the scene stream. It renders from the streamed camera
+pose and lens, returns BGRA or metric-depth buffers in a sensor-update message,
+and exposes the latest preview in the selected object’s Sensors tab. IMU and
+spinning-LiDAR values remain RaiSim-side. See <a class="reference internal" href="../RayraiTcpViewer.html"><span class="doc">Rayrai TCP Viewer</span></a> for the
+full request/response sequence and troubleshooting guidance.</p>
 </section>
 <section id="depth-and-lidar">
 <h2>Depth and LiDAR<a class="headerlink" href="#depth-and-lidar" title="Link to this heading"></a></h2>

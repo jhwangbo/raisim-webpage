@@ -60,10 +60,16 @@ Check these points:
   ``launchServer``.
 * The server-based example and TCP viewer must use the same port. The default
   is ``8080``.
-* Start the simulation and viewer from the same installed RaiSim version.
+* Run ``linux_install.sh``, ``mac_install.sh``, or ``win_install.ps1`` after
+  updating the package, then rebuild the examples copy of
+  ``rayrai_tcp_viewer``. A stale viewer source can connect but disagree with
+  the installed rayrai/RaiSim protocol implementation.
 
-The TCP viewer receives world state only. It does not write RGB/depth rendered
-images back into RaiSim sensor buffers.
+For manual RGB/depth cameras, keep the examples-built viewer connected. It
+renders requested frames and returns them to ``RaisimServer``. If the viewer
+reports ``Refusing RGB sensor update without a complete render``, rerun the
+platform install script and rebuild ``rayrai_tcp_viewer`` in
+``build-examples``; do not launch an older installed viewer binary.
 
 rayrai Window Or Offscreen Context Fails
 ========================================

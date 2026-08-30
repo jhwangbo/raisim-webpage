@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Troubleshooting &mdash; raisim 2.5.4 documentation</title>
+  <title>Troubleshooting &mdash; raisim 2.5.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=68f46a9b" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=c0370f68"></script>
+      <script src="../_static/documentation_options.js?v=644f8b71"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -173,10 +173,16 @@ new terminal before starting a viewer, an example, or Python with <code class="d
 <code class="docutils literal notranslate"><span class="pre">launchServer</span></code>.</p></li>
 <li><p>The server-based example and TCP viewer must use the same port. The default
 is <code class="docutils literal notranslate"><span class="pre">8080</span></code>.</p></li>
-<li><p>Start the simulation and viewer from the same installed RaiSim version.</p></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">linux_install.sh</span></code>, <code class="docutils literal notranslate"><span class="pre">mac_install.sh</span></code>, or <code class="docutils literal notranslate"><span class="pre">win_install.ps1</span></code> after
+updating the package, then rebuild the examples copy of
+<code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code>. A stale viewer source can connect but disagree with
+the installed rayrai/RaiSim protocol implementation.</p></li>
 </ul>
-<p>The TCP viewer receives world state only. It does not write RGB/depth rendered
-images back into RaiSim sensor buffers.</p>
+<p>For manual RGB/depth cameras, keep the examples-built viewer connected. It
+renders requested frames and returns them to <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code>. If the viewer
+reports <code class="docutils literal notranslate"><span class="pre">Refusing</span> <span class="pre">RGB</span> <span class="pre">sensor</span> <span class="pre">update</span> <span class="pre">without</span> <span class="pre">a</span> <span class="pre">complete</span> <span class="pre">render</span></code>, rerun the
+platform install script and rebuild <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> in
+<code class="docutils literal notranslate"><span class="pre">build-examples</span></code>; do not launch an older installed viewer binary.</p>
 </section>
 <section id="rayrai-window-or-offscreen-context-fails">
 <h2>rayrai Window Or Offscreen Context Fails<a class="headerlink" href="#rayrai-window-or-offscreen-context-fails" title="Link to this heading"></a></h2>

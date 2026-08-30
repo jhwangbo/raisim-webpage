@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="650" viewBox="0 0 1600 650" role="img" aria-labelledby="title desc">
+  <title id="title">TCP viewer RGB and depth sensor round trip</title>
+  <desc id="desc">Sequence showing a manual camera request leaving RaiSim, rendering in rayrai, and validated pixel data returning to the sensor buffer.</desc>
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#111827"/>
+      <stop offset="1" stop-color="#0f172a"/>
+    </linearGradient>
+    <marker id="arr" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#38bdf8"/>
+    </marker>
+    <marker id="ret" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#34d399"/>
+    </marker>
+  </defs>
+  <rect width="1600" height="650" rx="28" fill="url(#bg2)"/>
+  <text x="800" y="58" text-anchor="middle" fill="#f8fafc" font-family="sans-serif" font-size="34" font-weight="700">Manual RGB/depth measurement round trip</text>
+  <text x="800" y="91" text-anchor="middle" fill="#94a3b8" font-family="sans-serif" font-size="19">The selected-object Sensors tab previews the same completed render returned to RaiSim</text>
+
+  <g font-family="sans-serif">
+    <rect x="75" y="135" width="300" height="105" rx="18" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+    <text x="225" y="176" text-anchor="middle" fill="#fde68a" font-size="23" font-weight="700">1 · Sensor due</text>
+    <text x="225" y="210" text-anchor="middle" fill="#cbd5e1" font-size="17">MANUAL + update period elapsed</text>
+
+    <rect x="485" y="135" width="300" height="105" rx="18" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+    <text x="635" y="176" text-anchor="middle" fill="#bae6fd" font-size="23" font-weight="700">2 · Request</text>
+    <text x="635" y="207" text-anchor="middle" fill="#cbd5e1" font-size="16">pose · lens · resolution · clip</text>
+
+    <rect x="895" y="135" width="300" height="105" rx="18" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+    <text x="1045" y="176" text-anchor="middle" fill="#ddd6fe" font-size="23" font-weight="700">3 · rayrai render</text>
+    <text x="1045" y="207" text-anchor="middle" fill="#cbd5e1" font-size="16">complete RGB or metric-depth pass</text>
+
+    <rect x="1260" y="135" width="265" height="105" rx="18" fill="#1e293b" stroke="#ec4899" stroke-width="2"/>
+    <text x="1392" y="176" text-anchor="middle" fill="#fbcfe8" font-size="23" font-weight="700">4 · Preview</text>
+    <text x="1392" y="207" text-anchor="middle" fill="#cbd5e1" font-size="16">texture · timing · depth range</text>
+
+    <path d="M375 188 H485" stroke="#38bdf8" stroke-width="4" marker-end="url(#arr)"/>
+    <path d="M785 188 H895" stroke="#38bdf8" stroke-width="4" marker-end="url(#arr)"/>
+    <path d="M1195 188 H1260" stroke="#38bdf8" stroke-width="4" marker-end="url(#arr)"/>
+
+    <rect x="895" y="355" width="300" height="118" rx="18" fill="#1e293b" stroke="#34d399" stroke-width="2"/>
+    <text x="1045" y="395" text-anchor="middle" fill="#a7f3d0" font-size="23" font-weight="700">5 · Return frame</text>
+    <text x="1045" y="428" text-anchor="middle" fill="#cbd5e1" font-size="16">BGRA bytes or float depth</text>
+    <text x="1045" y="452" text-anchor="middle" fill="#94a3b8" font-size="15">REQUEST_SENSOR_UPDATE</text>
+
+    <rect x="485" y="355" width="300" height="118" rx="18" fill="#1e293b" stroke="#34d399" stroke-width="2"/>
+    <text x="635" y="395" text-anchor="middle" fill="#a7f3d0" font-size="23" font-weight="700">6 · Validate all</text>
+    <text x="635" y="428" text-anchor="middle" fill="#cbd5e1" font-size="16">tag · full name · type · dimensions</text>
+    <text x="635" y="452" text-anchor="middle" fill="#94a3b8" font-size="15">no partial sensor writes</text>
+
+    <rect x="75" y="355" width="300" height="118" rx="18" fill="#1e293b" stroke="#34d399" stroke-width="2"/>
+    <text x="225" y="395" text-anchor="middle" fill="#a7f3d0" font-size="23" font-weight="700">7 · Publish</text>
+    <text x="225" y="428" text-anchor="middle" fill="#cbd5e1" font-size="16">replace buffer + update timestamp</text>
+    <text x="225" y="452" text-anchor="middle" fill="#94a3b8" font-size="15">application reads current measurement</text>
+
+    <path d="M1045 240 V355" stroke="#34d399" stroke-width="4" marker-end="url(#ret)"/>
+    <path d="M895 414 H785" stroke="#34d399" stroke-width="4" marker-end="url(#ret)"/>
+    <path d="M485 414 H375" stroke="#34d399" stroke-width="4" marker-end="url(#ret)"/>
+
+    <rect x="180" y="535" width="1240" height="62" rx="18" fill="#172554" stroke="#60a5fa" stroke-width="1.5"/>
+    <text x="800" y="561" text-anchor="middle" fill="#dbeafe" font-size="18" font-weight="700">Failure is explicit</text>
+    <text x="800" y="584" text-anchor="middle" fill="#bfdbfe" font-size="16">An incomplete render, mismatched sensor identity, invalid dimensions, or malformed payload is rejected before sensor state changes.</text>
+  </g>
+</svg>

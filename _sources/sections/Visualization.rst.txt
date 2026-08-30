@@ -55,13 +55,15 @@ Then run a server-based example in another sourced terminal:
     ./build-examples/examples/primitive_grid
 
 The viewer connects to port ``8080`` by default. Use this workflow for normal
-debug visualization, object inspection, and interactive camera control.
+debug visualization, object inspection, interactive camera control, and
+viewer-rendered manual RGB/depth cameras. Camera requests and completed BGRA or
+metric-depth buffers share the same TCP session as scene updates.
 
-Important boundary: the TCP viewer only receives world state. It does not render
-RGB/depth frames back into RaiSim sensors. For RGB/depth sensor buffers, prefer
-in-process rayrai with ``Sensor::MeasurementSource::MANUAL``. Use RaiSim-side
-CPU depth only when rayrai is unavailable or a deterministic headless ray-query
-fallback is explicitly required.
+Use in-process rayrai when the application must own the OpenGL context, access
+textures without a network round trip, include custom render-only objects, or
+continue producing camera frames without a viewer process. Use RaiSim-side CPU
+depth when rayrai is unavailable or a deterministic headless ray-query fallback
+is explicitly required.
 
 In-Process rayrai
 =================

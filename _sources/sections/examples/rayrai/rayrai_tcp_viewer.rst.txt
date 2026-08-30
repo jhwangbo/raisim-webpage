@@ -75,5 +75,8 @@ Details
   keyboard shortcut help.
 - Rebuild the ``rayrai_tcp_viewer`` target after changing its checked-in source
   or the packaged rayrai library.
-- Direct RGB/depth sensor workflows should prefer in-process rayrai when the
-  application needs deterministic renderer buffers.
+- Services manual RGB/depth camera requests from ``RaisimServer``, returns
+  completed BGRA/metric-depth buffers, and shows previews and camera frustums
+  in the selected-object Sensors tab.
+- Prefer in-process rayrai when the application must own the render context or
+  access textures without a viewer process and TCP round trip.

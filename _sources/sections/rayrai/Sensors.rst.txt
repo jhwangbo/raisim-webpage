@@ -66,8 +66,8 @@ protocol header with feature bits before each request, and the server replies wi
 negotiated feature set. A viewer rejects newer unsupported protocol versions with a clear
 error instead of attempting to parse an incompatible stream.
 
-Current feature bits cover the explicit header, deformable delta streaming, and sim
-control. Deformable objects send mesh topology during initialization or topology
+Current feature bits cover the explicit header, deformable delta streaming, sim
+control, and contact ownership tags. Deformable objects send mesh topology during initialization or topology
 changes; ordinary update frames send vertex positions only. This keeps dynamic
 cloth/cube streaming cheaper while avoiding binary compression until network bandwidth
 is measured as a bottleneck. Sim-control messages share the same feature-negotiated
@@ -80,7 +80,8 @@ The protocol constants live in ``rayrai/RaisimTcpCommon.hpp`` (namespace
 * ``kProtocolVersion`` — the current wire version. Mismatched versions cause
   the viewer to disconnect with a versioned-protocol error.
 * ``kProtocolFeatureExplicitHeader``, ``kProtocolFeatureDeformableDelta``,
-  and ``kProtocolFeatureSimControl`` — the currently-negotiated feature bits;
+  ``kProtocolFeatureSimControl``, and ``kProtocolFeatureContactObjectTags`` —
+  the currently-negotiated feature bits;
   ``kProtocolSupportedFeatures`` is the OR of all bits this build understands.
 * ``kMaxMessageBytes`` — maximum accepted message size (default 64 MiB),
   overridable at build time via the
@@ -98,7 +99,7 @@ checked accessors:
 
 .. code-block:: cpp
 
-    raisin::tcp_viewer::BufferReader reader(buffer.data(), buffer.size());
+    raisin::tcp_viewer::BufferReader reader(buffer);
     auto version = reader.read<int>();
     auto features = reader.read<std::uint64_t>();
     auto name = reader.readString();
@@ -110,6 +111,13 @@ checked accessors:
 Each read advances ``reader.offset()`` and sets ``reader.ok = false`` if there
 is not enough data left, so callers can decode an entire frame and check
 ``ok`` at the end rather than after every field.
+
+The current viewer also services ``MeasurementSource::MANUAL`` RGB/depth
+requests received in the scene stream. It renders from the streamed camera
+pose and lens, returns BGRA or metric-depth buffers in a sensor-update message,
+and exposes the latest preview in the selected object's Sensors tab. IMU and
+spinning-LiDAR values remain RaiSim-side. See :doc:`../RayraiTcpViewer` for the
+full request/response sequence and troubleshooting guidance.
 
 Depth and LiDAR
 ===============
