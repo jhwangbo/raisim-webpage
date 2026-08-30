@@ -1,3 +1,44 @@
+/* Tables wrap instead of scrolling sideways.
+ *
+ * Two things in the default theme push a table wider than the content column,
+ * and the reader then has to scroll horizontally to finish a sentence:
+ *
+ *   - tables are laid out from their content (`table-layout: auto`), so the
+ *     `:widths:` ratios of a list-table are only a suggestion. One wide image
+ *     or one long path sets the column width, and `max-width: 100%` on the
+ *     image cannot help, because that percentage resolves against a column
+ *     width that is itself derived from the image.
+ *   - inline literals are kept on a single line (`code { white-space: nowrap }`),
+ *     so a long option name, path or identifier cannot break at all.
+ *
+ * Fixing the layout mode makes the declared ratios authoritative; the wrapping
+ * rules then let long cell content use as many lines as it needs. */
+.rst-content table.docutils {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.rst-content table.docutils td,
+.rst-content table.docutils th,
+.wy-table-responsive table td,
+.wy-table-responsive table th {
+  padding: 8px 12px;
+  vertical-align: top;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+/* Literals are the usual reason a column refuses to shrink: file paths, CMake
+ * options, env vars. Let them break anywhere, since they have no spaces. */
+.rst-content table.docutils td code,
+.rst-content table.docutils th code,
+.rst-content table.docutils td code .pre,
+.rst-content table.docutils th code .pre {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
 /* Make images flush inside table cells so feature-gallery grids show
  * the actual artwork edge-to-edge instead of a thin checker of margin. */
 .rst-content table.docutils td > p,
@@ -18,12 +59,13 @@
   height: auto;
 }
 
-.rst-content table.docutils td,
-.rst-content table.docutils th,
-.wy-table-responsive table td,
-.wy-table-responsive table th {
+/* Only the gallery cells go edge-to-edge; text cells keep the padding above,
+ * which is what stops adjacent columns from reading as one run-on line. */
+.rst-content table.docutils td:has(img),
+.rst-content table.docutils th:has(img),
+.wy-table-responsive table td:has(img),
+.wy-table-responsive table th:has(img) {
   padding: 0;
-  vertical-align: top;
 }
 
 /* Keep the header row (the labels above each image) slightly padded so the
