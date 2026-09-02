@@ -17,8 +17,10 @@ Quick map to the current rayrai-related targets:
   cameras, raw buffer readback, LiDAR visualization, camera frustums, and
   custom visuals.
 * ``rayrai_rgb_camera`` / ``rayrai_depth_camera`` /
+  ``rayrai_heightmap_replacement`` /
   ``rayrai_lidar_pointcloud`` / ``rayrai_aruco_marker``: robot-attached sensor
-  rendering, depth readback, point-cloud visualization, and marker rendering.
+  rendering, deleted-heightmap depth visualization, depth readback,
+  point-cloud visualization, and marker rendering.
 * ``rayrai_custom_visuals`` / ``rayrai_instancing_grid`` /
   ``rayrai_pointcloud_animation``: visual primitives, instancing, and dynamic
   point-cloud streaming.

@@ -22,6 +22,7 @@ avoid calling ``Camera::update()`` immediately afterward unless you also update
 For runnable coverage, see
 :doc:`Rayrai RGB camera <../examples/rayrai/rayrai_rgb_camera>`,
 :doc:`Rayrai depth camera <../examples/rayrai/rayrai_depth_camera>`,
+:doc:`Rayrai heightmap replacement <../examples/rayrai/rayrai_heightmap_replacement>`,
 :doc:`Rayrai LiDAR point cloud <../examples/rayrai/rayrai_lidar_pointcloud>`, and
 :doc:`Rayrai ArUco marker <../examples/rayrai/rayrai_aruco_marker>` for dedicated
 sensor examples. ``rayrai_complete_showcase`` combines RGB/depth cameras, LiDAR

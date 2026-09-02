@@ -205,6 +205,7 @@ Rayrai Tools And Examples
    examples/rayrai/rayrai_blender_scene_import
    examples/rayrai/rayrai_rgb_camera
    examples/rayrai/rayrai_depth_camera
+   examples/rayrai/rayrai_heightmap_replacement
    examples/rayrai/rayrai_lidar_pointcloud
    examples/rayrai/rayrai_aruco_marker
    examples/rayrai/rayrai_custom_visuals
