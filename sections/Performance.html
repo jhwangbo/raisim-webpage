@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Performance &mdash; raisim 2.5.7 documentation</title>
+  <title>Performance &mdash; raisim 2.6.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b6430375" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=f7cf8502"></script>
+      <script src="../_static/documentation_options.js?v=ae39cb24"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -88,6 +88,10 @@
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
@@ -228,16 +232,19 @@ robust than asking the solver to process a harder problem faster.</p>
 <section id="sleeping-islands">
 <h2>Sleeping Islands<a class="headerlink" href="#sleeping-islands" title="Link to this heading"></a></h2>
 <p>Sleeping is enabled by default. RaiSim can skip simulation work for dynamic
-islands whose velocities remain below the configured thresholds for a few steps.
+islands whose velocities remain below the configured thresholds for 5 consecutive
+steps by default.
 This helps scenes with piles, props, or objects that settle and then stay quiet.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">world</span><span class="p">.</span><span class="n">setSleepingEnabled</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
-<span class="n">world</span><span class="p">.</span><span class="n">setSleepingParameters</span><span class="p">(</span><span class="cm">/*linear*/</span><span class="w"> </span><span class="mf">0.002</span><span class="p">,</span><span class="w"> </span><span class="cm">/*angular*/</span><span class="w"> </span><span class="mf">0.01</span><span class="p">,</span><span class="w"> </span><span class="cm">/*quietSteps*/</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setSleepingParameters</span><span class="p">(</span><span class="cm">/*linear*/</span><span class="w"> </span><span class="mf">0.002</span><span class="p">,</span><span class="w"> </span><span class="cm">/*angular*/</span><span class="w"> </span><span class="mf">0.01</span><span class="p">,</span><span class="w"> </span><span class="cm">/*quietSteps*/</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span>
 <span class="n">world</span><span class="p">.</span><span class="n">wakeAll</span><span class="p">();</span>
 </pre></div>
 </div>
 <p>Disable sleeping when every object must remain numerically active every step, or
-when a benchmark is intended to measure the awake dynamics path. Use the
-<code class="docutils literal notranslate"><span class="pre">island_sleep</span></code> benchmark to quantify the effect for stack-like scenes.</p>
+when a benchmark is intended to measure the awake dynamics path. The public
+<code class="docutils literal notranslate"><span class="pre">island_sleep_benchmark</span></code> demonstrates sleep/wake behavior visually; it includes
+a server and a fixed 2 ms delay per step, so its elapsed time is not a measure
+of raw physics throughput.</p>
 </section>
 <section id="package-timing-examples">
 <h2>Package Timing Examples<a class="headerlink" href="#package-timing-examples" title="Link to this heading"></a></h2>
@@ -250,19 +257,16 @@ mode and run timing commands on one thread:</p>
 <span class="w">    </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DRAISIM_EXAMPLE<span class="o">=</span>ON
 cmake<span class="w"> </span>--build<span class="w"> </span>build-examples<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--target<span class="w"> </span>anymal_standing_benchmark<span class="w"> </span>articulated_system_benchmark<span class="w"> </span><span class="se">\</span>
-<span class="w">             </span>granular_media<span class="w"> </span>island_sleep_benchmark<span class="w"> </span>-j12
+<span class="w">    </span>--target<span class="w"> </span>anymal_standing_benchmark<span class="w"> </span>articulated_system_benchmark<span class="w"> </span>-j12
 <span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>./build-examples/examples/anymal_standing_benchmark<span class="w"> </span>--fast
 <span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>./build-examples/examples/articulated_system_benchmark
-<span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>./build-examples/examples/island_sleep_benchmark<span class="w"> </span>--steps<span class="o">=</span><span class="m">12000</span>
 </pre></div>
 </div>
 <p>The public workspace does not install these example executables; run them from
 the build tree shown above.</p>
-<p>Representative timing examples include:</p>
+<p>Public timing and visualization examples include:</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 36.0%" />
@@ -281,10 +285,10 @@ the build tree shown above.</p>
 <td><p>Articulated-system stepping cost.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">granular_media</span></code></p></td>
-<td><p>Granular bed interaction with a robot model.</p></td>
+<td><p>Visual granular-bed interaction demo with a server and pacing delays.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">island_sleep_benchmark</span></code></p></td>
-<td><p>Sleeping-island speedup and wake behavior.</p></td>
+<td><p>Visual sleep/wake demo with a fixed delay per step; not raw timing.</p></td>
 </tr>
 </tbody>
 </table>

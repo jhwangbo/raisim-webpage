@@ -277,12 +277,17 @@ Sleeping islands
 RaiSim can skip simulation for *sleeping islands*: groups of dynamic objects
 connected by contacts. Sleeping is **enabled by default**. An island goes to
 sleep when all objects in the island remain quiet for a configurable number of
-consecutive steps (:code:`quietSteps`, default **2**) and their maximum linear
+consecutive steps (:code:`quietSteps`, default **5**) and their maximum linear
 and angular velocities stay below the configured thresholds (defaults:
 **linear 0.002**, **angular 0.01**).
 
 Notes:
 
+* The quiet counter resets whenever either speed threshold is exceeded.
+* The quiet duration is ``quietSteps * timeStep`` (5 ms at a 1 ms timestep).
+  A pendulum can remain below both thresholds near a turning point for five
+  steps and go to sleep. Use a longer window for slower oscillations or smaller
+  timesteps when this occurs.
 * Only **dynamic** objects participate in sleeping islands.
 * Any user modification (e.g., changing state) keeps the island awake.
 * Contacts between awake and sleeping islands will wake the sleeping island
@@ -293,7 +298,7 @@ Configuration API:
 .. code-block:: cpp
 
   world.setSleepingEnabled(true);
-  world.setSleepingParameters(/*linear*/ 0.002, /*angular*/ 0.01, /*quietSteps*/ 2);
+  world.setSleepingParameters(/*linear*/ 0.002, /*angular*/ 0.01, /*quietSteps*/ 5);
   world.setSleepingVelocityThresholds(0.002, 0.01);
   world.wakeObject(obj);   // wakes the object's island
   world.wakeAll();

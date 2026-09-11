@@ -4,8 +4,8 @@ Benchmark
 
 This page reports representative timing comparisons between RaiSim and another
 widely used multi-body physics engine (MuJoCo) on articulated-dynamics
-workloads, and documents the environment in enough detail to reproduce the
-numbers. For general tuning guidance, see :doc:`Performance`.
+workloads. These are historical measurements from the private release-validation
+suite, with the machine and workload settings recorded below. For general tuning guidance, see :doc:`Performance`.
 
 Environment
 ===========
@@ -54,40 +54,30 @@ configuration.
           The RaiSim and MuJoCo variants use matching scene parameters and the
           same integration timestep, so the two engines simulate equivalent scenes.
 
-Build the benchmark binary
-==========================
+Measure the distributed package
+===============================
 
-From the RaiSim source tree, configure a ``Release`` build with the benchmark
-suite and the MuJoCo comparison enabled, then build the ``benchmarks`` target:
+The comparison runner and its MuJoCo backend are maintained in the private
+engine repository. They are not build targets in ``raisim2Lib``. The results
+below describe that recorded run, rather than a benchmark of the installed
+|raisim_version| package.
 
-.. code-block:: bash
-
-   cmake -S . -B build-benchmark \
-       -DCMAKE_BUILD_TYPE=Release \
-       -DRAISIM_BENCHMARK=ON \
-       -DRAISIM_MUJOCO_BENCHMARK=ON
-
-   cmake --build build-benchmark --target benchmarks -j
-
-This produces ``build-benchmark/benchmark/benchmarks``. ``RAISIM_MUJOCO_BENCHMARK``
-fetches and builds MuJoCo from source, so the first configure/build is slower.
-
-Run the comparison
-==================
-
-Run the six benchmarks below with both backends. ``--backend=both`` selects
-RaiSim and MuJoCo, while ``--repeat 3`` runs every benchmark/backend pair three
-times and reports the median, minimum, and maximum wall-clock time:
+To measure the binary package on your machine, build the public timing examples:
 
 .. code-block:: bash
 
-   ./build-benchmark/benchmark/benchmarks --backend=both --repeat 3 \
-       -b chain20_speed -b heightmap_anymal_speed -b primitive_speed \
-       -b chain10_speed -b anymal_standing -b anymal_falling
+   cmake -S . -B build-examples -DCMAKE_BUILD_TYPE=Release -DRAISIM_EXAMPLE=ON
+   cmake --build build-examples --target anymal_standing_benchmark \
+       articulated_system_benchmark --parallel 12
+   OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 \
+       ./build-examples/examples/anymal_standing_benchmark --steps=1000000
 
-Each benchmark can also be run on its own, e.g.
-``benchmarks --backend=both -b anymal_standing``. No extra arguments are needed;
-the step counts in the table below are the built-in defaults.
+On Windows, build with ``--config Release`` and run
+``build-examples\\bin\\anymal_standing_benchmark.exe``. Repeat the same command
+at least three times, keeping the package version, scene, timestep, step count,
+and machine fixed. These examples measure RaiSim only and do not reproduce the
+private comparison scenes or the published ratios. See :doc:`BuildAndTest`
+for other available timing examples.
 
 What the benchmarks simulate
 ============================
@@ -146,7 +136,7 @@ coordinates the dynamics solves for. A floating base contributes 6 DOF
 Results
 =======
 
-RaiSim is 2.59× to 6.23× faster than MuJoCo across these six workloads. The
+In the recorded run, RaiSim was 2.59× to 6.23× faster than MuJoCo across these six workloads. The
 charts below show both the median timings and the relative speedup.
 
 .. container:: benchmark-graph-block
@@ -199,12 +189,11 @@ charts below show both the median timings and the relative speedup.
 Absolute times depend on hardware, compiler, and scene configuration, so treat
 them as relative magnitudes rather than fixed specifications.
 
-Why RaiSim is faster here
-=========================
+Interpreting the comparison
+===========================
 
-RaiSim wins these benchmarks because it has better methods for articulated
-systems. Its articulated-system dynamics and contact solver are designed
-specifically for jointed mechanisms, so simulating chains, legged robots, and
-other articulated systems is more efficient. Raisim has O(n) articulated system
-solver that can even handle contact properties as well, whereas other physics engines
-use O(n^3) solver due to inversion of mass matrix.
+These measurements describe the six scenes and configurations above. They do
+not isolate the contribution of the dynamics algorithm, contact solver, or
+implementation details, and do not establish a speedup for other scenes or
+package versions. Use the public timing examples and your application workload
+when evaluating the current binary package.

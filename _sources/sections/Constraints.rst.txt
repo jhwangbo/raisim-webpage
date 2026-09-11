@@ -1,11 +1,69 @@
-#############################
 Constraints
-#############################
+===========
 
-Length constraints
-==================
+Length constraints use tendons
+==============================
 
-RaiSim currently has three types of length constraints:
+A straight length constraint is a spatial tendon with two sites. Use
+``World::addSpatialTendon`` for hard limits, a length lock, springs, or commanded
+tension. Routed cables and fixed joint transmissions use the same properties,
+solver, inspection, rendering, checkpoint, and removal interfaces. See
+:doc:`Tendons`, :doc:`tendons/CodeExamples`, and :doc:`tendons/Physics`.
+
+Migrating the former wire API
+=============================
+
+The C++ and Python ``addStiffWire``, ``addCompliantWire``, ``addCustomWire``,
+``getWire``, ``getWires``, and ``LengthConstraint`` types have been removed.
+Use ``addSpatialTendon``, ``getTendon``, ``getTendons``, and ``removeTendon``.
+Recompile applications and bindings against matching headers and libraries.
+
+.. list-table:: Configure a two-site Tendon with target length L
+   :header-rows: 1
+   :widths: 40 60
+
+   * - Former behavior
+     - Tendon properties or command
+   * - Stiff, stretch only
+     - ``upperLimit = L``
+   * - Stiff, compression only
+     - ``lowerLimit = L``
+   * - Stiff, both directions
+     - ``lowerLimit = upperLimit = L``
+   * - Compliant, stretch only
+     - ``stiffness = k; springLower = 0; springUpper = L``
+   * - Compliant, compression only
+     - ``stiffness = k; springLower = L; springUpper = +infinity``
+   * - Compliant, both directions
+     - ``stiffness = k; springLower = springUpper = L``
+   * - Custom tension
+     - ``tendon->setTension(T)``; positive T pulls
+
+Other properties keep their defaults in this table. A spring interval imposes
+no hard bound. Add limits explicitly if the model needs both elasticity and a
+maximum or minimum length. ``getLength()`` reports the current transmission
+coordinate; the configured target is in ``getProperties()``. Call
+``updateGeometry()`` after manually changing object positions before reading it.
+``getTension()`` is a signed scalar, positive in tension. ``getForce()`` has the
+opposite sign. Appearance is set through ``Properties::width`` and ``color``.
+The world owns tendons; removal invalidates their pointers and also removes
+couplings that reference them. Removing an attached object removes its tendons.
+
+Existing RaiSim XML ``<wire>`` elements remain readable. The loader converts
+them immediately into ordinary two-site tendons, including stretch mode, body
+attachments, nominal length, stiffness, and appearance. A custom wire's optional
+``tension`` attribute becomes its tension command; absent commands default to
+zero. New XML exports write only ``<tendon>`` elements. Legacy XML support is an
+import conversion, with no second runtime type or API.
+
+The mapping preserves the intended physical model, but does not promise
+identical trajectories. Former compliant wires applied explicit spring forces;
+tendon springs and damping use the implicit velocity solve described in
+:doc:`tendons/Physics`. Hard bounds also use tendon constraint rows now. Recheck
+timestep, damping, and tolerances when migrating a tuned simulation.
+
+Historical class links
+----------------------
 
 .. toctree::
    :maxdepth: 1
@@ -14,37 +72,10 @@ RaiSim currently has three types of length constraints:
    CompliantLengthConstraint
    CustomLengthConstraint
 
-All length constraints offer three stretch types: ``STRETCH_RESISTANT_ONLY``,
-``COMPRESSION_RESISTANT_ONLY``, ``BOTH``. The first two are unilateral constraints
-(i.e., acting only in one direction) and ``BOTH`` is a bilateral constraint
-(i.e., acting in both directions). The stretch types are explained in
-`StiffLengthConstraint <http://raisim.com/sections/StiffLengthConstraint.html>`_.
+Pin constraints
+===============
 
-The following animation shows the behavior of a Newton's-cradle style length
-constraint setup:
-
-.. image:: ../image/constraints.gif
-
-How constraints are solved
---------------------------
-RaiSim supports two different enforcement paths for constraints:
-
-* **StiffLengthConstraint (hard)**: converted into a contact problem and solved
-  by the contact solver as an impulse constraint. This behaves like a hard
-  constraint and is handled alongside collisions.
-* **CompliantLengthConstraint / CustomLengthConstraint (soft)**: applied as
-  explicit forces each step (spring or user-defined tension). These do not go
-  through the contact solver and therefore behave more like soft constraints.
-
-Pin constraints for closed-loop systems are also solved by the contact solver
-(as equality constraints), but they are specified in the URDF under
-``<constraints>`` rather than through the length-constraint API.
-
-API
-----
-
-LengthConstraint
-^^^^^^^^^^^^^^^^
-
-.. doxygenclass:: raisim::LengthConstraint
-   :members:
+Pin constraints impose coincidence of attachment points in closed-loop systems
+and are specified under URDF ``<constraints>``. They retain their independent
+API because they constrain vector position, whereas a tendon constrains one
+scalar transmission coordinate.

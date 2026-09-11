@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CompliantLengthConstraint &mdash; raisim 2.5.7 documentation</title>
+  <title>CompliantLengthConstraint migration &mdash; raisim 2.6.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b6430375" />
@@ -14,14 +14,14 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=f7cf8502"></script>
+      <script src="../_static/documentation_options.js?v=ae39cb24"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="CustomLengthConstraint" href="CustomLengthConstraint.html" />
-    <link rel="prev" title="StiffLengthConstraint" href="StiffLengthConstraint.html" /> 
+    <link rel="next" title="CustomLengthConstraint migration" href="CustomLengthConstraint.html" />
+    <link rel="prev" title="StiffLengthConstraint migration" href="StiffLengthConstraint.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -78,20 +78,19 @@
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="Constraints.html">Constraints</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="Constraints.html#length-constraints">Length constraints</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="StiffLengthConstraint.html">StiffLengthConstraint</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">CompliantLengthConstraint</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#api">API</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="CustomLengthConstraint.html">CustomLengthConstraint</a></li>
-<li class="toctree-l3"><a class="reference internal" href="Constraints.html#how-constraints-are-solved">How constraints are solved</a></li>
-<li class="toctree-l3"><a class="reference internal" href="Constraints.html#api">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="Constraints.html#historical-class-links">Historical class links</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="StiffLengthConstraint.html">StiffLengthConstraint migration</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">CompliantLengthConstraint migration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CustomLengthConstraint.html">CustomLengthConstraint migration</a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
@@ -121,7 +120,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="Constraints.html">Constraints</a></li>
-      <li class="breadcrumb-item active">CompliantLengthConstraint</li>
+      <li class="breadcrumb-item active">CompliantLengthConstraint migration</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -130,78 +129,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="compliantlengthconstraint">
-<h1>CompliantLengthConstraint<a class="headerlink" href="#compliantlengthconstraint" title="Link to this heading"></a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">CompliantLengthConstraint</span></code> is computed as a pair of external forces.
-To simulate a spring attached to a robot joint, you can define it directly in the URDF file.
-That way, more accurate integration schemes can be used.
-However, to simulate a compliant constraint between two objects (including articulated systems), <code class="docutils literal notranslate"><span class="pre">CompliantLengthConstraint</span></code> is required.
-To use this constraint, make sure that you set the time step sufficiently small (much smaller than the natural period of the system).</p>
-<p>This constraint also offers three stretch types.
-For details of the stretch types, please check <a class="reference external" href="http://raisim.com/sections/StiffLengthConstraint.html">StiffLengthConstraint</a>.</p>
-<p>A compliant constraint can be added as follows:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">pin5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">);</span>
-<span class="n">pin5</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">6.0</span><span class="p">);</span>
-<span class="n">pin5</span><span class="o">-&gt;</span><span class="n">setBodyType</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">BodyType</span><span class="o">::</span><span class="n">STATIC</span><span class="p">);</span>
-<span class="k">auto</span><span class="w"> </span><span class="n">box</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addBox</span><span class="p">(</span><span class="mf">.1</span><span class="p">,</span><span class="w"> </span><span class="mf">.1</span><span class="p">,</span><span class="w"> </span><span class="mf">.1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
-<span class="n">box</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">);</span>
-<span class="k">auto</span><span class="w"> </span><span class="n">wire5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addCompliantWire</span><span class="p">(</span><span class="n">pin5</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span><span class="w"> </span><span class="n">box</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">},</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">);</span>
-</pre></div>
-</div>
-<p>The following code results in:</p>
-<img alt="../_images/comp_stret_constraint.gif" src="../_images/comp_stret_constraint.gif" />
-<section id="api">
-<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
-<section id="class-reference">
-<h3>Class Reference<a class="headerlink" href="#class-reference" title="Link to this heading"></a></h3>
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim25CompliantLengthConstraintE">
-<span id="_CPPv3N6raisim25CompliantLengthConstraintE"></span><span id="_CPPv2N6raisim25CompliantLengthConstraintE"></span><span id="raisim::CompliantLengthConstraint"></span><span class="target" id="classraisim_1_1CompliantLengthConstraint"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CompliantLengthConstraint</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="Constraints.html#_CPPv4N6raisim16LengthConstraintE" title="raisim::LengthConstraint"><span class="n"><span class="pre">LengthConstraint</span></span></a><a class="headerlink" href="#_CPPv4N6raisim25CompliantLengthConstraintE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim25CompliantLengthConstraint12getStiffnessEv">
-<span id="_CPPv3NK6raisim25CompliantLengthConstraint12getStiffnessEv"></span><span id="_CPPv2NK6raisim25CompliantLengthConstraint12getStiffnessEv"></span><span id="raisim::CompliantLengthConstraint::getStiffnessC"></span><span class="target" id="classraisim_1_1CompliantLengthConstraint_1a87a703c6ebd06735c3a4871868117b73"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getStiffness</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim25CompliantLengthConstraint12getStiffnessEv" title="Link to this definition"></a><br /></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Spring stiffness (N/m). </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim25CompliantLengthConstraint18getPotentialEnergyEv">
-<span id="_CPPv3NK6raisim25CompliantLengthConstraint18getPotentialEnergyEv"></span><span id="_CPPv2NK6raisim25CompliantLengthConstraint18getPotentialEnergyEv"></span><span id="raisim::CompliantLengthConstraint::getPotentialEnergyC"></span><span class="target" id="classraisim_1_1CompliantLengthConstraint_1aa017e1957bddf50ee29963f7fda608f7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPotentialEnergy</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim25CompliantLengthConstraint18getPotentialEnergyEv" title="Link to this definition"></a><br /></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Stored spring potential energy (J). </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisim25CompliantLengthConstraint10getTensionEv">
-<span id="_CPPv3NK6raisim25CompliantLengthConstraint10getTensionEv"></span><span id="_CPPv2NK6raisim25CompliantLengthConstraint10getTensionEv"></span><span id="raisim::CompliantLengthConstraint::getTensionC"></span><span class="target" id="classraisim_1_1CompliantLengthConstraint_1a1e484ad3dcfa458b5e8d73f094a6775a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getTension</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim25CompliantLengthConstraint10getTensionEv" title="Link to this definition"></a><br /></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Current tension vector in world frame. </p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
-</dd></dl>
-
-</section>
-</section>
+  <section id="compliantlengthconstraint-migration">
+<h1>CompliantLengthConstraint migration<a class="headerlink" href="#compliantlengthconstraint-migration" title="Link to this heading"></a></h1>
+<p>This class has been removed. Use a two-site tendon with stiffness and a spring rest interval.
+See <a class="reference internal" href="Constraints.html"><span class="doc">Constraints</span></a> for the migration table and
+<a class="reference internal" href="tendons/CodeExamples.html"><span class="doc">Tendon code examples</span></a> for complete, compiled examples.</p>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="StiffLengthConstraint.html" class="btn btn-neutral float-left" title="StiffLengthConstraint" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="CustomLengthConstraint.html" class="btn btn-neutral float-right" title="CustomLengthConstraint" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="StiffLengthConstraint.html" class="btn btn-neutral float-left" title="StiffLengthConstraint migration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="CustomLengthConstraint.html" class="btn btn-neutral float-right" title="CustomLengthConstraint migration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

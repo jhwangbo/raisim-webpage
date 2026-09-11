@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CustomLengthConstraint &mdash; raisim 2.5.7 documentation</title>
+  <title>CustomLengthConstraint migration &mdash; raisim 2.6.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b6430375" />
@@ -14,14 +14,14 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=f7cf8502"></script>
+      <script src="../_static/documentation_options.js?v=ae39cb24"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Ray Test" href="RayTest.html" />
-    <link rel="prev" title="CompliantLengthConstraint" href="CompliantLengthConstraint.html" /> 
+    <link rel="next" title="Tendons" href="Tendons.html" />
+    <link rel="prev" title="CompliantLengthConstraint migration" href="CompliantLengthConstraint.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -78,20 +78,19 @@
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="Constraints.html">Constraints</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="Constraints.html#length-constraints">Length constraints</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="StiffLengthConstraint.html">StiffLengthConstraint</a></li>
-<li class="toctree-l3"><a class="reference internal" href="CompliantLengthConstraint.html">CompliantLengthConstraint</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">CustomLengthConstraint</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#api">API</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="Constraints.html#how-constraints-are-solved">How constraints are solved</a></li>
-<li class="toctree-l3"><a class="reference internal" href="Constraints.html#api">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="Constraints.html#historical-class-links">Historical class links</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="StiffLengthConstraint.html">StiffLengthConstraint migration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CompliantLengthConstraint.html">CompliantLengthConstraint migration</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">CustomLengthConstraint migration</a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
@@ -121,7 +120,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="Constraints.html">Constraints</a></li>
-      <li class="breadcrumb-item active">CustomLengthConstraint</li>
+      <li class="breadcrumb-item active">CustomLengthConstraint migration</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -130,49 +129,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="customlengthconstraint">
-<h1>CustomLengthConstraint<a class="headerlink" href="#customlengthconstraint" title="Link to this heading"></a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">CustomLengthConstraint</span></code> allows users to apply custom constraints.
-Users set the tension between two points using <code class="docutils literal notranslate"><span class="pre">setTension()</span></code>.</p>
-<p>An example is shown below:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">wire7</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addCustomWire</span><span class="p">(</span><span class="n">pin7</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span><span class="w"> </span><span class="n">anymalB</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">},</span><span class="w"> </span><span class="mf">2.0</span><span class="p">);</span>
-<span class="n">wire7</span><span class="o">-&gt;</span><span class="n">setTension</span><span class="p">(</span><span class="mi">400</span><span class="p">);</span>
-</pre></div>
-</div>
-<p>The following code results in:</p>
-<img alt="../_images/customWire.gif" src="../_images/customWire.gif" />
-<p>Use the current examples index for runnable source targets; the snippet above
-shows the core custom-wire API.</p>
-<section id="api">
-<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim22CustomLengthConstraintE">
-<span id="_CPPv3N6raisim22CustomLengthConstraintE"></span><span id="_CPPv2N6raisim22CustomLengthConstraintE"></span><span id="raisim::CustomLengthConstraint"></span><span class="target" id="classraisim_1_1CustomLengthConstraint"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CustomLengthConstraint</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="Constraints.html#_CPPv4N6raisim16LengthConstraintE" title="raisim::LengthConstraint"><span class="n"><span class="pre">LengthConstraint</span></span></a><a class="headerlink" href="#_CPPv4N6raisim22CustomLengthConstraintE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim22CustomLengthConstraint10setTensionEd">
-<span id="_CPPv3N6raisim22CustomLengthConstraint10setTensionEd"></span><span id="_CPPv2N6raisim22CustomLengthConstraint10setTensionEd"></span><span id="raisim::CustomLengthConstraint::setTension__double"></span><span class="target" id="classraisim_1_1CustomLengthConstraint_1a861567165b0638b4a8326950f8525d86"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setTension</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">tension</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim22CustomLengthConstraint10setTensionEd" title="Link to this definition"></a><br /></dt>
-<dd><p>set the tension of the wire </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>tension</strong> – the applied tension. If this number is positive, then the force is acting such a way that brings the two objects together </p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
-</dd></dl>
-
-</section>
+  <section id="customlengthconstraint-migration">
+<h1>CustomLengthConstraint migration<a class="headerlink" href="#customlengthconstraint-migration" title="Link to this heading"></a></h1>
+<p>This class has been removed. Use a two-site tendon and call <code class="docutils literal notranslate"><span class="pre">setTension</span></code> or <code class="docutils literal notranslate"><span class="pre">setActuationForce</span></code>.
+See <a class="reference internal" href="Constraints.html"><span class="doc">Constraints</span></a> for the migration table and
+<a class="reference internal" href="tendons/CodeExamples.html"><span class="doc">Tendon code examples</span></a> for complete, compiled examples.</p>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="CompliantLengthConstraint.html" class="btn btn-neutral float-left" title="CompliantLengthConstraint" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="RayTest.html" class="btn btn-neutral float-right" title="Ray Test" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="CompliantLengthConstraint.html" class="btn btn-neutral float-left" title="CompliantLengthConstraint migration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Tendons.html" class="btn btn-neutral float-right" title="Tendons" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

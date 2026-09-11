@@ -94,18 +94,21 @@ Sleeping Islands
 ================
 
 Sleeping is enabled by default. RaiSim can skip simulation work for dynamic
-islands whose velocities remain below the configured thresholds for a few steps.
+islands whose velocities remain below the configured thresholds for 5 consecutive
+steps by default.
 This helps scenes with piles, props, or objects that settle and then stay quiet.
 
 .. code-block:: cpp
 
   world.setSleepingEnabled(true);
-  world.setSleepingParameters(/*linear*/ 0.002, /*angular*/ 0.01, /*quietSteps*/ 2);
+  world.setSleepingParameters(/*linear*/ 0.002, /*angular*/ 0.01, /*quietSteps*/ 5);
   world.wakeAll();
 
 Disable sleeping when every object must remain numerically active every step, or
-when a benchmark is intended to measure the awake dynamics path. Use the
-``island_sleep`` benchmark to quantify the effect for stack-like scenes.
+when a benchmark is intended to measure the awake dynamics path. The public
+``island_sleep_benchmark`` demonstrates sleep/wake behavior visually; it includes
+a server and a fixed 2 ms delay per step, so its elapsed time is not a measure
+of raw physics throughput.
 
 Package Timing Examples
 =======================
@@ -122,19 +125,16 @@ mode and run timing commands on one thread:
       -DCMAKE_BUILD_TYPE=Release \
       -DRAISIM_EXAMPLE=ON
   cmake --build build-examples \
-      --target anymal_standing_benchmark articulated_system_benchmark \
-               granular_media island_sleep_benchmark -j12
+      --target anymal_standing_benchmark articulated_system_benchmark -j12
   OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
       ./build-examples/examples/anymal_standing_benchmark --fast
   OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
       ./build-examples/examples/articulated_system_benchmark
-  OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
-      ./build-examples/examples/island_sleep_benchmark --steps=12000
 
 The public workspace does not install these example executables; run them from
 the build tree shown above.
 
-Representative timing examples include:
+Public timing and visualization examples include:
 
 .. list-table::
    :header-rows: 1
@@ -147,9 +147,9 @@ Representative timing examples include:
    * - ``articulated_system_benchmark``
      - Articulated-system stepping cost.
    * - ``granular_media``
-     - Granular bed interaction with a robot model.
+     - Visual granular-bed interaction demo with a server and pacing delays.
    * - ``island_sleep_benchmark``
-     - Sleeping-island speedup and wake behavior.
+     - Visual sleep/wake demo with a fixed delay per step; not raw timing.
 
 For stable comparisons, run the same executable, package version, compiler,
 build type, CPU governor, benchmark arguments, and repeat count. Run one timing

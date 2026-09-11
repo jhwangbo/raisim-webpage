@@ -58,7 +58,11 @@ You can read back the camera buffers on CPU:
     rgbCamera.getRawImage(*rgbCam, raisin::Camera::SensorStorageMode::CUSTOM_BUFFER,
       rgba.data(), rgba.size(), /*flipVertical=*/false);
 
-Depth uses a ``float`` buffer with ``width * height`` entries.
+Depth uses a ``float`` buffer with ``width * height`` entries. In 2.5.8,
+constructing ``Camera`` from a ``DepthCamera`` allocates depth targets without
+also eagerly allocating the RGB/post-processing targets. Keep the camera alive
+across frames to reuse its buffers, and destroy it while its owning GL context
+is current. ``Camera`` cannot be copied or moved because it owns GL handles.
 
 TCP viewer protocol
 ===================

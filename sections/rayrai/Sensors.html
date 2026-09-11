@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sensors and depth/LiDAR &mdash; raisim 2.5.7 documentation</title>
+  <title>Sensors and depth/LiDAR &mdash; raisim 2.6.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b6430375" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=f7cf8502"></script>
+      <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -79,6 +79,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#pin-constraints">Pin constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
 </ul>
@@ -196,7 +200,11 @@ longer RGB/depth readback example.</p>
 <span class="w">  </span><span class="n">rgba</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">rgba</span><span class="p">.</span><span class="n">size</span><span class="p">(),</span><span class="w"> </span><span class="cm">/*flipVertical=*/</span><span class="nb">false</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Depth uses a <code class="docutils literal notranslate"><span class="pre">float</span></code> buffer with <code class="docutils literal notranslate"><span class="pre">width</span> <span class="pre">*</span> <span class="pre">height</span></code> entries.</p>
+<p>Depth uses a <code class="docutils literal notranslate"><span class="pre">float</span></code> buffer with <code class="docutils literal notranslate"><span class="pre">width</span> <span class="pre">*</span> <span class="pre">height</span></code> entries. In 2.5.8,
+constructing <code class="docutils literal notranslate"><span class="pre">Camera</span></code> from a <code class="docutils literal notranslate"><span class="pre">DepthCamera</span></code> allocates depth targets without
+also eagerly allocating the RGB/post-processing targets. Keep the camera alive
+across frames to reuse its buffers, and destroy it while its owning GL context
+is current. <code class="docutils literal notranslate"><span class="pre">Camera</span></code> cannot be copied or moved because it owns GL handles.</p>
 </section>
 <section id="tcp-viewer-protocol">
 <h2>TCP viewer protocol<a class="headerlink" href="#tcp-viewer-protocol" title="Link to this heading"></a></h2>

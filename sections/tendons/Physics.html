@@ -1,0 +1,586 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tendon physics &mdash; raisim 2.6.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b6430375" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Tendon API and model files" href="Reference.html" />
+    <link rel="prev" title="Tendon code examples" href="CodeExamples.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../FeatureMap.html">Feature Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ProjectLayout.html">Project Layout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Performance.html">Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Benchmark.html">Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RsceneFile.html">.rscene File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../OpenUSD.html">OpenUSD Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#pin-constraints">Pin constraints</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../Tendons.html">Tendons</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="CodeExamples.html">Tendon code examples</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Tendon physics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#length-velocity-and-virtual-work">Length, velocity, and virtual work</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#straight-segments-and-via-points">Straight segments and via-points</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sphere-and-cylinder-wrapping">Sphere and cylinder wrapping</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#side-sites-and-route-selection">Side sites and route selection</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pulley-branches-and-mechanical-advantage">Pulley branches and mechanical advantage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fixed-tendons-and-units">Fixed tendons and units</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spring-slack-interval-and-damping">Spring, slack interval, and damping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#actuator-and-activation-dynamics">Actuator and activation dynamics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#armature-and-route-curvature">Armature and route curvature</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#shared-impulse-solver">Shared impulse solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#length-bounds-margin-and-compliance">Length bounds, margin, and compliance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dry-friction-and-stiction">Dry friction and stiction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polynomial-tendon-couplings">Polynomial tendon couplings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#energy-interpretation">Energy interpretation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Reference.html">Tendon API and model files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Examples.html">Tendon examples and Rayrai</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Tendons.html#what-the-model-represents">What the model represents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Tendons.html#a-short-working-example">A short working example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Tendons.html#three-lengths-with-different-meanings">Three lengths with different meanings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Tendons.html#force-signs-and-diagnostics">Force signs and diagnostics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Tendons.html#ownership-and-runtime-changes">Ownership and runtime changes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Tendons.html#choosing-and-tuning-a-model">Choosing and tuning a model</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimMatlab.html">RaisimMatlab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../Tendons.html">Tendons</a></li>
+      <li class="breadcrumb-item active">Tendon physics</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tendon-physics">
+<h1>Tendon physics<a class="headerlink" href="#tendon-physics" title="Link to this heading"></a></h1>
+<p>This chapter describes the model implemented by RaiSim’s tendon solver.
+Use <a class="reference internal" href="../Tendons.html"><span class="doc">Tendons</span></a> for the workflow and <a class="reference internal" href="Reference.html"><span class="doc">Tendon API and model files</span></a> for parameter names.
+The continuous equations explain the physical meaning; the discrete equations
+specify how RaiSim advances that model during a timestep.</p>
+<section id="length-velocity-and-virtual-work">
+<h2>Length, velocity, and virtual work<a class="headerlink" href="#length-velocity-and-virtual-work" title="Link to this heading"></a></h2>
+<p>Let <span class="math notranslate nohighlight">\(q\)</span> denote the participating bodies’ configuration, <span class="math notranslate nohighlight">\(v\)</span> their
+generalized velocities, and <span class="math notranslate nohighlight">\(\ell\)</span> the tendon length. Define the row
+Jacobian <span class="math notranslate nohighlight">\(J\)</span> by the transmission’s velocity map:</p>
+<div class="math notranslate nohighlight">
+\[\ell = \ell(q,t), \qquad \dot\ell = Jv + v_{\mathrm{prescribed}}.\]</div>
+<p>The offset accounts for motion of kinematic attachments and guides that the
+solver cannot accelerate. For floating and ball-joint configurations, generalized
+velocity is not simply the time derivative of every stored position parameter;
+<span class="math notranslate nohighlight">\(J\)</span> is expressed in RaiSim’s generalized-velocity coordinates.</p>
+<p>A signed scalar tendon force <span class="math notranslate nohighlight">\(F\)</span> does virtual work
+<span class="math notranslate nohighlight">\(\delta W=F\,\delta\ell\)</span>. Therefore its generalized force is</p>
+<div class="math notranslate nohighlight">
+\[\tau = J^T F, \qquad T=-F.\]</div>
+<p>Here <span class="math notranslate nohighlight">\(T\)</span> is the reported tension. Positive <span class="math notranslate nohighlight">\(T\)</span> pulls toward shorter
+length, while positive <span class="math notranslate nohighlight">\(F\)</span> acts toward longer length. The actual direction
+of motion also depends on external forces, inertia, contacts, and constraints.
+A force sign does not by itself prescribe a velocity.</p>
+<p>For a point with world position <span class="math notranslate nohighlight">\(p_i\)</span>, define
+<span class="math notranslate nohighlight">\(g_i=\partial\ell/\partial p_i\)</span>. Its force is <span class="math notranslate nohighlight">\(f_i=F g_i\)</span>.
+On a rigid body with center of mass <span class="math notranslate nohighlight">\(c\)</span>, this point contributes torque
+<span class="math notranslate nohighlight">\((p_i-c)\times f_i\)</span>. On an articulated body, the point’s kinematic Jacobian
+maps the same force into joint/base generalized forces. Contributions on the
+same object or joint are summed before computing the solver response. Internal
+routes or repeated terms that cancel cannot spuriously accelerate that object.</p>
+</section>
+<section id="straight-segments-and-via-points">
+<h2>Straight segments and via-points<a class="headerlink" href="#straight-segments-and-via-points" title="Link to this heading"></a></h2>
+<p>A segment from <span class="math notranslate nohighlight">\(a\)</span> to <span class="math notranslate nohighlight">\(b\)</span> contributes</p>
+<div class="math notranslate nohighlight">
+\[s=\|b-a\|, \qquad
+\frac{\partial s}{\partial a}=-u, \qquad
+\frac{\partial s}{\partial b}=u, \qquad
+u=\frac{b-a}{\|b-a\|}.\]</div>
+<p>Thus positive tension pulls its endpoints toward one another. A via-point
+receives the sum of the adjacent segments’ forces. If its object is dynamic,
+that force and its moment accelerate the object; a world anchor supplies a
+reaction without adding a dynamic degree of freedom.</p>
+<p>Coincident endpoints have zero segment length and use a zero direction to avoid
+division by zero. A collapsed segment consequently has no defined pulling
+direction until its points separate. Avoid relying on it to initiate motion.</p>
+</section>
+<section id="sphere-and-cylinder-wrapping">
+<h2>Sphere and cylinder wrapping<a class="headerlink" href="#sphere-and-cylinder-wrapping" title="Link to this heading"></a></h2>
+<p>Each wrapping primitive sits between two sites. Its center belongs to a rigid
+body/link or the world; its radius belongs to the routing model. For an active
+exterior wrap, the path consists of an incoming tangent segment, a surface arc,
+and an outgoing tangent segment. The straight route is used when wrapping is
+inactive.</p>
+<p>For a sphere of radius <span class="math notranslate nohighlight">\(r\)</span>, let <span class="math notranslate nohighlight">\(\rho_a\)</span> and <span class="math notranslate nohighlight">\(\rho_b\)</span> be the
+endpoint distances from its center, and let <span class="math notranslate nohighlight">\(\theta\)</span> be the selected
+surface sweep in the plane through the endpoints and center. The routed length is</p>
+<div class="math notranslate nohighlight">
+\[\ell_{\mathrm{sphere}} =
+\sqrt{\rho_a^2-r^2} + r|\theta| + \sqrt{\rho_b^2-r^2}.\]</div>
+<p>For a cylinder, use endpoint distances projected onto the plane perpendicular
+to its axis. If <span class="math notranslate nohighlight">\(s_\perp\)</span> is the corresponding planar tangent/arc/tangent
+length and <span class="math notranslate nohighlight">\(\Delta z\)</span> is the endpoint separation along the axis, then</p>
+<div class="math notranslate nohighlight">
+\[\ell_{\mathrm{cylinder}} = \sqrt{s_\perp^2 + (\Delta z)^2}.\]</div>
+<p>Axial displacement is distributed in proportion to travel along the planar
+route. The surface portion is a helix; treating it as a flat circular arc would
+produce incorrect lengths, gradients, and axial forces. The cylinder is infinite:
+its visual/collision height does not limit the routing surface.</p>
+<p>The endpoint force directions follow the tangent segments. Equal and opposite
+forces are applied at the two tangency points on the guide, including moments
+about its center of mass. A translating or rotating dynamic guide therefore
+receives reactions, and a moving kinematic guide transfers motion while keeping
+its prescribed trajectory. Free dynamic bodies receive balanced internal
+forces/moments; fixed or driven supports can exchange momentum and energy with
+the rest of the scene.</p>
+<section id="side-sites-and-route-selection">
+<h3>Side sites and route selection<a class="headerlink" href="#side-sites-and-route-selection" title="Link to this heading"></a></h3>
+<p>With no side site, the direct segment is used when it misses the obstacle;
+otherwise the valid shorter exterior wrapping route is selected. A side site
+outside the obstacle selects the side of the wrapping arc. It can retain an
+overhead-pulley route even when the direct endpoint segment passes below and
+misses the pulley. The route can release when the direct segment reaches the
+selected side.</p>
+<p>A side site is a routing hint, rather than an additional attachment through
+which force is transmitted. It can belong to a body or to the world. Its
+position selects the route, but it receives no point-force contribution merely
+for serving as a side site.</p>
+<p>An interior side site changes the routing mode: the path must intersect the
+sphere, or the cylinder’s cross-sectional disk. If the direct segment already
+intersects it, the direct segment is used. Otherwise the route bends through a
+single point on the near boundary that minimizes the two straight lengths.
+This does not attach the tendon at the side site’s exact position. For a
+cylinder, inside/outside is evaluated perpendicular to the cylinder axis.</p>
+<p>If an endpoint is on or inside an exterior wrapping surface, the implementation
+falls back to the unwrapped segment. Wrapping assumes usable exterior endpoints;
+it is not a penetration-resolution algorithm. Route selection, contact/release,
+and zero-length segments introduce nonsmooth configurations. Small timesteps
+and suitable initial placement are especially useful near those transitions.</p>
+</section>
+</section>
+<section id="pulley-branches-and-mechanical-advantage">
+<h2>Pulley branches and mechanical advantage<a class="headerlink" href="#pulley-branches-and-mechanical-advantage" title="Link to this heading"></a></h2>
+<p>A pulley element divides the ordered path into independent branches. If branch
+<span class="math notranslate nohighlight">\(b\)</span> has ordinary routed length <span class="math notranslate nohighlight">\(s_b\)</span> and positive divisor <span class="math notranslate nohighlight">\(d_b\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\ell = \sum_b \frac{s_b}{d_b}, \qquad
+J = \sum_b \frac{J_b}{d_b}, \qquad
+T_b = \frac{T}{d_b}.\]</div>
+<p>The divisor scales both length and force. It does not duplicate a cable, add a
+wheel, create a spatial point, or join the end of one branch to the start of the
+next. Each branch starts and ends with sites. The initial divisor is 1; a leading
+pulley element can replace it. Each subsequent pulley sets the following
+branch’s divisor directly, rather than multiplying the previous divisor.</p>
+<a class="reference internal image-reference" href="../../_images/tendon_transmission.svg"><img alt="Two independent branches: length L equals LA plus LB over two; branch tensions are T and T over two" src="../../_images/tendon_transmission.svg" style="width: 100%;" />
+</a>
+<p>For two branches with divisors 1 and 2, <span class="math notranslate nohighlight">\(\ell=s_A+s_B/2\)</span>. If the total
+length is locked, <span class="math notranslate nohighlight">\(\dot s_B=-2\dot s_A\)</span>: the second branch moves twice as
+far and receives half the tension. At <span class="math notranslate nohighlight">\(T=10\)</span> N, its straight segments
+carry 5 N. This is a virtual-work transmission ratio. An actual moving pulley
+with several cable strands can also have force contributions from multiple
+segments, which add at the pulley body.</p>
+</section>
+<section id="fixed-tendons-and-units">
+<h2>Fixed tendons and units<a class="headerlink" href="#fixed-tendons-and-units" title="Link to this heading"></a></h2>
+<p>A fixed tendon uses scalar revolute or prismatic joints:</p>
+<div class="math notranslate nohighlight">
+\[\ell=\sum_i c_i q_i, \qquad
+\dot\ell=\sum_i c_i \dot q_i, \qquad
+\tau_i=c_iF.\]</div>
+<p>The coefficients may be negative, zero, or repeated. The coordinate may also
+be negative. Ball, floating, and fixed joints are rejected because they do not
+provide the supported single revolute/prismatic coordinate. Joints may belong
+to different articulated systems in the same world.</p>
+<p>Choose coefficient units deliberately. If length is measured in metres, a
+revolute-joint coefficient can represent a signed moment arm in m/rad and a
+prismatic-joint coefficient a dimensionless ratio. If the coordinate instead
+represents an angle, its conjugate force is a torque. Mixing joint types with
+arbitrary unitless coefficients does not automatically create a physical length.</p>
+<p>For the metre/Newton convention, parameters have these units:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 47.0%" />
+<col style="width: 53.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Quantity</p></th>
+<th class="head"><p>Unit</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Lengths, margin, drawing radius</p></td>
+<td><p>m</p></td>
+</tr>
+<tr class="row-odd"><td><p>Force, tension, friction threshold, actuator bounds</p></td>
+<td><p>N</p></td>
+</tr>
+<tr class="row-even"><td><p>Spring stiffness and position gain</p></td>
+<td><p>N/m</p></td>
+</tr>
+<tr class="row-odd"><td><p>Damping and velocity gain</p></td>
+<td><p>N s/m</p></td>
+</tr>
+<tr class="row-even"><td><p>Armature</p></td>
+<td><p>kg</p></td>
+</tr>
+<tr class="row-odd"><td><p>Limit/coupling compliance and friction regularization</p></td>
+<td><p>m/N, used in the discrete equations below</p></td>
+</tr>
+<tr class="row-even"><td><p>Activation time</p></td>
+<td><p>s</p></td>
+</tr>
+<tr class="row-odd"><td><p>Position correction, pulley divisor, RGBA</p></td>
+<td><p>Dimensionless</p></td>
+</tr>
+</tbody>
+</table>
+<p>For a general transmission coordinate <span class="math notranslate nohighlight">\(\ell\)</span>, force has units of energy
+per unit <span class="math notranslate nohighlight">\(\ell\)</span>, stiffness has force/length units, and armature has
+force-time-squared/length units. The drawing radius always remains a spatial
+radius in metres, including when the physical transmission has other units.</p>
+</section>
+<section id="spring-slack-interval-and-damping">
+<h2>Spring, slack interval, and damping<a class="headerlink" href="#spring-slack-interval-and-damping" title="Link to this heading"></a></h2>
+<p>Let <span class="math notranslate nohighlight">\([\ell_s^-,\ell_s^+]\)</span> be the spring interval and define</p>
+<div class="math notranslate nohighlight">
+\[e=\ell-\operatorname{clamp}(\ell,\ell_s^-,\ell_s^+), \qquad
+U=\tfrac12 k e^2, \qquad
+F_{\mathrm{spring}}=-ke, \qquad F_{\mathrm{damping}}=-d\dot\ell.\]</div>
+<p>Equal endpoints define an ordinary rest length. Unequal endpoints define a
+zero-spring-force interval: below it the spring pushes toward larger length;
+above it the spring pulls toward smaller length. <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">L]</span></code> produces a pull-only
+spring for a spatial path. Damping remains active inside the spring interval.</p>
+<p>The spring and damping share an implicit solver row. With timestep <span class="math notranslate nohighlight">\(h\)</span>,
+current error <span class="math notranslate nohighlight">\(e_n\)</span>, and the solved end-step length velocity
+<span class="math notranslate nohighlight">\(\dot\ell_+\)</span>, the passive impulse satisfies</p>
+<div class="math notranslate nohighlight">
+\[p_{\mathrm{passive}} =
+-h k_a e_n - h(d+h k_a)\dot\ell_+.\]</div>
+<p>Here <span class="math notranslate nohighlight">\(k_a=k\)</span> outside the interval, or for equal spring endpoints, and
+<span class="math notranslate nohighlight">\(k_a=0\)</span> inside an unequal-endpoint interval. The active region and the
+geometry Jacobian are evaluated at the start of the step. Crossing a slack
+boundary within that step is not a continuous event solve.</p>
+<p>The extra <span class="math notranslate nohighlight">\(h k_a\)</span> term comes from evaluating spring extension using the
+linearized end-step length <span class="math notranslate nohighlight">\(\ell_n+h\dot\ell_+\)</span>. This prevents the explicit
+spring-force instability at high stiffness, while introducing the numerical
+damping and approximation associated with implicit integration. Stability
+alone does not establish timestep-independent accuracy.</p>
+<p>For the introductory 1 kg suspended load, the static balance above the spring
+interval is <span class="math notranslate nohighlight">\(k(\ell-1)+2=9.81\)</span> N. With <span class="math notranslate nohighlight">\(k=500\)</span> N/m, the equilibrium
+length is 1.01562 m. The actuator supplies 2 N of tension, while the total tension
+balances the load’s weight. The independent 1.5 m upper constraint is inactive.</p>
+</section>
+<section id="actuator-and-activation-dynamics">
+<h2>Actuator and activation dynamics<a class="headerlink" href="#actuator-and-activation-dynamics" title="Link to this heading"></a></h2>
+<p>Let <span class="math notranslate nohighlight">\(u\)</span> be <code class="docutils literal notranslate"><span class="pre">Drive::force</span></code>, <span class="math notranslate nohighlight">\(a\)</span> the filtered feedforward force,
+<span class="math notranslate nohighlight">\(k_p,k_v\)</span> the position and velocity gains, and
+<span class="math notranslate nohighlight">\(\ell_d,\dot\ell_d\)</span> the targets. The intended force law is</p>
+<div class="math notranslate nohighlight">
+\[F_{\mathrm{drive}}=a+k_p(\ell_d-\ell)+k_v(\dot\ell_d-\dot\ell).\]</div>
+<p>For activation time <span class="math notranslate nohighlight">\(\tau&gt;0\)</span>, the feedforward state advances by the exact
+first-order update for a command held constant over one timestep:</p>
+<div class="math notranslate nohighlight">
+\[a_{n+1}=u+(a_n-u)e^{-h/\tau}.\]</div>
+<p>A newly created tendon starts with zero activation. With zero activation time,
+<span class="math notranslate nohighlight">\(a_{n+1}=u\)</span>. Only feedforward force is filtered: targets, gains, passive
+forces, and constraint forces are not passed through this activation filter.
+This scalar filter does not constitute a muscle force-length/force-velocity or
+biochemical activation model.</p>
+<p>Position/velocity feedback is implicit. The discrete actuator relation is</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+r &amp;= a_{n+1}+k_p(\ell_d-\ell_n)+k_v\dot\ell_d,\\
+F_{\mathrm{drive},+} &amp;= \operatorname{clamp}\left(
+  r-(k_v+h k_p)\dot\ell_+,\ F_{\min},F_{\max}\right).
+\end{aligned}\end{split}\]</div>
+<p>Its impulse is <span class="math notranslate nohighlight">\(hF_{\mathrm{drive},+}\)</span>. The bounds apply to the combined
+feedforward and servo force of this tendon, after activation and feedback.
+They exclude springs, damping, friction, armature, length limits, and coupling
+reactions. Bounds may exclude zero; in that case a zero command can still
+produce the nearest allowed nonzero actuator force.</p>
+</section>
+<section id="armature-and-route-curvature">
+<h2>Armature and route curvature<a class="headerlink" href="#armature-and-route-curvature" title="Link to this heading"></a></h2>
+<p>Armature <span class="math notranslate nohighlight">\(a_t\geq0\)</span> stores kinetic energy</p>
+<div class="math notranslate nohighlight">
+\[K_t=\tfrac12 a_t\dot\ell^2.\]</div>
+<p>For an unconstrained, autonomous transmission it contributes the generalized
+mass term <span class="math notranslate nohighlight">\(a_tJ^TJ\)</span> and the curvature force term
+<span class="math notranslate nohighlight">\(-a_tJ^T\dot Jv\)</span>. It adds inertia along the transmission rather than equally
+in every spatial direction. Several tendons contribute their own coupled
+transmission inertia through their solver rows.</p>
+<p>For a spatial tendon with moving endpoints or guides, let <span class="math notranslate nohighlight">\(b_\ell\)</span> denote
+the length acceleration caused by kinematics with generalized acceleration held
+zero, including changes of direction. The armature row uses</p>
+<div class="math notranslate nohighlight">
+\[p_{\mathrm{armature}} =
+a_t\left(\dot\ell_n-h b_\ell-\dot\ell_+\right).\]</div>
+<p>RaiSim estimates this bias with a centered second difference of routed length,
+using endpoint and guide-axis kinematics. Fixed tendons have constant scalar
+joint coefficients and use zero curvature bias.</p>
+<p>For a 1 kg body on a straight radial transmission with armature 3 kg, an 8 N
+radial force initially produces 2 m/s² radial acceleration. If the body instead
+has transverse velocity 2 m/s at radius 1 m, the length curvature is
+<span class="math notranslate nohighlight">\(v_\perp^2/\ell=4\)</span> m/s². With no applied radial force, the armature term
+produces radial acceleration <span class="math notranslate nohighlight">\(-3\)</span> m/s². Omitting curvature would miss this
+reaction even though the instantaneous length velocity is zero.</p>
+</section>
+<section id="shared-impulse-solver">
+<h2>Shared impulse solver<a class="headerlink" href="#shared-impulse-solver" title="Link to this heading"></a></h2>
+<p>The world first computes unconstrained velocity changes from body dynamics.
+Tendon rows and contact rows then share iterative velocity updates. Springs,
+drives, friction, armature, limits, and couplings therefore respond to changes
+made by other rows during a sweep; they are not independent post-processing
+forces applied after contact resolution.</p>
+<p>For one row, let <span class="math notranslate nohighlight">\(p\)</span> be its accumulated impulse, <span class="math notranslate nohighlight">\(b\)</span> its target
+velocity, <span class="math notranslate nohighlight">\(\gamma\)</span> its softness, and <span class="math notranslate nohighlight">\(M^{-1}\)</span> the participating
+bodies’ inverse mass response. Define <span class="math notranslate nohighlight">\(W=JM^{-1}J^T\)</span>. One projected update is</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+p_{\mathrm{new}} &amp;= \operatorname{clamp}\left(
+  p-\frac{Jv+v_{\mathrm{prescribed}}-b+\gamma p}{W+\gamma},
+  p_{\min},p_{\max}\right),\\
+v &amp;\leftarrow v+M^{-1}J^T(p_{\mathrm{new}}-p).
+\end{aligned}\end{split}\]</div>
+<p>Prescribed-motion objects contribute velocity offsets but no inverse mass.
+Multiple points and joints on the same articulation share its inverse mass
+matrix. Solver iteration limits and convergence tolerance apply to the combined
+contact/tendon problem. The matrix expression explains the response; it does
+not imply that each tendon is solved in isolation with a constant effective mass.</p>
+<p>After solving, each row’s reported force is its impulse divided by <span class="math notranslate nohighlight">\(h\)</span>.
+A prescribed force can still be reported for a transmission whose dynamic
+Jacobian is zero, including all-static endpoints. Such a transmission has no
+motion response to that force. An inconsistent hard constraint with no available
+degrees of freedom cannot move its endpoints into compliance.</p>
+</section>
+<section id="length-bounds-margin-and-compliance">
+<h2>Length bounds, margin, and compliance<a class="headerlink" href="#length-bounds-margin-and-compliance" title="Link to this heading"></a></h2>
+<p>Lower and upper bounds are separate unilateral rows. A lower row can only exert
+positive force; an upper row can only exert negative force. They can act
+predictively before a bound is crossed, limiting the end-step closing velocity.
+They do not directly clamp the stored configuration to a target length.</p>
+<p>With margin <span class="math notranslate nohighlight">\(m\)</span>, define the signed gaps</p>
+<div class="math notranslate nohighlight">
+\[g_{\mathrm{low}}=\ell-\ell_{\min}-m, \qquad
+g_{\mathrm{high}}=\ell_{\max}-\ell-m.\]</div>
+<p>Let <span class="math notranslate nohighlight">\(\eta(g)=\beta\)</span> for <span class="math notranslate nohighlight">\(g&lt;0\)</span> and 1 otherwise, where
+<span class="math notranslate nohighlight">\(\beta\)</span> is <code class="docutils literal notranslate"><span class="pre">positionCorrection</span></code>. The row targets and impulse bounds are</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+b_{\mathrm{low}}&amp;=-\eta(g_{\mathrm{low}})g_{\mathrm{low}}/h,
+&amp;p_{\mathrm{low}}&amp;\in[0,+\infty),\\
+b_{\mathrm{high}}&amp;=\eta(g_{\mathrm{high}})g_{\mathrm{high}}/h,
+&amp;p_{\mathrm{high}}&amp;\in(-\infty,0].
+\end{aligned}\end{split}\]</div>
+<p>Positive margin moves the effective boundaries inward to
+<span class="math notranslate nohighlight">\(\ell_{\min}+m\)</span> and <span class="math notranslate nohighlight">\(\ell_{\max}-m\)</span>; it is not merely a reporting
+threshold. Choose a margin compatible with the permitted interval. Overlapping
+effective boundaries create conflicting requirements.</p>
+<p>Equal finite bounds create one bilateral lock with target
+<span class="math notranslate nohighlight">\(b=\beta(\ell_{\mathrm{target}}-\ell)/h\)</span> and unbounded signed impulse.
+Margin is ignored for this equality case. The default correction fraction is
+0.2: in an isolated linear hard equality, that targets removal of 20% of existing
+position error in one step. Zero correction prevents correction of existing
+violation; 1 targets full linearized correction. Strong correction can inject
+energy and cause abrupt transients.</p>
+<p>For compliance <span class="math notranslate nohighlight">\(c\)</span>, row softness is <span class="math notranslate nohighlight">\(\gamma=c/h^2\)</span>. Zero compliance
+selects a hard velocity constraint, subject to solver convergence and geometric
+linearization. Positive compliance allows residual constraint error under load.
+For a bilateral row with error <span class="math notranslate nohighlight">\(C\)</span>, the converged relation is</p>
+<div class="math notranslate nohighlight">
+\[h\dot C_+ + \beta C + cF = 0.\]</div>
+<p>This makes the parameter interaction explicit. At static equilibrium with
+<span class="math notranslate nohighlight">\(\beta&gt;0\)</span>, <span class="math notranslate nohighlight">\(F=-\beta C/c\)</span>; therefore numerical compliance and position
+correction together determine the apparent static stiffness. Use the spring
+<code class="docutils literal notranslate"><span class="pre">stiffness</span></code> parameter for a directly specified elastic force law, and use the
+constraint equation when calibrating a compliant lock or limit.</p>
+</section>
+<section id="dry-friction-and-stiction">
+<h2>Dry friction and stiction<a class="headerlink" href="#dry-friction-and-stiction" title="Link to this heading"></a></h2>
+<p>Dry friction targets zero length velocity with</p>
+<div class="math notranslate nohighlight">
+\[b=0, \qquad
+p\in[-hF_f,hF_f], \qquad
+\gamma=c_f/h^2.\]</div>
+<p>Here <span class="math notranslate nohighlight">\(F_f\)</span> is <code class="docutils literal notranslate"><span class="pre">frictionLoss</span></code> and <span class="math notranslate nohighlight">\(c_f\)</span> is
+<code class="docutils literal notranslate"><span class="pre">frictionCompliance</span></code>. With zero compliance, a subthreshold disturbance can be
+balanced by an interior impulse while the transmission remains at rest. During
+sliding the impulse saturates at the threshold and opposes motion. It can bring
+a sufficiently small velocity to zero without reversing it simply because a
+fixed friction force overshot the stop.</p>
+<p>Positive friction compliance regularizes this condition. In an unsaturated row,
+<span class="math notranslate nohighlight">\(\dot\ell_+=-c_fF/h\)</span>, so nonzero balancing force permits creep. It should
+not be interpreted as exact stiction with the same threshold. Unlike viscous
+damping, dry friction can produce a finite opposing force at zero velocity.</p>
+</section>
+<section id="polynomial-tendon-couplings">
+<h2>Polynomial tendon couplings<a class="headerlink" href="#polynomial-tendon-couplings" title="Link to this heading"></a></h2>
+<p>Let the captured references be <span class="math notranslate nohighlight">\(\ell_{1,0},\ell_{2,0}\)</span> and define</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+x&amp;=\ell_2-\ell_{2,0},\\
+f(x)&amp;=c_0+c_1x+c_2x^2+c_3x^3+c_4x^4,\\
+C&amp;=\ell_1-\ell_{1,0}-f(x)=0.
+\end{aligned}\end{split}\]</div>
+<p>Coefficient <span class="math notranslate nohighlight">\(c_i\)</span> has units of the first length coordinate divided by
+the second coordinate to power <span class="math notranslate nohighlight">\(i\)</span>; the constant term has first-length
+units. Choose coefficients accordingly when coupling different kinds of
+transmission coordinates.</p>
+<p>The coupling row has Jacobian and force distribution</p>
+<div class="math notranslate nohighlight">
+\[J_C=J_1-f'(x)J_2, \qquad
+F_1=\lambda, \qquad F_2=-f'(x)\lambda.\]</div>
+<p>The derivative controls both velocity ratio and force transmission. Using the
+polynomial value as a force coefficient would violate virtual work. For
+<code class="docutils literal notranslate"><span class="pre">{0,</span> <span class="pre">2,</span> <span class="pre">0.1,</span> <span class="pre">0,</span> <span class="pre">0}</span></code>, the relation is <span class="math notranslate nohighlight">\(\Delta\ell_1=2x+0.1x^2\)</span> and the
+instantaneous ratio is <span class="math notranslate nohighlight">\(2+0.2x\)</span>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">TendonCoupling::getForce()</span></code> returns <span class="math notranslate nohighlight">\(\lambda\)</span>. Each tendon’s total force
+includes its respective contribution above. Coupling compliance uses
+<span class="math notranslate nohighlight">\(\gamma=c/h^2\)</span>, target velocity is <span class="math notranslate nohighlight">\(-\beta C/h\)</span>, and the impulse is
+bilateral. The polynomial and derivative are evaluated once for the step; a
+nonlinear equality is enforced through this local linearization and subsequent
+position correction, rather than an exact nonlinear position projection.</p>
+<p>Passing a null second tendon constrains the first to
+<span class="math notranslate nohighlight">\(\ell_{1,0}+c_0\)</span>; higher coefficients then have no effect. Disabling the
+coupling or either participating tendon removes the row. The first and second
+tendons must be distinct and belong to the same world.</p>
+</section>
+<section id="energy-interpretation">
+<h2>Energy interpretation<a class="headerlink" href="#energy-interpretation" title="Link to this heading"></a></h2>
+<p>The spring potential and armature kinetic energies above are the quantities
+returned by the tendon energy getters. They exclude body energy, actuator work,
+and any energy associated with compliant limit/coupling/friction rows.
+Passive damping and ideal sliding friction dissipate energy. Drives and moving
+kinematic supports can supply it. Constraint position correction and finite-step
+implicit integration can also change mechanical energy numerically. Use a
+whole-system energy/work balance when diagnosing a mechanism; summing only the
+tendon energy getters is not a conservation test for the complete world.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="CodeExamples.html" class="btn btn-neutral float-left" title="Tendon code examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Reference.html" class="btn btn-neutral float-right" title="Tendon API and model files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

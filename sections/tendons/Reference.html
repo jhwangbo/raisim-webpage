@@ -1,0 +1,615 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tendon API and model files &mdash; raisim 2.6.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b6430375" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Tendon examples and Rayrai" href="Examples.html" />
+    <link rel="prev" title="Tendon physics" href="Physics.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../FeatureMap.html">Feature Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ProjectLayout.html">Project Layout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Performance.html">Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Benchmark.html">Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RsceneFile.html">.rscene File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../OpenUSD.html">OpenUSD Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#pin-constraints">Pin constraints</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../Tendons.html">Tendons</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="CodeExamples.html">Tendon code examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Physics.html">Tendon physics</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Tendon API and model files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#world-api">World API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sites-paths-and-joints">Sites, paths, and joints</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tendon-properties">Tendon properties</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#drive-properties">Drive properties</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#coupling-properties-and-api">Coupling properties and API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#native-world-xml">Native world XML</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mjcf-import">MJCF import</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Examples.html">Tendon examples and Rayrai</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Tendons.html#what-the-model-represents">What the model represents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Tendons.html#a-short-working-example">A short working example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Tendons.html#three-lengths-with-different-meanings">Three lengths with different meanings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Tendons.html#force-signs-and-diagnostics">Force signs and diagnostics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Tendons.html#ownership-and-runtime-changes">Ownership and runtime changes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Tendons.html#choosing-and-tuning-a-model">Choosing and tuning a model</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimMatlab.html">RaisimMatlab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../Tendons.html">Tendons</a></li>
+      <li class="breadcrumb-item active">Tendon API and model files</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tendon-api-and-model-files">
+<h1>Tendon API and model files<a class="headerlink" href="#tendon-api-and-model-files" title="Link to this heading"></a></h1>
+<p>All names below refer to the current C++ tendon API. Include
+<code class="docutils literal notranslate"><span class="pre">&lt;raisim/World.hpp&gt;</span></code>. <a class="reference internal" href="Physics.html"><span class="doc">Tendon physics</span></a> gives the equations and sign conventions;
+<a class="reference internal" href="CodeExamples.html"><span class="doc">Tendon code examples</span></a> provides focused, tested C++ recipes, and
+<a class="reference internal" href="Examples.html"><span class="doc">Tendon examples and Rayrai</span></a> provides complete runnable scenes.</p>
+<section id="world-api">
+<h2>World API<a class="headerlink" href="#world-api" title="Link to this heading"></a></h2>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">spatial</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSpatialTendon</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="n">properties</span><span class="p">);</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">fixed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addFixedTendon</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">jointTerms</span><span class="p">,</span><span class="w"> </span><span class="n">properties</span><span class="p">);</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">equality</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addTendonCoupling</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">first</span><span class="p">,</span><span class="w"> </span><span class="n">second</span><span class="p">,</span><span class="w"> </span><span class="n">couplingProperties</span><span class="p">);</span>
+
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">found</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">getTendon</span><span class="p">(</span><span class="n">name</span><span class="p">);</span><span class="w">  </span><span class="c1">// nullptr when absent</span>
+<span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">tendons</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">getTendons</span><span class="p">();</span>
+<span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">couplings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">getTendonCouplings</span><span class="p">();</span>
+
+<span class="n">world</span><span class="p">.</span><span class="n">removeTendonCoupling</span><span class="p">(</span><span class="n">equality</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">removeTendon</span><span class="p">(</span><span class="n">spatial</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The properties arguments can be omitted to use defaults. <code class="docutils literal notranslate"><span class="pre">getTendons()</span></code> and
+<code class="docutils literal notranslate"><span class="pre">getTendonCouplings()</span></code> return const references to vectors of world-owned
+<code class="docutils literal notranslate"><span class="pre">unique_ptr</span></code> objects. <code class="docutils literal notranslate"><span class="pre">getTendon()</span></code> looks up a tendon by name; enumerate
+couplings and inspect their names to find a coupling. See <a class="reference internal" href="../Tendons.html"><span class="doc">Tendons</span></a> for
+ownership, deletion, enable state, and split-integration restrictions.</p>
+</section>
+<section id="sites-paths-and-joints">
+<h2>Sites, paths, and joints<a class="headerlink" href="#sites-paths-and-joints" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">Tendon::Site</span></code> contains <code class="docutils literal notranslate"><span class="pre">object</span></code>, <code class="docutils literal notranslate"><span class="pre">localIndex</span></code>, and <code class="docutils literal notranslate"><span class="pre">position</span></code>:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 26.0%" />
+<col style="width: 26.0%" />
+<col style="width: 48.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Attachment</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">localIndex</span></code></p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">position</span></code></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>World (<code class="docutils literal notranslate"><span class="pre">object</span> <span class="pre">==</span> <span class="pre">nullptr</span></code>)</p></td>
+<td><p>0</p></td>
+<td><p>World coordinates.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Single rigid body</p></td>
+<td><p>0</p></td>
+<td><p>Body-local coordinates, not a world-space point.</p></td>
+</tr>
+<tr class="row-even"><td><p>Articulated system</p></td>
+<td><p>Simulated body index, e.g. <code class="docutils literal notranslate"><span class="pre">getBodyIdx(linkName)</span></code></p></td>
+<td><p>Coordinates in that body’s frame. A frame index and a body index are
+different concepts.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Deformable/granular system</p></td>
+<td><p>Particle index</p></td>
+<td><p>Use zero offset to attach directly to the particle.</p></td>
+</tr>
+</tbody>
+</table>
+<p>For an imported fixed frame, resolve its simulated parent body and express the
+attachment point in that parent’s frame. Do not use a fixed-frame index as a
+body index. All referenced objects must belong to the same world as the tendon.</p>
+<p>Build a spatial path with <code class="docutils literal notranslate"><span class="pre">Tendon::PathElement</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">E</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">Tendon</span><span class="o">::</span><span class="n">PathElement</span><span class="p">;</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">anchor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">E</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="k">nullptr</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">}});</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">endpoint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">E</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="n">load</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="p">}});</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">guide</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">E</span><span class="o">::</span><span class="n">cylinder</span><span class="p">({</span><span class="n">guideBody</span><span class="p">},</span><span class="w"> </span><span class="mf">0.2</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">});</span>
+<span class="n">guide</span><span class="p">.</span><span class="n">withSideSite</span><span class="p">({</span><span class="k">nullptr</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.5</span><span class="p">}});</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">tendon</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSpatialTendon</span><span class="p">(</span><span class="s">&quot;route&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">anchor</span><span class="p">,</span><span class="w"> </span><span class="n">guide</span><span class="p">,</span><span class="w"> </span><span class="n">endpoint</span><span class="p">});</span>
+</pre></div>
+</div>
+<p>The example fragment assumes <code class="docutils literal notranslate"><span class="pre">load</span></code> and <code class="docutils literal notranslate"><span class="pre">guideBody</span></code> already exist and have
+suitable exterior placement. <code class="docutils literal notranslate"><span class="pre">sphere(center,</span> <span class="pre">radius)</span></code> supplies a sphere guide.
+<code class="docutils literal notranslate"><span class="pre">cylinder(center,</span> <span class="pre">radius,</span> <span class="pre">axis)</span></code> defaults to the local +Z axis. The axis is
+normalized during validation; it must be finite and nonzero. Both radii and
+pulley divisors must be finite and strictly positive.</p>
+<p>Every branch needs at least two sites, starting and ending with sites. A wrap
+must have an immediate site on both sides. Consequently two consecutive wraps
+need an intervening via-point. <code class="docutils literal notranslate"><span class="pre">E::pulley(divisor)</span></code> starts a new branch; a
+leading pulley is permitted. A path ending in a pulley or a wrap is rejected.</p>
+<p>A fixed tendon uses <code class="docutils literal notranslate"><span class="pre">Tendon::JointTerm{system,</span> <span class="pre">jointName,</span> <span class="pre">coefficient}</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">transmission</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addFixedTendon</span><span class="p">(</span><span class="s">&quot;finger&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">{</span><span class="n">robot</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;proximal_joint&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="n">robot</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;distal_joint&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">0.65</span><span class="p">}});</span>
+</pre></div>
+</div>
+<p>Only revolute and prismatic joint names are accepted. At least one term is
+required. <code class="docutils literal notranslate"><span class="pre">getPath()</span></code> and <code class="docutils literal notranslate"><span class="pre">getJoints()</span></code> expose const route/term lists.
+<code class="docutils literal notranslate"><span class="pre">getType()</span></code> distinguishes <code class="docutils literal notranslate"><span class="pre">Tendon::Type::Spatial</span></code> and <code class="docutils literal notranslate"><span class="pre">Fixed</span></code>.
+<code class="docutils literal notranslate"><span class="pre">getName()</span></code> reads the name and <code class="docutils literal notranslate"><span class="pre">setName()</span></code> renames a tendon, checking that
+its new name is nonempty and unique.</p>
+<p>After a geometry refresh, the diagnostic records expose:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">PointGradient::site</span></code>: the owning attachment/body and body-local application
+point; <code class="docutils literal notranslate"><span class="pre">position</span></code>: its world-space application point; <code class="docutils literal notranslate"><span class="pre">gradient</span></code>: the
+world-space length derivative, including branch scaling. For a wrapped guide,
+records identify the instantaneous tangency points on that guide.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">JointGradient::system</span></code>, <code class="docutils literal notranslate"><span class="pre">coordinateIndex</span></code>, <code class="docutils literal notranslate"><span class="pre">velocityIndex</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">coefficient</span></code>: the resolved scalar-joint transmission term. The solver sums
+repeated contributions even though the returned term list retains them.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VisualSegment::start</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span></code>: world-space endpoints of one drawing
+segment; <code class="docutils literal notranslate"><span class="pre">wrapped</span></code>: whether it tessellates the curved surface portion.
+These records are refreshed only when visual geometry is requested.</p></li>
+</ul>
+</section>
+<section id="tendon-properties">
+<h2>Tendon properties<a class="headerlink" href="#tendon-properties" title="Link to this heading"></a></h2>
+<p>Read the current value, modify a copy, and call <code class="docutils literal notranslate"><span class="pre">setProperties()</span></code>. Constructing
+a fresh <code class="docutils literal notranslate"><span class="pre">Properties</span></code> instead resets any fields you do not explicitly set.
+The defaults below describe a newly constructed properties object.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 26.0%" />
+<col style="width: 19.0%" />
+<col style="width: 55.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>C++ field</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">stiffness</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Nonnegative spring stiffness outside the rest interval.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">damping</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Nonnegative viscous resistance to length velocity, including inside the
+spring’s slack interval.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">springLower</span></code>, <code class="docutils literal notranslate"><span class="pre">springUpper</span></code></p></td>
+<td><p>NaN, NaN</p></td>
+<td><p>Both NaN resolve to the creation reference length. Otherwise endpoints must be ordered; the lower endpoint may be
+-infinity and the upper endpoint may be +infinity. Equal endpoints give a rest length; unequal endpoints
+give a zero-spring-force interval.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">lowerLimit</span></code>, <code class="docutils literal notranslate"><span class="pre">upperLimit</span></code></p></td>
+<td><p>-infinity, +infinity</p></td>
+<td><p>Ordered constraint bounds. Equal finite values lock length. These do
+not set the spring rest interval or the drive target.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">limitMargin</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Nonnegative inward offset of unilateral constraint boundaries. Ignored
+for an equal-bound lock.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">limitCompliance</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Nonnegative length-constraint softness, used as compliance / timestep².
+See the correction/compliance relation in <a class="reference internal" href="Physics.html"><span class="doc">Tendon physics</span></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">frictionLoss</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Nonnegative dry-friction force threshold for transmission motion.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">frictionCompliance</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Nonnegative friction-row regularization, used as compliance / timestep².
+Positive values permit creep under load.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">armature</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Nonnegative added inertia along the transmission.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">positionCorrection</span></code></p></td>
+<td><p>0.2</p></td>
+<td><p>Length-constraint position-correction fraction in [0, 1]. Couplings have
+their own independent correction property.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">actuationLower</span></code>, <code class="docutils literal notranslate"><span class="pre">actuationUpper</span></code></p></td>
+<td><p>-infinity, +infinity</p></td>
+<td><p>Ordered bounds on combined actuator force. The interval need not contain
+zero. Passive and constraint forces are excluded.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">width</span></code></p></td>
+<td><p>0.004</p></td>
+<td><p>Strictly positive visualization radius in metres; no collision thickness.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">color</span></code></p></td>
+<td><p>{0.9, 0.35, 0.08, 1.0}</p></td>
+<td><p>Finite RGBA components. Use values in [0, 1] for conventional rendering.</p></td>
+</tr>
+</tbody>
+</table>
+<p>All nonnegative scalar fields must also be finite. Spring/length/actuation bounds may
+be unbounded only in their corresponding outward directions. NaN is rejected
+except for the paired automatic spring endpoints. Invalid settings throw
+<code class="docutils literal notranslate"><span class="pre">std::invalid_argument</span></code>. Properties are shared by spatial and fixed tendons;
+choose the coordinate units consistently as explained in <a class="reference internal" href="Physics.html"><span class="doc">Tendon physics</span></a>.</p>
+</section>
+<section id="drive-properties">
+<h2>Drive properties<a class="headerlink" href="#drive-properties" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">setDrive()</span></code> replaces the drive configuration; <code class="docutils literal notranslate"><span class="pre">getDrive()</span></code> returns a const
+reference. Copy it before changing individual fields.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.0%" />
+<col style="width: 16.0%" />
+<col style="width: 56.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p><code class="docutils literal notranslate"><span class="pre">Tendon::Drive</span></code> field</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">force</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Finite signed feedforward force; positive lengthens the transmission.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">targetLength</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Finite position target. It is not automatically initialized to the
+creation reference. Set it before enabling a position servo.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">targetVelocity</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Finite desired transmission velocity.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">positionGain</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Finite nonnegative implicit position-feedback gain.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">velocityGain</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Finite nonnegative implicit velocity-feedback gain.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">activationTime</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Finite nonnegative feedforward activation time constant. Zero applies
+feedforward commands immediately during the next step.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">Tendon</span><span class="o">::</span><span class="n">Drive</span><span class="w"> </span><span class="n">drive</span><span class="p">;</span>
+<span class="n">drive</span><span class="p">.</span><span class="n">targetLength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">transmission</span><span class="o">-&gt;</span><span class="n">getLength</span><span class="p">();</span>
+<span class="n">drive</span><span class="p">.</span><span class="n">positionGain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">120.0</span><span class="p">;</span>
+<span class="n">drive</span><span class="p">.</span><span class="n">velocityGain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">12.0</span><span class="p">;</span>
+<span class="n">transmission</span><span class="o">-&gt;</span><span class="n">setDrive</span><span class="p">(</span><span class="n">drive</span><span class="p">);</span>
+
+<span class="k">auto</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">transmission</span><span class="o">-&gt;</span><span class="n">getProperties</span><span class="p">();</span>
+<span class="n">p</span><span class="p">.</span><span class="n">actuationLower</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">-50.0</span><span class="p">;</span>
+<span class="n">p</span><span class="p">.</span><span class="n">actuationUpper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span><span class="w">  </span><span class="c1">// Actuator may only pull toward smaller length.</span>
+<span class="n">transmission</span><span class="o">-&gt;</span><span class="n">setProperties</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">setActuationForce(value)</span></code> changes only <code class="docutils literal notranslate"><span class="pre">Drive::force</span></code>.
+<code class="docutils literal notranslate"><span class="pre">setTension(value)</span></code> changes it to <code class="docutils literal notranslate"><span class="pre">-value</span></code>. They leave servo gains, targets,
+and activation time unchanged. Force commands take effect on simulation steps.</p>
+</section>
+<section id="coupling-properties-and-api">
+<h2>Coupling properties and API<a class="headerlink" href="#coupling-properties-and-api" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">TendonCoupling::Properties</span></code> contains:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 29.0%" />
+<col style="width: 22.0%" />
+<col style="width: 49.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">coefficients</span></code></p></td>
+<td><p>{0, 1, 0, 0, 0}</p></td>
+<td><p>Five finite coefficients, constant term first. Default couples equal
+changes from the two creation references.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">compliance</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Finite nonnegative coupling-row compliance.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">positionCorrection</span></code></p></td>
+<td><p>0.2</p></td>
+<td><p>Finite position-correction fraction in [0, 1].</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">enabled</span></code></p></td>
+<td><p>true</p></td>
+<td><p>Whether the coupling contributes, provided both tendons are enabled.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">TendonCoupling</span><span class="o">::</span><span class="n">Properties</span><span class="w"> </span><span class="n">relation</span><span class="p">;</span>
+<span class="n">relation</span><span class="p">.</span><span class="n">coefficients</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">};</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">coupling</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addTendonCoupling</span><span class="p">(</span><span class="s">&quot;ratio&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">first</span><span class="p">,</span><span class="w"> </span><span class="n">second</span><span class="p">,</span><span class="w"> </span><span class="n">relation</span><span class="p">);</span>
+<span class="c1">// deltaLengthFirst = 2*x + 0.1*x*x, x = deltaLengthSecond</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">getFirst()</span></code> and <code class="docutils literal notranslate"><span class="pre">getSecond()</span></code> return borrowed tendon pointers; the second
+may be null. <code class="docutils literal notranslate"><span class="pre">getName()</span></code>, <code class="docutils literal notranslate"><span class="pre">getProperties()</span></code>, <code class="docutils literal notranslate"><span class="pre">setProperties()</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">getForce()</span></code> provide inspection/configuration. There is no independent spatial
+path for a coupling. Its force is the multiplier for the first tendon, with the
+second receiving the derivative-scaled reaction described in <a class="reference internal" href="Physics.html"><span class="doc">Tendon physics</span></a>.</p>
+</section>
+<section id="native-world-xml">
+<h2>Native world XML<a class="headerlink" href="#native-world-xml" title="Link to this heading"></a></h2>
+<p>Native XML places each <code class="docutils literal notranslate"><span class="pre">&lt;tendon&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;tendon_coupling&gt;</span></code> directly under
+<code class="docutils literal notranslate"><span class="pre">&lt;raisim&gt;</span></code>, alongside <code class="docutils literal notranslate"><span class="pre">&lt;objects&gt;</span></code>. This differs from the MJCF container
+syntax. Here is a complete world corresponding to the introductory suspension:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">tendon_world.xml</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot;?&gt;</span>
+<span class="nt">&lt;raisim&gt;</span>
+<span class="w">  </span><span class="nt">&lt;gravity</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;0, 0, -9.81&quot;</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;timeStep</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;0.001&quot;</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;objects&gt;</span>
+<span class="w">    </span><span class="nt">&lt;ground</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;floor&quot;</span><span class="w"> </span><span class="na">height=</span><span class="s">&quot;0&quot;</span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;sphere</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;load&quot;</span><span class="w"> </span><span class="na">mass=</span><span class="s">&quot;1&quot;</span><span class="w"> </span><span class="na">appearance=</span><span class="s">&quot;0.08, 0.46, 0.86, 1&quot;</span><span class="nt">&gt;</span>
+<span class="w">      </span><span class="nt">&lt;dim</span><span class="w"> </span><span class="na">radius=</span><span class="s">&quot;0.1&quot;</span><span class="nt">/&gt;</span>
+<span class="w">      </span><span class="nt">&lt;state</span><span class="w"> </span><span class="na">pos=</span><span class="s">&quot;0, 0, 0.8&quot;</span><span class="w"> </span><span class="na">quat=</span><span class="s">&quot;1, 0, 0, 0&quot;</span>
+<span class="w">             </span><span class="na">lin_vel=</span><span class="s">&quot;0, 0, 0&quot;</span><span class="w"> </span><span class="na">ang_vel=</span><span class="s">&quot;0, 0, 0&quot;</span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/sphere&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/objects&gt;</span>
+<span class="w">  </span><span class="nt">&lt;tendon</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;suspension&quot;</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;spatial&quot;</span>
+<span class="w">          </span><span class="na">spring_lower=</span><span class="s">&quot;0&quot;</span><span class="w"> </span><span class="na">spring_upper=</span><span class="s">&quot;1&quot;</span><span class="w"> </span><span class="na">stiffness=</span><span class="s">&quot;500&quot;</span><span class="w"> </span><span class="na">damping=</span><span class="s">&quot;8&quot;</span>
+<span class="w">          </span><span class="na">upper_limit=</span><span class="s">&quot;1.5&quot;</span><span class="w"> </span><span class="na">width=</span><span class="s">&quot;0.008&quot;</span><span class="w"> </span><span class="na">color=</span><span class="s">&quot;0.9, 0.35, 0.08, 1&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;drive</span><span class="w"> </span><span class="na">force=</span><span class="s">&quot;-2&quot;</span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;site</span><span class="w"> </span><span class="na">pos=</span><span class="s">&quot;0, 0, 2&quot;</span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;site</span><span class="w"> </span><span class="na">object=</span><span class="s">&quot;load&quot;</span><span class="w"> </span><span class="na">local_index=</span><span class="s">&quot;0&quot;</span><span class="w"> </span><span class="na">pos=</span><span class="s">&quot;0, 0, 0&quot;</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/tendon&gt;</span>
+<span class="nt">&lt;/raisim&gt;</span>
+</pre></div>
+</div>
+</div>
+<p>Download <a class="reference download internal" download="" href="../../_downloads/f15f92beeb9fb4cbe86e35ca347e9ece/tendon_world.xml"><code class="xref download docutils literal notranslate"><span class="pre">the</span> <span class="pre">native</span> <span class="pre">XML</span></code></a>. Load it with
+<code class="docutils literal notranslate"><span class="pre">raisim::World</span> <span class="pre">world(xmlPath)</span></code> or drop it onto the TCP viewer to simulate it.</p>
+<p>Tendon attributes include <code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">type=&quot;spatial|fixed&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">enabled</span></code>,
+<code class="docutils literal notranslate"><span class="pre">reference_length</span></code>, and <code class="docutils literal notranslate"><span class="pre">activation</span></code>. Missing reference length defaults to
+the imported tendon’s initial length. Missing activation defaults to zero.
+Numeric property names follow this mapping:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>stiffness             damping               spring_lower
+spring_upper          lower_limit           upper_limit
+limit_margin          limit_compliance      friction_loss
+friction_compliance   armature              position_correction
+actuation_lower       actuation_upper       width
+color
+</pre></div>
+</div>
+<p>The optional <code class="docutils literal notranslate"><span class="pre">&lt;drive&gt;</span></code> child accepts <code class="docutils literal notranslate"><span class="pre">force</span></code>, <code class="docutils literal notranslate"><span class="pre">target_length</span></code>,
+<code class="docutils literal notranslate"><span class="pre">target_velocity</span></code>, <code class="docutils literal notranslate"><span class="pre">position_gain</span></code>, <code class="docutils literal notranslate"><span class="pre">velocity_gain</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">activation_time</span></code>. Unspecified properties use the C++ defaults.</p>
+<p>Spatial path children remain in routing order:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;site</span> <span class="pre">object=&quot;load&quot;</span> <span class="pre">local_index=&quot;0&quot;</span> <span class="pre">pos=&quot;0,</span> <span class="pre">0,</span> <span class="pre">0.1&quot;/&gt;</span></code> is an attachment.
+Omit <code class="docutils literal notranslate"><span class="pre">object</span></code> for a world site; omitted index and position default to zero.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;sphere</span> <span class="pre">...</span> <span class="pre">radius=&quot;0.2&quot;/&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;cylinder</span> <span class="pre">...</span> <span class="pre">radius=&quot;0.2&quot;</span>
+<span class="pre">axis=&quot;0,</span> <span class="pre">1,</span> <span class="pre">0&quot;/&gt;</span></code> use the same site attributes to locate their centers.
+An optional <code class="docutils literal notranslate"><span class="pre">&lt;side</span> <span class="pre">.../&gt;</span></code> child defines the side site with the same site
+attributes. A missing cylinder axis defaults to local +Z.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;pulley</span> <span class="pre">divisor=&quot;2&quot;/&gt;</span></code> splits branches. Its divisor is required.</p></li>
+</ul>
+<p>A fixed tendon instead contains <code class="docutils literal notranslate"><span class="pre">&lt;joint</span> <span class="pre">object=&quot;robot&quot;</span> <span class="pre">joint=&quot;joint_name&quot;</span>
+<span class="pre">coefficient=&quot;0.65&quot;/&gt;</span></code> children. The object name must identify an articulated
+system; joint names identify its revolute/prismatic coordinates.</p>
+<p>A coupling uses <code class="docutils literal notranslate"><span class="pre">name</span></code>, required <code class="docutils literal notranslate"><span class="pre">first</span></code>, optional <code class="docutils literal notranslate"><span class="pre">second</span></code>,
+<code class="docutils literal notranslate"><span class="pre">coefficients=&quot;c0,</span> <span class="pre">c1,</span> <span class="pre">c2,</span> <span class="pre">c3,</span> <span class="pre">c4&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">compliance</span></code>,
+<code class="docutils literal notranslate"><span class="pre">position_correction</span></code>, and <code class="docutils literal notranslate"><span class="pre">enabled</span></code> attributes. The referenced tendons must
+exist. Omitting the second fixes the first relative to its creation reference.</p>
+<p>Give referenced objects unique names. Unknown or ambiguous object names and
+unknown tendon references are rejected. Export writes the current reference and
+activation state as well as properties and commands. It does not serialize an
+arbitrary C++ controller or a future schedule of changing servo targets.</p>
+<p>For a complete scene, prefer <code class="docutils literal notranslate"><span class="pre">World::exportToXml</span></code>. The example programs expose
+<code class="docutils literal notranslate"><span class="pre">--export</span> <span class="pre">PATH</span></code> and export initial scenes. Their embedded articulated models
+produce URDF sidecar files, with absolute references in the XML. Keep those
+assets and update paths if moving the exported scene. The example exporter
+passes an absolute directory with a trailing separator to the directory/filename
+overload so embedded URDF files are written beside the XML. Native export also
+depends on the objects themselves being exportable; the tendon exporter does
+not reconstruct URDF descriptions for arbitrary <code class="docutils literal notranslate"><span class="pre">Child</span></code>-built articulations.</p>
+</section>
+<section id="mjcf-import">
+<h2>MJCF import<a class="headerlink" href="#mjcf-import" title="Link to this heading"></a></h2>
+<p>RaiSim imports tendon definitions through its existing MJCF world loader.
+Supported tendon elements and attribute mappings are:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 40.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>MJCF construct</p></th>
+<th class="head"><p>RaiSim interpretation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;tendon&gt;&lt;spatial&gt;</span></code></p></td>
+<td><p>Ordered named sites, sphere/cylinder <code class="docutils literal notranslate"><span class="pre">geom</span></code> guides, optional
+<code class="docutils literal notranslate"><span class="pre">sidesite</span></code>, and <code class="docutils literal notranslate"><span class="pre">pulley</span> <span class="pre">divisor</span></code> branches.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;tendon&gt;&lt;fixed&gt;</span></code></p></td>
+<td><p>Named scalar joints with <code class="docutils literal notranslate"><span class="pre">coef</span></code> coefficients.</p></td>
+</tr>
+<tr class="row-even"><td><p>Tendon defaults/classes</p></td>
+<td><p>Inherited tendon properties are resolved by the model loader.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">springlength</span></code></p></td>
+<td><p>One value sets a rest length; two values set an interval. <code class="docutils literal notranslate"><span class="pre">-1</span></code> or
+<code class="docutils literal notranslate"><span class="pre">-1</span> <span class="pre">-1</span></code> selects the initial length.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">stiffness</span></code>, <code class="docutils literal notranslate"><span class="pre">damping</span></code>, <code class="docutils literal notranslate"><span class="pre">armature</span></code>, <code class="docutils literal notranslate"><span class="pre">frictionloss</span></code></p></td>
+<td><p>Corresponding tendon properties.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">limited</span></code>, <code class="docutils literal notranslate"><span class="pre">range</span></code>, <code class="docutils literal notranslate"><span class="pre">margin</span></code></p></td>
+<td><p>Length bounds and margin. <code class="docutils literal notranslate"><span class="pre">auto</span></code> uses a supplied range;
+<code class="docutils literal notranslate"><span class="pre">limited=&quot;false&quot;</span></code> disables those bounds.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">actuatorfrclimited</span></code>, <code class="docutils literal notranslate"><span class="pre">actuatorfrcrange</span></code></p></td>
+<td><p>Bounds on the tendon actuator contribution. <code class="docutils literal notranslate"><span class="pre">auto</span></code> uses a supplied
+force range; explicit <code class="docutils literal notranslate"><span class="pre">false</span></code> disables the bounds.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">width</span></code>, <code class="docutils literal notranslate"><span class="pre">rgba</span></code></p></td>
+<td><p>Drawing radius and color.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;equality&gt;&lt;tendon&gt;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tendon1</span></code>, optional <code class="docutils literal notranslate"><span class="pre">tendon2</span></code>, <code class="docutils literal notranslate"><span class="pre">polycoef</span></code>, and <code class="docutils literal notranslate"><span class="pre">active</span></code> map to a
+polynomial coupling and its enable state.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Routing guides are resolved from declared sphere/cylinder geometry even when
+that geometry is excluded from collision detection. These remain the
+frictionless routing primitives described in <a class="reference internal" href="Physics.html"><span class="doc">Tendon physics</span></a>.</p>
+<p>The importer does not load the separate MuJoCo actuator subsystem into tendon
+<code class="docutils literal notranslate"><span class="pre">Drive</span></code> objects. Configure actuation through the C++ API after import.
+MuJoCo’s <code class="docutils literal notranslate"><span class="pre">solref</span></code>/<code class="docutils literal notranslate"><span class="pre">solimp</span></code> constraint response is not reproduced by RaiSim’s
+compliance/correction model. Explicit tendon <code class="docutils literal notranslate"><span class="pre">solreflimit</span></code>, <code class="docutils literal notranslate"><span class="pre">solimplimit</span></code>,
+<code class="docutils literal notranslate"><span class="pre">solreffriction</span></code>, or <code class="docutils literal notranslate"><span class="pre">solimpfriction</span></code> parameters trigger a warning about this
+difference. Equality solver parameters also do not establish equivalent RaiSim
+constraint behavior. Supported model syntax therefore does not imply identical
+force histories, solver convergence, or trajectories across engines.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Physics.html" class="btn btn-neutral float-left" title="Tendon physics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Examples.html" class="btn btn-neutral float-right" title="Tendon examples and Rayrai" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

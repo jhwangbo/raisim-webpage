@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ray Test &mdash; raisim 2.5.7 documentation</title>
+  <title>Ray Test &mdash; raisim 2.6.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b6430375" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=f7cf8502"></script>
+      <script src="../_static/documentation_options.js?v=ae39cb24"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -22,7 +22,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Sensors" href="Sensors.html" />
-    <link rel="prev" title="CustomLengthConstraint" href="CustomLengthConstraint.html" /> 
+    <link rel="prev" title="Tendon examples and Rayrai" href="tendons/Examples.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -80,6 +80,10 @@
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Ray Test</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#arguments">Arguments</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#single-ray-test-raytest">Single-ray test (<code class="code docutils literal notranslate"><span class="pre">rayTest</span></code>)</a></li>
@@ -306,17 +310,18 @@ contact-normal calculation. No path approximates hit positions.</p>
 BVH instead. Small scenes use a scan-wide conservative cull and a compact flat
 candidate list. These fallbacks preserve the same closest-hit and compact-output
 semantics.</p>
-<p>The source-tree <code class="code docutils literal notranslate"><span class="pre">ray_lidar_comparison</span></code> benchmark compares both APIs using
-identical rays in a 100%-hit scan and verifies every hit position plus a timed
-checksum. Its default 256-by-16 configuration is also a performance regression
-check: <code class="code docutils literal notranslate"><span class="pre">rayTestLidar</span></code> must be faster than repeated <code class="code docutils literal notranslate"><span class="pre">rayTest</span></code> calls.
-Run it single-threaded with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>./build-benchmark/benchmark/benchmarks<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--bench<span class="w"> </span>ray_lidar_comparison<span class="w"> </span>--raisim<span class="w"> </span>--repeat<span class="o">=</span><span class="m">5</span>
+<p>Use the public <code class="docutils literal notranslate"><span class="pre">ray_scan_lidar</span></code> example to inspect structured scans and
+<code class="docutils literal notranslate"><span class="pre">large_scale_ray_test</span></code> to inspect repeated ray queries:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>--build<span class="w"> </span>build-examples<span class="w"> </span>--target<span class="w"> </span>ray_scan_lidar<span class="w"> </span>large_scale_ray_test<span class="w"> </span>--parallel<span class="w"> </span><span class="m">12</span>
+./build-examples/examples/rayrai_tcp_viewer
 </pre></div>
 </div>
-<p>The relative speed still depends on scene layout, motion, filters, and scan
-shape, so benchmark the application workload when making performance decisions.</p>
+<p>Start either simulation in another terminal. These examples visualize the APIs;
+they are not timing comparisons. For application benchmarks, time
+<code class="docutils literal notranslate"><span class="pre">World::rayTestLidar</span></code> and repeated <code class="docutils literal notranslate"><span class="pre">World::rayTest</span></code> calls with identical
+sensor poses, rays, ranges, and collision filters on one thread, and verify the
+hit positions before comparing timings. Relative speed depends on scene layout,
+motion, filters, and scan shape.</p>
 </section>
 </section>
 <section id="details">
@@ -534,7 +539,7 @@ along the ray. Use <code class="code docutils literal notranslate"><span class="
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="CustomLengthConstraint.html" class="btn btn-neutral float-left" title="CustomLengthConstraint" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tendons/Examples.html" class="btn btn-neutral float-left" title="Tendon examples and Rayrai" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="Sensors.html" class="btn btn-neutral float-right" title="Sensors" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

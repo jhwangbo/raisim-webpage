@@ -92,14 +92,11 @@ scene changes:
 .. code-block:: bash
 
     cmake --build build-examples \
-      --target anymal_standing_benchmark articulated_system_benchmark \
-               granular_media island_sleep_benchmark -j12
+      --target anymal_standing_benchmark articulated_system_benchmark -j12
     OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
       ./build-examples/examples/anymal_standing_benchmark --fast
     OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
       ./build-examples/examples/articulated_system_benchmark
-    OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
-      ./build-examples/examples/island_sleep_benchmark --steps=12000
 
 Use :doc:`Performance` for scene-level tuning guidance and for choosing a
 representative package example before changing solver settings or sensor
@@ -115,9 +112,15 @@ Sphinx:
 .. code-block:: bash
 
     cmake -S /path/to/raisim2Lib/docs -B /tmp/raisim2lib-docs \
+      -DCMAKE_PREFIX_PATH="/path/to/raisim2Lib/raisim;/path/to/raisim2Lib/rayrai" \
+      -DRAISIM_DOCS_BUILD_RAYRAI_IMAGES=OFF \
       -DRAISIM_DOCS_RAISIM_INCLUDE_DIR=/path/to/raisim2Lib/raisim/include/raisim \
       -DRAISIM_DOCS_RAYRAI_INCLUDE_DIR=/path/to/raisim2Lib/rayrai/include/rayrai
     cmake --build /tmp/raisim2lib-docs -j12
+
+This generates API references from the distributed headers and reuses the
+checked-in documentation images. Enable ``RAISIM_DOCS_BUILD_RAYRAI_IMAGES``
+when you have a working OpenGL context and want to regenerate those images.
 
 For prose and link checks, the documentation can also be built directly with
 Sphinx:

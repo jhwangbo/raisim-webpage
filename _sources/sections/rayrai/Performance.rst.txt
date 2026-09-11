@@ -5,9 +5,10 @@ Performance notes and the C++ API reference
 Performance notes
 =================
 
-rayrai is intended to stay single-threaded so it can be embedded in
-simulation, replay, and data-generation tools without adding renderer worker
-synchronization. The renderer keeps the main performance controls explicit:
+rayrai defaults to one simulation/render thread. Applications that explicitly
+opt into ``ThreadingMode::MultiThread`` use one renderer and current OpenGL
+context per worker, as described in :doc:`../Rayrai`. The renderer keeps the
+main performance controls explicit:
 
 * Disable shadows for high-throughput camera observations when shadows are not part
   of the desired output. Use ``RenderOverrides::doShadows = false`` or disable the
@@ -40,6 +41,37 @@ synchronization. The renderer keeps the main performance controls explicit:
   streaming changes.
 * Deformable TCP streaming sends topology/indices only during initialization or topology
   changes; normal frames send vertex positions only.
+
+Shared mesh buffers across contexts
+===================================
+
+In 2.5.8, compatible OpenGL contexts reuse immutable indexed mesh buffers for
+primitives and file-backed assets. To create compatible contexts, make the root
+SDL OpenGL context current before calling
+``RayraiWindow::createOffscreenGlContext`` for each child. Each call makes the
+new context current, so rebind the root when creating the next child. Creating
+a context on a thread with no current context creates an independent share
+group and cannot provide this reuse.
+
+Keep each renderer's context current for rendering and resource destruction.
+Do not use one context concurrently on multiple threads. Mesh vertex/index
+buffers can be shared; VAOs, framebuffers, and camera targets remain specific
+to each context. The cache retains weak references, so reuse requires an
+existing owner to keep the mesh alive.
+
+The public diagnostics can be read without changing rendering behavior:
+
+.. code-block:: cpp
+
+    const auto stats = raisin::RayraiGlobalAsset::sharedGpuAssetStats();
+    const auto uploadedBytes = stats.gpuBufferBytesUploaded;
+    const auto reusedBytes = stats.gpuBufferBytesReused;
+
+These are cumulative mesh-buffer counters, not total or live GPU memory.
+Textures, VAOs, and render targets are excluded. Use
+``resetSharedGpuAssetStats()`` before a controlled measurement, and
+``setSharedGpuAssetCacheEnabled(false)`` before loading assets for a comparison
+with separate uploads. Restore it to ``true`` before the shared-cache run.
 
 Shader binary cache and multi-threaded prewarming
 =================================================

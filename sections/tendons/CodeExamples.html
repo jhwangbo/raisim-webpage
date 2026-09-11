@@ -1,0 +1,683 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tendon code examples &mdash; raisim 2.6.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b6430375" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Tendon physics" href="Physics.html" />
+    <link rel="prev" title="Tendons" href="../Tendons.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../FeatureMap.html">Feature Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ProjectLayout.html">Project Layout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Performance.html">Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Benchmark.html">Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RsceneFile.html">.rscene File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../OpenUSD.html">OpenUSD Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#pin-constraints">Pin constraints</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../Tendons.html">Tendons</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Tendon code examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#build-and-run-the-recipes">Build and run the recipes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#limit-the-maximum-separation">Limit the maximum separation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#lock-the-current-length">Lock the current length</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#suspend-a-load-with-a-slack-spring">Suspend a load with a slack spring</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#apply-a-bounded-tension-command">Apply a bounded tension command</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#control-the-length-with-a-servo">Control the length with a servo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#route-over-a-cylinder-and-add-a-pulley-branch">Route over a cylinder and add a pulley branch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#drive-a-weighted-joint-coordinate">Drive a weighted joint coordinate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#couple-two-visible-cable-lengths">Couple two visible cable lengths</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#inspect-style-export-and-reload">Inspect, style, export, and reload</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#straight-connections-through-the-tendon-api">Straight connections through the tendon API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#python-uses-the-same-model">Python uses the same model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Physics.html">Tendon physics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Reference.html">Tendon API and model files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Examples.html">Tendon examples and Rayrai</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Tendons.html#what-the-model-represents">What the model represents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Tendons.html#a-short-working-example">A short working example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Tendons.html#three-lengths-with-different-meanings">Three lengths with different meanings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Tendons.html#force-signs-and-diagnostics">Force signs and diagnostics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Tendons.html#ownership-and-runtime-changes">Ownership and runtime changes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Tendons.html#choosing-and-tuning-a-model">Choosing and tuning a model</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimMatlab.html">RaisimMatlab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../Tendons.html">Tendons</a></li>
+      <li class="breadcrumb-item active">Tendon code examples</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tendon-code-examples">
+<h1>Tendon code examples<a class="headerlink" href="#tendon-code-examples" title="Link to this heading"></a></h1>
+<p>These examples show the C++ needed for individual tendon behaviors. Every block
+below is included directly from the runnable <code class="docutils literal notranslate"><span class="pre">tendon_recipes.cpp</span></code> source.
+The program also checks the resulting motion, forces, and exported state, so
+these are executable examples with physical acceptance checks.</p>
+<p>Download <a class="reference download internal" download="" href="../../_downloads/3658286789b70ebd71b45ed90eb15d76/tendon_recipes.cpp"><code class="xref download docutils literal notranslate"><span class="pre">tendon_recipes.cpp</span></code></a>
+and its <a class="reference download internal" download="" href="../../_downloads/afcd3c424a124ead7f059ba27010ccf2/CMakeLists.txt"><code class="xref download docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code></a> into the
+same directory, or use <code class="docutils literal notranslate"><span class="pre">docs/code/tendons</span></code> in the distribution. For the larger
+interactive and TCP scenes, see <a class="reference internal" href="Examples.html"><span class="doc">Tendon examples and Rayrai</span></a>. The recipes themselves run
+headlessly and print measurements.</p>
+<section id="build-and-run-the-recipes">
+<h2>Build and run the recipes<a class="headerlink" href="#build-and-run-the-recipes" title="Link to this heading"></a></h2>
+<p>From the <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> root on Linux:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-S<span class="w"> </span>docs/code/tendons<span class="w"> </span>-B<span class="w"> </span>/tmp/raisim-tendon-recipes<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span>-DCMAKE_CXX_COMPILER<span class="o">=</span>clang++-20<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-DCMAKE_PREFIX_PATH<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PWD</span><span class="s2">/raisim&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-DRAISIM_RECIPE_ACTIVATION_KEY<span class="o">=</span>/path/to/activation.raisim
+cmake<span class="w"> </span>--build<span class="w"> </span>/tmp/raisim-tendon-recipes<span class="w"> </span>--parallel<span class="w"> </span><span class="m">12</span>
+/tmp/raisim-tendon-recipes/tendon_recipes<span class="w"> </span>limit<span class="w"> </span>/path/to/activation.raisim
+ctest<span class="w"> </span>--test-dir<span class="w"> </span>/tmp/raisim-tendon-recipes<span class="w"> </span>-j<span class="w"> </span><span class="m">12</span><span class="w"> </span>--output-on-failure
+</pre></div>
+</div>
+<p>Set the prefix to the installed RaiSim package directory if its location differs.
+On macOS and Windows, use the platform’s compiler setup and build directory;
+omit the Linux compiler override. Multi-configuration generators also need
+<code class="docutils literal notranslate"><span class="pre">--config</span> <span class="pre">Release</span></code> when building and <code class="docutils literal notranslate"><span class="pre">-C</span> <span class="pre">Release</span></code> for CTest. Their executable
+normally resides in a configuration subdirectory such as <code class="docutils literal notranslate"><span class="pre">Release</span></code>. On Windows,
+make the RaiSim package’s runtime DLLs discoverable as described in
+<a class="reference internal" href="../Installation.html"><span class="doc">Installation</span></a>.</p>
+<p>The command syntax is <code class="docutils literal notranslate"><span class="pre">tendon_recipes</span> <span class="pre">CASE</span> <span class="pre">[ACTIVATION_KEY|-]</span> <span class="pre">[EXPORT_XML]</span></code>.
+Omit the key argument or use <code class="docutils literal notranslate"><span class="pre">-</span></code> for normal license discovery. The CMake key
+setting is optional and affects CTest. The <code class="docutils literal notranslate"><span class="pre">export</span></code> case also requires an
+absolute output filename in an existing directory, for example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>/tmp/raisim-tendon-recipes/tendon_recipes<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-<span class="w"> </span>/tmp/tendon-recipe.xml
+</pre></div>
+</div>
+<p>Available cases are <code class="docutils literal notranslate"><span class="pre">limit</span></code>, <code class="docutils literal notranslate"><span class="pre">lock</span></code>, <code class="docutils literal notranslate"><span class="pre">spring</span></code>, <code class="docutils literal notranslate"><span class="pre">force</span></code>, <code class="docutils literal notranslate"><span class="pre">servo</span></code>,
+<code class="docutils literal notranslate"><span class="pre">wrap</span></code>, <code class="docutils literal notranslate"><span class="pre">fixed</span></code>, <code class="docutils literal notranslate"><span class="pre">coupling</span></code>, <code class="docutils literal notranslate"><span class="pre">export</span></code>, and <code class="docutils literal notranslate"><span class="pre">straight</span></code>. Each has a CTest
+entry; the <code class="docutils literal notranslate"><span class="pre">straight</span></code> case runs the three straight-tendon examples below. Export
+writes the supplied file, so choose an output path you intend to replace.</p>
+<p>The fragments below are function bodies. To use one in your own program,
+include <code class="docutils literal notranslate"><span class="pre">&lt;raisim/World.hpp&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;iostream&gt;</span></code>, initialize your license before
+creating the world, and provide this shared alias and stepping helper:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">Path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">Tendon</span><span class="o">::</span><span class="n">PathElement</span><span class="p">;</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">advance</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">&amp;</span><span class="w"> </span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">steps</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">steps</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">integrate</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="limit-the-maximum-separation">
+<h2>Limit the maximum separation<a class="headerlink" href="#limit-the-maximum-separation" title="Link to this heading"></a></h2>
+<p>Run <code class="docutils literal notranslate"><span class="pre">tendon_recipes</span> <span class="pre">limit</span></code>. A 1 kg load starts at 1 m with an outward velocity
+of 2 m/s. It stops at the 1.2 m upper bound. No spring or actuator is needed for
+a hard length limit.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setGravity</span><span class="p">({</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">});</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">load</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="n">load</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">);</span>
+<span class="n">load</span><span class="o">-&gt;</span><span class="n">setLinearVelocity</span><span class="p">({</span><span class="mf">2.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">});</span>
+
+<span class="n">raisim</span><span class="o">::</span><span class="n">Tendon</span><span class="o">::</span><span class="n">Properties</span><span class="w"> </span><span class="n">p</span><span class="p">;</span>
+<span class="n">p</span><span class="p">.</span><span class="n">upperLimit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.2</span><span class="p">;</span><span class="w">  </span><span class="c1">// Maximum distance from the world origin, in metres.</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">cable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSpatialTendon</span><span class="p">(</span><span class="s">&quot;stop&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="k">nullptr</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">}}),</span><span class="w"> </span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="n">load</span><span class="p">})},</span><span class="w"> </span><span class="n">p</span><span class="p">);</span>
+
+<span class="n">advance</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">1000</span><span class="p">);</span>
+<span class="n">cable</span><span class="o">-&gt;</span><span class="n">updateGeometry</span><span class="p">();</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;length=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">cable</span><span class="o">-&gt;</span><span class="n">getLength</span><span class="p">()</span>
+<span class="w">          </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; speed=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">cable</span><span class="o">-&gt;</span><span class="n">getVelocity</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>For a minimum separation, set <code class="docutils literal notranslate"><span class="pre">lowerLimit</span></code> instead. To allow only an interval,
+set both bounds, for example <code class="docutils literal notranslate"><span class="pre">lowerLimit</span> <span class="pre">=</span> <span class="pre">0.8</span></code> and <code class="docutils literal notranslate"><span class="pre">upperLimit</span> <span class="pre">=</span> <span class="pre">1.2</span></code>.
+<code class="docutils literal notranslate"><span class="pre">limitMargin</span></code> moves the unilateral activation boundaries inward.</p>
+</section>
+<section id="lock-the-current-length">
+<h2>Lock the current length<a class="headerlink" href="#lock-the-current-length" title="Link to this heading"></a></h2>
+<p>Run <code class="docutils literal notranslate"><span class="pre">tendon_recipes</span> <span class="pre">lock</span></code>. Refresh geometry and assign the current length to
+both limits. The load can still swing: only its distance from the anchor is
+constrained. This is the tendon equivalent of a bilateral straight wire.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setGravity</span><span class="p">({</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">-9.81</span><span class="p">});</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">load</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="n">load</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">);</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">cable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSpatialTendon</span><span class="p">(</span><span class="s">&quot;pendulum&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="k">nullptr</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">2.</span><span class="p">}}),</span><span class="w"> </span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="n">load</span><span class="p">})});</span>
+
+<span class="n">cable</span><span class="o">-&gt;</span><span class="n">updateGeometry</span><span class="p">();</span><span class="w">  </span><span class="c1">// Also do this after manually changing poses.</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">lockedLength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cable</span><span class="o">-&gt;</span><span class="n">getLength</span><span class="p">();</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cable</span><span class="o">-&gt;</span><span class="n">getProperties</span><span class="p">();</span>
+<span class="n">p</span><span class="p">.</span><span class="n">lowerLimit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lockedLength</span><span class="p">;</span>
+<span class="n">p</span><span class="p">.</span><span class="n">upperLimit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lockedLength</span><span class="p">;</span>
+<span class="n">p</span><span class="p">.</span><span class="n">limitCompliance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.</span><span class="p">;</span><span class="w">   </span><span class="c1">// Hard bilateral length constraint.</span>
+<span class="n">p</span><span class="p">.</span><span class="n">positionCorrection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.2</span><span class="p">;</span>
+<span class="n">cable</span><span class="o">-&gt;</span><span class="n">setProperties</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+
+<span class="n">load</span><span class="o">-&gt;</span><span class="n">setLinearVelocity</span><span class="p">({</span><span class="mf">0.4</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">});</span><span class="w">  </span><span class="c1">// The load may swing around the anchor.</span>
+<span class="n">advance</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">2000</span><span class="p">);</span>
+<span class="n">cable</span><span class="o">-&gt;</span><span class="n">updateGeometry</span><span class="p">();</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;locked=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">lockedLength</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; actual=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">cable</span><span class="o">-&gt;</span><span class="n">getLength</span><span class="p">()</span>
+<span class="w">          </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; reaction=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">cable</span><span class="o">-&gt;</span><span class="n">getLimitForce</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Equal bounds select a bilateral row; <code class="docutils literal notranslate"><span class="pre">limitMargin</span></code> is ignored for this lock.
+<code class="docutils literal notranslate"><span class="pre">positionCorrection</span></code> controls error correction, so setting a target different
+from the current length does not teleport the body. To soften the lock, use
+positive <code class="docutils literal notranslate"><span class="pre">limitCompliance</span></code>; see <a class="reference internal" href="Physics.html"><span class="doc">Tendon physics</span></a> for its discrete meaning.</p>
+<p>To release the lock later, reset only its limits. Include <code class="docutils literal notranslate"><span class="pre">&lt;limits&gt;</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">released</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cable</span><span class="o">-&gt;</span><span class="n">getProperties</span><span class="p">();</span>
+<span class="n">released</span><span class="p">.</span><span class="n">lowerLimit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;::</span><span class="n">infinity</span><span class="p">();</span>
+<span class="n">released</span><span class="p">.</span><span class="n">upperLimit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;::</span><span class="n">infinity</span><span class="p">();</span>
+<span class="n">cable</span><span class="o">-&gt;</span><span class="n">setProperties</span><span class="p">(</span><span class="n">released</span><span class="p">);</span><span class="w"> </span><span class="c1">// Retain other properties and drive settings.</span>
+</pre></div>
+</div>
+<p>Springs, drives, and other configured effects remain active. The <code class="docutils literal notranslate"><span class="pre">lock</span></code> case
+also checks that the load can move beyond the former bound after release.</p>
+</section>
+<section id="suspend-a-load-with-a-slack-spring">
+<h2>Suspend a load with a slack spring<a class="headerlink" href="#suspend-a-load-with-a-slack-spring" title="Link to this heading"></a></h2>
+<p>Run <code class="docutils literal notranslate"><span class="pre">tendon_recipes</span> <span class="pre">spring</span></code>. A vertical 1 kg load settles near
+<code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">+</span> <span class="pre">9.81</span> <span class="pre">/</span> <span class="pre">200</span> <span class="pre">=</span> <span class="pre">1.04905</span></code> m. Dry friction permits a small equilibrium band
+around that value. Damping dissipates oscillation, while armature adds inertia
+along the tendon coordinate.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setGravity</span><span class="p">({</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">-9.81</span><span class="p">});</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">load</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="n">load</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">);</span>
+
+<span class="n">raisim</span><span class="o">::</span><span class="n">Tendon</span><span class="o">::</span><span class="n">Properties</span><span class="w"> </span><span class="n">p</span><span class="p">;</span>
+<span class="n">p</span><span class="p">.</span><span class="n">springLower</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.</span><span class="p">;</span>
+<span class="n">p</span><span class="p">.</span><span class="n">springUpper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span><span class="w">      </span><span class="c1">// Spring is slack below 1 m.</span>
+<span class="n">p</span><span class="p">.</span><span class="n">stiffness</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">200.</span><span class="p">;</span><span class="w">      </span><span class="c1">// N/m.</span>
+<span class="n">p</span><span class="p">.</span><span class="n">damping</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">12.</span><span class="p">;</span><span class="w">         </span><span class="c1">// N s/m; remains active inside the slack interval.</span>
+<span class="n">p</span><span class="p">.</span><span class="n">frictionLoss</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.05</span><span class="p">;</span><span class="w">   </span><span class="c1">// N of dry friction along the transmission.</span>
+<span class="n">p</span><span class="p">.</span><span class="n">armature</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.1</span><span class="p">;</span><span class="w">        </span><span class="c1">// kg of added transmission inertia.</span>
+<span class="n">p</span><span class="p">.</span><span class="n">upperLimit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.8</span><span class="p">;</span><span class="w">      </span><span class="c1">// Independent safety bound.</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">cable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSpatialTendon</span><span class="p">(</span><span class="s">&quot;spring&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="k">nullptr</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">2.</span><span class="p">}}),</span><span class="w"> </span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="n">load</span><span class="p">})},</span><span class="w"> </span><span class="n">p</span><span class="p">);</span>
+
+<span class="n">advance</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">4000</span><span class="p">);</span>
+<span class="n">cable</span><span class="o">-&gt;</span><span class="n">updateGeometry</span><span class="p">();</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;length=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">cable</span><span class="o">-&gt;</span><span class="n">getLength</span><span class="p">()</span>
+<span class="w">          </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; tension=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">cable</span><span class="o">-&gt;</span><span class="n">getTension</span><span class="p">()</span>
+<span class="w">          </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; spring_energy=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">cable</span><span class="o">-&gt;</span><span class="n">getPotentialEnergy</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>For a spring that also resists compression, set both spring endpoints to the
+same rest length. The spring interval, hard limit, and actuator target are
+independent. A slack spring can still have damping or friction force.</p>
+</section>
+<section id="apply-a-bounded-tension-command">
+<h2>Apply a bounded tension command<a class="headerlink" href="#apply-a-bounded-tension-command" title="Link to this heading"></a></h2>
+<p>Run <code class="docutils literal notranslate"><span class="pre">tendon_recipes</span> <span class="pre">force</span></code>. The requested 5 N tension is limited to 4 N. In
+zero gravity, the 1 kg load reaches -0.4 m/s after 0.1 s. Negative signed actuator
+force pulls toward shorter length.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setGravity</span><span class="p">({</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">});</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">load</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="n">load</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">2.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">);</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">cable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSpatialTendon</span><span class="p">(</span><span class="s">&quot;motor&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="k">nullptr</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">}}),</span><span class="w"> </span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="n">load</span><span class="p">})});</span>
+
+<span class="k">auto</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cable</span><span class="o">-&gt;</span><span class="n">getProperties</span><span class="p">();</span>
+<span class="n">p</span><span class="p">.</span><span class="n">actuationLower</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">-4.</span><span class="p">;</span><span class="w">  </span><span class="c1">// Up to 4 N pulling.</span>
+<span class="n">p</span><span class="p">.</span><span class="n">actuationUpper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.</span><span class="p">;</span><span class="w">   </span><span class="c1">// No pushing from the actuator.</span>
+<span class="n">cable</span><span class="o">-&gt;</span><span class="n">setProperties</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+<span class="n">cable</span><span class="o">-&gt;</span><span class="n">setDrive</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">Tendon</span><span class="o">::</span><span class="n">Drive</span><span class="p">{});</span><span class="w"> </span><span class="c1">// Clear any previous servo/filter.</span>
+<span class="n">cable</span><span class="o">-&gt;</span><span class="n">setTension</span><span class="p">(</span><span class="mf">5.</span><span class="p">);</span><span class="w">   </span><span class="c1">// Requests F = -5 N; the actuator clamps this to -4 N.</span>
+
+<span class="n">advance</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">);</span><span class="w">     </span><span class="c1">// 0.1 s: a 1 kg load acquires -0.4 m/s.</span>
+<span class="n">cable</span><span class="o">-&gt;</span><span class="n">updateGeometry</span><span class="p">();</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;actuator_force=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">cable</span><span class="o">-&gt;</span><span class="n">getActuationForce</span><span class="p">()</span>
+<span class="w">          </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; velocity_x=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">load</span><span class="o">-&gt;</span><span class="n">getLinearVelocity</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>A fresh <code class="docutils literal notranslate"><span class="pre">Drive{}</span></code> clears previous gains, targets, and activation filtering.
+Calling <code class="docutils literal notranslate"><span class="pre">setTension()</span></code> alone preserves those settings. The actuator bounds do
+not clamp passive springs, friction, or limit/coupling reactions.</p>
+</section>
+<section id="control-the-length-with-a-servo">
+<h2>Control the length with a servo<a class="headerlink" href="#control-the-length-with-a-servo" title="Link to this heading"></a></h2>
+<p>Run <code class="docutils literal notranslate"><span class="pre">tendon_recipes</span> <span class="pre">servo</span></code>. A pull-only winch lifts the suspended load from a
+1.2 m cable length toward 0.8 m. Feedforward compensates gravity in this vertical
+configuration, while position/velocity feedback controls the transient.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setGravity</span><span class="p">({</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">-9.81</span><span class="p">});</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">load</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="n">load</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">);</span>
+
+<span class="n">raisim</span><span class="o">::</span><span class="n">Tendon</span><span class="o">::</span><span class="n">Properties</span><span class="w"> </span><span class="n">p</span><span class="p">;</span>
+<span class="n">p</span><span class="p">.</span><span class="n">actuationLower</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">-30.</span><span class="p">;</span>
+<span class="n">p</span><span class="p">.</span><span class="n">actuationUpper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.</span><span class="p">;</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">cable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSpatialTendon</span><span class="p">(</span><span class="s">&quot;winch&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="k">nullptr</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">2.</span><span class="p">}}),</span><span class="w"> </span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="n">load</span><span class="p">})},</span><span class="w"> </span><span class="n">p</span><span class="p">);</span>
+<span class="n">raisim</span><span class="o">::</span><span class="n">Tendon</span><span class="o">::</span><span class="n">Drive</span><span class="w"> </span><span class="n">drive</span><span class="p">;</span>
+<span class="n">drive</span><span class="p">.</span><span class="n">targetLength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.8</span><span class="p">;</span>
+<span class="n">drive</span><span class="p">.</span><span class="n">targetVelocity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.</span><span class="p">;</span>
+<span class="n">drive</span><span class="p">.</span><span class="n">positionGain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">200.</span><span class="p">;</span>
+<span class="n">drive</span><span class="p">.</span><span class="n">velocityGain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">25.</span><span class="p">;</span>
+<span class="n">drive</span><span class="p">.</span><span class="n">force</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">-9.81</span><span class="p">;</span><span class="w">      </span><span class="c1">// Feedforward balances this 1 kg vertical load.</span>
+<span class="n">drive</span><span class="p">.</span><span class="n">activationTime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.05</span><span class="p">;</span><span class="w"> </span><span class="c1">// Filters feedforward; gains remain implicit.</span>
+<span class="n">cable</span><span class="o">-&gt;</span><span class="n">setDrive</span><span class="p">(</span><span class="n">drive</span><span class="p">);</span>
+
+<span class="n">advance</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">3000</span><span class="p">);</span>
+<span class="n">cable</span><span class="o">-&gt;</span><span class="n">updateGeometry</span><span class="p">();</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;target=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">drive</span><span class="p">.</span><span class="n">targetLength</span>
+<span class="w">          </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; actual=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">cable</span><span class="o">-&gt;</span><span class="n">getLength</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>For a moving target, copy <code class="docutils literal notranslate"><span class="pre">getDrive()</span></code>, update <code class="docutils literal notranslate"><span class="pre">targetLength</span></code> and optionally
+<code class="docutils literal notranslate"><span class="pre">targetVelocity</span></code>, call <code class="docutils literal notranslate"><span class="pre">setDrive()</span></code>, and then integrate each step.
+<code class="docutils literal notranslate"><span class="pre">activationTime</span></code> filters the feedforward force; it does not delay the target
+or filter the feedback gains. The gravity-compensation value depends on the
+actual routing and load and must be recomputed for other mechanisms.</p>
+</section>
+<section id="route-over-a-cylinder-and-add-a-pulley-branch">
+<h2>Route over a cylinder and add a pulley branch<a class="headerlink" href="#route-over-a-cylinder-and-add-a-pulley-branch" title="Link to this heading"></a></h2>
+<p>Run <code class="docutils literal notranslate"><span class="pre">tendon_recipes</span> <span class="pre">wrap</span></code>. The two main loads receive 4 N upward, and the
+independent divisor-2 output branch receives 2 N. Their first-step vertical
+velocities are approximately 0.004 and 0.002 m/s, respectively. Add <code class="docutils literal notranslate"><span class="pre">&lt;cmath&gt;</span></code>
+when copying this fragment.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setGravity</span><span class="p">({</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">});</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">left</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">right</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="n">left</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">-0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">1.</span><span class="p">);</span>
+<span class="n">right</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">1.</span><span class="p">);</span>
+<span class="n">output</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">3.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">1.</span><span class="p">);</span>
+
+<span class="c1">// This static body makes the guide visible. Its collision masks are zero.</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">wheel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addCylinder</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">0.2</span><span class="p">,</span><span class="w"> </span><span class="mf">1.</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;default&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="n">wheel</span><span class="o">-&gt;</span><span class="n">setBodyType</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">BodyType</span><span class="o">::</span><span class="n">STATIC</span><span class="p">);</span>
+<span class="n">wheel</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">2.</span><span class="p">);</span>
+<span class="n">wheel</span><span class="o">-&gt;</span><span class="n">setOrientation</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">0.5</span><span class="p">),</span><span class="w"> </span><span class="o">-</span><span class="n">std</span><span class="o">::</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">0.5</span><span class="p">),</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">guide</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="o">::</span><span class="n">cylinder</span><span class="p">({</span><span class="n">wheel</span><span class="p">},</span><span class="w"> </span><span class="mf">0.5</span><span class="p">);</span><span class="w"> </span><span class="c1">// Local Z axis becomes world Y.</span>
+<span class="n">guide</span><span class="p">.</span><span class="n">withSideSite</span><span class="p">({</span><span class="k">nullptr</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">3.</span><span class="p">}});</span><span class="w"> </span><span class="c1">// Route over the wheel.</span>
+
+<span class="n">raisim</span><span class="o">::</span><span class="n">Tendon</span><span class="o">::</span><span class="n">Properties</span><span class="w"> </span><span class="n">p</span><span class="p">;</span>
+<span class="n">p</span><span class="p">.</span><span class="n">width</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.01</span><span class="p">;</span>
+<span class="n">p</span><span class="p">.</span><span class="n">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">1.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.55</span><span class="p">,</span><span class="w"> </span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="mf">1.</span><span class="p">};</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">cable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSpatialTendon</span><span class="p">(</span><span class="s">&quot;pulley&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="n">left</span><span class="p">}),</span><span class="w"> </span><span class="n">guide</span><span class="p">,</span><span class="w"> </span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="n">right</span><span class="p">}),</span>
+<span class="w">    </span><span class="n">Path</span><span class="o">::</span><span class="n">pulley</span><span class="p">(</span><span class="mf">2.</span><span class="p">),</span><span class="w">  </span><span class="c1">// Begins an independent branch at half force.</span>
+<span class="w">    </span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="k">nullptr</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">3.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">3.</span><span class="p">}}),</span><span class="w"> </span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="n">output</span><span class="p">})},</span><span class="w"> </span><span class="n">p</span><span class="p">);</span>
+<span class="n">cable</span><span class="o">-&gt;</span><span class="n">setTension</span><span class="p">(</span><span class="mf">4.</span><span class="p">);</span><span class="w">  </span><span class="c1">// Main branch: 4 N; output branch: 2 N.</span>
+<span class="n">world</span><span class="p">.</span><span class="n">integrate</span><span class="p">();</span>
+<span class="n">cable</span><span class="o">-&gt;</span><span class="n">updateGeometry</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;left_vz=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">left</span><span class="o">-&gt;</span><span class="n">getLinearVelocity</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span>
+<span class="w">          </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; output_vz=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">output</span><span class="o">-&gt;</span><span class="n">getLinearVelocity</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span>
+<span class="w">          </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; drawing_segments=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">cable</span><span class="o">-&gt;</span><span class="n">getVisualSegments</span><span class="p">().</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">{wheel}</span></code> locates the routing guide at that body’s origin. The cylinder axis
+is local +Z; the body’s orientation rotates it into world Y. The top side site
+retains the overhead route. <code class="docutils literal notranslate"><span class="pre">pulley(2)</span></code> begins a separate branch rather than
+creating a segment from <code class="docutils literal notranslate"><span class="pre">right</span></code> to the output anchor.</p>
+<p>To wrap a sphere, use <code class="docutils literal notranslate"><span class="pre">Path::sphere(centerSite,</span> <span class="pre">radius)</span></code> with suitably placed
+endpoints. The wrapping primitive is separate from collision geometry: the
+static cylinder above exists to show the wheel. <code class="docutils literal notranslate"><span class="pre">updateGeometry(true)</span></code> exposes
+the route for inspection; normal Rayrai rendering draws it automatically.</p>
+</section>
+<section id="drive-a-weighted-joint-coordinate">
+<h2>Drive a weighted joint coordinate<a class="headerlink" href="#drive-a-weighted-joint-coordinate" title="Link to this heading"></a></h2>
+<p>Run <code class="docutils literal notranslate"><span class="pre">tendon_recipes</span> <span class="pre">fixed</span></code>. This small model supplies two independent
+prismatic joints with unit moving masses. It needs no external URDF file.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">ArticulatedSystem</span><span class="o">*</span><span class="w"> </span><span class="nf">makeTwoSliders</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">&amp;</span><span class="w"> </span><span class="n">world</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// Two independent 1 kg sliders on a fixed base; no external model file.</span>
+<span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">Body</span><span class="w"> </span><span class="n">body</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">Mat</span><span class="o">&lt;</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;::</span><span class="n">getIdentity</span><span class="p">(),</span><span class="w"> </span><span class="p">{</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">});</span>
+<span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">Joint</span><span class="w"> </span><span class="n">base</span><span class="p">;</span>
+<span class="w">  </span><span class="n">base</span><span class="p">.</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">Joint</span><span class="o">::</span><span class="n">FIXED</span><span class="p">;</span>
+<span class="w">  </span><span class="n">base</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;base&quot;</span><span class="p">;</span>
+<span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">Child</span><span class="w"> </span><span class="n">root</span><span class="p">(</span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">base</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;base&quot;</span><span class="p">);</span>
+<span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">Joint</span><span class="w"> </span><span class="n">x</span><span class="p">({</span><span class="mf">1.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">},</span>
+<span class="w">      </span><span class="n">raisim</span><span class="o">::</span><span class="n">Mat</span><span class="o">&lt;</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;::</span><span class="n">getIdentity</span><span class="p">(),</span><span class="w"> </span><span class="p">{</span><span class="mf">-10.</span><span class="p">,</span><span class="w"> </span><span class="mf">10.</span><span class="p">},</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">Joint</span><span class="o">::</span><span class="n">PRISMATIC</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;x&quot;</span><span class="p">);</span>
+<span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">Joint</span><span class="w"> </span><span class="n">y</span><span class="p">({</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">1.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">},</span>
+<span class="w">      </span><span class="n">raisim</span><span class="o">::</span><span class="n">Mat</span><span class="o">&lt;</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;::</span><span class="n">getIdentity</span><span class="p">(),</span><span class="w"> </span><span class="p">{</span><span class="mf">-10.</span><span class="p">,</span><span class="w"> </span><span class="mf">10.</span><span class="p">},</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">Joint</span><span class="o">::</span><span class="n">PRISMATIC</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;y&quot;</span><span class="p">);</span>
+<span class="w">  </span><span class="n">root</span><span class="p">.</span><span class="n">addChild</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">Child</span><span class="p">(</span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;link_x&quot;</span><span class="p">));</span>
+<span class="w">  </span><span class="n">root</span><span class="p">.</span><span class="n">addChild</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">Child</span><span class="p">(</span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;link_y&quot;</span><span class="p">));</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addArticulatedSystem</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The tendon drives <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">+</span> <span class="pre">0.5*y</span></code> toward 0.5. For these masses, zero initial state,
+and no other forces, the resulting joint coordinates approach 0.4 and 0.2.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setGravity</span><span class="p">({</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">});</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">robot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">makeTwoSliders</span><span class="p">(</span><span class="n">world</span><span class="p">);</span>
+<span class="n">robot</span><span class="o">-&gt;</span><span class="n">setGeneralizedCoordinate</span><span class="p">({</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">});</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">transmission</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addFixedTendon</span><span class="p">(</span><span class="s">&quot;differential&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">{</span><span class="n">robot</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;x&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="n">robot</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;y&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">}});</span>
+
+<span class="n">raisim</span><span class="o">::</span><span class="n">Tendon</span><span class="o">::</span><span class="n">Drive</span><span class="w"> </span><span class="n">drive</span><span class="p">;</span>
+<span class="n">drive</span><span class="p">.</span><span class="n">targetLength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5</span><span class="p">;</span><span class="w"> </span><span class="c1">// x + 0.5*y = 0.5; individual joints remain free.</span>
+<span class="n">drive</span><span class="p">.</span><span class="n">positionGain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">200.</span><span class="p">;</span>
+<span class="n">drive</span><span class="p">.</span><span class="n">velocityGain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">20.</span><span class="p">;</span>
+<span class="n">transmission</span><span class="o">-&gt;</span><span class="n">setDrive</span><span class="p">(</span><span class="n">drive</span><span class="p">);</span>
+<span class="n">advance</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">2000</span><span class="p">);</span>
+<span class="n">transmission</span><span class="o">-&gt;</span><span class="n">updateGeometry</span><span class="p">();</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;transmission=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">transmission</span><span class="o">-&gt;</span><span class="n">getLength</span><span class="p">()</span>
+<span class="w">          </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; joints=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getGeneralizedCoordinate</span><span class="p">().</span><span class="n">e</span><span class="p">().</span><span class="n">transpose</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Replace the model helper with your robot and use its revolute/prismatic joint
+names. The tendon constrains or drives the weighted sum, leaving other motion
+possible. Coefficients on revolute joints carry the chosen transmission units.
+A fixed tendon has no spatial cable line; <a class="reference internal" href="Examples.html"><span class="doc">Tendon examples and Rayrai</span></a> includes a visible
+mechanism combining a fixed actuator with spatial cables.</p>
+</section>
+<section id="couple-two-visible-cable-lengths">
+<h2>Couple two visible cable lengths<a class="headerlink" href="#couple-two-visible-cable-lengths" title="Link to this heading"></a></h2>
+<p>Run <code class="docutils literal notranslate"><span class="pre">tendon_recipes</span> <span class="pre">coupling</span></code>. Tendon A extends by 0.2 m and tendon B shortens
+by 0.13 m. Creation poses establish the references, so initialize the bodies
+before adding the tendons.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setGravity</span><span class="p">({</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">});</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setContactSolverParam</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span><span class="w"> </span><span class="mf">1.</span><span class="p">,</span><span class="w"> </span><span class="mf">1.</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="mf">1e-12</span><span class="p">);</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">firstLoad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">secondLoad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="n">firstLoad</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">);</span>
+<span class="n">secondLoad</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span><span class="w"> </span><span class="mf">2.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">);</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSpatialTendon</span><span class="p">(</span><span class="s">&quot;A&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="k">nullptr</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">}}),</span><span class="w"> </span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="n">firstLoad</span><span class="p">})});</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSpatialTendon</span><span class="p">(</span><span class="s">&quot;B&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="k">nullptr</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">2.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">}}),</span><span class="w"> </span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="n">secondLoad</span><span class="p">})});</span>
+
+<span class="n">raisim</span><span class="o">::</span><span class="n">TendonCoupling</span><span class="o">::</span><span class="n">Properties</span><span class="w"> </span><span class="n">relation</span><span class="p">;</span>
+<span class="n">relation</span><span class="p">.</span><span class="n">coefficients</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.65</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">};</span>
+<span class="n">world</span><span class="p">.</span><span class="n">addTendonCoupling</span><span class="p">(</span><span class="s">&quot;ratio&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">relation</span><span class="p">);</span><span class="w"> </span><span class="c1">// delta B = -0.65 * delta A.</span>
+<span class="n">raisim</span><span class="o">::</span><span class="n">Tendon</span><span class="o">::</span><span class="n">Drive</span><span class="w"> </span><span class="n">drive</span><span class="p">;</span>
+<span class="n">drive</span><span class="p">.</span><span class="n">targetLength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="o">-&gt;</span><span class="n">getReferenceLength</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.2</span><span class="p">;</span>
+<span class="n">drive</span><span class="p">.</span><span class="n">positionGain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">100.</span><span class="p">;</span>
+<span class="n">drive</span><span class="p">.</span><span class="n">velocityGain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">20.</span><span class="p">;</span>
+<span class="n">a</span><span class="o">-&gt;</span><span class="n">setDrive</span><span class="p">(</span><span class="n">drive</span><span class="p">);</span>
+<span class="n">advance</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">3000</span><span class="p">);</span>
+<span class="n">a</span><span class="o">-&gt;</span><span class="n">updateGeometry</span><span class="p">();</span>
+<span class="n">b</span><span class="o">-&gt;</span><span class="n">updateGeometry</span><span class="p">();</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">deltaA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="o">-&gt;</span><span class="n">getLength</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">a</span><span class="o">-&gt;</span><span class="n">getReferenceLength</span><span class="p">();</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">deltaB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b</span><span class="o">-&gt;</span><span class="n">getLength</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">b</span><span class="o">-&gt;</span><span class="n">getReferenceLength</span><span class="p">();</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;delta_A=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">deltaA</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; delta_B=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">deltaB</span>
+<span class="w">          </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; residual=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">deltaB</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.65</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">deltaA</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Argument order matters: the first tendon is the dependent coordinate. This
+example passes <code class="docutils literal notranslate"><span class="pre">b</span></code> first and <code class="docutils literal notranslate"><span class="pre">a</span></code> second. The coefficient array is constant
+term first; <code class="docutils literal notranslate"><span class="pre">{0.,</span> <span class="pre">2.,</span> <span class="pre">0.1,</span> <span class="pre">0.,</span> <span class="pre">0.}</span></code> instead means
+<code class="docutils literal notranslate"><span class="pre">deltaB</span> <span class="pre">=</span> <span class="pre">2*deltaA</span> <span class="pre">+</span> <span class="pre">0.1*deltaA*deltaA</span></code>. Passing <code class="docutils literal notranslate"><span class="pre">nullptr</span></code> as the second tendon
+locks the first relative to its creation reference plus the constant term.</p>
+</section>
+<section id="inspect-style-export-and-reload">
+<h2>Inspect, style, export, and reload<a class="headerlink" href="#inspect-style-export-and-reload" title="Link to this heading"></a></h2>
+<p>Run the <code class="docutils literal notranslate"><span class="pre">export</span></code> case with an absolute output filename. The file preserves
+attachment names, appearance, limits, and the current force command. Add
+<code class="docutils literal notranslate"><span class="pre">&lt;stdexcept&gt;</span></code> when copying the fragment and supply <code class="docutils literal notranslate"><span class="pre">exportPath</span></code> as a string.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setGravity</span><span class="p">({</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">-9.81</span><span class="p">});</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">load</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="n">load</span><span class="o">-&gt;</span><span class="n">setName</span><span class="p">(</span><span class="s">&quot;load&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// Native XML resolves attachments by object name.</span>
+<span class="n">load</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">);</span>
+<span class="n">raisim</span><span class="o">::</span><span class="n">Tendon</span><span class="o">::</span><span class="n">Properties</span><span class="w"> </span><span class="n">p</span><span class="p">;</span>
+<span class="n">p</span><span class="p">.</span><span class="n">upperLimit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.2</span><span class="p">;</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">cable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSpatialTendon</span><span class="p">(</span><span class="s">&quot;saved_cable&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="k">nullptr</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">2.</span><span class="p">}}),</span><span class="w"> </span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="n">load</span><span class="p">})},</span><span class="w"> </span><span class="n">p</span><span class="p">);</span>
+<span class="n">cable</span><span class="o">-&gt;</span><span class="n">setTension</span><span class="p">(</span><span class="mf">2.</span><span class="p">);</span>
+
+<span class="k">auto</span><span class="w"> </span><span class="n">appearance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cable</span><span class="o">-&gt;</span><span class="n">getProperties</span><span class="p">();</span>
+<span class="n">appearance</span><span class="p">.</span><span class="n">width</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.012</span><span class="p">;</span><span class="w"> </span><span class="c1">// Visual radius, not collision thickness.</span>
+<span class="n">appearance</span><span class="p">.</span><span class="n">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="mf">0.9</span><span class="p">,</span><span class="w"> </span><span class="mf">0.75</span><span class="p">,</span><span class="w"> </span><span class="mf">1.</span><span class="p">};</span>
+<span class="n">cable</span><span class="o">-&gt;</span><span class="n">setProperties</span><span class="p">(</span><span class="n">appearance</span><span class="p">);</span>
+<span class="n">cable</span><span class="o">-&gt;</span><span class="n">updateGeometry</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">segment</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">cable</span><span class="o">-&gt;</span><span class="n">getVisualSegments</span><span class="p">())</span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;segment &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">segment</span><span class="p">.</span><span class="n">start</span><span class="p">.</span><span class="n">e</span><span class="p">().</span><span class="n">transpose</span><span class="p">()</span>
+<span class="w">            </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; -&gt; &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">segment</span><span class="p">.</span><span class="n">end</span><span class="p">.</span><span class="n">e</span><span class="p">().</span><span class="n">transpose</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+
+<span class="n">world</span><span class="p">.</span><span class="n">exportToXml</span><span class="p">(</span><span class="n">exportPath</span><span class="p">);</span><span class="w"> </span><span class="c1">// An absolute output filename supplied by main.</span>
+<span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="nf">restored</span><span class="p">(</span><span class="n">exportPath</span><span class="p">);</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">restoredCable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">restored</span><span class="p">.</span><span class="n">getTendon</span><span class="p">(</span><span class="s">&quot;saved_cable&quot;</span><span class="p">);</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">restoredCable</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">runtime_error</span><span class="p">(</span><span class="s">&quot;missing tendon after reload&quot;</span><span class="p">);</span>
+<span class="n">advance</span><span class="p">(</span><span class="n">restored</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">);</span>
+<span class="n">restoredCable</span><span class="o">-&gt;</span><span class="n">updateGeometry</span><span class="p">();</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;reloaded_length=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">restoredCable</span><span class="o">-&gt;</span><span class="n">getLength</span><span class="p">()</span>
+<span class="w">          </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; reloaded_force=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">restoredCable</span><span class="o">-&gt;</span><span class="n">getActuationForce</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>No custom drawing loop is required in Rayrai. Geometry refresh with <code class="docutils literal notranslate"><span class="pre">true</span></code> is
+used here only to inspect segment coordinates. Alpha zero hides the cable while
+retaining its physics; <code class="docutils literal notranslate"><span class="pre">setEnabled(false)</span></code> disables both its physics and its
+drawing. Export preserves the current command, not a future C++ control schedule.
+See <a class="reference internal" href="Reference.html"><span class="doc">Tendon API and model files</span></a> for XML attributes and embedded-URDF sidecars.</p>
+</section>
+<section id="straight-connections-through-the-tendon-api">
+<h2>Straight connections through the tendon API<a class="headerlink" href="#straight-connections-through-the-tendon-api" title="Link to this heading"></a></h2>
+<p>Run <code class="docutils literal notranslate"><span class="pre">tendon_recipes</span> <span class="pre">straight</span></code> to execute these three independent worlds.
+Each connection is a two-site spatial tendon. Here a static sphere supplies the
+anchor; a null-object site can instead attach directly to the world frame.</p>
+<p>Equal limits lock separation in both directions and stop the initial outward
+velocity:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setGravity</span><span class="p">({</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">});</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">anchor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.02</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="n">anchor</span><span class="o">-&gt;</span><span class="n">setBodyType</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">BodyType</span><span class="o">::</span><span class="n">STATIC</span><span class="p">);</span>
+<span class="n">anchor</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">);</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">load</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="n">load</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">);</span>
+<span class="n">load</span><span class="o">-&gt;</span><span class="n">setLinearVelocity</span><span class="p">({</span><span class="mf">1.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">});</span>
+<span class="n">raisim</span><span class="o">::</span><span class="n">Tendon</span><span class="o">::</span><span class="n">Properties</span><span class="w"> </span><span class="n">p</span><span class="p">;</span>
+<span class="n">p</span><span class="p">.</span><span class="n">lowerLimit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">upperLimit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">tendon</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSpatialTendon</span><span class="p">(</span><span class="s">&quot;lock&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="n">anchor</span><span class="p">}),</span><span class="w"> </span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="n">load</span><span class="p">})},</span><span class="w"> </span><span class="n">p</span><span class="p">);</span>
+<span class="n">advance</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">);</span>
+<span class="n">tendon</span><span class="o">-&gt;</span><span class="n">updateGeometry</span><span class="p">();</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;target=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">tendon</span><span class="o">-&gt;</span><span class="n">getProperties</span><span class="p">().</span><span class="n">upperLimit</span>
+<span class="w">          </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; current=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">tendon</span><span class="o">-&gt;</span><span class="n">getLength</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">getLength()</span></code> is the current coordinate; <code class="docutils literal notranslate"><span class="pre">getProperties()</span></code> holds the bounds.
+A pull-only spring is slack below its rest length. The implicit update with
+0.1 m initial stretch and 100 N/m stiffness gives approximately 10 N of tension:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setGravity</span><span class="p">({</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">});</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">anchor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.02</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="n">anchor</span><span class="o">-&gt;</span><span class="n">setBodyType</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">BodyType</span><span class="o">::</span><span class="n">STATIC</span><span class="p">);</span>
+<span class="n">anchor</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">);</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">load</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="n">load</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">1.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">);</span>
+<span class="n">raisim</span><span class="o">::</span><span class="n">Tendon</span><span class="o">::</span><span class="n">Properties</span><span class="w"> </span><span class="n">p</span><span class="p">;</span>
+<span class="n">p</span><span class="p">.</span><span class="n">springLower</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.</span><span class="p">;</span>
+<span class="n">p</span><span class="p">.</span><span class="n">springUpper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.</span><span class="p">;</span>
+<span class="n">p</span><span class="p">.</span><span class="n">stiffness</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">100.</span><span class="p">;</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">tendon</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSpatialTendon</span><span class="p">(</span><span class="s">&quot;spring&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="n">anchor</span><span class="p">}),</span><span class="w"> </span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="n">load</span><span class="p">})},</span><span class="w"> </span><span class="n">p</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">integrate</span><span class="p">();</span><span class="w"> </span><span class="c1">// Implicit spring force is approximately 10 N initially.</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;tension=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">tendon</span><span class="o">-&gt;</span><span class="n">getTension</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The same tendon type supports a commanded tension without a spring or limit:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setGravity</span><span class="p">({</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">});</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">anchor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.02</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="n">anchor</span><span class="o">-&gt;</span><span class="n">setBodyType</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">BodyType</span><span class="o">::</span><span class="n">STATIC</span><span class="p">);</span>
+<span class="n">anchor</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">);</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">load</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="n">load</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">);</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">tendon</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSpatialTendon</span><span class="p">(</span><span class="s">&quot;actuator&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="n">anchor</span><span class="p">}),</span><span class="w"> </span><span class="n">Path</span><span class="o">::</span><span class="n">via</span><span class="p">({</span><span class="n">load</span><span class="p">})});</span>
+<span class="n">tendon</span><span class="o">-&gt;</span><span class="n">setTension</span><span class="p">(</span><span class="mf">4.</span><span class="p">);</span><span class="w"> </span><span class="c1">// Positive pulls the endpoints together.</span>
+<span class="n">advance</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;velocity_x=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">load</span><span class="o">-&gt;</span><span class="n">getLinearVelocity</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>For a compression-only spring, set <code class="docutils literal notranslate"><span class="pre">springLower</span> <span class="pre">=</span> <span class="pre">L</span></code> and
+<code class="docutils literal notranslate"><span class="pre">springUpper</span> <span class="pre">=</span> <span class="pre">std::numeric_limits&lt;double&gt;::infinity()</span></code>. For a bilateral
+spring, set both endpoints to L. See <a class="reference internal" href="../Constraints.html"><span class="doc">Constraints</span></a> for the complete
+migration table from the former wire API.</p>
+</section>
+<section id="python-uses-the-same-model">
+<h2>Python uses the same model<a class="headerlink" href="#python-uses-the-same-model" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">raisimpy.Tendon</span></code> exposes the same properties, routes, drives, and inspection
+methods. Properties and drive getters return copies; apply edits with the
+corresponding setter so validation and wake-up happen. The world owns tendons
+and couplings; do not use their Python handles after explicit removal or after
+removing an attached object.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">raisimpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">raisim</span>
+
+<span class="c1"># Configure the RaiSim activation key before creating the world if needed.</span>
+<span class="n">world</span> <span class="o">=</span> <span class="n">raisim</span><span class="o">.</span><span class="n">World</span><span class="p">()</span>
+<span class="n">world</span><span class="o">.</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
+<span class="n">load</span> <span class="o">=</span> <span class="n">world</span><span class="o">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="n">load</span><span class="o">.</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="n">Site</span> <span class="o">=</span> <span class="n">raisim</span><span class="o">.</span><span class="n">Tendon</span><span class="o">.</span><span class="n">Site</span>
+<span class="n">Path</span> <span class="o">=</span> <span class="n">raisim</span><span class="o">.</span><span class="n">Tendon</span><span class="o">.</span><span class="n">PathElement</span>
+<span class="n">properties</span> <span class="o">=</span> <span class="n">raisim</span><span class="o">.</span><span class="n">Tendon</span><span class="o">.</span><span class="n">Properties</span><span class="p">()</span>
+<span class="n">properties</span><span class="o">.</span><span class="n">upperLimit</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">properties</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="mf">0.01</span>
+<span class="n">properties</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+<span class="n">cable</span> <span class="o">=</span> <span class="n">world</span><span class="o">.</span><span class="n">addSpatialTendon</span><span class="p">(</span><span class="s2">&quot;cable&quot;</span><span class="p">,</span> <span class="p">[</span>
+    <span class="n">Path</span><span class="o">.</span><span class="n">via</span><span class="p">(</span><span class="n">Site</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">])),</span>
+    <span class="n">Path</span><span class="o">.</span><span class="n">via</span><span class="p">(</span><span class="n">Site</span><span class="p">(</span><span class="n">load</span><span class="p">)),</span>
+<span class="p">],</span> <span class="n">properties</span><span class="p">)</span>
+<span class="n">cable</span><span class="o">.</span><span class="n">setTension</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">world</span><span class="o">.</span><span class="n">integrate</span><span class="p">()</span>
+<span class="n">cable</span><span class="o">.</span><span class="n">updateGeometry</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cable</span><span class="o">.</span><span class="n">getLength</span><span class="p">(),</span> <span class="n">cable</span><span class="o">.</span><span class="n">getTension</span><span class="p">())</span>
+<span class="n">properties</span> <span class="o">=</span> <span class="n">cable</span><span class="o">.</span><span class="n">getProperties</span><span class="p">()</span>
+<span class="n">properties</span><span class="o">.</span><span class="n">lowerLimit</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">upperLimit</span> <span class="o">=</span> <span class="n">cable</span><span class="o">.</span><span class="n">getLength</span><span class="p">()</span>
+<span class="n">cable</span><span class="o">.</span><span class="n">setProperties</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span>
+<span class="n">world</span><span class="o">.</span><span class="n">removeTendon</span><span class="p">(</span><span class="n">cable</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../Tendons.html" class="btn btn-neutral float-left" title="Tendons" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Physics.html" class="btn btn-neutral float-right" title="Tendon physics" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -165,11 +165,17 @@ port ``59312``. With the default loopback bind, the beacon is sent to
 ``127.0.0.1``. After ``server.setBindLoopbackOnly(false)``, the beacon is
 broadcast on the local network.
 
-The viewer listens on the same UDP port, keeps compatible protocol-version
-beacons in the **Connection** tab endpoint dropdown, and removes stale entries
-after roughly eight seconds without another beacon. Discovery only fills the
-endpoint list; direct ``--connect host:port`` and manually typed endpoints
-still work when UDP broadcast is blocked.
+The viewer listens on the same UDP port and removes stale entries after roughly
+eight seconds without another beacon. One listener serves every pane. Compatible
+beacons appear in the server table a pane shows while it has no session, and in
+the **Connection** tab endpoint dropdown while it has one; both re-list at least
+every two seconds, so there is no rescan button. Discovery only fills those
+lists; direct ``--connect host:port`` and manually typed endpoints still work
+when UDP broadcast is blocked.
+
+The beacon carries the server's ``exe`` name, hostname, bind mode and whether
+its single client seat is taken, which is what fills the table's **Name**,
+**Computer** and **Availability** columns.
 
 For cross-machine connections on Windows, allow both the TCP server port
 (default ``8080``) and UDP discovery port ``59312`` through the firewall.
@@ -246,6 +252,124 @@ Command-line options
    * - ``--help``
      - Print the authoritative option list for this build.
 
+.. _split-panes:
+
+Split panes
+===========
+The viewer window can be divided into independent panes, the way terminator
+divides a terminal. Each pane is a complete viewer session — its own renderer,
+camera, TCP connection and control panels — so one window can watch several
+simulations at once, or the same simulation from several angles.
+
+.. figure:: ../image/rayrai/tcp_viewer/tcp_viewer_split_panes.png
+   :width: 100%
+   :alt: the viewer split into two panes, one attached to a server and one idle
+
+   A vertical split. The left pane is attached to ``example_anymal_contacts``
+   and shows the usual tabbed overlay; the right pane has no session yet, so it
+   shows only the connect prompt. The blue outline marks the focused pane. The
+   server row is amber and reads ``in use`` because the left pane is holding
+   that server's single client seat.
+
+Right-click a pane's 3D view to open the pane menu:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 26 22 52
+
+   * - Action
+     - Shortcut
+     - Result
+   * - **Split Horizontally**
+     - ``Ctrl+Shift+O``
+     - Horizontal divider; the new pane goes below
+   * - **Split Vertically**
+     - ``Ctrl+Shift+E``
+     - Vertical divider; the new pane goes to the right
+   * - **Close Pane**
+     - ``Ctrl+Shift+W``
+     - Closes that pane's connection and gives its space to the neighbour
+
+The menu header names the pane by its endpoint and status, so two panes are
+easy to tell apart. Right-clicking over a panel opens that panel's own
+behaviour instead — the pane menu only appears over the rendered image. The
+last remaining pane cannot be closed.
+
+Drag a divider to change the split. A divider can be dragged to 5 % of its
+region but no further, so a pane never collapses to a width you cannot grab
+back. The grab band is wider than the 2 px line it draws.
+
+Per pane and shared
+-------------------
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - Per pane
+     - Shared by every pane
+   * - Host and port, auto-connect, the connection itself
+     - Render quality, lighting, sky and weather, background, post-processing
+   * - Camera, selection, object list
+     - UI scale
+   * - Measuring, force, wire-drag and pose tools
+     - The recent-connection list and saved endpoints
+   * - Articulated-system inspector
+     - Resource search directories
+   * - Screenshots, video, session record and replay
+     - Server discovery (one UDP listener serves all panes)
+
+Render settings are edited from whichever pane's panel is in front and take
+effect everywhere on the next frame, including in a pane created afterwards.
+
+A new pane starts disconnected with auto-connect off, on the camera of the pane
+it was split from. Splitting never opens a second connection to the server you
+were already watching; pick that pane's server from its own connect prompt.
+
+Focus
+-----
+Clicking or scrolling in a pane focuses it. The focused pane is outlined, and it
+is the one that keyboard shortcuts (``F``, ``C``, ``R``, ``M``, ``G``, ``F12``,
+``Esc``) and a dropped file act on. Camera drags and picking always follow the
+pointer, so a pane can be orbited without focusing it first.
+
+Resolution and cost
+-------------------
+A pane renders into its own texture at its own size, so a four-way split renders
+four quarter-sized frames rather than four full-sized ones. Mesh data is shared
+process-wide: two panes showing the same robot upload its geometry to the GPU
+once. Each pane does keep its own render targets and shadow maps, which is the
+main per-pane memory cost, and each runs its own TCP session at the configured
+update rate.
+
+Panels are sized for a full window, so a pane much narrower than about 900
+points is tight for both of them at once. The object inspector gives way to the
+left overlay rather than overlapping it, and disappears when even its minimised
+width no longer fits; minimise the left overlay to bring it back.
+
+Persistence
+-----------
+The split arrangement, the divider positions and each pane's last endpoint are
+written to ``~/.rayrai/settings.yaml`` as ``pane_layout`` and ``pane_endpoint``
+keys, and restored on the next launch:
+
+.. code-block:: yaml
+
+   pane_layout: V0.5000(L1,H0.5000(L2,L3))
+   pane_endpoint: 1 127.0.0.1:8080
+   pane_endpoint: 2 10.0.0.7:8080
+   pane_endpoint: 3 10.0.0.9:8080
+
+``pane_layout`` is a binary tree: ``L<id>`` is a pane, ``V``/``H`` is a vertical
+or horizontal split with its ratio and two children. ``--no-save-settings``
+keeps a session's layout temporary. A settings file written before split panes
+existed has no layout in it and opens a single pane; an unreadable layout is
+reported on stderr and ignored.
+
+Command-line options that name a session — ``--connect``, ``--simulate``,
+``--screenshot``, ``--replay-session``, ``--record-session``,
+``--trajectory-csv``, ``--inspect`` — apply to the first pane only. The other
+panes of a restored layout come back on their saved endpoints, disconnected.
+
 UI layout
 =========
 .. figure:: ../image/rayrai/tcp_viewer/tcp_viewer_overview.png
@@ -258,6 +382,10 @@ UI layout
    scene stays visible. The overlay auto-collapses to a small icon after
    3.5 s without hover — pass ``--keep-overlay-open`` to disable that
    behaviour for screenshots or demos.
+
+Every pane carries its own copy of this overlay, positioned inside that pane
+(see :ref:`split-panes`). With a single pane — the default — the overlay fills
+the window as shown above.
 
 The viewer overlay has two compact panels:
 
@@ -284,10 +412,12 @@ Connection tab — widget reference
 **Connection row.**
 
 * **Endpoint dropdown** — enter host and port in the popup, save the endpoint,
-  or pick a recent or discovered server. Compatible ``RaisimServer``
-  beacons include host, executable, bind mode, and connection status; newer
-  incompatible protocol versions are filtered out. Persisted in
-  ``$XDG_CONFIG_HOME/raisim/rayrai_tcp_viewer.json``.
+  or pick a recent one. While a session is live the popup also lists compatible
+  ``RaisimServer`` beacons with host, executable, bind mode and connection
+  status; newer incompatible protocol versions are filtered out. In a pane with
+  no session the beacons are in the server table instead, so the popup does not
+  repeat them — see `Connect prompt — a pane with no session`_. Saved endpoints
+  persist in ``~/.rayrai/settings.yaml``.
 * **Connect / Disconnect** button — toggles the TCP socket. Greyed out
   while a session is replaying (``--replay-session``).
 * **Auto-connect** checkbox — when on, the viewer dials the server on
@@ -368,6 +498,48 @@ next frame's asset resolution. Use this to fix ``Assets unresolved`` for
 URDFs whose mesh paths assume a workspace root that isn't on the default
 search list. The same list can be passed up-front via ``--resource-dir
 PATH`` (repeatable).
+
+Connect prompt — a pane with no session
+---------------------------------------
+.. figure:: ../image/rayrai/tcp_viewer/tcp_viewer_connect_prompt.png
+   :width: 80%
+   :alt: the connect prompt listing one discovered RaiSim server
+
+   A pane with no session shows the endpoint row and the live server table, and
+   nothing else. Clicking a row connects that pane to that server.
+
+Until a pane has a scene it shows no tab bar — one tab would be a title with
+extra steps — and only the connection controls:
+
+* **Endpoint row** — the ``host:port`` editor, **Connect**, and
+  **Auto-connect**, exactly as described above.
+* **Server table** — one row per ``RaisimServer`` beacon on the network, with
+  the columns **Name** (the server executable), **Address**, **Port**,
+  **Computer** (the beacon's hostname) and **Availability**. Clicking anywhere
+  on a row fills the endpoint fields and connects in the same click.
+* **Status line** — amber while a connect is in flight, red once idle or
+  failed.
+
+Only verified beacons are listed. A saved endpoint is an address someone typed
+at some point, with nothing to say that anything is listening on it now, so
+those stay in the endpoint editor's dropdown rather than appearing as live
+servers. The table refreshes itself — beacons are drained every frame and the
+list is rebuilt at least every two seconds — so servers appear and disappear on
+their own and there is nothing to rescan.
+
+A server whose client seat is already taken reads ``in use`` and is drawn in
+amber. The row stays clickable, because a beacon is a second or two old and the
+seat may have been given up since it was sent. ``RaisimServer`` serves one
+client at a time and only calls ``accept()`` while it has none, so connecting to
+a server that is already taken completes the TCP handshake in the kernel backlog
+and is then ignored — at the socket it looks exactly like a slow server. After
+five seconds without a first reply the pane drops the connection and reports
+either ``server already occupied``, when the beacon says the seat is taken, or
+``no reply from server``. An established session that goes quiet is given the
+same five seconds before it is called lost.
+
+The tabs and the viewer controls appear as soon as the pane has a scene. A
+replay (``--replay-session``) or a dropped world XML counts as a session too.
 
 Options tab
 -----------

@@ -177,19 +177,20 @@ BVH instead. Small scenes use a scan-wide conservative cull and a compact flat
 candidate list. These fallbacks preserve the same closest-hit and compact-output
 semantics.
 
-The source-tree :code:`ray_lidar_comparison` benchmark compares both APIs using
-identical rays in a 100%-hit scan and verifies every hit position plus a timed
-checksum. Its default 256-by-16 configuration is also a performance regression
-check: :code:`rayTestLidar` must be faster than repeated :code:`rayTest` calls.
-Run it single-threaded with:
+Use the public ``ray_scan_lidar`` example to inspect structured scans and
+``large_scale_ray_test`` to inspect repeated ray queries:
 
 .. code-block:: bash
 
-    OMP_NUM_THREADS=1 ./build-benchmark/benchmark/benchmarks \
-      --bench ray_lidar_comparison --raisim --repeat=5
+    cmake --build build-examples --target ray_scan_lidar large_scale_ray_test --parallel 12
+    ./build-examples/examples/rayrai_tcp_viewer
 
-The relative speed still depends on scene layout, motion, filters, and scan
-shape, so benchmark the application workload when making performance decisions.
+Start either simulation in another terminal. These examples visualize the APIs;
+they are not timing comparisons. For application benchmarks, time
+``World::rayTestLidar`` and repeated ``World::rayTest`` calls with identical
+sensor poses, rays, ranges, and collision filters on one thread, and verify the
+hit positions before comparing timings. Relative speed depends on scene layout,
+motion, filters, and scan shape.
 
 
 Details

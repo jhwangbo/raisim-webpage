@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Benchmark &mdash; raisim 2.5.7 documentation</title>
+  <title>Benchmark &mdash; raisim 2.6.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b6430375" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=f7cf8502"></script>
+      <script src="../_static/documentation_options.js?v=ae39cb24"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -56,11 +56,10 @@
 <li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Benchmark</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#environment">Environment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#build-the-benchmark-binary">Build the benchmark binary</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#run-the-comparison">Run the comparison</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#measure-the-distributed-package">Measure the distributed package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#what-the-benchmarks-simulate">What the benchmarks simulate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#results">Results</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#why-raisim-is-faster-here">Why RaiSim is faster here</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interpreting-the-comparison">Interpreting the comparison</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Troubleshooting.html">Troubleshooting</a></li>
@@ -87,6 +86,10 @@
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
@@ -128,8 +131,8 @@
 <h1>Benchmark<a class="headerlink" href="#benchmark" title="Link to this heading"></a></h1>
 <p>This page reports representative timing comparisons between RaiSim and another
 widely used multi-body physics engine (MuJoCo) on articulated-dynamics
-workloads, and documents the environment in enough detail to reproduce the
-numbers. For general tuning guidance, see <a class="reference internal" href="Performance.html"><span class="doc">Performance</span></a>.</p>
+workloads. These are historical measurements from the private release-validation
+suite, with the machine and workload settings recorded below. For general tuning guidance, see <a class="reference internal" href="Performance.html"><span class="doc">Performance</span></a>.</p>
 <section id="environment">
 <h2>Environment<a class="headerlink" href="#environment" title="Link to this heading"></a></h2>
 <p>All numbers on this page were collected on a single machine with the following
@@ -191,34 +194,26 @@ same integration timestep, so the two engines simulate equivalent scenes.</p></t
 </table>
 </div>
 </section>
-<section id="build-the-benchmark-binary">
-<h2>Build the benchmark binary<a class="headerlink" href="#build-the-benchmark-binary" title="Link to this heading"></a></h2>
-<p>From the RaiSim source tree, configure a <code class="docutils literal notranslate"><span class="pre">Release</span></code> build with the benchmark
-suite and the MuJoCo comparison enabled, then build the <code class="docutils literal notranslate"><span class="pre">benchmarks</span></code> target:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build-benchmark<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-DRAISIM_BENCHMARK<span class="o">=</span>ON<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-DRAISIM_MUJOCO_BENCHMARK<span class="o">=</span>ON
-
-cmake<span class="w"> </span>--build<span class="w"> </span>build-benchmark<span class="w"> </span>--target<span class="w"> </span>benchmarks<span class="w"> </span>-j
+<section id="measure-the-distributed-package">
+<h2>Measure the distributed package<a class="headerlink" href="#measure-the-distributed-package" title="Link to this heading"></a></h2>
+<p>The comparison runner and its MuJoCo backend are maintained in the private
+engine repository. They are not build targets in <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code>. The results
+below describe that recorded run, rather than a benchmark of the installed
+2.6.0 package.</p>
+<p>To measure the binary package on your machine, build the public timing examples:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build-examples<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span>-DRAISIM_EXAMPLE<span class="o">=</span>ON
+cmake<span class="w"> </span>--build<span class="w"> </span>build-examples<span class="w"> </span>--target<span class="w"> </span>anymal_standing_benchmark<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>articulated_system_benchmark<span class="w"> </span>--parallel<span class="w"> </span><span class="m">12</span>
+<span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">MKL_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>./build-examples/examples/anymal_standing_benchmark<span class="w"> </span>--steps<span class="o">=</span><span class="m">1000000</span>
 </pre></div>
 </div>
-<p>This produces <code class="docutils literal notranslate"><span class="pre">build-benchmark/benchmark/benchmarks</span></code>. <code class="docutils literal notranslate"><span class="pre">RAISIM_MUJOCO_BENCHMARK</span></code>
-fetches and builds MuJoCo from source, so the first configure/build is slower.</p>
-</section>
-<section id="run-the-comparison">
-<h2>Run the comparison<a class="headerlink" href="#run-the-comparison" title="Link to this heading"></a></h2>
-<p>Run the six benchmarks below with both backends. <code class="docutils literal notranslate"><span class="pre">--backend=both</span></code> selects
-RaiSim and MuJoCo, while <code class="docutils literal notranslate"><span class="pre">--repeat</span> <span class="pre">3</span></code> runs every benchmark/backend pair three
-times and reports the median, minimum, and maximum wall-clock time:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build-benchmark/benchmark/benchmarks<span class="w"> </span>--backend<span class="o">=</span>both<span class="w"> </span>--repeat<span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-b<span class="w"> </span>chain20_speed<span class="w"> </span>-b<span class="w"> </span>heightmap_anymal_speed<span class="w"> </span>-b<span class="w"> </span>primitive_speed<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-b<span class="w"> </span>chain10_speed<span class="w"> </span>-b<span class="w"> </span>anymal_standing<span class="w"> </span>-b<span class="w"> </span>anymal_falling
-</pre></div>
-</div>
-<p>Each benchmark can also be run on its own, e.g.
-<code class="docutils literal notranslate"><span class="pre">benchmarks</span> <span class="pre">--backend=both</span> <span class="pre">-b</span> <span class="pre">anymal_standing</span></code>. No extra arguments are needed;
-the step counts in the table below are the built-in defaults.</p>
+<p>On Windows, build with <code class="docutils literal notranslate"><span class="pre">--config</span> <span class="pre">Release</span></code> and run
+<code class="docutils literal notranslate"><span class="pre">build-examples\\bin\\anymal_standing_benchmark.exe</span></code>. Repeat the same command
+at least three times, keeping the package version, scene, timestep, step count,
+and machine fixed. These examples measure RaiSim only and do not reproduce the
+private comparison scenes or the published ratios. See <a class="reference internal" href="BuildAndTest.html"><span class="doc">Build, Test, and Benchmark</span></a>
+for other available timing examples.</p>
 </section>
 <section id="what-the-benchmarks-simulate">
 <h2>What the benchmarks simulate<a class="headerlink" href="#what-the-benchmarks-simulate" title="Link to this heading"></a></h2>
@@ -288,7 +283,7 @@ box–ground, sphere–box, and box–box primitive pairs. Timestep 0.002 s.</p>
 </section>
 <section id="results">
 <h2>Results<a class="headerlink" href="#results" title="Link to this heading"></a></h2>
-<p>RaiSim is 2.59× to 6.23× faster than MuJoCo across these six workloads. The
+<p>In the recorded run, RaiSim was 2.59× to 6.23× faster than MuJoCo across these six workloads. The
 charts below show both the median timings and the relative speedup.</p>
 <div class="benchmark-graph-block docutils container">
 <figure class="align-default">
@@ -355,14 +350,13 @@ charts below show both the median timings and the relative speedup.</p>
 <p>Absolute times depend on hardware, compiler, and scene configuration, so treat
 them as relative magnitudes rather than fixed specifications.</p>
 </section>
-<section id="why-raisim-is-faster-here">
-<h2>Why RaiSim is faster here<a class="headerlink" href="#why-raisim-is-faster-here" title="Link to this heading"></a></h2>
-<p>RaiSim wins these benchmarks because it has better methods for articulated
-systems. Its articulated-system dynamics and contact solver are designed
-specifically for jointed mechanisms, so simulating chains, legged robots, and
-other articulated systems is more efficient. Raisim has O(n) articulated system
-solver that can even handle contact properties as well, whereas other physics engines
-use O(n^3) solver due to inversion of mass matrix.</p>
+<section id="interpreting-the-comparison">
+<h2>Interpreting the comparison<a class="headerlink" href="#interpreting-the-comparison" title="Link to this heading"></a></h2>
+<p>These measurements describe the six scenes and configurations above. They do
+not isolate the contribution of the dynamics algorithm, contact solver, or
+implementation details, and do not establish a speedup for other scenes or
+package versions. Use the public timing examples and your application workload
+when evaluating the current binary package.</p>
 </section>
 </section>
 
