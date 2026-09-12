@@ -7,17 +7,17 @@ RaiSim |raisim_version_title|
    :align: center
 
    * - .. image:: image/rayrai_complete_showcase.gif
-       :alt: rayrai_complete_showcase animated example
-       :width: 100%
+          :alt: rayrai_complete_showcase animated example
+          :width: 100%
      - .. image:: image/granular_media.gif
-       :alt: granular_media animated example
-       :width: 100%
+          :alt: granular_media animated example
+          :width: 100%
    * - .. image:: image/deformable_objects.gif
-       :alt: deformable_objects animated example
-       :width: 100%
+          :alt: deformable_objects animated example
+          :width: 100%
      - .. image:: image/procedural_heightmap.gif
-       :alt: procedural_heightmap animated example
-       :width: 100%
+          :alt: procedural_heightmap animated example
+          :width: 100%
 
 RaiSim is a cross-platform multi-body physics engine for robotics and AI. The
 binary package includes rigid bodies, articulated systems, deformable bodies,
