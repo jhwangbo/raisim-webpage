@@ -5,6 +5,7 @@ RaiSim |raisim_version_title|
 .. list-table::
    :widths: 50 50
    :align: center
+   :class: home-gallery
 
    * - .. image:: ../rsc/docs/image/rayrai_complete_showcase.gif
           :alt: rayrai_complete_showcase animated example
