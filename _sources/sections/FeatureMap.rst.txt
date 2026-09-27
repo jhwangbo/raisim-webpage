@@ -115,11 +115,22 @@ Visualization and tools
    * - Render in process
      - ``raisin::RayraiWindow``
      - :doc:`Rayrai`, :doc:`Visualization`
-   * - Inspect PBR, glTF, HDR, and OpenUSD assets
+   * - Inspect PBR, glTF, HDR, OpenUSD, and textured URDF assets
      - ``rayrai_pbr_material_grid``,
        ``rayrai_pbr_texture_maps``,
        ``rayrai_visual_asset_support``
-     - :doc:`Examples`, :doc:`Rayrai`
+     - :doc:`Examples`, :doc:`Rayrai`, :doc:`OpenUSD`
+   * - Render dense vegetation
+     - ``InstancedVisuals`` automatic mesh LOD, foliage wind, and shadow LOD;
+       ``rayrai_forest``
+     - :doc:`rayrai/Visuals`, :doc:`examples/rayrai/rayrai_forest`
+   * - Render glass
+     - ``Material::glass``, ``RenderQualitySettings::screenSpaceRefraction``,
+       ``RenderQualitySettings::geometryRefraction``
+     - :doc:`rayrai/Materials`, :doc:`rayrai/PostProcess`
+   * - Visualize tendons
+     - ``RayraiWindow::getTendonVisual``, ``rayrai_tendons``
+     - :doc:`tendons/Examples`
    * - Exercise sensor and rayrai rendering examples
      - ``rayrai_rgb_camera``, ``rayrai_depth_camera``,
        ``rayrai_lidar_pointcloud``, ``rayrai_complete_showcase``

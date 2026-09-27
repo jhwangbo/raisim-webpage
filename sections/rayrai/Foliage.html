@@ -1,0 +1,340 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Foliage and forest rendering &mdash; raisim 2.7.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b6430375" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Post-process effects" href="PostProcess.html" />
+    <link rel="prev" title="Custom visuals, instancing, and scene helpers" href="Visuals.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../FeatureMap.html">Feature Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ProjectLayout.html">Project Layout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Performance.html">Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Benchmark.html">Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RsceneFile.html">.rscene File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../OpenUSD.html">OpenUSD Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#pin-constraints">Pin constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Tendons.html">Tendons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../Rayrai.html">rayrai Visualizer</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../Rayrai.html#overview">Overview</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="RenderQuality.html">Render quality, tone mapping, color grading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Lighting.html">Lighting, shadows, and HDR/IBL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Materials.html">PBR materials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Visuals.html">Custom visuals, instancing, and scene helpers</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Foliage and forest rendering</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#create-a-vegetation-batch">Create a vegetation batch</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#visibility-detail-and-shadows">Visibility, detail, and shadows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#leaf-lighting-and-cutouts">Leaf lighting and cutouts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#asynchronous-loading-and-persistent-lod-caches">Asynchronous loading and persistent LOD caches</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="PostProcess.html">Post-process effects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Weather.html">Weather and atmospherics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Capture.html">Capture, diagnostics, and headless rendering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Sensors.html">Sensors and depth/LiDAR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Examples.html">Example targets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Performance.html">Performance notes and the C++ API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#platform-support">Platform support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#source-built-tcp-viewer-recommended">Source-built TCP viewer (recommended)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#build-and-link">Build and link</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#minimal-usage">Minimal usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#threading-contract">Threading contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#lifetime-and-error-model">Lifetime and error model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#example-custom-visuals-background-color">Example: custom visuals + background color</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#where-to-go-next">Where to go next</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimMatlab.html">RaisimMatlab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../Rayrai.html">rayrai Visualizer</a></li>
+      <li class="breadcrumb-item active">Foliage and forest rendering</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="foliage-and-forest-rendering">
+<h1>Foliage and forest rendering<a class="headerlink" href="#foliage-and-forest-rendering" title="Link to this heading"></a></h1>
+<p>Use <code class="docutils literal notranslate"><span class="pre">InstancedVisuals</span></code> for repeated trees, grass, and ground cover. Rayrai
+combines mesh LOD, per-plant visibility checks, compatible color/shadow draw
+batching, rooted wind deformation, and two-sided leaf lighting. Vegetation
+added this way is visual-only; add RaiSim collision objects separately.</p>
+<p>The <a class="reference internal" href="../examples/rayrai/rayrai_forest.html"><span class="doc">dense forest example</span></a> puts these
+features together on an 80 by 80 metre heightmap with more than 63,000 plants.</p>
+<a class="reference internal image-reference" href="../../_images/forest.png"><img alt="Instanced trees and grass on rolling terrain with dynamic RaiSim objects" src="../../_images/forest.png" style="width: 100%;" />
+</a>
+<section id="create-a-vegetation-batch">
+<h2>Create a vegetation batch<a class="headerlink" href="#create-a-vegetation-batch" title="Link to this heading"></a></h2>
+<p>Create one batch for each source mesh and populate it with <code class="docutils literal notranslate"><span class="pre">InstanceSpec</span></code>
+transforms. Bulk <code class="docutils literal notranslate"><span class="pre">addInstances</span></code> avoids repeated per-instance setup. Place
+each plant’s local root at zero before scattering, and use the terrain height
+at its position. Imported display-lineup offsets otherwise leave plants
+floating or buried on slopes.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span><span class="p">.</span><span class="n">setAsyncMeshLoadingEnabled</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span><span class="w">  </span><span class="c1">// Before creating mesh visuals.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">grass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addInstancedVisuals</span><span class="p">(</span>
+<span class="w">  </span><span class="s">&quot;grass&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">Shape</span><span class="o">::</span><span class="n">Mesh</span><span class="p">,</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">),</span>
+<span class="w">  </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">),</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;/path/to/grass/model.gltf&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">raisin</span><span class="o">::</span><span class="n">InstancedVisuals</span><span class="o">::</span><span class="n">InstanceSpec</span><span class="o">&gt;</span><span class="w"> </span><span class="n">instances</span><span class="p">;</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">InstancedVisuals</span><span class="o">::</span><span class="n">InstanceSpec</span><span class="w"> </span><span class="n">plant</span><span class="p">;</span>
+<span class="n">plant</span><span class="p">.</span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">terrain</span><span class="o">-&gt;</span><span class="n">getHeight</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">));</span>
+<span class="n">plant</span><span class="p">.</span><span class="n">orientation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span>
+<span class="w">                              </span><span class="n">std</span><span class="o">::</span><span class="n">sin</span><span class="p">(</span><span class="n">yaw</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.5f</span><span class="p">),</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">cos</span><span class="p">(</span><span class="n">yaw</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.5f</span><span class="p">));</span>
+<span class="n">plant</span><span class="p">.</span><span class="n">scale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">);</span>
+<span class="n">instances</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">plant</span><span class="p">);</span><span class="w">  </span><span class="c1">// Repeat for the remaining scatter positions.</span>
+<span class="n">grass</span><span class="o">-&gt;</span><span class="n">addInstances</span><span class="p">(</span><span class="n">instances</span><span class="p">);</span>
+<span class="n">grass</span><span class="o">-&gt;</span><span class="n">setUseMeshColor</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+<span class="n">grass</span><span class="o">-&gt;</span><span class="n">setAutomaticMeshLodEnabled</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+<span class="n">grass</span><span class="o">-&gt;</span><span class="n">setProjectedLodPolicy</span><span class="p">(</span><span class="nb">true</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0f</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">);</span>
+<span class="n">grass</span><span class="o">-&gt;</span><span class="n">setShadowFoliageLodPolicy</span><span class="p">(</span><span class="nb">true</span><span class="p">,</span><span class="w"> </span><span class="mf">2.5f</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">);</span>
+<span class="n">grass</span><span class="o">-&gt;</span><span class="n">configureFoliageWind</span><span class="p">(</span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.09f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.7f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.2f</span><span class="p">);</span>
+<span class="n">grass</span><span class="o">-&gt;</span><span class="n">setSortTransparentInstances</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span><span class="w">  </span><span class="c1">// Opaque/alpha-masked plants.</span>
+<span class="n">grass</span><span class="o">-&gt;</span><span class="n">setFoliageImpostorPolicy</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The quaternion vector uses <strong>XYZW</strong> order. <code class="docutils literal notranslate"><span class="pre">setUseMeshColor(true)</span></code> keeps
+the imported material/texture colors. The wind arguments are local root
+height, tip height, strength, stiffness, and flutter weight. Global wind and
+its clock are controlled through render quality or weather settings; see
+<a class="reference internal" href="Weather.html"><span class="doc">Weather and atmospherics</span></a>. Keep transparency sorting for genuinely alpha-blended assets.</p>
+</section>
+<section id="visibility-detail-and-shadows">
+<h2>Visibility, detail, and shadows<a class="headerlink" href="#visibility-detail-and-shadows" title="Link to this heading"></a></h2>
+<p>Automatic mesh LOD reduces the triangles in each plant. Projected-size LOD
+instead reduces the number of drawn instances as plants become small on
+screen. Neither changes the authored instance array. Eligible high-detail
+opaque or alpha-masked foliage uses per-instance LOD, so a nearby tree does
+not force all distant trees in the batch to use the same detail level.
+Smaller foliage meshes retain their batch-selected LOD while benefiting from
+per-instance culling and shared draw submission.</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Foliage controls on <code class="docutils literal notranslate"><span class="pre">InstancedVisuals</span></code></span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 40.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Control</p></th>
+<th class="head"><p>Effect</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">setAutomaticMeshLodEnabled</span></code></p></td>
+<td><p>Generate/select simplified mesh levels; enabled by default.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">setProjectedLodPolicy</span></code></p></td>
+<td><p>Opt-in instance thinning below a projected pixel radius, with a maximum
+stride. The explicit <code class="docutils literal notranslate"><span class="pre">setRenderedInstanceStride</span></code> remains a lower bound.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">setShadowFoliageLodPolicy</span></code></p></td>
+<td><p>Opt-in shadow-only instance thinning and optional maximum shadow distance.
+It does not change color-pass density.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">setCastsShadows</span></code></p></td>
+<td><p>Shadow casting is enabled by default. Foliage/wind configuration preserves
+the caller’s choice; the scene light must also have shadows enabled.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">setFoliageImpostorPolicy</span></code></p></td>
+<td><p>Opt-in camera-facing quads for sufficiently small distant foliage.
+Disabled in the forest example to retain mesh silhouettes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">setHierarchicalFoliageClustersPolicy</span></code></p></td>
+<td><p>Opt-in conservative cluster culling for large batches. Inspect
+<code class="docutils literal notranslate"><span class="pre">hierarchicalFoliageClusterDiagnostics()</span></code> for use and fallback status.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The renderer reuses visibility/LOD selections and instance uploads while their
+inputs remain valid. It caches transformed bounds, shares frustum preparation,
+and merges compatible foliage draws in color and shadow passes. Materials
+requiring special ordering or unsupported state retain the fallback paths.
+These optimizations require no application-side batch collector.</p>
+<p>Foliage occlusion uses conservative depth tests with wind-expanded bounds and
+alpha-aware coverage. The optional <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings::foliageAlphaDepthPrepass</span></code>
+adds an alpha-tested foliage depth pass; it is disabled by default. Its extra
+geometry and texture work can cost more than it saves, so measure it for the
+actual scene. Likewise, increasing shadow stride or enabling impostors changes
+image quality and should be evaluated separately from renderer optimizations.</p>
+</section>
+<section id="leaf-lighting-and-cutouts">
+<h2>Leaf lighting and cutouts<a class="headerlink" href="#leaf-lighting-and-cutouts" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">Material::foliage</span></code> selects a foliage class and enables foliage two-sided
+lighting. <code class="docutils literal notranslate"><span class="pre">foliageTransmissionStrength</span></code> controls thin-leaf direct and indirect
+transmission; <code class="docutils literal notranslate"><span class="pre">foliageTransmissionColor</span></code> is a linear RGB tint of the base
+color. High-fidelity indirect lighting also gathers illumination from the
+opposite hemisphere, allowing leaves to respond to light behind the surface.
+This is separate from glass-style <code class="docutils literal notranslate"><span class="pre">transmissionFactor</span></code>.</p>
+<p>Use authored alpha masking for leaf cards. Color rendering and depth/shadow
+coverage honor the material’s alpha cutoff. Geometry-only needles with no
+texture alpha should remain opaque, as in the forest’s pine and fir assets.
+Normal-map filtering and specular antialiasing stabilize leaf highlights;
+authored roughness and specular factors still determine their appearance.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pbrEnvironmentLightingTint</span></code> controls the procedural fallback’s illumination
+independently of the visible sky/fog palette. HDR environment maps keep their
+captured color. The forest uses subdued neutral fill and strong direct sunlight
+with ACES tone mapping to preserve canopy shade and bright sunlit leaves.</p>
+<p>The limited-sampler OpenGL path used on macOS supports directional shadow
+cascades and diffuse environment illumination too. Do not disable cascades
+solely because the platform uses the compact shaders. See <a class="reference internal" href="Lighting.html"><span class="doc">Lighting, shadows, and HDR/IBL</span></a>
+for shadow settings and <a class="reference internal" href="Materials.html"><span class="doc">PBR materials</span></a> for material authoring.</p>
+</section>
+<section id="asynchronous-loading-and-persistent-lod-caches">
+<h2>Asynchronous loading and persistent LOD caches<a class="headerlink" href="#asynchronous-loading-and-persistent-lod-caches" title="Link to this heading"></a></h2>
+<p>Call <code class="docutils literal notranslate"><span class="pre">setAsyncMeshLoadingEnabled(true)</span></code> before adding mesh assets. File import,
+base-geometry preparation, and instanced LOD generation run on workers;
+material/texture resolution and incremental GPU uploads remain on the render
+thread. Pending instances are skipped until ready. This does not make RaiSim
+physics multithreaded.</p>
+<p>Continue rendering while loading. <code class="docutils literal notranslate"><span class="pre">pendingAsyncMeshLoadCount()</span></code> includes
+imports, LOD preparation, and unfinished GPU uploads, making it suitable for a
+loading indicator. <code class="docutils literal notranslate"><span class="pre">pollAsyncMeshLoads(maxAssets)</span></code> advances ready stages on
+the render thread with its OpenGL context current. The forest example pauses
+physics until loading completes and leaves camera input available. Texture
+resolution and uploads can still cause short hitches.</p>
+<p>Prepared mesh levels are cached as <code class="docutils literal notranslate"><span class="pre">rayrai_cache_&lt;source-file&gt;.lods</span></code> beside
+the source asset, for example <code class="docutils literal notranslate"><span class="pre">rayrai_cache_model.gltf.lods</span></code>. A read-only
+asset directory falls back to the system temporary cache. Geometry fingerprints
+include external buffers and LOD-affecting material settings; other material
+and texture properties are taken from the current import. Invalid caches are
+ignored and rebuilt. Deleting these optional files trades disk space for a
+slower next load without reducing geometry precision or quality.</p>
+<ul class="simple">
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">RAYRAI_ASYNC_LOD_CACHE_DIR</span></code> to choose a cache directory.</p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">RAYRAI_DISABLE_ASYNC_LOD_CACHE=1</span></code> to benchmark without this cache;
+unset the variable to restore caching.</p></li>
+</ul>
+<p>Use the <a class="reference internal" href="../examples/rayrai/rayrai_forest.html"><span class="doc">forest test and benchmark commands</span></a>
+to measure completed frames separately from cold/cached loading. CPU preparation
+savings do not necessarily produce the same percentage improvement in full-frame
+FPS; GPU work, shadows, resolution, and camera position also matter.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Visuals.html" class="btn btn-neutral float-left" title="Custom visuals, instancing, and scene helpers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="PostProcess.html" class="btn btn-neutral float-right" title="Post-process effects" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

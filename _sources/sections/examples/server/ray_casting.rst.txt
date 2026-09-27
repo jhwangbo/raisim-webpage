@@ -8,7 +8,7 @@ Performs a ray test from a fixed origin, then visualizes the hit point with a po
 
 Screenshot
 ==========
-.. image:: ../../../image/ray_casting.png
+.. image:: ../../../../rsc/docs/image/ray_casting.png
    :alt: ray_casting example
    :width: 100%
 

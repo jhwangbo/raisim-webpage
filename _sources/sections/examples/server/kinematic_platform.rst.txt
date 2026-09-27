@@ -8,7 +8,7 @@ Creates a kinematic ground platform that moves sinusoidally under an ANYmal. It 
 
 Screenshot
 ==========
-.. image:: ../../../image/kinematic_platform.png
+.. image:: ../../../../rsc/docs/image/kinematic_platform.png
    :alt: kinematic_platform example
    :width: 100%
 

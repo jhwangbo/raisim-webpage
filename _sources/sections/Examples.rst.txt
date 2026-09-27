@@ -16,7 +16,7 @@ inspect applications that publish a
 ``raisim::World`` through ``raisim::RaisimServer``. RaisimUnity and RaisimUnreal
 are no longer supported.
 
-.. image:: ../image/examples_overview.png
+.. image:: ../../rsc/docs/image/examples_overview.png
    :alt: Overview of RaiSim and rayrai examples
    :width: 100%
 
@@ -143,11 +143,12 @@ Start with these targets when learning a specific feature:
    * - ``rayrai_pbr_material_grid``
      - Inspecting metallic-roughness PBR material behavior under rayrai.
    * - ``rayrai_visual_asset_support``
-     - Importing glTF/GLB visual scenes with PBR materials, authored lights,
-       and reflection-probe sidecars.
+     - Rendering textured URDF visual meshes (OBJ/DAE with image textures)
+       separately from their collision geometry.
    * - ``rayrai_coacd_mesh_approximation``
      - Visually comparing original meshes and CoACD convex approximation
-       parts generated through ``World::addMesh``.
+       parts generated through ``World::addMesh``. The first run can take a
+       few minutes while CoACD generates and caches the parts.
    * - ``rayrai_tcp_viewer``
      - The TCP visualizer used by RaisimServer examples.
 
@@ -157,6 +158,10 @@ Start with these targets when learning a specific feature:
    * - ``rayrai_tendons``
      - Automatic tendon rendering with scene selection, pause/step/reset,
        and live transmission values. See :doc:`Tendons`.
+   * - ``rayrai_forest``
+     - Dense instanced vegetation on a heightmap with automatic mesh LOD,
+       foliage wind and shadows, and asynchronous loading. Requires the
+       upcoming rayrai release; see :doc:`examples/rayrai/rayrai_forest`.
 
 Runtime assets
 ==============
@@ -164,11 +169,18 @@ Some targets depend on bundled assets or platform runtime packages:
 
 * OpenUSD loading uses the package's bundled OpenUSD runtime and USD files; keep
   the ``openusd`` runtime directory and ``rsc`` assets with the installed
-  package. OpenUSD examples are skipped by CMake only when the selected RaiSim
-  package is too old to expose USD scene loading.
-* Rayrai examples require SDL2/OpenGL and rayrai runtime libraries.
+  package.
+* Rayrai examples require SDL2/OpenGL and rayrai runtime libraries. See
+  :ref:`rayrai-platform-support` for the OpenGL requirements and the reduced
+  macOS feature set.
 * Poly Haven and PBR asset examples require the corresponding assets under
-  ``rsc``.
+  ``rsc``. CMake copies ``rsc`` next to the executables
+  (``build-examples/examples/rsc``, or ``build-examples/bin/rsc`` on Windows).
+* ``rayrai_forest`` reads its assets from ``rsc/forest`` in the
+  configured checkout and writes regenerable ``rayrai_cache_*.lods`` files
+  beside them.
+* ``rayrai_coacd_mesh_approximation`` writes ``raisim_coacd_*`` cache files
+  beside the YCB meshes in the build tree's ``rsc`` copy.
 
 After building, list the example executables from the platform-specific output
 directory. Linux and macOS builds place them under ``examples``:
@@ -217,15 +229,18 @@ Rayrai Tools And Examples
    examples/rayrai/rayrai_aruco_marker
    examples/rayrai/rayrai_custom_visuals
    examples/rayrai/rayrai_instancing_grid
+   examples/rayrai/rayrai_forest
    examples/rayrai/rayrai_pointcloud_animation
    examples/rayrai/rayrai_pbr_material_grid
    examples/rayrai/rayrai_pbr_texture_maps
+   examples/rayrai/rayrai_nested_glass
    examples/rayrai/rayrai_quality_lighting
    examples/rayrai/rayrai_visual_asset_support
    examples/rayrai/rayrai_coacd_mesh_approximation
    examples/rayrai/rayrai_runtime_scene_editing
    examples/rayrai/rayrai_rolling_spinning_friction
    examples/rayrai/rayrai_swept_ccd
+   examples/rayrai/rayrai_forest
    examples/rayrai/rayrai_tcp_viewer
 
 Server Examples
@@ -270,10 +285,7 @@ Server Examples
    examples/server/ycb_objects
    examples/worlds/anymal_pair
    examples/worlds/atlas
-   examples/worlds/hill1_heightmap
    examples/worlds/kinova_arm
-   examples/worlds/lake1_heightmap
-   examples/worlds/mountain1_heightmap
    examples/worlds/office1_scene
 
 XML Examples

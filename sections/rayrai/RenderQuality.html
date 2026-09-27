@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Render quality, tone mapping, color grading &mdash; raisim 2.6.0 documentation</title>
+  <title>Render quality, tone mapping, color grading &mdash; raisim 2.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b6430375" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
+      <script src="../../_static/documentation_options.js?v=dfec817d"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -93,13 +93,17 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Render quality, tone mapping, color grading</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#color-and-gamma-semantics">Color and gamma semantics</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#render-quality-controls">Render-quality controls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#preset-reference">Preset reference</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sun-softness-sky-light-and-local-light-range">Sun softness, sky light, and local-light range</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tone-mapping-exposure-and-color-grading">Tone mapping, exposure, and color grading</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#linear-hdr-rendering">Linear HDR rendering</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#adaptive-quality-and-texture-budgets">Adaptive quality and texture budgets</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="Lighting.html">Lighting, shadows, and HDR/IBL</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Materials.html">PBR materials</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Visuals.html">Custom visuals, instancing, and scene helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Foliage.html">Foliage and forest rendering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="PostProcess.html">Post-process effects</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Weather.html">Weather and atmospherics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Capture.html">Capture, diagnostics, and headless rendering</a></li>
@@ -109,6 +113,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#platform-support">Platform support</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#source-built-tcp-viewer-recommended">Source-built TCP viewer (recommended)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#build-and-link">Build and link</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#minimal-usage">Minimal usage</a></li>
@@ -152,12 +157,13 @@
              
   <section id="render-quality-tone-mapping-color-grading">
 <h1>Render quality, tone mapping, color grading<a class="headerlink" href="#render-quality-tone-mapping-color-grading" title="Link to this heading"></a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code> is the single struct that drives the renderer’s
-behaviour each frame. Pick a preset for the common cases, then override
-individual flags for the effects you need. Other pages cover narrower
-subsets of this struct: <a class="reference internal" href="PostProcess.html"><span class="doc">Post-process effects</span></a> for cinematic and screen-space
-effects, <a class="reference internal" href="Weather.html"><span class="doc">Weather and atmospherics</span></a> for atmospheric state, and <a class="reference internal" href="Lighting.html"><span class="doc">Lighting, shadows, and HDR/IBL</span></a> for
-shadow/light budgets.</p>
+<p><code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code> holds almost every option the renderer applies each
+frame. Pick a preset for the common cases, then override individual fields for
+the effects you need. A few options are window-level calls instead, such as
+<code class="docutils literal notranslate"><span class="pre">setLinearHdrRenderingEnabled</span></code> (see <a class="reference internal" href="#linear-hdr-rendering">Linear HDR rendering</a>); presets do not
+change them. Other pages cover narrower subsets of this struct:
+<a class="reference internal" href="PostProcess.html"><span class="doc">Post-process effects</span></a> for cinematic and screen-space effects, <a class="reference internal" href="Weather.html"><span class="doc">Weather and atmospherics</span></a> for
+atmospheric state, and <a class="reference internal" href="Lighting.html"><span class="doc">Lighting, shadows, and HDR/IBL</span></a> for shadow/light budgets.</p>
 <section id="color-and-gamma-semantics">
 <h2>Color and gamma semantics<a class="headerlink" href="#color-and-gamma-semantics" title="Link to this heading"></a></h2>
 <p>rayrai applies display gamma at the shader/output stage; do not pre-gamma-correct
@@ -191,17 +197,19 @@ metallic-roughness, AO, depth, mask, or other linear data textures.</p></li>
 </section>
 <section id="render-quality-controls">
 <h2>Render-quality controls<a class="headerlink" href="#render-quality-controls" title="Link to this heading"></a></h2>
-<p>rayrai keeps RL throughput and visual fidelity separate. The <code class="docutils literal notranslate"><span class="pre">Fast</span></code> preset keeps
-reflections, high-fidelity PBR, FXAA, and extra expensive viewer effects off by default.
-<code class="docutils literal notranslate"><span class="pre">Balanced</span></code> now uses the PBR + IBL path and a reflective checker ground, but
-still leaves the heavier High/Ultra effects off. <code class="docutils literal notranslate"><span class="pre">High</span></code> and <code class="docutils literal notranslate"><span class="pre">Ultra</span></code> enable
-the quality-oriented path, including stronger shadow filtering, FXAA,
-additional screen-space effects, and depth-of-field postprocessing.</p>
+<p>rayrai keeps RL throughput and visual fidelity separate. The <code class="docutils literal notranslate"><span class="pre">Fast</span></code> preset
+keeps reflections, high-fidelity PBR, FXAA, and extra expensive viewer effects
+off by default. <code class="docutils literal notranslate"><span class="pre">Balanced</span></code> uses the PBR + IBL path and a reflective checker
+ground, but still leaves the heavier High/Ultra effects off. <code class="docutils literal notranslate"><span class="pre">High</span></code> and
+<code class="docutils literal notranslate"><span class="pre">Ultra</span></code> enable the quality-oriented path, including MSAA, stronger shadow
+filtering, FXAA, additional screen-space effects, and depth-of-field
+postprocessing. <a class="reference internal" href="#preset-reference">Preset reference</a> lists the main values.</p>
 <p>Every preset is tuned so directional shadows are readable out of the box while
 smooth and metallic materials still receive enough sky/IBL fill. Balanced and
-High use brighter ambient/environment defaults than older releases; Ultra keeps
-a lower direct ambient with stronger IBL and AgX tone mapping. You should not
-need to tweak ambient/diffuse/shadow values for a readable outdoor scene.</p>
+High use a bright ambient and environment fill. Ultra uses a lower direct
+ambient, a slightly lower environment intensity, and a lower exposure with AgX
+tone mapping, which keeps more contrast. You should not need to tweak
+ambient/diffuse/shadow values for a readable outdoor scene.</p>
 <p>The reflective checker ground is on by default for <code class="docutils literal notranslate"><span class="pre">Balanced</span></code>, <code class="docutils literal notranslate"><span class="pre">High</span></code>, and
 <code class="docutils literal notranslate"><span class="pre">Ultra</span></code> (<code class="docutils literal notranslate"><span class="pre">reflectiveGround</span> <span class="pre">=</span> <span class="pre">true</span></code> plus the PBR path) and off for <code class="docutils literal notranslate"><span class="pre">Fast</span></code>.
 Heightmap terrain is intentionally excluded from the planar reflective-ground
@@ -225,6 +233,17 @@ policy; it uses a rough, non-reflective PBR terrain material even when
 <span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">quality</span><span class="p">);</span>
 </pre></div>
 </div>
+<p><code class="docutils literal notranslate"><span class="pre">setRenderQualityPreset</span></code> and <code class="docutils literal notranslate"><span class="pre">setRenderQualitySettings</span></code> rebuild the main
+light from the <code class="docutils literal notranslate"><span class="pre">mainLight*</span></code> and shadow fields and clear all additional lights;
+the two viewer fill lights are added back when <code class="docutils literal notranslate"><span class="pre">addViewerFillLights</span></code> is true.
+Apply settings before adding or importing lights. To change a single option on a
+lit scene, use a dedicated setter, which keeps lights and materials:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span><span class="p">.</span><span class="n">setDepthPrepassesEnabled</span><span class="p">(</span><span class="cm">/*opaque=*/</span><span class="nb">true</span><span class="p">,</span><span class="w"> </span><span class="cm">/*foliageAlpha=*/</span><span class="nb">false</span><span class="p">);</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setAdditionalLightContributionThreshold</span><span class="p">(</span><span class="mf">1.0e-4f</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>After any explicit change, <code class="docutils literal notranslate"><span class="pre">getRenderQualityPreset()</span></code> reports
+<code class="docutils literal notranslate"><span class="pre">RenderQualityPreset::Custom</span></code>.</p>
 <p>The shipped rayrai examples, including <code class="docutils literal notranslate"><span class="pre">rayrai_pbr_material_grid</span></code>,
 <code class="docutils literal notranslate"><span class="pre">rayrai_quality_lighting</span></code>, and <code class="docutils literal notranslate"><span class="pre">rayrai_complete_showcase</span></code>, exercise these
 controls in runnable scenes.</p>
@@ -257,6 +276,178 @@ controls in runnable scenes.</p>
 <p>These four images are produced by <code class="docutils literal notranslate"><span class="pre">doc_image_quality_presets</span></code> in
 <code class="docutils literal notranslate"><span class="pre">docs/image_generators/</span></code> and are regenerated automatically as part of the
 <code class="docutils literal notranslate"><span class="pre">Sphinx</span></code> build target.</p>
+</section>
+<section id="preset-reference">
+<h2>Preset reference<a class="headerlink" href="#preset-reference" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">RayraiWindow::defaultRenderQualitySettings(preset)</span></code> and
+<code class="docutils literal notranslate"><span class="pre">RenderQualitySettings::preset(preset)</span></code> return the settings below. The
+presets also tune fields that are not listed, such as shadow bias, AO radius and
+bloom parameters.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 32.0%" />
+<col style="width: 17.0%" />
+<col style="width: 17.0%" />
+<col style="width: 17.0%" />
+<col style="width: 17.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Setting</p></th>
+<th class="head"><p>Fast</p></th>
+<th class="head"><p>Balanced</p></th>
+<th class="head"><p>High</p></th>
+<th class="head"><p>Ultra</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Material shading</p></td>
+<td><p>simple</p></td>
+<td><p>PBR + IBL</p></td>
+<td><p>PBR + IBL</p></td>
+<td><p>PBR + IBL</p></td>
+</tr>
+<tr class="row-odd"><td><p>Tone curve, <code class="docutils literal notranslate"><span class="pre">pbrExposure</span></code></p></td>
+<td><p>none</p></td>
+<td><p>ACES, 0.60</p></td>
+<td><p>ACES, 0.55</p></td>
+<td><p>AgX, 0.42</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pbrEnvironmentIntensity</span></code></p></td>
+<td><p>(no IBL)</p></td>
+<td><p>1.30</p></td>
+<td><p>1.35</p></td>
+<td><p>1.20</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mainLightAmbient</span></code></p></td>
+<td><p>(0.38, 0.40, 0.45)</p></td>
+<td><p>0.48</p></td>
+<td><p>0.54</p></td>
+<td><p>0.32</p></td>
+</tr>
+<tr class="row-even"><td><p>MSAA samples, alpha-to-coverage</p></td>
+<td><p>1, off</p></td>
+<td><p>1, off</p></td>
+<td><p>2, on</p></td>
+<td><p>4, on</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">shadowResolution</span></code>, <code class="docutils literal notranslate"><span class="pre">shadowPcfRadius</span></code></p></td>
+<td><p>2048, 1.25</p></td>
+<td><p>3072, 1.75</p></td>
+<td><p>4096, 1.50</p></td>
+<td><p>6144, 1.75</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">updateShadowsEveryFrame</span></code></p></td>
+<td><p>off</p></td>
+<td><p>off</p></td>
+<td><p>on</p></td>
+<td><p>on</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">shadowedLightBudget</span></code></p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>2</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-even"><td><p>Reflective ground</p></td>
+<td><p>off</p></td>
+<td><p>on</p></td>
+<td><p>on</p></td>
+<td><p>on</p></td>
+</tr>
+<tr class="row-odd"><td><p>FXAA, temporal AA</p></td>
+<td><p>off, off</p></td>
+<td><p>off, off</p></td>
+<td><p>on, off</p></td>
+<td><p>on, on</p></td>
+</tr>
+<tr class="row-even"><td><p>Screen-space AO (samples)</p></td>
+<td><p>off</p></td>
+<td><p>off</p></td>
+<td><p>on (12)</p></td>
+<td><p>on (20)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Depth of field</p></td>
+<td><p>off</p></td>
+<td><p>off</p></td>
+<td><p>on</p></td>
+<td><p>on</p></td>
+</tr>
+<tr class="row-even"><td><p>Opaque depth prepass</p></td>
+<td><p>off</p></td>
+<td><p>off</p></td>
+<td><p>on</p></td>
+<td><p>on</p></td>
+</tr>
+<tr class="row-odd"><td><p>Screen-space refraction</p></td>
+<td><p>off</p></td>
+<td><p>off</p></td>
+<td><p>on</p></td>
+<td><p>on</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">cloudQuality</span></code></p></td>
+<td><p>Texture</p></td>
+<td><p>Texture</p></td>
+<td><p>Volumetric</p></td>
+<td><p>Volumetric</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">textureAnisotropy</span></code></p></td>
+<td><p>1</p></td>
+<td><p>4</p></td>
+<td><p>8</p></td>
+<td><p>16</p></td>
+</tr>
+<tr class="row-even"><td><p>Foliage wind</p></td>
+<td><p>off</p></td>
+<td><p>off</p></td>
+<td><p>on</p></td>
+<td><p>on</p></td>
+</tr>
+</tbody>
+</table>
+<p>Bloom is off in every preset; its tuning is kept for when you enable it.
+Ultra’s temporal AA runs without projection jitter. <code class="docutils literal notranslate"><span class="pre">Custom</span></code> starts from the
+struct defaults with the texture cloud layer enabled.</p>
+</section>
+<section id="sun-softness-sky-light-and-local-light-range">
+<h2>Sun softness, sky light, and local-light range<a class="headerlink" href="#sun-softness-sky-light-and-local-light-range" title="Link to this heading"></a></h2>
+<p>These fields keep their struct defaults in every preset:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">directionalShadowSoftnessDegrees</span></code> (default <code class="docutils literal notranslate"><span class="pre">0</span></code>: plain PCF) gives the main
+directional light a penumbra that widens with the distance between blocker
+and receiver. Set it to the light’s angular diameter in degrees; the Sun is
+about <code class="docutils literal notranslate"><span class="pre">0.53</span></code>. The blur is at least <code class="docutils literal notranslate"><span class="pre">shadowPcfRadius</span></code> and at most
+<code class="docutils literal notranslate"><span class="pre">directionalShadowSoftnessMaxRadius</span></code> shadow-map texels (default <code class="docutils literal notranslate"><span class="pre">8</span></code>).
+<code class="docutils literal notranslate"><span class="pre">setRenderQualitySettings</span></code> clamps the angle to <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">4]</span></code> and the radius to
+<code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">16]</span></code>. Soft shadows take more shadow-map samples than PCF.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pbrEnvironmentLightingTint</span></code> (default white) is the color of the procedural
+sky light that PBR materials receive when no environment map is set: 0.35
+times the tint from above and that color times <code class="docutils literal notranslate"><span class="pre">pbrEnvironmentGroundTint</span></code>
+from below, scaled by <code class="docutils literal notranslate"><span class="pre">pbrEnvironmentIntensity</span></code>. It is independent of the
+visible sky and fog colors; <code class="docutils literal notranslate"><span class="pre">pbrEnvironmentSkyTint</span></code>,
+<code class="docutils literal notranslate"><span class="pre">pbrEnvironmentHorizonTint</span></code> and <code class="docutils literal notranslate"><span class="pre">pbrEnvironmentHorizonStrength</span></code> tint only
+the sky background. Instanced visuals with PBR materials always take their
+sky light from this term.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">additionalLightContributionThreshold</span></code> (default <code class="docutils literal notranslate"><span class="pre">0</span></code>: every additional
+light reaches everywhere) gives point, spot and area lights a finite range.
+The value is a total scene-linear incident-radiance budget shared equally by
+the active additional lights. Each light fades out between the distance where
+its incident radiance falls to its share and the distance where it falls to
+half of it, and objects entirely beyond that range skip the light.
+Directional lights and lights with an ambient term, a projector texture or no
+distance attenuation keep an unlimited range. The budget is not a bound on
+the final pixel error; compare against <code class="docutils literal notranslate"><span class="pre">0</span></code> at your exposure.</p></li>
+</ul>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">quality</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">();</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">directionalShadowSoftnessDegrees</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.53f</span><span class="p">;</span><span class="w">  </span><span class="c1">// Sun-sized penumbra</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">pbrEnvironmentLightingTint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.98f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.95f</span><span class="p">);</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">quality</span><span class="p">);</span>
+
+<span class="c1">// Unlike setRenderQualitySettings, this keeps the authored lights.</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setAdditionalLightContributionThreshold</span><span class="p">(</span><span class="mf">1.0e-4f</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">geometryRefraction*</span></code> fields control traced refraction for transmissive
+materials; see <a class="reference internal" href="Materials.html"><span class="doc">PBR materials</span></a>.</p>
 </section>
 <section id="tone-mapping-exposure-and-color-grading">
 <h2>Tone mapping, exposure, and color grading<a class="headerlink" href="#tone-mapping-exposure-and-color-grading" title="Link to this heading"></a></h2>
@@ -369,48 +560,89 @@ preset with <code class="docutils literal notranslate"><span class="pre">viewerC
 </table>
 <p>The tone-mapping grid is produced by <code class="docutils literal notranslate"><span class="pre">doc_image_tone_mapping</span></code> and the grade
 grid by <code class="docutils literal notranslate"><span class="pre">doc_image_color_grading</span></code> in <code class="docutils literal notranslate"><span class="pre">docs/image_generators/</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>On macOS and on GPUs with 16 or fewer fragment texture units, the post pass
+supports only depth of field, FXAA, bloom, SSAO and temporal AA, so white
+balance, saturation and color grading have no effect there. Tone curves and
+exposure still apply. See <a class="reference internal" href="../Rayrai.html#rayrai-platform-support"><span class="std std-ref">Platform support</span></a> and
+<a class="reference internal" href="Materials.html#gpu-capability-tiers"><span class="std std-ref">GPU capability tiers</span></a>.</p>
+</div>
 <p>For batch capture, the static helpers <code class="docutils literal notranslate"><span class="pre">analyzeRgbaLuminance</span></code>,
 <code class="docutils literal notranslate"><span class="pre">recommendExposure</span></code>, and <code class="docutils literal notranslate"><span class="pre">smoothExposure</span></code> (see <em>Exposure, calibration, and
-output transforms</em> below) drive automatic exposure adjustment without touching
-renderer state directly.</p>
+output transforms</em> in <a class="reference internal" href="Capture.html"><span class="doc">Capture, diagnostics, and headless rendering</span></a>) drive automatic exposure adjustment
+without touching renderer state directly.</p>
+</section>
+<section id="linear-hdr-rendering">
+<h2>Linear HDR rendering<a class="headerlink" href="#linear-hdr-rendering" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">setLinearHdrRenderingEnabled(true)</span></code> keeps scene color linear through MSAA
+resolve, fog, bloom and depth of field, then applies exposure (including
+auto-exposure), the <code class="docutils literal notranslate"><span class="pre">colorMode</span></code> curve (when <code class="docutils literal notranslate"><span class="pre">pbrToneMapping</span></code> is on) and
+gamma once in the final post pass. It is off by default. Because it is a window
+setting, presets and <code class="docutils literal notranslate"><span class="pre">setRenderQualitySettings</span></code> leave it unchanged.</p>
+<p>In this mode bloom thresholds are compared with scene-linear radiance, and a
+post pass runs even when no other post effect is enabled. External renders with
+<code class="docutils literal notranslate"><span class="pre">RenderOverrides::postProcess</span> <span class="pre">=</span> <span class="pre">false</span></code> or a custom <code class="docutils literal notranslate"><span class="pre">post</span></code> shader, and frames
+with a PBR debug output, keep the regular output. Toggling the mode resets the
+temporal-AA history.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span><span class="p">.</span><span class="n">setLinearHdrRenderingEnabled</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+
+<span class="k">auto</span><span class="w"> </span><span class="n">quality</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">();</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">bloomEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">bloomThreshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.3f</span><span class="p">;</span><span class="w">  </span><span class="c1">// scene-linear radiance in this mode</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">quality</span><span class="p">);</span>
+</pre></div>
+</div>
 </section>
 <section id="adaptive-quality-and-texture-budgets">
 <h2>Adaptive quality and texture budgets<a class="headerlink" href="#adaptive-quality-and-texture-budgets" title="Link to this heading"></a></h2>
-<p>For long-running applications and offline pipelines, two static helpers convert
-measured timings or memory budgets into recommended settings without mutating
+<p>For long-running applications and offline pipelines, two helpers convert
+measured timings or a memory budget into recommended settings without changing
 the renderer:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">recommendDynamicQuality(currentSettings,</span> <span class="pre">preset,</span> <span class="pre">timings)</span></code> looks at GPU
-pass timings (from <code class="docutils literal notranslate"><span class="pre">captureRenderPassTimings</span></code>) and proposes a render-scale,
-shadow-update cadence, bloom/SSAO quality, and target frame time. The result
-is a <code class="docutils literal notranslate"><span class="pre">DynamicQualityRecommendation</span></code> with bottleneck flags
-(<code class="docutils literal notranslate"><span class="pre">fillRate</span></code>/<code class="docutils literal notranslate"><span class="pre">shadow</span></code>/<code class="docutils literal notranslate"><span class="pre">postprocess</span></code>) and a human-readable reason.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">recommendMaterialTextureBudget(budgetBytes)</span></code> proposes texture
-formats/filters and which slots can fall back when the asset set exceeds a
-byte budget. The result describes what would be changed; the application
-decides whether to apply it.</p></li>
+<li><p>The static <code class="docutils literal notranslate"><span class="pre">RayraiWindow::recommendDynamicQuality(settings,</span> <span class="pre">preset,</span>
+<span class="pre">timings)</span></code> sums GPU pass timings from <code class="docutils literal notranslate"><span class="pre">captureViewerPassTimings</span></code> or
+<code class="docutils literal notranslate"><span class="pre">captureRenderPassTimings</span></code> and returns a <code class="docutils literal notranslate"><span class="pre">DynamicQualityRecommendation</span></code>.
+It reports the bottleneck flags <code class="docutils literal notranslate"><span class="pre">fillRateBound</span></code>, <code class="docutils literal notranslate"><span class="pre">shadowBound</span></code> and
+<code class="docutils literal notranslate"><span class="pre">postprocessBound</span></code>, a <code class="docutils literal notranslate"><span class="pre">targetFrameMs</span></code>, the proposed
+<code class="docutils literal notranslate"><span class="pre">recommendedRenderScale</span></code>, <code class="docutils literal notranslate"><span class="pre">recommendedUpdateShadowsEveryFrame</span></code>,
+<code class="docutils literal notranslate"><span class="pre">recommendedBloomQuality</span></code>, <code class="docutils literal notranslate"><span class="pre">recommendedScreenSpaceAoSamples</span></code> and
+<code class="docutils literal notranslate"><span class="pre">recommendedScreenSpaceAoDenoiseEnabled</span></code>, the complete
+<code class="docutils literal notranslate"><span class="pre">recommendedSettings</span></code>, <code class="docutils literal notranslate"><span class="pre">changed</span></code> and a <code class="docutils literal notranslate"><span class="pre">reason</span></code>. For <code class="docutils literal notranslate"><span class="pre">High</span></code> and
+<code class="docutils literal notranslate"><span class="pre">Ultra</span></code> it returns the settings unchanged with the reason
+<code class="docutils literal notranslate"><span class="pre">quality_preset_preserves_fidelity</span></code>; pass <code class="docutils literal notranslate"><span class="pre">Fast</span></code>, <code class="docutils literal notranslate"><span class="pre">Balanced</span></code> or
+<code class="docutils literal notranslate"><span class="pre">Custom</span></code> to allow changes.</p></li>
+<li><p>The member function <code class="docutils literal notranslate"><span class="pre">viewer.recommendMaterialTextureBudget(budgetBytes)</span></code>
+(<code class="docutils literal notranslate"><span class="pre">0</span></code> selects a preset-aware default budget) measures material texture
+memory (<code class="docutils literal notranslate"><span class="pre">materialTextureBytes</span></code>, <code class="docutils literal notranslate"><span class="pre">overBudget</span></code>) and proposes
+<code class="docutils literal notranslate"><span class="pre">recommendedTextureAnisotropy</span></code>, <code class="docutils literal notranslate"><span class="pre">recommendedTextureMipLodBias</span></code>,
+<code class="docutils literal notranslate"><span class="pre">recommendedPbrEnvironmentMipLodBias</span></code> and
+<code class="docutils literal notranslate"><span class="pre">recommendedReflectionProbeFilteringEnabled</span></code> values that reduce texture
+sampling cost, also as <code class="docutils literal notranslate"><span class="pre">recommendedSettings</span></code>. It does not unload textures.</p></li>
 </ul>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Measure once per second of headroom.</span>
-<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">RenderOverrides</span><span class="w"> </span><span class="n">ov</span><span class="p">;</span>
-<span class="k">auto</span><span class="w"> </span><span class="n">timings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">captureRenderPassTimings</span><span class="p">(</span><span class="n">viewer</span><span class="p">.</span><span class="n">getCamera</span><span class="p">(),</span><span class="w"> </span><span class="n">ov</span><span class="p">);</span>
+<p>Both capture helpers block on GPU timer queries, so measure occasionally rather
+than every frame. When the scene contains foliage instanced visuals, they also
+append <code class="docutils literal notranslate"><span class="pre">shadow_foliage*</span></code> and <code class="docutils literal notranslate"><span class="pre">scene_foliage*</span></code> entries measured in a second
+frame; these are parts of the coarse passes, so remove them before calling
+<code class="docutils literal notranslate"><span class="pre">recommendDynamicQuality</span></code>.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Render the built-in viewer camera once with GPU timer queries.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">timings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">captureViewerPassTimings</span><span class="p">(</span><span class="mi">1280</span><span class="p">,</span><span class="w"> </span><span class="mi">720</span><span class="p">);</span>
 
 <span class="k">auto</span><span class="w"> </span><span class="n">rec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">recommendDynamicQuality</span><span class="p">(</span>
 <span class="w">    </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">(),</span>
-<span class="w">    </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">RenderQualityPreset</span><span class="o">::</span><span class="n">High</span><span class="p">,</span>
+<span class="w">    </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">RenderQualityPreset</span><span class="o">::</span><span class="n">Balanced</span><span class="p">,</span>
 <span class="w">    </span><span class="n">timings</span><span class="p">);</span>
-
-<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rec</span><span class="p">.</span><span class="n">fillRateBottleneck</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">();</span>
-<span class="w">  </span><span class="n">q</span><span class="p">.</span><span class="n">viewerRenderScale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rec</span><span class="p">.</span><span class="n">recommendedRenderScale</span><span class="p">;</span><span class="w">  </span><span class="c1">// e.g. 0.85</span>
-<span class="w">  </span><span class="n">q</span><span class="p">.</span><span class="n">updateShadowsEveryFrame</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rec</span><span class="p">.</span><span class="n">updateShadowsEveryFrame</span><span class="p">;</span>
-<span class="w">  </span><span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">q</span><span class="p">);</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rec</span><span class="p">.</span><span class="n">changed</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">rec</span><span class="p">.</span><span class="n">recommendedSettings</span><span class="p">);</span>
 <span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Adaptive: %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">rec</span><span class="p">.</span><span class="n">reason</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
 <span class="p">}</span>
 
 <span class="c1">// Texture budget recommendation for a 512 MiB target.</span>
-<span class="k">auto</span><span class="w"> </span><span class="n">budget</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">recommendMaterialTextureBudget</span><span class="p">(</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">budget</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">recommendMaterialTextureBudget</span><span class="p">(</span>
 <span class="w">    </span><span class="cm">/*budgetBytes=*/</span><span class="mi">512ull</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1024</span><span class="p">);</span>
-<span class="c1">// budget.recommendedFilter / .recommendedFormat tell you what to lower.</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">budget</span><span class="p">.</span><span class="n">overBudget</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">budget</span><span class="p">.</span><span class="n">changed</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">budget</span><span class="p">.</span><span class="n">recommendedSettings</span><span class="p">);</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 </section>

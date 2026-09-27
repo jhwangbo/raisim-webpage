@@ -2,7 +2,7 @@
 Articulated Systems
 #############################
 
-.. image:: ../image/anymals.png
+.. image:: ../../rsc/docs/image/anymals.png
     :width: 543
     :height: 423
 
@@ -13,7 +13,7 @@ TL;DR
 
 Click the image for vector graphics
 
-.. image:: ../image/articulatedSystem.png
+.. image:: ../../rsc/docs/image/articulatedSystem.png
   :target: ../_images/articulatedSystem.pdf
   
 Introduction

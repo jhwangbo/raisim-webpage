@@ -8,7 +8,7 @@ Creates a Newton's cradle with stiff and compliant wires, adds robots, and expor
 
 Screenshot
 ==========
-.. image:: ../../../image/length_constraints_newtons_cradle.png
+.. image:: ../../../../rsc/docs/image/length_constraints_newtons_cradle.png
    :alt: length_constraints_newtons_cradle example
    :width: 100%
 

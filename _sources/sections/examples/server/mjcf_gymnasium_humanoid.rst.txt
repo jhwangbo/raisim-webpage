@@ -1,7 +1,7 @@
 mjcf_gymnasium_humanoid
 =======================
 
-.. image:: ../../../image/mjcf_gymnasium_humanoid.png
+.. image:: ../../../../rsc/docs/image/mjcf_gymnasium_humanoid.png
    :alt: mjcf_gymnasium_humanoid example
    :width: 100%
 

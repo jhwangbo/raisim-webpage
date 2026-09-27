@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Capture, diagnostics, and headless rendering &mdash; raisim 2.6.0 documentation</title>
+  <title>Capture, diagnostics, and headless rendering &mdash; raisim 2.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b6430375" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
+      <script src="../../_static/documentation_options.js?v=dfec817d"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -94,16 +94,20 @@
 <li class="toctree-l3"><a class="reference internal" href="Lighting.html">Lighting, shadows, and HDR/IBL</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Materials.html">PBR materials</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Visuals.html">Custom visuals, instancing, and scene helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Foliage.html">Foliage and forest rendering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="PostProcess.html">Post-process effects</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Weather.html">Weather and atmospherics</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Capture, diagnostics, and headless rendering</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#imgui-integration-sdl2-opengl">ImGui integration (SDL2 + OpenGL)</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#headless-offscreen-opengl-context">Headless/offscreen OpenGL context</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#several-renderers-and-context-hand-off">Several renderers and context hand-off</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#detectability-in-camera-captures">Detectability in camera captures</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#camera-control-and-picking">Camera control and picking</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#captures-and-diagnostics">Captures and diagnostics</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#exposure-calibration-and-output-transforms">Exposure, calibration, and output transforms</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#async-mesh-loading">Async mesh loading</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mesh-caches-on-disk">Mesh caches on disk</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#compressed-texture-storage">Compressed texture storage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#heightmap-appearance-and-streaming-updates">Heightmap appearance and streaming updates</a></li>
 </ul>
 </li>
@@ -113,6 +117,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#platform-support">Platform support</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#source-built-tcp-viewer-recommended">Source-built TCP viewer (recommended)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#build-and-link">Build and link</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#minimal-usage">Minimal usage</a></li>
@@ -157,9 +162,10 @@
   <section id="capture-diagnostics-and-headless-rendering">
 <h1>Capture, diagnostics, and headless rendering<a class="headerlink" href="#capture-diagnostics-and-headless-rendering" title="Link to this heading"></a></h1>
 <p>This page covers everything you need to drive rayrai without a GUI: the
-headless/offscreen GL context, ImGui integration, the camera and picking
-APIs, screenshot/diagnostics captures, exposure and calibration helpers,
-async mesh loading, and heightmap texture overrides.</p>
+headless/offscreen GL context and context hand-off between renderers, ImGui
+integration, the camera and picking APIs, screenshot/diagnostics captures,
+exposure and calibration helpers, async mesh loading and the mesh caches,
+compressed texture storage, and heightmap texture overrides.</p>
 <section id="imgui-integration-sdl2-opengl">
 <h2>ImGui integration (SDL2 + OpenGL)<a class="headerlink" href="#imgui-integration-sdl2-opengl" title="Link to this heading"></a></h2>
 <p>rayrai is designed to be embedded in custom UI. The repository ships a minimal
@@ -263,6 +269,27 @@ and batch image generation can run without creating ImGui state.</p>
 <code class="docutils literal notranslate"><span class="pre">docs/image_generators/</span></code> — see <code class="docutils literal notranslate"><span class="pre">doc_image_common.hpp</span></code> for a packaged
 helper that wraps the boilerplate above.</p>
 </section>
+<section id="several-renderers-and-context-hand-off">
+<h2>Several renderers and context hand-off<a class="headerlink" href="#several-renderers-and-context-hand-off" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">createOffscreenGlContext</span></code> leaves the new context current on the calling
+thread, and a context can be current on only one thread at a time. To hand a
+context created on the main thread to a worker, release it with
+<code class="docutils literal notranslate"><span class="pre">RayraiWindow::detachOffscreenGlContext(window)</span></code> (safe to call when no
+context is current), then call <code class="docutils literal notranslate"><span class="pre">makeOffscreenContextCurrent</span></code> on the worker.
+When several renderers share one thread, switch between their contexts with
+<code class="docutils literal notranslate"><span class="pre">makeOffscreenContextCurrent</span></code> too: it also resets rayrai’s per-thread GL
+binding caches, which a plain <code class="docutils literal notranslate"><span class="pre">SDL_GL_MakeCurrent</span></code> does not.</p>
+<p>A context created while another one is current joins its share group. Within
+a share group, the geometry of untextured meshes is uploaded once and reused;
+textured meshes and their textures are loaded separately for each context,
+because rayrai tunes texture filtering per renderer. See <a class="reference internal" href="../Rayrai.html"><span class="doc">rayrai Visualizer</span></a> for
+the threading contract.</p>
+<p>SDL keyboard state is shared by the whole process, so with several renderers
+enable keyboard input only on the focused one. <code class="docutils literal notranslate"><span class="pre">setKeyboardInputEnabled(false)</span></code>
+stops WASD/Space camera movement, and <code class="docutils literal notranslate"><span class="pre">setKeyboardShortcutsEnabled(false)</span></code>
+stops global shortcuts such as <code class="docutils literal notranslate"><span class="pre">B</span></code> (pick-buffer view). Both default to
+<code class="docutils literal notranslate"><span class="pre">true</span></code>. Mouse input is already scoped by the hover flag passed to <code class="docutils literal notranslate"><span class="pre">update</span></code>.</p>
+</section>
 <section id="detectability-in-camera-captures">
 <h2>Detectability in camera captures<a class="headerlink" href="#detectability-in-camera-captures" title="Link to this heading"></a></h2>
 <p>External-camera captures draw RaiSim world objects according to the usual
@@ -340,25 +367,68 @@ and bug reports. These helpers are opt-in and are not part of the normal fast
 frame path.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">captureSupersampledRgba</span></code> renders high-resolution screenshots without
-resizing the caller’s camera.</p></li>
+resizing the caller’s camera. <code class="docutils literal notranslate"><span class="pre">scale</span></code> is clamped to 1–4.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">captureDebugPasses</span></code> captures the standard PBR/post-process debug-pass set
-as top-left ordered RGBA buffers.</p></li>
+as top-left ordered RGBA buffers. It overrides the PBR debug output for this
+renderer only and leaves the process environment untouched;
+<code class="docutils literal notranslate"><span class="pre">pbrDebugOutputMode()</span></code> returns the mode in force, which otherwise comes from
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_PBR_DEBUG_OUTPUT</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">captureRenderPassTimings</span></code> inserts blocking GPU timer queries for pass-level
-measurements. Use it for benchmarks, not ordinary frames.</p></li>
+measurements of an external camera. Use it for benchmarks, not ordinary
+frames.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">captureViewerPassTimings(width,</span> <span class="pre">height)</span></code> measures the built-in viewer the
+same way. It calls <code class="docutils literal notranslate"><span class="pre">update</span></code> at that size, so it also resizes the viewer, and
+it includes non-detectable foliage.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">renderDiagnosticsJson</span></code> and <code class="docutils literal notranslate"><span class="pre">writeRenderDiagnosticsFiles</span></code> export structured
 quality, scene, material, shadow, transparent-rendering, and resource state.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">analyzeRgbaLuminance</span></code>, <code class="docutils literal notranslate"><span class="pre">recommendExposure</span></code>, luminance histograms, and
 calibration helpers operate on captured RGBA pixels for screenshot/report
 workflows.</p></li>
 </ul>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisin</span><span class="o">::</span><span class="n">RenderOverrides</span><span class="w"> </span><span class="n">ov</span><span class="p">;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">RenderOverrides</span><span class="w"> </span><span class="n">ov</span><span class="p">;</span>
 <span class="n">ov</span><span class="p">.</span><span class="n">doShadows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">rgba</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">captureSupersampledRgba</span><span class="p">(</span><span class="n">viewer</span><span class="p">.</span><span class="n">getCamera</span><span class="p">(),</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">ov</span><span class="p">);</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">timings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">captureRenderPassTimings</span><span class="p">(</span><span class="n">viewer</span><span class="p">.</span><span class="n">getCamera</span><span class="p">(),</span><span class="w"> </span><span class="n">ov</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">viewerTimings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">captureViewerPassTimings</span><span class="p">(</span><span class="mi">1280</span><span class="p">,</span><span class="w"> </span><span class="mi">720</span><span class="p">);</span>
 <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">renderDiagnosticsJson</span><span class="p">();</span>
 <span class="n">viewer</span><span class="p">.</span><span class="n">writeRenderDiagnosticsFiles</span><span class="p">(</span><span class="s">&quot;/tmp/rayrai_diag&quot;</span><span class="p">,</span><span class="w"> </span><span class="cm">/*importReport=*/</span><span class="p">{});</span>
 </pre></div>
 </div>
+<p>When the scene contains foliage batches, both timing captures render twice.
+The coarse passes (<code class="docutils literal notranslate"><span class="pre">shadow</span></code>, <code class="docutils literal notranslate"><span class="pre">scene_color</span></code> or <code class="docutils literal notranslate"><span class="pre">scene_color_and_resolve</span></code>,
+<code class="docutils literal notranslate"><span class="pre">postprocess</span></code>, and so on) come from the first render, and the foliage
+sub-passes (<code class="docutils literal notranslate"><span class="pre">scene_foliage_*</span></code> and <code class="docutils literal notranslate"><span class="pre">shadow_foliage_*</span></code>) from the second. The
+sub-passes overlap the coarse passes, so do not add them to a frame total.</p>
+<p>Per-frame state can be read without extra rendering, and describes the most
+recent <code class="docutils literal notranslate"><span class="pre">update</span></code> or external-camera render:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">foliageRenderDiagnostics()</span></code> — foliage draw calls, instance counts, culling
+and batching counters, and the foliage GPU times filled in by the timing
+captures.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">shadowCacheDiagnostics()</span></code> — shadow-map renders versus reuses, including
+per-light and static/dynamic layer tracking.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">conservativeOcclusionCullingDiagnostics()</span></code> — occlusion-query and Hi-Z
+culling counters.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">environmentBackgroundDiagnostics()</span></code> — <code class="docutils literal notranslate"><span class="pre">drawn</span></code>, <code class="docutils literal notranslate"><span class="pre">deferred</span></code> (drawn inside
+the scene pass rather than right after the clear), and <code class="docutils literal notranslate"><span class="pre">depthTested</span></code> (drawn
+after the depth prepass, so only uncovered samples were shaded).</p></li>
+</ul>
+<p>For offline multi-view captures such as probe bakes, set
+<code class="docutils literal notranslate"><span class="pre">RenderOverrides::fixedShadowCenterEnabled</span></code> and <code class="docutils literal notranslate"><span class="pre">fixedShadowCenter</span></code> so all
+views share one directional shadow region instead of centering it on each
+camera; use a single shadow cascade with it. External renders reuse the
+previous frame when the camera, overrides, settings, and scene are unchanged;
+call <code class="docutils literal notranslate"><span class="pre">invalidateExternalFrameCache()</span></code> after editing GL resources in place.
+When the quality settings enable MSAA, an external camera keeps its
+multisample buffers between renders; <code class="docutils literal notranslate"><span class="pre">camera.setSceneMsaaSamples(1)</span></code> releases
+them.</p>
+<p>With <code class="docutils literal notranslate"><span class="pre">setLinearHdrRenderingEnabled(true)</span></code> (off by default), scene colour stays
+linear through MSAA, fog, bloom, and depth of field, and exposure, the tone
+curve, and gamma are applied once at the end of postprocessing; bloom
+thresholds are then scene-linear. Captures that run the built-in
+postprocessing (<code class="docutils literal notranslate"><span class="pre">RenderOverrides::postProcess</span></code>, the default) follow this
+pipeline, while renders with <code class="docutils literal notranslate"><span class="pre">postProcess</span> <span class="pre">=</span> <span class="pre">false</span></code>, a custom <code class="docutils literal notranslate"><span class="pre">post</span></code> shader,
+or a PBR debug output keep the previous output.</p>
 <p>For transparent scenes, <code class="docutils literal notranslate"><span class="pre">transparentDrawDebugView</span></code> reports draw order, OIT,
 refraction, overdraw, and per-item sorting state. Shadow and reflection-probe
 planning are similarly exposed through <code class="docutils literal notranslate"><span class="pre">shadowDebugOverlaySummary</span></code>,
@@ -378,8 +448,8 @@ measurements into proposed setting changes.</p>
 <p>Capture pipelines often need consistent brightness and color across
 screenshots. rayrai provides static helpers that operate on captured RGBA
 buffers without touching renderer state:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">metrics</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">analyzeRgbaLuminance</span><span class="p">(</span><span class="n">rgba</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span>
-<span class="w">                                                          </span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">height</span><span class="p">);</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// rgba: std::vector&lt;unsigned char&gt; with width * height RGBA8 pixels.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">metrics</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">analyzeRgbaLuminance</span><span class="p">(</span><span class="n">rgba</span><span class="p">,</span><span class="w"> </span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">height</span><span class="p">);</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">rec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">recommendExposure</span><span class="p">(</span>
 <span class="w">    </span><span class="n">metrics</span><span class="p">,</span><span class="w"> </span><span class="cm">/*currentExposure=*/</span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*targetMedian=*/</span><span class="mf">0.18f</span><span class="p">,</span>
 <span class="w">    </span><span class="cm">/*targetP95=*/</span><span class="mf">0.7f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*minExp=*/</span><span class="mf">0.05f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*maxExp=*/</span><span class="mf">16.0f</span><span class="p">);</span>
@@ -409,7 +479,7 @@ read the current frame’s luminance and recommend a new exposure value:</p>
 <span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">running</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">frame</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">captureSupersampledRgba</span><span class="p">(</span><span class="n">viewer</span><span class="p">.</span><span class="n">getCamera</span><span class="p">(),</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="p">{});</span>
 <span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">metrics</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">analyzeRgbaLuminance</span><span class="p">(</span>
-<span class="w">      </span><span class="n">frame</span><span class="p">.</span><span class="n">rgba</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">frame</span><span class="p">.</span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">frame</span><span class="p">.</span><span class="n">height</span><span class="p">);</span>
+<span class="w">      </span><span class="n">frame</span><span class="p">.</span><span class="n">rgba</span><span class="p">,</span><span class="w"> </span><span class="n">frame</span><span class="p">.</span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">frame</span><span class="p">.</span><span class="n">height</span><span class="p">);</span>
 <span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">rec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">recommendExposure</span><span class="p">(</span>
 <span class="w">      </span><span class="n">metrics</span><span class="p">,</span><span class="w"> </span><span class="n">currentExposure</span><span class="p">,</span>
 <span class="w">      </span><span class="cm">/*targetMedian=*/</span><span class="mf">0.18f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*targetP95=*/</span><span class="mf">0.7f</span><span class="p">,</span>
@@ -429,13 +499,17 @@ read the current frame’s luminance and recommend a new exposure value:</p>
 </section>
 <section id="async-mesh-loading">
 <h2>Async mesh loading<a class="headerlink" href="#async-mesh-loading" title="Link to this heading"></a></h2>
-<p>For scene authoring tools and editors, expensive mesh imports can run on
-worker threads. The renderer’s main thread polls for completed assets and
-finalizes their GPU buffers:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span><span class="p">.</span><span class="n">setAsyncMeshLoadingEnabled</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
-<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">visual</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addVisualMesh</span><span class="p">(</span>
-<span class="w">    </span><span class="s">&quot;shelf&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/path/to/large_scene.glb&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span>
-<span class="w">    </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">);</span>
+<p>Mesh files load asynchronously by default. The import runs on a worker
+thread, materials and textures are resolved on the render thread, geometry is
+optimized on a worker, and the prepared submeshes are uploaded to the GPU one
+per step on the render thread. Until an asset is ready, its visuals draw
+nothing; instanced batches also wait for their LOD chains (see <a class="reference internal" href="Visuals.html"><span class="doc">Custom visuals, instancing, and scene helpers</span></a>).
+<code class="docutils literal notranslate"><span class="pre">update()</span></code> and every external-camera render advance one step themselves.
+<code class="docutils literal notranslate"><span class="pre">pollAsyncMeshLoads(n)</span></code> advances up to <code class="docutils literal notranslate"><span class="pre">n</span></code> import or upload steps (<code class="docutils literal notranslate"><span class="pre">0</span></code>
+does nothing) and returns the number of assets that finished. OpenUSD files
+always load synchronously.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">visual</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addVisualMesh</span><span class="p">(</span><span class="s">&quot;shelf&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/path/to/large_scene.glb&quot;</span><span class="p">,</span>
+<span class="w">                                   </span><span class="n">glm</span><span class="o">::</span><span class="n">dvec3</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">));</span>
 
 <span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">viewer</span><span class="p">.</span><span class="n">pendingAsyncMeshLoadCount</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="n">viewer</span><span class="p">.</span><span class="n">pollAsyncMeshLoads</span><span class="p">(</span><span class="cm">/*maxAssets=*/</span><span class="mi">4</span><span class="p">);</span>
@@ -443,9 +517,58 @@ finalizes their GPU buffers:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Async loading keeps the frame loop responsive on first import. The flag has
-no effect for assets that are already cached through
-<code class="docutils literal notranslate"><span class="pre">RayraiGlobalAsset</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pendingAsyncMeshLoadCount()</span></code> includes unfinished GPU uploads and instanced
+LOD jobs. Call <code class="docutils literal notranslate"><span class="pre">setAsyncMeshLoadingEnabled(false)</span></code> before adding visuals when
+assets must be complete as soon as <code class="docutils literal notranslate"><span class="pre">addVisualMesh</span></code> or <code class="docutils literal notranslate"><span class="pre">importVisualScene</span></code>
+returns. Assets already held in memory are returned immediately either way.</p>
+</section>
+<section id="mesh-caches-on-disk">
+<h2>Mesh caches on disk<a class="headerlink" href="#mesh-caches-on-disk" title="Link to this heading"></a></h2>
+<p>rayrai keeps two regenerable caches for imported meshes; deleting them only
+costs regeneration time on the next load.</p>
+<ul class="simple">
+<li><p>Mesh metadata and generated LOD chains are written to
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_MESH_PREPROCESS_CACHE_DIR</span></code>, by default the
+<code class="docutils literal notranslate"><span class="pre">rayrai_mesh_preprocess_cache</span></code> folder in the system temporary directory.
+An entry is invalidated when the source file’s size or modification time
+changes, or when the cache format changes.
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_SUPPRESS_MESH_PREPROCESS_CACHE_FALLBACK_WARNINGS=1</span></code> silences the
+warnings printed when the cache cannot be used.</p></li>
+<li><p>LOD chains that instanced batches prepare during asynchronous loading are
+stored next to each asset as <code class="docutils literal notranslate"><span class="pre">rayrai_cache_&lt;file</span> <span class="pre">name&gt;.lods</span></code>. They are
+invalidated by a fingerprint of the imported geometry, so edits to external
+glTF buffers are detected. <code class="docutils literal notranslate"><span class="pre">RAYRAI_ASYNC_LOD_CACHE_DIR</span></code> stores them in
+another folder instead (if that folder is not writable, nothing is cached).
+Without it, an unwritable asset folder falls back to the system temporary
+directory. Setting <code class="docutils literal notranslate"><span class="pre">RAYRAI_DISABLE_ASYNC_LOD_CACHE</span></code> to any value disables
+this cache.</p></li>
+</ul>
+</section>
+<section id="compressed-texture-storage">
+<h2>Compressed texture storage<a class="headerlink" href="#compressed-texture-storage" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">rayrai/Bc7TextureStorage.hpp</span></code> provides an opt-in, load-time helper that
+re-encodes eligible colour textures as BC7 to reduce texture memory. Call it
+with the renderer’s GL context current, after the visuals are loaded:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;rayrai/Bc7TextureStorage.hpp&gt;</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">textures</span><span class="p">;</span>
+<span class="n">visual</span><span class="o">-&gt;</span><span class="n">collectMaterialTextureIds</span><span class="p">(</span><span class="n">textures</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">sort</span><span class="p">(</span><span class="n">textures</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="w"> </span><span class="n">textures</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
+<span class="n">textures</span><span class="p">.</span><span class="n">erase</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">unique</span><span class="p">(</span><span class="n">textures</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="w"> </span><span class="n">textures</span><span class="p">.</span><span class="n">end</span><span class="p">()),</span><span class="w"> </span><span class="n">textures</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">textures</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">stored</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">compressRgbTextureBc7</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+<span class="w">  </span><span class="c1">// stored.mipLevels == 0 means the texture was left unchanged.</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Only mutable 8-bit RGB or sRGB 2D textures are converted. Textures with alpha,
+float, depth, immutable, or already compressed storage are left untouched, as
+is any texture that would not get smaller. Every authored mip level, the
+filtering state, and the texture id are kept. <code class="docutils literal notranslate"><span class="pre">supportsBc7TextureStorage()</span></code>
+reports whether the context has OpenGL 4.2 or
+<code class="docutils literal notranslate"><span class="pre">GL_ARB_texture_compression_bptc</span></code>; without it the helper does nothing. The
+driver’s encoder is lossy and runs again on every launch, so compare images
+before enabling it for an asset.</p>
 </section>
 <section id="heightmap-appearance-and-streaming-updates">
 <h2>Heightmap appearance and streaming updates<a class="headerlink" href="#heightmap-appearance-and-streaming-updates" title="Link to this heading"></a></h2>
@@ -454,6 +577,13 @@ heightmap in the viewer. The matching
 <code class="docutils literal notranslate"><span class="pre">setHeightmapNormalResourcePath</span></code> and <code class="docutils literal notranslate"><span class="pre">setHeightmapHeightResourcePath</span></code>
 methods provide global normal and height/parallax textures. Passing an empty
 path clears the corresponding resource.</p>
+<p><code class="docutils literal notranslate"><span class="pre">setHeightmapTerrainMaterialParameters(normalStrength,</span> <span class="pre">roughness,</span>
+<span class="pre">parallaxScale,</span> <span class="pre">deepParallax</span> <span class="pre">=</span> <span class="pre">true)</span></code> tunes the heightmap terrain material
+(defaults <code class="docutils literal notranslate"><span class="pre">1.0</span></code>, <code class="docutils literal notranslate"><span class="pre">0.90</span></code>, <code class="docutils literal notranslate"><span class="pre">4.0</span></code>). With a height texture,
+<code class="docutils literal notranslate"><span class="pre">deepParallax</span> <span class="pre">=</span> <span class="pre">true</span></code> uses layered parallax occlusion mapping and <code class="docutils literal notranslate"><span class="pre">false</span></code> a
+single-sample parallax offset; <code class="docutils literal notranslate"><span class="pre">parallaxScale</span> <span class="pre">=</span> <span class="pre">0</span></code> disables parallax.
+Parallax changes texture sampling only, not collision or the terrain
+silhouette.</p>
 <p>Per-heightmap data is authored on <code class="docutils literal notranslate"><span class="pre">raisim::HeightMap</span></code> itself. Use
 <code class="docutils literal notranslate"><span class="pre">setColor</span></code> for a full RGB color map, <code class="docutils literal notranslate"><span class="pre">setColorPatch</span></code> for a rectangular
 color patch after the full map has been initialized, and

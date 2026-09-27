@@ -1,7 +1,7 @@
 Examples Overview
 =================
 
-.. image:: ../../image/examples_overview.png
+.. image:: ../../../rsc/docs/image/examples_overview.png
    :alt: Compiled overview of current RaiSim and rayrai examples
    :width: 100%
 

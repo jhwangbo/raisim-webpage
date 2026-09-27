@@ -7,7 +7,7 @@ OpenUSD support is part of supported RaiSim packages and source builds; it is
 not an optional Assimp importer path and there is no CMake switch to build
 RaiSim without it.
 
-.. figure:: ../image/rayrai/rayrai_usd_nvidia_robots.png
+.. figure:: ../../rsc/docs/image/rayrai/rayrai_usd_nvidia_robots.png
    :alt: Three Isaac Sim robot USD assets imported into RaiSim
    :width: 100%
 
@@ -54,7 +54,7 @@ template-driven worlds.
     raisim::World emptyWorld;                      // empty world, build it
                                                    // up programmatically
 
-.. figure:: ../image/rayrai/rayrai_usd_shadow_hand_cube.png
+.. figure:: ../../rsc/docs/image/rayrai/rayrai_usd_shadow_hand_cube.png
    :alt: ShadowHand USD scene imported into RaiSim with a native cube
    :width: 100%
 

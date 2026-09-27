@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rayrai Example: CoACD Mesh Approximation &mdash; raisim 2.6.0 documentation</title>
+  <title>Rayrai Example: CoACD Mesh Approximation &mdash; raisim 2.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=b6430375" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=ae39cb24"></script>
+      <script src="../../../_static/documentation_options.js?v=dfec817d"></script>
       <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -69,9 +69,11 @@
 <li class="toctree-l3"><a class="reference internal" href="rayrai_aruco_marker.html">Rayrai Example: Aruco Marker</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_custom_visuals.html">Rayrai Example: Custom Visuals</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_instancing_grid.html">Rayrai Example: Instancing Grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_forest.html">Rayrai Example: Forest</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_pointcloud_animation.html">Rayrai Example: Pointcloud Animation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_pbr_material_grid.html">Rayrai Example: PBR Material Grid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_pbr_texture_maps.html">Rayrai Example: PBR Texture Maps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_nested_glass.html">Rayrai Example: Nested Glass</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_quality_lighting.html">Rayrai Example: Quality Lighting and FXAA</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_visual_asset_support.html">rayrai_visual_asset_support</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Rayrai Example: CoACD Mesh Approximation</a><ul>
@@ -79,6 +81,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#screenshot">Screenshot</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#target">Target</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#run">Run</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#first-run-and-caching">First run and caching</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#details">Details</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#what-this-example-is-not">What this example is not</a></li>
 </ul>
@@ -86,6 +89,7 @@
 <li class="toctree-l3"><a class="reference internal" href="rayrai_runtime_scene_editing.html">Rayrai Example: Runtime Scene Editing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_rolling_spinning_friction.html">Rayrai Example: Rolling And Spinning Friction</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_swept_ccd.html">Rayrai Example: Swept CCD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_forest.html">Rayrai Example: Forest</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_tcp_viewer.html">Rayrai Example: TCP Viewer</a></li>
 </ul>
 </li>
@@ -189,17 +193,29 @@ Use it to visually inspect collision approximations generated from YCB meshes.</
 <p>On Windows, run <code class="docutils literal notranslate"><span class="pre">rayrai_coacd_mesh_approximation.exe</span></code> instead.
 This example uses the in-process rayrai renderer (no external client required).</p>
 </section>
+<section id="first-run-and-caching">
+<h2>First run and caching<a class="headerlink" href="#first-run-and-caching" title="Link to this heading"></a></h2>
+<p>The example builds the world and generates every CoACD part before it opens the
+window. It first prints
+<code class="docutils literal notranslate"><span class="pre">Generating</span> <span class="pre">CoACD</span> <span class="pre">collision</span> <span class="pre">parts;</span> <span class="pre">the</span> <span class="pre">first</span> <span class="pre">run</span> <span class="pre">can</span> <span class="pre">take</span> <span class="pre">a</span> <span class="pre">few</span> <span class="pre">minutes...</span></code>
+and then one line per mesh. On the first run this phase can take a few minutes;
+press Ctrl-C to stop it. <code class="docutils literal notranslate"><span class="pre">World::addMesh</span></code> caches each result beside its source
+mesh as a <code class="docutils literal notranslate"><span class="pre">raisim_coacd_*</span></code> OBJ file, here in the build tree’s copied
+<code class="docutils literal notranslate"><span class="pre">rsc/ycb</span></code> directory, so later runs in the same build tree load the saved parts
+directly. See <a class="reference internal" href="../../SingleBodyObjects.html"><span class="doc">Single-Body Objects</span></a> for the cache format.</p>
+</section>
 <section id="details">
 <h2>Details<a class="headerlink" href="#details" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Loads several YCB OBJ meshes.</p></li>
+<li><p>Loads five YCB OBJ meshes: master chef can, tuna fish can, strawberry, apple,
+and orange.</p></li>
 <li><p>Calls <code class="docutils literal notranslate"><span class="pre">World::addMesh</span></code> directly for both the original triangle mesh and the
 CoACD convex approximation mesh.</p></li>
 <li><p>Passes <code class="docutils literal notranslate"><span class="pre">raisim::CoacdOptions</span></code> into <code class="docutils literal notranslate"><span class="pre">addMesh</span></code> so the mesh processing stays
 inside RaiSim rather than in application-side rendering code.</p></li>
 <li><p>Prints the number of generated convex parts for each mesh.</p></li>
-<li><p>Displays the original meshes in gray beside the CoACD convex approximation
-collision parts.</p></li>
+<li><p>Displays the original meshes in gray beside the translucent orange CoACD
+convex approximation parts.</p></li>
 </ul>
 </section>
 <section id="what-this-example-is-not">

@@ -8,7 +8,7 @@ Loads URDFs with spring and damper joints (cartpole and chain) to visualize join
 
 Screenshot
 ==========
-.. image:: ../../../image/spring_damper_joints.png
+.. image:: ../../../../rsc/docs/image/spring_damper_joints.png
    :alt: spring_damper_joints example
    :width: 100%
 

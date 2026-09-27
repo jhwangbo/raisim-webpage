@@ -1,7 +1,7 @@
 rayrai_visual_asset_support
 ===========================
 
-.. image:: ../../../image/rayrai_visual_asset_support.png
+.. image:: ../../../../rsc/docs/image/rayrai_visual_asset_support.png
    :alt: rayrai_visual_asset_support example
    :width: 100%
 

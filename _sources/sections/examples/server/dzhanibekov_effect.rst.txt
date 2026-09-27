@@ -8,7 +8,7 @@ Demonstrates the Dzhanibekov effect by spinning a box in zero gravity and visual
 
 Screenshot
 ==========
-.. image:: ../../../image/dzhanibekov_effect.png
+.. image:: ../../../../rsc/docs/image/dzhanibekov_effect.png
    :alt: dzhanibekov_effect example
    :width: 100%
 

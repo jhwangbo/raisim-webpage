@@ -8,7 +8,7 @@ Loads a mesh (the monkey OBJ) multiple times and stacks them in a grid. This dem
 
 Screenshot
 ==========
-.. image:: ../../../image/mesh_stack.png
+.. image:: ../../../../rsc/docs/image/mesh_stack.png
    :alt: mesh_stack example
    :width: 100%
 

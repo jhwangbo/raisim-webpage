@@ -8,7 +8,7 @@ Adds visual primitives, meshes, arrows, polylines, dynamic meshes, and a visual 
 
 Screenshot
 ==========
-.. image:: ../../../image/visual_objects_showcase.png
+.. image:: ../../../../rsc/docs/image/visual_objects_showcase.png
    :alt: visual_objects_showcase example
    :width: 100%
 

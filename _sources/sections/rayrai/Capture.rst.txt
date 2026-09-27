@@ -3,9 +3,10 @@ Capture, diagnostics, and headless rendering
 ############################################
 
 This page covers everything you need to drive rayrai without a GUI: the
-headless/offscreen GL context, ImGui integration, the camera and picking
-APIs, screenshot/diagnostics captures, exposure and calibration helpers,
-async mesh loading, and heightmap texture overrides.
+headless/offscreen GL context and context hand-off between renderers, ImGui
+integration, the camera and picking APIs, screenshot/diagnostics captures,
+exposure and calibration helpers, async mesh loading and the mesh caches,
+compressed texture storage, and heightmap texture overrides.
 
 ImGui integration (SDL2 + OpenGL)
 =================================
@@ -117,6 +118,29 @@ This is the same pattern used by the doc image generators under
 ``docs/image_generators/`` — see ``doc_image_common.hpp`` for a packaged
 helper that wraps the boilerplate above.
 
+Several renderers and context hand-off
+======================================
+``createOffscreenGlContext`` leaves the new context current on the calling
+thread, and a context can be current on only one thread at a time. To hand a
+context created on the main thread to a worker, release it with
+``RayraiWindow::detachOffscreenGlContext(window)`` (safe to call when no
+context is current), then call ``makeOffscreenContextCurrent`` on the worker.
+When several renderers share one thread, switch between their contexts with
+``makeOffscreenContextCurrent`` too: it also resets rayrai's per-thread GL
+binding caches, which a plain ``SDL_GL_MakeCurrent`` does not.
+
+A context created while another one is current joins its share group. Within
+a share group, the geometry of untextured meshes is uploaded once and reused;
+textured meshes and their textures are loaded separately for each context,
+because rayrai tunes texture filtering per renderer. See :doc:`../Rayrai` for
+the threading contract.
+
+SDL keyboard state is shared by the whole process, so with several renderers
+enable keyboard input only on the focused one. ``setKeyboardInputEnabled(false)``
+stops WASD/Space camera movement, and ``setKeyboardShortcutsEnabled(false)``
+stops global shortcuts such as ``B`` (pick-buffer view). Both default to
+``true``. Mouse input is already scoped by the hover flag passed to ``update``.
+
 Detectability in camera captures
 ================================
 External-camera captures draw RaiSim world objects according to the usual
@@ -206,11 +230,18 @@ and bug reports. These helpers are opt-in and are not part of the normal fast
 frame path.
 
 * ``captureSupersampledRgba`` renders high-resolution screenshots without
-  resizing the caller's camera.
+  resizing the caller's camera. ``scale`` is clamped to 1–4.
 * ``captureDebugPasses`` captures the standard PBR/post-process debug-pass set
-  as top-left ordered RGBA buffers.
+  as top-left ordered RGBA buffers. It overrides the PBR debug output for this
+  renderer only and leaves the process environment untouched;
+  ``pbrDebugOutputMode()`` returns the mode in force, which otherwise comes from
+  ``RAYRAI_PBR_DEBUG_OUTPUT``.
 * ``captureRenderPassTimings`` inserts blocking GPU timer queries for pass-level
-  measurements. Use it for benchmarks, not ordinary frames.
+  measurements of an external camera. Use it for benchmarks, not ordinary
+  frames.
+* ``captureViewerPassTimings(width, height)`` measures the built-in viewer the
+  same way. It calls ``update`` at that size, so it also resizes the viewer, and
+  it includes non-detectable foliage.
 * ``renderDiagnosticsJson`` and ``writeRenderDiagnosticsFiles`` export structured
   quality, scene, material, shadow, transparent-rendering, and resource state.
 * ``analyzeRgbaLuminance``, ``recommendExposure``, luminance histograms, and
@@ -219,12 +250,51 @@ frame path.
 
 .. code-block:: cpp
 
-    raisin::RenderOverrides ov;
+    raisin::RayraiWindow::RenderOverrides ov;
     ov.doShadows = true;
     auto rgba = viewer.captureSupersampledRgba(viewer.getCamera(), 2, ov);
     auto timings = viewer.captureRenderPassTimings(viewer.getCamera(), ov);
+    auto viewerTimings = viewer.captureViewerPassTimings(1280, 720);
     std::string json = viewer.renderDiagnosticsJson();
     viewer.writeRenderDiagnosticsFiles("/tmp/rayrai_diag", /*importReport=*/{});
+
+When the scene contains foliage batches, both timing captures render twice.
+The coarse passes (``shadow``, ``scene_color`` or ``scene_color_and_resolve``,
+``postprocess``, and so on) come from the first render, and the foliage
+sub-passes (``scene_foliage_*`` and ``shadow_foliage_*``) from the second. The
+sub-passes overlap the coarse passes, so do not add them to a frame total.
+
+Per-frame state can be read without extra rendering, and describes the most
+recent ``update`` or external-camera render:
+
+* ``foliageRenderDiagnostics()`` — foliage draw calls, instance counts, culling
+  and batching counters, and the foliage GPU times filled in by the timing
+  captures.
+* ``shadowCacheDiagnostics()`` — shadow-map renders versus reuses, including
+  per-light and static/dynamic layer tracking.
+* ``conservativeOcclusionCullingDiagnostics()`` — occlusion-query and Hi-Z
+  culling counters.
+* ``environmentBackgroundDiagnostics()`` — ``drawn``, ``deferred`` (drawn inside
+  the scene pass rather than right after the clear), and ``depthTested`` (drawn
+  after the depth prepass, so only uncovered samples were shaded).
+
+For offline multi-view captures such as probe bakes, set
+``RenderOverrides::fixedShadowCenterEnabled`` and ``fixedShadowCenter`` so all
+views share one directional shadow region instead of centering it on each
+camera; use a single shadow cascade with it. External renders reuse the
+previous frame when the camera, overrides, settings, and scene are unchanged;
+call ``invalidateExternalFrameCache()`` after editing GL resources in place.
+When the quality settings enable MSAA, an external camera keeps its
+multisample buffers between renders; ``camera.setSceneMsaaSamples(1)`` releases
+them.
+
+With ``setLinearHdrRenderingEnabled(true)`` (off by default), scene colour stays
+linear through MSAA, fog, bloom, and depth of field, and exposure, the tone
+curve, and gamma are applied once at the end of postprocessing; bloom
+thresholds are then scene-linear. Captures that run the built-in
+postprocessing (``RenderOverrides::postProcess``, the default) follow this
+pipeline, while renders with ``postProcess = false``, a custom ``post`` shader,
+or a PBR debug output keep the previous output.
 
 For transparent scenes, ``transparentDrawDebugView`` reports draw order, OIT,
 refraction, overdraw, and per-item sorting state. Shadow and reflection-probe
@@ -249,8 +319,8 @@ buffers without touching renderer state:
 
 .. code-block:: cpp
 
-    auto metrics = raisin::RayraiWindow::analyzeRgbaLuminance(rgba.data(),
-                                                              width, height);
+    // rgba: std::vector<unsigned char> with width * height RGBA8 pixels.
+    auto metrics = raisin::RayraiWindow::analyzeRgbaLuminance(rgba, width, height);
     auto rec = raisin::RayraiWindow::recommendExposure(
         metrics, /*currentExposure=*/1.0f, /*targetMedian=*/0.18f,
         /*targetP95=*/0.7f, /*minExp=*/0.05f, /*maxExp=*/16.0f);
@@ -284,7 +354,7 @@ read the current frame's luminance and recommend a new exposure value:
     while (running) {
       auto frame = viewer.captureSupersampledRgba(viewer.getCamera(), 1, {});
       auto metrics = raisin::RayraiWindow::analyzeRgbaLuminance(
-          frame.rgba.data(), frame.width, frame.height);
+          frame.rgba, frame.width, frame.height);
       auto rec = raisin::RayraiWindow::recommendExposure(
           metrics, currentExposure,
           /*targetMedian=*/0.18f, /*targetP95=*/0.7f,
@@ -302,25 +372,79 @@ read the current frame's luminance and recommend a new exposure value:
 
 Async mesh loading
 ==================
-For scene authoring tools and editors, expensive mesh imports can run on
-worker threads. The renderer's main thread polls for completed assets and
-finalizes their GPU buffers:
+Mesh files load asynchronously by default. The import runs on a worker
+thread, materials and textures are resolved on the render thread, geometry is
+optimized on a worker, and the prepared submeshes are uploaded to the GPU one
+per step on the render thread. Until an asset is ready, its visuals draw
+nothing; instanced batches also wait for their LOD chains (see :doc:`Visuals`).
+``update()`` and every external-camera render advance one step themselves.
+``pollAsyncMeshLoads(n)`` advances up to ``n`` import or upload steps (``0``
+does nothing) and returns the number of assets that finished. OpenUSD files
+always load synchronously.
 
 .. code-block:: cpp
 
-    viewer.setAsyncMeshLoadingEnabled(true);
-    auto* visual = viewer.addVisualMesh(
-        "shelf", "/path/to/large_scene.glb", 1.0f, 1.0f, 1.0f,
-        1.0f, 1.0f, 1.0f, 1.0f);
+    auto visual = viewer.addVisualMesh("shelf", "/path/to/large_scene.glb",
+                                       glm::dvec3(1.0), glm::vec4(1.0f));
 
     while (viewer.pendingAsyncMeshLoadCount() > 0) {
       viewer.pollAsyncMeshLoads(/*maxAssets=*/4);
       // continue rendering / updating the UI between polls
     }
 
-Async loading keeps the frame loop responsive on first import. The flag has
-no effect for assets that are already cached through
-``RayraiGlobalAsset``.
+``pendingAsyncMeshLoadCount()`` includes unfinished GPU uploads and instanced
+LOD jobs. Call ``setAsyncMeshLoadingEnabled(false)`` before adding visuals when
+assets must be complete as soon as ``addVisualMesh`` or ``importVisualScene``
+returns. Assets already held in memory are returned immediately either way.
+
+Mesh caches on disk
+===================
+rayrai keeps two regenerable caches for imported meshes; deleting them only
+costs regeneration time on the next load.
+
+* Mesh metadata and generated LOD chains are written to
+  ``RAYRAI_MESH_PREPROCESS_CACHE_DIR``, by default the
+  ``rayrai_mesh_preprocess_cache`` folder in the system temporary directory.
+  An entry is invalidated when the source file's size or modification time
+  changes, or when the cache format changes.
+  ``RAYRAI_SUPPRESS_MESH_PREPROCESS_CACHE_FALLBACK_WARNINGS=1`` silences the
+  warnings printed when the cache cannot be used.
+* LOD chains that instanced batches prepare during asynchronous loading are
+  stored next to each asset as ``rayrai_cache_<file name>.lods``. They are
+  invalidated by a fingerprint of the imported geometry, so edits to external
+  glTF buffers are detected. ``RAYRAI_ASYNC_LOD_CACHE_DIR`` stores them in
+  another folder instead (if that folder is not writable, nothing is cached).
+  Without it, an unwritable asset folder falls back to the system temporary
+  directory. Setting ``RAYRAI_DISABLE_ASYNC_LOD_CACHE`` to any value disables
+  this cache.
+
+Compressed texture storage
+==========================
+``rayrai/Bc7TextureStorage.hpp`` provides an opt-in, load-time helper that
+re-encodes eligible colour textures as BC7 to reduce texture memory. Call it
+with the renderer's GL context current, after the visuals are loaded:
+
+.. code-block:: cpp
+
+    #include <rayrai/Bc7TextureStorage.hpp>
+
+    std::vector<unsigned int> textures;
+    visual->collectMaterialTextureIds(textures);
+    std::sort(textures.begin(), textures.end());
+    textures.erase(std::unique(textures.begin(), textures.end()), textures.end());
+    for (unsigned int id : textures) {
+      const auto stored = raisin::compressRgbTextureBc7(id);
+      // stored.mipLevels == 0 means the texture was left unchanged.
+    }
+
+Only mutable 8-bit RGB or sRGB 2D textures are converted. Textures with alpha,
+float, depth, immutable, or already compressed storage are left untouched, as
+is any texture that would not get smaller. Every authored mip level, the
+filtering state, and the texture id are kept. ``supportsBc7TextureStorage()``
+reports whether the context has OpenGL 4.2 or
+``GL_ARB_texture_compression_bptc``; without it the helper does nothing. The
+driver's encoder is lossy and runs again on every launch, so compare images
+before enabling it for an asset.
 
 Heightmap appearance and streaming updates
 ==========================================
@@ -330,6 +454,14 @@ heightmap in the viewer. The matching
 ``setHeightmapNormalResourcePath`` and ``setHeightmapHeightResourcePath``
 methods provide global normal and height/parallax textures. Passing an empty
 path clears the corresponding resource.
+
+``setHeightmapTerrainMaterialParameters(normalStrength, roughness,
+parallaxScale, deepParallax = true)`` tunes the heightmap terrain material
+(defaults ``1.0``, ``0.90``, ``4.0``). With a height texture,
+``deepParallax = true`` uses layered parallax occlusion mapping and ``false`` a
+single-sample parallax offset; ``parallaxScale = 0`` disables parallax.
+Parallax changes texture sampling only, not collision or the terrain
+silhouette.
 
 Per-heightmap data is authored on ``raisim::HeightMap`` itself. Use
 ``setColor`` for a full RGB color map, ``setColorPatch`` for a rectangular

@@ -104,8 +104,7 @@ Where To Add New Things
    * - New user-facing C++ example
      - ``examples/src`` plus a target registration in ``examples/CMakeLists.txt``.
    * - New example resource
-     - ``rsc`` or ``examples/rsc``, depending on whether it is shared package
-       data or example-only data.
+     - ``rsc``. Put example-only resources under a relevant subdirectory there.
    * - New Python wrapper behavior
      - ``raisimPy``.
    * - New RL package behavior

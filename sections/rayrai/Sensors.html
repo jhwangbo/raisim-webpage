@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sensors and depth/LiDAR &mdash; raisim 2.6.0 documentation</title>
+  <title>Sensors and depth/LiDAR &mdash; raisim 2.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b6430375" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
+      <script src="../../_static/documentation_options.js?v=dfec817d"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -94,11 +94,14 @@
 <li class="toctree-l3"><a class="reference internal" href="Lighting.html">Lighting, shadows, and HDR/IBL</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Materials.html">PBR materials</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Visuals.html">Custom visuals, instancing, and scene helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Foliage.html">Foliage and forest rendering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="PostProcess.html">Post-process effects</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Weather.html">Weather and atmospherics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Capture.html">Capture, diagnostics, and headless rendering</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Sensors and depth/LiDAR</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#sensor-alignment">Sensor alignment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#asynchronous-readback">Asynchronous readback</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fisheye-lenses">Fisheye lenses</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tcp-viewer-protocol">TCP viewer protocol</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#depth-and-lidar">Depth and LiDAR</a></li>
 </ul>
@@ -108,6 +111,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#platform-support">Platform support</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#source-built-tcp-viewer-recommended">Source-built TCP viewer (recommended)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#build-and-link">Build and link</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#minimal-usage">Minimal usage</a></li>
@@ -151,9 +155,10 @@
              
   <section id="sensors-and-depth-lidar">
 <h1>Sensors and depth/LiDAR<a class="headerlink" href="#sensors-and-depth-lidar" title="Link to this heading"></a></h1>
-<p>This page covers aligning rayrai to RaiSim camera sensors, rendering depth
-and LiDAR data, and the picking pipeline. For the general camera control
-APIs (free-fly, orbit, picking from the viewer) see <a class="reference internal" href="Capture.html"><span class="doc">Capture, diagnostics, and headless rendering</span></a>.</p>
+<p>This page covers aligning rayrai to RaiSim camera sensors, fisheye lenses,
+CPU readback, rendering depth and LiDAR data, and the TCP viewer protocol. For
+the general camera control and picking APIs (free-fly, orbit, picking from the
+viewer) see <a class="reference internal" href="Capture.html"><span class="doc">Capture, diagnostics, and headless rendering</span></a>.</p>
 <section id="sensor-alignment">
 <h2>Sensor alignment<a class="headerlink" href="#sensor-alignment" title="Link to this heading"></a></h2>
 <p>rayrai can align rendering to RaiSim camera sensors. Use
@@ -174,7 +179,7 @@ avoid calling <code class="docutils literal notranslate"><span class="pre">Camer
 <a class="reference internal" href="../examples/rayrai/rayrai_aruco_marker.html"><span class="doc">Rayrai ArUco marker</span></a> for dedicated
 sensor examples. <code class="docutils literal notranslate"><span class="pre">rayrai_complete_showcase</span></code> combines RGB/depth cameras, LiDAR
 visualization, camera frustums, raw buffer readback, and custom visuals in one
-runnable scene. The sensor overview in <a class="reference internal" href="#"><span class="doc">Sensors</span></a> includes a
+runnable scene. The sensor overview in <a class="reference internal" href="../Sensors.html"><span class="doc">Sensors</span></a> includes a
 longer RGB/depth readback example.</p>
 <p>RGB/Depth camera workflow (manual source + external camera):</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">rgbCam</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getSensorSet</span><span class="p">(</span><span class="s">&quot;d455_front&quot;</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">getSensor</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">RGBCamera</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;color&quot;</span><span class="p">);</span>
@@ -205,6 +210,44 @@ constructing <code class="docutils literal notranslate"><span class="pre">Camera
 also eagerly allocating the RGB/post-processing targets. Keep the camera alive
 across frames to reuse its buffers, and destroy it while its owning GL context
 is current. <code class="docutils literal notranslate"><span class="pre">Camera</span></code> cannot be copied or moved because it owns GL handles.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">RGBCamera</span></code>/<code class="docutils literal notranslate"><span class="pre">DepthCamera</span></code> overloads of <code class="docutils literal notranslate"><span class="pre">renderWithExternalCamera</span></code>
+always render without MSAA, temporal AA, or viewer upscaling, whatever the
+quality preset. They do run the built-in postprocessing unless
+<code class="docutils literal notranslate"><span class="pre">RenderOverrides::postProcess</span></code> is <code class="docutils literal notranslate"><span class="pre">false</span></code>, so enabling
+<code class="docutils literal notranslate"><span class="pre">setLinearHdrRenderingEnabled(true)</span></code> (see <a class="reference internal" href="Capture.html"><span class="doc">Capture, diagnostics, and headless rendering</span></a>) also changes RGB
+sensor images; pass <code class="docutils literal notranslate"><span class="pre">postProcess</span> <span class="pre">=</span> <span class="pre">false</span></code> to keep the previous output.</p>
+</section>
+<section id="asynchronous-readback">
+<h2>Asynchronous readback<a class="headerlink" href="#asynchronous-readback" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">getRawImage</span></code> is synchronous. For high-rate capture,
+<code class="docutils literal notranslate"><span class="pre">Camera::setAsyncReadbackEnabled(true,</span> <span class="pre">ringSize)</span></code> (ring size at least 2,
+default 3) enables a ring of pixel-buffer objects:
+<code class="docutils literal notranslate"><span class="pre">readSceneColorRgbaAsync(rgba)</span></code> and <code class="docutils literal notranslate"><span class="pre">readLinearDepthAsync(depth)</span></code> start a
+readback of the current frame and return <code class="docutils literal notranslate"><span class="pre">true</span></code> once they have copied an
+earlier one. The first calls return <code class="docutils literal notranslate"><span class="pre">false</span></code> until the ring is full, and the
+copied frame then lags the latest render by <code class="docutils literal notranslate"><span class="pre">ringSize</span></code> calls.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rgbCamera</span><span class="p">.</span><span class="n">setAsyncReadbackEnabled</span><span class="p">(</span><span class="nb">true</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="o">&gt;</span><span class="w"> </span><span class="n">rgba</span><span class="p">;</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">renderWithExternalCamera</span><span class="p">(</span><span class="o">*</span><span class="n">rgbCam</span><span class="p">,</span><span class="w"> </span><span class="n">rgbCamera</span><span class="p">,</span><span class="w"> </span><span class="p">{});</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rgbCamera</span><span class="p">.</span><span class="n">readSceneColorRgbaAsync</span><span class="p">(</span><span class="n">rgba</span><span class="p">,</span><span class="w"> </span><span class="cm">/*flipVertical=*/</span><span class="nb">true</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// rgba holds the frame rendered three calls earlier.</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="fisheye-lenses">
+<h2>Fisheye lenses<a class="headerlink" href="#fisheye-lenses" title="Link to this heading"></a></h2>
+<p>A RaiSim camera whose <code class="docutils literal notranslate"><span class="pre">lens</span></code> property is an equidistant fisheye model
+(<code class="docutils literal notranslate"><span class="pre">raisim::CameraLensModel::setOpenCvFisheye(fx,</span> <span class="pre">fy,</span> <span class="pre">cx,</span> <span class="pre">cy,</span> <span class="pre">k1,</span> <span class="pre">k2,</span> <span class="pre">k3,</span> <span class="pre">k4)</span></code>)
+is honoured by <code class="docutils literal notranslate"><span class="pre">raisin::Camera</span></code>. The <code class="docutils literal notranslate"><span class="pre">RGBCamera</span></code> and <code class="docutils literal notranslate"><span class="pre">DepthCamera</span></code>
+constructors copy the lens, <code class="docutils literal notranslate"><span class="pre">isFisheyeLens()</span></code> reports it, and
+<code class="docutils literal notranslate"><span class="pre">renderWithExternalCamera</span></code> resamples the rendered colour image through the
+OpenCV/ROS equidistant model with <code class="docutils literal notranslate"><span class="pre">k1</span></code>–<code class="docutils literal notranslate"><span class="pre">k4</span></code> distortion. The source view is
+rasterized with a horizontal field of view of at most 179°. Only the colour
+image is remapped; depth from <code class="docutils literal notranslate"><span class="pre">renderDepthPlaneDistance</span></code> stays rectilinear.
+For a camera that is not built from a RaiSim sensor, call
+<code class="docutils literal notranslate"><span class="pre">Camera::setLensModel(lens,</span> <span class="pre">hFovRad)</span></code> and set <code class="docutils literal notranslate"><span class="pre">zoom</span></code> (the vertical field of
+view of the rasterized source view) yourself.</p>
 </section>
 <section id="tcp-viewer-protocol">
 <h2>TCP viewer protocol<a class="headerlink" href="#tcp-viewer-protocol" title="Link to this heading"></a></h2>
@@ -266,9 +309,13 @@ full request/response sequence and troubleshooting guidance.</p>
 passes render RaiSim world objects only; visualization-only objects are intentionally
 ignored so they cannot leak into training observations.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">renderDepthPlaneDistance</span></code> renders a linear depth texture.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">renderDepthPlaneDistance</span></code> renders a linear depth texture. Its optional
+<code class="docutils literal notranslate"><span class="pre">drawVisualizationObjects</span></code> argument (default <code class="docutils literal notranslate"><span class="pre">false</span></code>) adds custom and
+instanced visuals; only detectable ones are included unless
+<code class="docutils literal notranslate"><span class="pre">visualizationObjectsMustBeDetectable</span></code> is <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">measureSpinningLidarSingleDrawGPU</span></code> renders a LiDAR slice using a
-spherical chunk shader.</p></li>
+spherical chunk shader. Pass <code class="docutils literal notranslate"><span class="pre">objectToExclude</span></code> (for example the robot
+carrying the sensor) to leave one object out of the scan.</p></li>
 </ul>
 <p>You can retrieve the depth texture via <code class="docutils literal notranslate"><span class="pre">getDepthPlaneTexture()</span></code>.</p>
 <p>LiDAR usage has two paths. Prefer the rayrai GPU path when rayrai is available:</p>

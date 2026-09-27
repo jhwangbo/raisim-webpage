@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Example targets &mdash; raisim 2.6.0 documentation</title>
+  <title>Example targets &mdash; raisim 2.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b6430375" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
+      <script src="../../_static/documentation_options.js?v=dfec817d"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -94,6 +94,7 @@
 <li class="toctree-l3"><a class="reference internal" href="Lighting.html">Lighting, shadows, and HDR/IBL</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Materials.html">PBR materials</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Visuals.html">Custom visuals, instancing, and scene helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Foliage.html">Foliage and forest rendering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="PostProcess.html">Post-process effects</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Weather.html">Weather and atmospherics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Capture.html">Capture, diagnostics, and headless rendering</a></li>
@@ -106,6 +107,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#platform-support">Platform support</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#source-built-tcp-viewer-recommended">Source-built TCP viewer (recommended)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#build-and-link">Build and link</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#minimal-usage">Minimal usage</a></li>
@@ -151,17 +153,17 @@
 <h1>Example targets<a class="headerlink" href="#example-targets" title="Link to this heading"></a></h1>
 <section id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
-<p>Rayrai examples are documented in <a class="reference internal" href="#"><span class="doc">Examples</span></a>. Each example
+<p>Rayrai examples are documented in <a class="reference internal" href="../Examples.html"><span class="doc">Examples</span></a>. Each example
 page includes a short explanation, CMake target, and build-tree usage.</p>
 <p>Quick map to the current rayrai-related targets:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code>: source-built viewer for <code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code>
 scenes.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_basic_scene</span></code>: minimal ImGui + SDL2 app showing the standard update
-loop, custom visuals, and the offscreen render texture.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_complete_showcase</span></code>: broad in-process scene that combines RGB/depth
-cameras, raw buffer readback, LiDAR visualization, camera frustums, and
-custom visuals.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_basic_scene</span></code>: minimal ImGui + SDL2 app that loads Go1 on a
+checkerboard ground and runs the standard update loop.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_complete_showcase</span></code>: broad in-process scene with a sensored ANYmal
+that combines RGB/depth cameras, raw buffer readback, LiDAR visualization,
+camera frustums, instancing, and custom visuals.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">rayrai_rgb_camera</span></code> / <code class="docutils literal notranslate"><span class="pre">rayrai_depth_camera</span></code> /
 <code class="docutils literal notranslate"><span class="pre">rayrai_heightmap_replacement</span></code> /
 <code class="docutils literal notranslate"><span class="pre">rayrai_lidar_pointcloud</span></code> / <code class="docutils literal notranslate"><span class="pre">rayrai_aruco_marker</span></code>: robot-attached sensor
@@ -171,22 +173,28 @@ point-cloud visualization, and marker rendering.</p></li>
 <code class="docutils literal notranslate"><span class="pre">rayrai_pointcloud_animation</span></code>: visual primitives, instancing, and dynamic
 point-cloud streaming.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">rayrai_pbr_material_grid</span></code> / <code class="docutils literal notranslate"><span class="pre">rayrai_pbr_texture_maps</span></code> /
-<code class="docutils literal notranslate"><span class="pre">rayrai_quality_lighting</span></code>: PBR materials, texture slots, quality presets,
-and additional-light configurations.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_visual_asset_support</span></code>: authored glTF/GLB scene import with PBR
-materials, embedded lights, and reflection-probe sidecars.</p></li>
+<code class="docutils literal notranslate"><span class="pre">rayrai_quality_lighting</span></code>: bundled glTF PBR sample assets, texture maps,
+HDR image-based lighting, quality presets, and additional-light
+configurations.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_nested_glass</span></code>: nested water, glass, and air with automatic geometry tracing; see
+<a class="reference internal" href="../examples/rayrai/rayrai_nested_glass.html"><span class="doc">Rayrai Example: Nested Glass</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_visual_asset_support</span></code>: textured URDF visual meshes (OBJ/DAE with
+image textures) rendered separately from their collision geometry.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">rayrai_coacd_mesh_approximation</span></code>: in-process comparison of source meshes
 and CoACD convex approximation parts generated through <code class="docutils literal notranslate"><span class="pre">World::addMesh</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_runtime_scene_editing</span></code>: runtime add/remove of RaiSim objects and
-rayrai visuals with stable ids, snapshots, collision filters, and cloning.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_runtime_scene_editing</span></code>: snapshots, cloning, removal, stable object
+ids, and collision-filter changes in a running world.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">rayrai_rolling_spinning_friction</span></code> / <code class="docutils literal notranslate"><span class="pre">rayrai_swept_ccd</span></code>: physics-focused
 scenes that visualize rolling/spinning friction and swept CCD.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_pbr_material_grid</span></code> and <code class="docutils literal notranslate"><span class="pre">rayrai_pbr_texture_maps</span></code>: bundled glTF
-PBR sample assets under rayrai quality settings.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_tendons</span></code>: automatic spatial tendon rendering for the elastic,
+pulley, and coupling scenes; see <a class="reference internal" href="../tendons/Examples.html"><span class="doc">Tendon examples and Rayrai</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_forest</span></code>: dense instanced vegetation on a heightmap with automatic
+mesh LOD, foliage wind and shadows, and asynchronous loading; see
+<a class="reference internal" href="../examples/rayrai/rayrai_forest.html"><span class="doc">Rayrai Example: Forest</span></a>.</p></li>
+<li><p>glTF/GLB scene import with authored lights and reflection-probe sidecars is
+described in <a class="reference internal" href="../examples/rayrai/rayrai_blender_scene_import.html"><span class="doc">rayrai_blender_scene_import</span></a>.</p></li>
 <li><p>OpenUSD visual meshes can be loaded through <code class="docutils literal notranslate"><span class="pre">RayraiWindow::addVisualMesh</span></code>;
 see <a class="reference internal" href="../OpenUSD.html"><span class="doc">OpenUSD Loading</span></a> for importer scope and runtime layout.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_visual_asset_support</span></code>: glTF/GLB scene import with imported lights,
-HDR IBL, optional reflection probes, and screenshots.</p></li>
 </ul>
 </section>
 </section>

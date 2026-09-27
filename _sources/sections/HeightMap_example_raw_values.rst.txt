@@ -2,7 +2,7 @@
 Height Map Using Raw Values
 #############################
 
-.. image:: ../image/heightMapUsingRawValues.gif
+.. image:: ../../rsc/docs/image/heightMapUsingRawValues.gif
 
 XML approach
 -----------------------------

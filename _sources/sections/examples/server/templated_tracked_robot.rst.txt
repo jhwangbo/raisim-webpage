@@ -8,7 +8,7 @@ Loads a templated tracked robot URDF with parameter overrides and drives wheels/
 
 Screenshot
 ==========
-.. image:: ../../../image/templated_tracked_robot.png
+.. image:: ../../../../rsc/docs/image/templated_tracked_robot.png
    :alt: templated_tracked_robot example
    :width: 100%
 

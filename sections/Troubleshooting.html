@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Troubleshooting &mdash; raisim 2.6.0 documentation</title>
+  <title>Troubleshooting &mdash; raisim 2.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b6430375" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=ae39cb24"></script>
+      <script src="../_static/documentation_options.js?v=dfec817d"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -61,6 +61,9 @@
 <li class="toctree-l2"><a class="reference internal" href="#activation-key-not-found">Activation Key Not Found</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#tcp-viewer-does-not-connect">TCP Viewer Does Not Connect</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#rayrai-window-or-offscreen-context-fails">rayrai Window Or Offscreen Context Fails</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#vulkan-ray-queries-unavailable">Vulkan Ray Queries Unavailable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#post-processing-effect-missing-on-macos">Post-Processing Effect Missing On macOS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#first-launch-of-an-example-is-slow">First Launch Of An Example Is Slow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example-asset-missing">Example Asset Missing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#openusd-runtime-or-plugin-missing">OpenUSD Runtime Or Plugin Missing</a></li>
 </ul>
@@ -190,10 +193,80 @@ platform install script and rebuild <code class="docutils literal notranslate"><
 </section>
 <section id="rayrai-window-or-offscreen-context-fails">
 <h2>rayrai Window Or Offscreen Context Fails<a class="headerlink" href="#rayrai-window-or-offscreen-context-fails" title="Link to this heading"></a></h2>
-<p>rayrai requires a working OpenGL context. On Linux, make sure OpenGL and SDL2
-development/runtime packages are available. On headless systems, use the
-offscreen context helpers documented in <a class="reference internal" href="Rayrai.html"><span class="doc">rayrai Visualizer</span></a> and verify that the
-machine provides a usable software or hardware OpenGL stack.</p>
+<p>rayrai requires a working OpenGL 3.3 core-profile context; its context helpers
+request 4.3 first. On Linux, make sure OpenGL and SDL2 development/runtime
+packages are available. On headless systems, use the offscreen context helpers
+documented in <a class="reference internal" href="Rayrai.html"><span class="doc">rayrai Visualizer</span></a> and verify that the machine provides a usable
+software or hardware OpenGL stack.</p>
+</section>
+<section id="vulkan-ray-queries-unavailable">
+<span id="rayrai-vulkan-ray-query-troubleshooting"></span><h2>Vulkan Ray Queries Unavailable<a class="headerlink" href="#vulkan-ray-queries-unavailable" title="Link to this heading"></a></h2>
+<p>Geometry-traced glass can use Vulkan ray queries on Linux and Windows. If
+rayrai was built without the optional Vulkan backend, the portable OpenGL
+tracer remains available. Installing a compiler or driver after a binary
+package was built does not add the missing backend to that package. Use a
+package built with Vulkan support or rebuild rayrai from source. A
+<code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> from a build configured without <code class="docutils literal notranslate"><span class="pre">glslc</span></code> prints a warning
+once to standard output with installation and rebuild steps. An existing
+Vulkan-enabled binary does not need <code class="docutils literal notranslate"><span class="pre">glslc</span></code> at run time.</p>
+<p>For a source build on Ubuntu, install the Vulkan development files and the
+<code class="docutils literal notranslate"><span class="pre">glslc</span></code> shader compiler (Python 3 is also required):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>update
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>libvulkan-dev<span class="w"> </span>glslc
+glslc<span class="w"> </span>--version
+</pre></div>
+</div>
+<p>A source build enables the optional Vulkan ray-query backend automatically
+when these tools are present; <code class="docutils literal notranslate"><span class="pre">RAYRAI_ENABLE_VULKAN_RAY_QUERY</span></code> defaults to
+<code class="docutils literal notranslate"><span class="pre">ON</span></code>. Reconfigure and build after installing <code class="docutils literal notranslate"><span class="pre">glslc</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-S<span class="w"> </span>/path/to/raisim-source<span class="w"> </span>-B<span class="w"> </span>/path/to/existing-build
+cmake<span class="w"> </span>--build<span class="w"> </span>/path/to/existing-build
+</pre></div>
+</div>
+<p>An existing CMake cache with <code class="docutils literal notranslate"><span class="pre">RAYRAI_ENABLE_VULKAN_RAY_QUERY=OFF</span></code> keeps that
+explicit setting; change it to <code class="docutils literal notranslate"><span class="pre">ON</span></code> when reconfiguring. If tests were
+enabled in that source build, check the hardware cases with
+<code class="docutils literal notranslate"><span class="pre">ctest</span> <span class="pre">--test-dir</span> <span class="pre">/path/to/existing-build</span> <span class="pre">-j12</span> <span class="pre">-L</span> <span class="pre">hardware-ray-query</span></code>.</p>
+<p>Check for the CMake message
+<code class="docutils literal notranslate"><span class="pre">optional</span> <span class="pre">Vulkan</span> <span class="pre">ray</span> <span class="pre">queries</span> <span class="pre">enabled</span></code>. A message about <code class="docutils literal notranslate"><span class="pre">portable</span> <span class="pre">glass</span>
+<span class="pre">tracing</span> <span class="pre">only</span></code> means the optional backend was not built. The
+<code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> example build links to a prebuilt rayrai library; configuring
+that example build cannot change which backend the library contains.</p>
+<p>At run time, the active OpenGL device must match a non-CPU Vulkan 1.2 GPU
+with ray queries, acceleration structures, buffer device addresses, and
+external memory and semaphore sharing (including the OpenGL FD extensions
+<code class="docutils literal notranslate"><span class="pre">GL_EXT_memory_object_fd</span></code> and <code class="docutils literal notranslate"><span class="pre">GL_EXT_semaphore_fd</span></code> on Linux). On Ubuntu,
+<code class="docutils literal notranslate"><span class="pre">vulkan-tools</span></code> provides <code class="docutils literal notranslate"><span class="pre">vulkaninfo</span></code> for checking the visible Vulkan
+devices:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>vulkan-tools
+vulkaninfo<span class="w"> </span>--summary
+</pre></div>
+</div>
+<p>Run the viewer and hardware tests in a graphical session with GPU device
+access. Containers and sandboxes may hide <code class="docutils literal notranslate"><span class="pre">/dev/dri</span></code> or NVIDIA device
+nodes even when the host driver works. If <code class="docutils literal notranslate"><span class="pre">VulkanRayQuery</span></code> was explicitly
+selected, an unavailable backend raises an error; <code class="docutils literal notranslate"><span class="pre">Automatic</span></code> uses the
+portable tracer when hardware ray queries cannot be used. See
+<a class="reference internal" href="rayrai/Materials.html"><span class="doc">PBR materials</span></a> for these backend settings.</p>
+</section>
+<section id="post-processing-effect-missing-on-macos">
+<h2>Post-Processing Effect Missing On macOS<a class="headerlink" href="#post-processing-effect-missing-on-macos" title="Link to this heading"></a></h2>
+<p>macOS provides OpenGL 4.1 with 16 fragment texture units, so rayrai uses its
+compact PBR programs and the common post-process program there. Effects such
+as screen-space reflections, volumetric fog, color grading, saturation, and
+white balance are not applied on macOS; see <a class="reference internal" href="Rayrai.html#rayrai-platform-support"><span class="std std-ref">Platform support</span></a> for
+the full list.</p>
+<p>Some rayrai examples print the Apple driver message <code class="docutils literal notranslate"><span class="pre">unit</span> <span class="pre">10</span>
+<span class="pre">GLD_TEXTURE_INDEX_2D</span> <span class="pre">is</span> <span class="pre">unloadable</span></code>. No program samples a 2D texture on that
+unit at those draws, so the message has no visible effect.</p>
+</section>
+<section id="first-launch-of-an-example-is-slow">
+<h2>First Launch Of An Example Is Slow<a class="headerlink" href="#first-launch-of-an-example-is-slow" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">rayrai_coacd_mesh_approximation</span></code> runs CoACD for every mesh on its first run,
+which can take a few minutes; Ctrl-C stops it during that phase. RaiSim caches
+the parts beside each mesh, so later runs load them directly. <code class="docutils literal notranslate"><span class="pre">rayrai_forest</span></code>
+builds mesh LODs on its first launch and saves them as <code class="docutils literal notranslate"><span class="pre">rayrai_cache_*.lods</span></code>
+files beside its assets. Delete these cache files to force regeneration.</p>
 </section>
 <section id="example-asset-missing">
 <h2>Example Asset Missing<a class="headerlink" href="#example-asset-missing" title="Link to this heading"></a></h2>

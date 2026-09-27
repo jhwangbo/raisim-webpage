@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Performance notes and the C++ API reference &mdash; raisim 2.6.0 documentation</title>
+  <title>Performance notes and the C++ API reference &mdash; raisim 2.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b6430375" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
+      <script src="../../_static/documentation_options.js?v=dfec817d"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -94,6 +94,7 @@
 <li class="toctree-l3"><a class="reference internal" href="Lighting.html">Lighting, shadows, and HDR/IBL</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Materials.html">PBR materials</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Visuals.html">Custom visuals, instancing, and scene helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Foliage.html">Foliage and forest rendering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="PostProcess.html">Post-process effects</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Weather.html">Weather and atmospherics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Capture.html">Capture, diagnostics, and headless rendering</a></li>
@@ -101,8 +102,13 @@
 <li class="toctree-l3"><a class="reference internal" href="Examples.html">Example targets</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Performance notes and the C++ API reference</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#performance-notes">Performance notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gpu-paths-and-opengl-requirements">GPU paths and OpenGL requirements</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dense-foliage">Dense foliage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#frame-submission-and-measurement">Frame submission and measurement</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#shared-mesh-buffers-across-contexts">Shared mesh buffers across contexts</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#shader-binary-cache-and-multi-threaded-prewarming">Shader binary cache and multi-threaded prewarming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#on-disk-caches">On-disk caches</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#environment-variables">Environment variables</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#additional-tips">Additional tips</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#api">API</a></li>
 </ul>
@@ -110,6 +116,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#platform-support">Platform support</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#source-built-tcp-viewer-recommended">Source-built TCP viewer (recommended)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#build-and-link">Build and link</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#minimal-usage">Minimal usage</a></li>
@@ -166,9 +173,10 @@ light’s shadow map globally.</p></li>
 <li><p>Prefer <code class="docutils literal notranslate"><span class="pre">addInstancedVisuals</span></code> for repeated primitives or meshes. A single
 instanced visual renders many copies with one instance buffer instead of many
 separate visual objects.</p></li>
-<li><p>Opaque RaiSim single-body primitives are internally batched on non-shadowed color
-renders. This helps high-throughput observation rendering while keeping shadowed
-rendering on the conservative per-object path.</p></li>
+<li><p>Opaque RaiSim single-body primitives (spheres, boxes, cylinders, capsules) are
+batched into instanced draws in shadow-map passes and in simple-shading color
+passes. With PBR primitives (<code class="docutils literal notranslate"><span class="pre">Balanced</span></code> and above) the color pass batches
+them only in renders without shadows.</p></li>
 <li><p>TCP viewer scenes synthesize repeated articulated mesh visuals into internal
 <code class="docutils literal notranslate"><span class="pre">InstancedVisuals</span></code> batches when mesh path, scale, color policy, and color match.
 <code class="docutils literal notranslate"><span class="pre">RemoteScene::tcpMeshBatchCount()</span></code> and
@@ -182,6 +190,8 @@ visuals, and point clouds, so off-camera content is skipped before draw submissi
 Mesh-local bounds are used when available, so offset meshes, articulated links,
 deformables, and heightmaps cull and frame from their rendered bounds rather
 than only from the object origin.</p></li>
+<li><p>Scenes with many local lights can give point, spot and area lights a finite
+range with <code class="docutils literal notranslate"><span class="pre">additionalLightContributionThreshold</span></code> (see <a class="reference internal" href="RenderQuality.html"><span class="doc">Render quality, tone mapping, color grading</span></a>).</p></li>
 <li><p>If the world topology is stable, repeated <code class="docutils literal notranslate"><span class="pre">updateObjectLists()</span></code> calls are cheap:
 rayrai refreshes appearances without rebuilding the object cache unless objects
 were added or removed.</p></li>
@@ -193,31 +203,135 @@ streaming changes.</p></li>
 changes; normal frames send vertex positions only.</p></li>
 </ul>
 </section>
+<section id="gpu-paths-and-opengl-requirements">
+<h2>GPU paths and OpenGL requirements<a class="headerlink" href="#gpu-paths-and-opengl-requirements" title="Link to this heading"></a></h2>
+<p>Several instanced-rendering paths run on the GPU when the context supports them
+and fall back automatically otherwise:</p>
+<ul class="simple">
+<li><p>Instanced visuals with 4096 or more rendered instances are culled with a
+compute shader (OpenGL 4.3). Without it, culling runs on the CPU.</p></li>
+<li><p>Instanced meshes made of several submeshes can be submitted with
+multi-draw-indirect (OpenGL 4.3 or <code class="docutils literal notranslate"><span class="pre">GL_ARB_multi_draw_indirect</span></code>); otherwise
+each submesh is drawn separately.</p></li>
+<li><p>Foliage visuals with 4096 or more instances are occlusion-culled against
+opaque geometry already drawn in the frame, using a hierarchical depth
+pyramid or occlusion queries. The compute-shader pyramid needs OpenGL 4.3.</p></li>
+<li><p>With OpenGL 4.3 and MSAA, foliage is also culled against the depth rendered
+so far in the same frame (see <a class="reference internal" href="#dense-foliage">Dense foliage</a>).</p></li>
+</ul>
+<p>Most of these fallbacks print a one-time <code class="docutils literal notranslate"><span class="pre">WARN</span></code> line to stderr; the matching
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_SUPPRESS_*_FALLBACK_WARNINGS</span></code> variable silences it (see
+<a class="reference internal" href="#environment-variables">Environment variables</a>).</p>
+<p>macOS provides OpenGL 4.1 (no compute shaders or multi-draw-indirect), so it
+uses the fallback of every path above; see <a class="reference internal" href="../Rayrai.html#rayrai-platform-support"><span class="std std-ref">Platform support</span></a>. The
+renderer also selects a full, compact or limited shader tier from the number of
+fragment texture units when it is constructed; the lower tiers render fewer
+material and post-process features (see
+<a class="reference internal" href="Materials.html#gpu-capability-tiers"><span class="std std-ref">GPU capability tiers</span></a>).</p>
+</section>
+<section id="dense-foliage">
+<h2>Dense foliage<a class="headerlink" href="#dense-foliage" title="Link to this heading"></a></h2>
+<p>Instanced visuals with alpha-masked foliage materials use a dedicated path with
+no extra API calls:</p>
+<ul class="simple">
+<li><p>Compatible foliage draws in the color and shadow passes are merged into
+batched runs. Other objects between them split a run instead of disabling
+batching.</p></li>
+<li><p>Visibility, and for larger plants the LOD level, are chosen per instance and
+per submesh from the automatic mesh LOD chain. A level is used when its
+projected simplification error is at most 2.25 pixels, or 2.5 shadow-map
+texels in shadow passes. <code class="docutils literal notranslate"><span class="pre">RAYRAI_FOLIAGE_LOD_PIXEL_ERROR</span></code> and
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_FOLIAGE_SHADOW_LOD_PIXEL_ERROR</span></code> override these budgets for the whole
+process (values in <code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">8]</span></code>).</p></li>
+<li><p>With OpenGL 4.3 and MSAA, passes that contain a foliage visual with 2048 or
+more instances cull foliage against the depth already rendered in the same
+frame, tested in 8-pixel tiles that cover every sample.</p></li>
+<li><p>Foliage casts shadows by default. Call <code class="docutils literal notranslate"><span class="pre">setCastsShadows(false)</span></code> on an
+<code class="docutils literal notranslate"><span class="pre">InstancedVisuals</span></code> to exclude it; wind and grass-patch configuration keep
+that choice. When the main viewer refreshes cascaded shadows every frame,
+foliage that cannot shadow anything inside a cascade’s part of the view is
+skipped for that cascade.</p></li>
+<li><p>With asynchronous mesh loading (<a class="reference internal" href="Capture.html"><span class="doc">Capture, diagnostics, and headless rendering</span></a>), base geometry and instanced
+LOD chains are prepared on worker threads. Each <code class="docutils literal notranslate"><span class="pre">pollAsyncMeshLoads(n)</span></code> call
+advances at most <code class="docutils literal notranslate"><span class="pre">n</span></code> import/upload stages (<code class="docutils literal notranslate"><span class="pre">0</span></code> does nothing) and uploads
+at most one prepared submesh per pending instanced visual;
+<code class="docutils literal notranslate"><span class="pre">pendingAsyncMeshLoadCount()</span></code> includes these jobs. Prepared LOD chains are
+cached on disk (see <a class="reference internal" href="#on-disk-caches">On-disk caches</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai/Bc7TextureStorage.hpp</span></code> provides an opt-in load-time helper,
+<code class="docutils literal notranslate"><span class="pre">raisin::compressRgbTextureBc7(texture)</span></code>, that re-stores an RGB8/SRGB8
+texture and all of its mip levels as BC7. It needs OpenGL 4.2 or
+<code class="docutils literal notranslate"><span class="pre">GL_ARB_texture_compression_bptc</span></code> (check <code class="docutils literal notranslate"><span class="pre">supportsBc7TextureStorage()</span></code>)
+and is lossy. Alpha, float, immutable and already compressed textures are
+left unchanged.</p></li>
+</ul>
+</section>
+<section id="frame-submission-and-measurement">
+<h2>Frame submission and measurement<a class="headerlink" href="#frame-submission-and-measurement" title="Link to this heading"></a></h2>
+<p>The renderer applies these submission optimizations automatically; none of
+them changes the rendered image:</p>
+<ul class="simple">
+<li><p>After shadow maps or the planar reflection were rendered in a frame, one
+<code class="docutils literal notranslate"><span class="pre">glFlush</span></code> submits them so the GPU works on them while the CPU encodes the
+scene pass. This lowers frame time at the cost of some process CPU time;
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_DEBUG_DISABLE_PASS_FLUSH=1</span></code> turns it off for comparisons.</p></li>
+<li><p>The environment background is drawn inside the scene pass. After an opaque
+depth prepass it is depth-tested, so only pixels that no surface covers are
+shaded. <code class="docutils literal notranslate"><span class="pre">environmentBackgroundDiagnostics()</span></code> reports how the last scene pass
+drew it.</p></li>
+<li><p>The transparent pass skips the proximity-fade depth copy and the screen-space
+refraction capture when no drawn material samples them.</p></li>
+<li><p>An external <code class="docutils literal notranslate"><span class="pre">Camera</span></code> keeps its multisampled render target between frames;
+the next render of that camera without MSAA releases it.
+<code class="docutils literal notranslate"><span class="pre">Camera::setSceneMsaaSamples(samples,</span> <span class="pre">keepAllocation)</span></code> exposes the same
+behaviour.</p></li>
+</ul>
+<p>While <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings::geometryRefraction</span></code> is on, the frame caches that
+let unchanged external-camera renders reuse earlier results are bypassed, so
+every render is drawn in full.</p>
+<p><code class="docutils literal notranslate"><span class="pre">captureViewerPassTimings(width,</span> <span class="pre">height)</span></code> renders the built-in viewer camera
+once with blocking GPU timer queries (the renderer’s context must be current)
+and returns the <code class="docutils literal notranslate"><span class="pre">shadow</span></code>, <code class="docutils literal notranslate"><span class="pre">scene_color_and_resolve</span></code> and <code class="docutils literal notranslate"><span class="pre">postprocess</span></code>
+passes. <code class="docutils literal notranslate"><span class="pre">captureRenderPassTimings</span></code> does the same for an external camera. When
+foliage instanced visuals are present, both render a second frame and append
+<code class="docutils literal notranslate"><span class="pre">shadow_foliage*</span></code> and <code class="docutils literal notranslate"><span class="pre">scene_foliage*</span></code> entries that are nested inside the
+coarse passes. <code class="docutils literal notranslate"><span class="pre">shadowCacheDiagnostics()</span></code>, <code class="docutils literal notranslate"><span class="pre">foliageRenderDiagnostics()</span></code> and
+<code class="docutils literal notranslate"><span class="pre">conservativeOcclusionCullingDiagnostics()</span></code> report shadow-map reuse and
+culling without extra GPU work.</p>
+</section>
 <section id="shared-mesh-buffers-across-contexts">
 <h2>Shared mesh buffers across contexts<a class="headerlink" href="#shared-mesh-buffers-across-contexts" title="Link to this heading"></a></h2>
-<p>In 2.5.8, compatible OpenGL contexts reuse immutable indexed mesh buffers for
-primitives and file-backed assets. To create compatible contexts, make the root
-SDL OpenGL context current before calling
-<code class="docutils literal notranslate"><span class="pre">RayraiWindow::createOffscreenGlContext</span></code> for each child. Each call makes the
-new context current, so rebind the root when creating the next child. Creating
-a context on a thread with no current context creates an independent share
-group and cannot provide this reuse.</p>
+<p>OpenGL contexts in one share group reuse the immutable vertex/index buffers of
+the built-in primitives and of file-backed meshes whose materials use no
+textures and no <code class="docutils literal notranslate"><span class="pre">nextPass</span></code> chain. To create such contexts, make the root SDL
+OpenGL context current before calling <code class="docutils literal notranslate"><span class="pre">RayraiWindow::createOffscreenGlContext</span></code>
+for each child. Each call makes the new context current, so rebind the root
+when creating the next child. Creating a context on a thread with no current
+context creates an independent share group and cannot provide this reuse.</p>
+<p>Textures are not shared. rayrai sets filtering and anisotropy on each texture
+object per material and per quality preset, so every context decodes and
+uploads its own copy of each image file, and textured meshes are uploaded per
+context as well.</p>
 <p>Keep each renderer’s context current for rendering and resource destruction.
-Do not use one context concurrently on multiple threads. Mesh vertex/index
-buffers can be shared; VAOs, framebuffers, and camera targets remain specific
-to each context. The cache retains weak references, so reuse requires an
-existing owner to keep the mesh alive.</p>
+Do not use one context concurrently on multiple threads. VAOs, framebuffers,
+and camera targets remain specific to each context. A context created on the
+main thread stays current there; release it with
+<code class="docutils literal notranslate"><span class="pre">RayraiWindow::detachOffscreenGlContext(window)</span></code> before a worker adopts it
+with <code class="docutils literal notranslate"><span class="pre">makeOffscreenContextCurrent</span></code>. The cache retains weak references, so
+reuse requires an existing owner to keep the mesh alive.</p>
 <p>The public diagnostics can be read without changing rendering behavior:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">stats</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiGlobalAsset</span><span class="o">::</span><span class="n">sharedGpuAssetStats</span><span class="p">();</span>
 <span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">uploadedBytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stats</span><span class="p">.</span><span class="n">gpuBufferBytesUploaded</span><span class="p">;</span>
 <span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">reusedBytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stats</span><span class="p">.</span><span class="n">gpuBufferBytesReused</span><span class="p">;</span>
+<span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">templates</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stats</span><span class="p">.</span><span class="n">cachedSnapshots</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>These are cumulative mesh-buffer counters, not total or live GPU memory.
-Textures, VAOs, and render targets are excluded. Use
-<code class="docutils literal notranslate"><span class="pre">resetSharedGpuAssetStats()</span></code> before a controlled measurement, and
-<code class="docutils literal notranslate"><span class="pre">setSharedGpuAssetCacheEnabled(false)</span></code> before loading assets for a comparison
-with separate uploads. Restore it to <code class="docutils literal notranslate"><span class="pre">true</span></code> before the shared-cache run.</p>
+<p>The byte counts are cumulative mesh-buffer counters, not total or live GPU
+memory. Textures, VAOs, and render targets are excluded. <code class="docutils literal notranslate"><span class="pre">cachedSnapshots</span></code> is
+the number of published mesh templates currently held, one per distinct asset
+and share group. Use <code class="docutils literal notranslate"><span class="pre">resetSharedGpuAssetStats()</span></code> before a controlled
+measurement, and <code class="docutils literal notranslate"><span class="pre">setSharedGpuAssetCacheEnabled(false)</span></code> before loading assets
+for a comparison with separate uploads. Restore it to <code class="docutils literal notranslate"><span class="pre">true</span></code> before the
+shared-cache run.</p>
 </section>
 <section id="shader-binary-cache-and-multi-threaded-prewarming">
 <h2>Shader binary cache and multi-threaded prewarming<a class="headerlink" href="#shader-binary-cache-and-multi-threaded-prewarming" title="Link to this heading"></a></h2>
@@ -238,24 +352,37 @@ pre-compile every shader, then every worker thread reads from the cache.</p></li
 <span class="w">  </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">ThreadingMode</span><span class="o">::</span><span class="n">SingleThread</span><span class="p">,</span>
 <span class="w">  </span><span class="cm">/*shaderCompileThreadCount=*/</span><span class="mi">1</span><span class="p">,</span><span class="w">            </span><span class="c1">// 1 = matches rayrai&#39;s default</span>
 <span class="w">  </span><span class="cm">/*shaderBinaryCacheEnabled=*/</span><span class="nb">true</span><span class="p">,</span><span class="w">         </span><span class="c1">// on by default</span>
-<span class="w">  </span><span class="cm">/*shaderBinaryCacheDirectory=*/</span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w">          </span><span class="c1">// empty → $HOME/.raisim/rayrai</span>
+<span class="w">  </span><span class="cm">/*shaderBinaryCacheDirectory=*/</span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w">          </span><span class="c1">// empty → default location</span>
 <span class="w">  </span><span class="cm">/*logShaderBinaryCache=*/</span><span class="nb">false</span><span class="p">);</span>
 </pre></div>
 </div>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">shaderCompileThreadCount</span></code> is passed to
-<code class="docutils literal notranslate"><span class="pre">glMaxShaderCompilerThreadsARB</span></code> and only takes effect on drivers that
-expose <code class="docutils literal notranslate"><span class="pre">KHR/ARB_parallel_shader_compile</span></code>. Raise it only when the host
-application is itself multi-threaded.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">shaderCompileThreadCount</span></code> is passed to <code class="docutils literal notranslate"><span class="pre">glMaxShaderCompilerThreadsARB</span></code>
+on drivers that expose <code class="docutils literal notranslate"><span class="pre">GL_ARB_parallel_shader_compile</span></code> and is ignored
+elsewhere. Raise it only when the host application is itself multi-threaded.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">shaderBinaryCacheEnabled</span> <span class="pre">=</span> <span class="pre">true</span></code> (the default) writes program binaries
 under the cache directory keyed by GL vendor / renderer / version + GLSL
-source. On the next run, identical configurations are loaded directly,
-skipping the GLSL compile entirely.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">shaderBinaryCacheDirectory</span> <span class="pre">=</span> <span class="pre">&quot;&quot;</span></code> uses <code class="docutils literal notranslate"><span class="pre">$XDG_CACHE_HOME/raisim/rayrai</span></code>
-(or <code class="docutils literal notranslate"><span class="pre">$HOME/.raisim/rayrai</span></code> on Linux/macOS).</p></li>
+source, when the driver reports at least one program binary format. On the
+next run, identical configurations are loaded directly, skipping the GLSL
+compile entirely. Several processes can share one cache directory.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">shaderBinaryCacheDirectory</span> <span class="pre">=</span> <span class="pre">&quot;&quot;</span></code> uses the first writable directory in this
+order, then falls back to <code class="docutils literal notranslate"><span class="pre">&lt;temp&gt;/raisim/rayrai</span></code>:</p>
+<ul>
+<li><p>Linux: <code class="docutils literal notranslate"><span class="pre">$XDG_CACHE_HOME/raisim/rayrai</span></code>, <code class="docutils literal notranslate"><span class="pre">~/.cache/raisim/rayrai</span></code>,
+<code class="docutils literal notranslate"><span class="pre">~/.raisim/rayrai</span></code></p></li>
+<li><p>macOS: <code class="docutils literal notranslate"><span class="pre">$XDG_CACHE_HOME/raisim/rayrai</span></code>, <code class="docutils literal notranslate"><span class="pre">~/Library/Caches/raisim/rayrai</span></code>,
+<code class="docutils literal notranslate"><span class="pre">~/.cache/raisim/rayrai</span></code>, <code class="docutils literal notranslate"><span class="pre">~/.raisim/rayrai</span></code></p></li>
+<li><p>Windows: <code class="docutils literal notranslate"><span class="pre">%LOCALAPPDATA%\RaiSim\rayrai</span></code>, <code class="docutils literal notranslate"><span class="pre">%HOME%\.raisim\rayrai</span></code> (when
+<code class="docutils literal notranslate"><span class="pre">HOME</span></code> is set), <code class="docutils literal notranslate"><span class="pre">%USERPROFILE%\AppData\Local\RaiSim\rayrai</span></code>,
+<code class="docutils literal notranslate"><span class="pre">%USERPROFILE%\.raisim\rayrai</span></code></p></li>
+</ul>
+</li>
 <li><p><code class="docutils literal notranslate"><span class="pre">logShaderBinaryCache</span> <span class="pre">=</span> <span class="pre">true</span></code> prints every hit/miss/store to stderr —
 useful for verifying the cache is actually being consulted.</p></li>
 </ul>
+<p>The compile thread count and the cache settings are process-wide: each
+<code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> constructor applies its arguments to the whole process, so pass
+the same values to every renderer, including a prewarmer.</p>
 <p>Cache statistics (per process, across all <code class="docutils literal notranslate"><span class="pre">Shader::compile</span></code> calls):</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Shader</span><span class="o">::</span><span class="n">binaryCacheStats</span><span class="p">();</span>
 <span class="n">std</span><span class="o">::</span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hits=%llu misses=%llu stores=%llu coordinated_waits=%llu</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
@@ -274,25 +401,37 @@ cache:</p>
 rayrai_shader_prewarm<span class="w"> </span>--log-cache
 </pre></div>
 </div>
-<p>For an embedded application, spawn one background thread, give it its own
-offscreen GL context, call <code class="docutils literal notranslate"><span class="pre">prewarmShadersForCurrentContext</span></code> once. Worker
-threads that later construct their own <code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> will find the heavy
-shaders already cached (or briefly block on a per-shader compile mutex if
-the warm-up is still in flight):</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="kr">thread</span><span class="p">([]{</span>
-<span class="w">  </span><span class="n">SDL_Window</span><span class="o">*</span><span class="w"> </span><span class="n">w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">nullptr</span><span class="p">;</span><span class="w"> </span><span class="n">SDL_GLContext</span><span class="w"> </span><span class="n">gl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">nullptr</span><span class="p">;</span>
-<span class="w">  </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">createOffscreenGlContext</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="w"> </span><span class="n">gl</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;rayrai_prewarm&quot;</span><span class="p">);</span>
+<p>For an embedded application, create an offscreen context on the main thread,
+release it, and call <code class="docutils literal notranslate"><span class="pre">prewarmShadersForCurrentContext</span></code> once from a background
+thread that adopts it. SDL windows must be created and destroyed on the main
+thread, and every renderer in the process, including the prewarmer, must use
+the same <code class="docutils literal notranslate"><span class="pre">ThreadingMode</span></code>. Worker threads that later construct their own
+<code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> will find the heavy shaders already cached (or briefly block on
+a per-shader compile mutex if the warm-up is still in flight):</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Main thread: create the prewarm context, then release it.</span>
+<span class="n">SDL_Window</span><span class="o">*</span><span class="w"> </span><span class="n">w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">nullptr</span><span class="p">;</span>
+<span class="n">SDL_GLContext</span><span class="w"> </span><span class="n">gl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">nullptr</span><span class="p">;</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">createOffscreenGlContext</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="w"> </span><span class="n">gl</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;rayrai_prewarm&quot;</span><span class="p">);</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">detachOffscreenGlContext</span><span class="p">(</span><span class="n">w</span><span class="p">);</span>
+
+<span class="n">std</span><span class="o">::</span><span class="kr">thread</span><span class="w"> </span><span class="nf">prewarm</span><span class="p">([</span><span class="n">w</span><span class="p">,</span><span class="w"> </span><span class="n">gl</span><span class="p">]</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">makeOffscreenContextCurrent</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="w"> </span><span class="n">gl</span><span class="p">);</span>
 <span class="w">  </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">prewarmShadersForCurrentContext</span><span class="p">(</span>
 <span class="w">    </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">ThreadingMode</span><span class="o">::</span><span class="n">MultiThread</span><span class="p">);</span>
-<span class="w">  </span><span class="n">SDL_GL_MakeCurrent</span><span class="p">(</span><span class="k">nullptr</span><span class="p">,</span><span class="w"> </span><span class="k">nullptr</span><span class="p">);</span>
-<span class="w">  </span><span class="n">SDL_GL_DeleteContext</span><span class="p">(</span><span class="n">gl</span><span class="p">);</span>
-<span class="w">  </span><span class="n">SDL_DestroyWindow</span><span class="p">(</span><span class="n">w</span><span class="p">);</span>
-<span class="p">}).</span><span class="n">detach</span><span class="p">();</span>
+<span class="w">  </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">detachOffscreenGlContext</span><span class="p">(</span><span class="n">w</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="c1">// ... start the rendering workers ...</span>
+
+<span class="n">prewarm</span><span class="p">.</span><span class="n">join</span><span class="p">();</span><span class="w">  </span><span class="c1">// main thread</span>
+<span class="n">SDL_GL_DeleteContext</span><span class="p">(</span><span class="n">gl</span><span class="p">);</span>
+<span class="n">SDL_DestroyWindow</span><span class="p">(</span><span class="n">w</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Across the whole process, each shader’s GLSL→binary compile runs exactly
-once regardless of the number of worker threads.</p>
+<p>Pass the workers’ cache directory as the second argument of
+<code class="docutils literal notranslate"><span class="pre">prewarmShadersForCurrentContext</span></code> when they do not use the default location.
+With the binary cache enabled, each registered program is compiled from GLSL
+once per process, however many worker threads construct renderers.</p>
 <p>When you only want to warm a specific subset:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Names of every program registered with the running RayraiWindow.</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">linkedShaderNames</span><span class="p">();</span>
@@ -312,6 +451,77 @@ once regardless of the number of worker threads.</p>
 <p>For diagnostics on the cost of the lazy-compile pipeline (how long each
 program took on first use, how many are linked so far), call
 <code class="docutils literal notranslate"><span class="pre">shaderWarmupDiagnostics()</span></code>.</p>
+</section>
+<section id="on-disk-caches">
+<h2>On-disk caches<a class="headerlink" href="#on-disk-caches" title="Link to this heading"></a></h2>
+<p>Besides the shader binary cache, rayrai keeps these caches. All of them are
+regenerated when missing, so the files can be deleted at any time. The mesh
+caches are also checked against their source and rebuilt when stale.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 40.0%" />
+<col style="width: 30.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Contents</p></th>
+<th class="head"><p>Default location</p></th>
+<th class="head"><p>Override</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Imported-mesh metadata and generated LOD chains</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;temp&gt;/rayrai_mesh_preprocess_cache</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">RAYRAI_MESH_PREPROCESS_CACHE_DIR</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>LOD chains prepared by asynchronous loading of instanced meshes</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">rayrai_cache_&lt;file&gt;.lods</span></code> next to the source asset, else
+<code class="docutils literal notranslate"><span class="pre">&lt;temp&gt;/rayrai_async_lod_cache</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">RAYRAI_ASYNC_LOD_CACHE_DIR</span></code>; <code class="docutils literal notranslate"><span class="pre">RAYRAI_DISABLE_ASYNC_LOD_CACHE</span></code>
+disables the cache</p></td>
+</tr>
+<tr class="row-even"><td><p>Procedural cloud noise textures</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$HOME/.raisim/rayrai</span></code>, then <code class="docutils literal notranslate"><span class="pre">%USERPROFILE%\.raisim\rayrai</span></code>
+(Windows), then <code class="docutils literal notranslate"><span class="pre">&lt;temp&gt;/raisim/rayrai</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">RAYRAI_CLOUD_TEXTURE_CACHE_DIR</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;temp&gt;</span></code> is the system temporary directory. The asynchronous LOD sidecars
+store full vertex data and can be large for dense assets.</p>
+</section>
+<section id="environment-variables">
+<h2>Environment variables<a class="headerlink" href="#environment-variables" title="Link to this heading"></a></h2>
+<p>rayrai reads these variables from the process environment; set them before the
+renderer starts. Boolean switches are on when set to a non-empty value that does
+not start with <code class="docutils literal notranslate"><span class="pre">0</span></code>, unless noted otherwise.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">RAYRAI_MESH_PREPROCESS_CACHE_DIR</span></code>, <code class="docutils literal notranslate"><span class="pre">RAYRAI_ASYNC_LOD_CACHE_DIR</span></code>,
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_CLOUD_TEXTURE_CACHE_DIR</span></code>: cache directories (see
+<a class="reference internal" href="#on-disk-caches">On-disk caches</a>). <code class="docutils literal notranslate"><span class="pre">RAYRAI_DISABLE_ASYNC_LOD_CACHE</span></code> disables the
+asynchronous LOD cache when set to any value.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RAYRAI_FOLIAGE_LOD_PIXEL_ERROR</span></code> and
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_FOLIAGE_SHADOW_LOD_PIXEL_ERROR</span></code>: foliage LOD error budgets
+(defaults <code class="docutils literal notranslate"><span class="pre">2.25</span></code> pixels and <code class="docutils literal notranslate"><span class="pre">2.5</span></code> texels; read once per process). The
+shadow budget follows the color budget when only the latter is set.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RAYRAI_SUPPRESS_&lt;PATH&gt;_FALLBACK_WARNINGS</span></code>: silence the one-time warning of
+a GPU path fallback, for example
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_SUPPRESS_GPU_INSTANCE_CULLING_FALLBACK_WARNINGS</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RAYRAI_FORCE_COMPACT_PBR_SAMPLER_FALLBACK</span></code> and
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_FORCE_LIMITED_PBR_SAMPLER_FALLBACK</span></code>: select the compact or limited
+shader tier on a larger GPU, for testing.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RAYRAI_EAGER_SHADER_WARMUP</span></code>: compile every registered shader when a
+renderer is constructed instead of on first use.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RAYRAI_PBR_DEBUG_OUTPUT</span></code>: PBR debug visualization channel (<code class="docutils literal notranslate"><span class="pre">0</span></code> is off);
+<code class="docutils literal notranslate"><span class="pre">captureDebugPasses</span></code> overrides it for the frames it renders.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RAYRAI_DISABLE_VULKAN_RAY_QUERY</span></code>: set to exactly <code class="docutils literal notranslate"><span class="pre">1</span></code> to use the portable
+OpenGL glass tracer even when the Vulkan ray-query backend is available.</p></li>
+</ul>
+<p>The TCP viewer reads its own <code class="docutils literal notranslate"><span class="pre">RAYRAI_TCP_VIEWER_*</span></code> variables
+(<a class="reference internal" href="../RayraiTcpViewer.html"><span class="doc">Rayrai TCP Viewer</span></a>). Variables named <code class="docutils literal notranslate"><span class="pre">RAYRAI_DEBUG_*</span></code>,
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_LOG_*</span></code> and <code class="docutils literal notranslate"><span class="pre">RAYRAI_BENCH_*</span></code>, and the other <code class="docutils literal notranslate"><span class="pre">RAYRAI_DISABLE_*</span></code> and
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_ENABLE_*</span></code> switches, are renderer-development diagnostics (reference
+paths, logging and experiments) and may change between releases.</p>
 </section>
 <section id="additional-tips">
 <h2>Additional tips<a class="headerlink" href="#additional-tips" title="Link to this heading"></a></h2>
@@ -376,8 +586,10 @@ program took on first use, how many are linked so far), call
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow13ThreadingModeE">
 <span id="_CPPv3N6raisin12RayraiWindow13ThreadingModeE"></span><span id="_CPPv2N6raisin12RayraiWindow13ThreadingModeE"></span><span class="target" id="classraisin_1_1RayraiWindow_1ac60a9fed4737e2679b298f856c2f0625"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ThreadingMode</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow13ThreadingModeE" title="Link to this definition"></a><br /></dt>
 <dd><p>Threading contract for the renderer. </p>
-<p><code class="docutils literal notranslate"><span class="pre">SingleThread</span></code> (the default) promises the application creates exactly one <a class="reference internal" href="#classraisin_1_1RayraiWindow"><span class="std std-ref">RayraiWindow</span></a> per process and never spawns additional threads that touch rayrai state. In this mode no <code class="docutils literal notranslate"><span class="pre">thread_local</span></code> storage is used internally — caches sit in plain process-wide statics or on the window instance.</p>
-<p><code class="docutils literal notranslate"><span class="pre">MultiThread</span></code> is for RL / batch-render setups that spawn one <a class="reference internal" href="#classraisin_1_1RayraiWindow"><span class="std std-ref">RayraiWindow</span></a> per worker thread, each with its own offscreen GL context. Internal caches that would otherwise need synchronization are kept per-thread via <code class="docutils literal notranslate"><span class="pre">thread_local</span></code> so workers cannot stomp on each other; shared resources (mesh import cache, texture cache) remain mutex-protected.</p>
+<p><code class="docutils literal notranslate"><span class="pre">SingleThread</span></code> (the default) promises the application creates exactly one <a class="reference internal" href="#classraisin_1_1RayraiWindow"><span class="std std-ref">RayraiWindow</span></a> per process and never spawns additional threads that touch rayrai state. Render state is owned by the window or the calling thread.</p>
+<p><code class="docutils literal notranslate"><span class="pre">MultiThread</span></code> is for RL / batch-render setups that spawn one <a class="reference internal" href="#classraisin_1_1RayraiWindow"><span class="std std-ref">RayraiWindow</span></a> per worker thread, each with its own offscreen GL context. State that would otherwise need synchronization is owned by the object it describes — a resolved uniform location by its Shader, GL context state by the renderer driving that context — rather than kept per-thread, so handing a context between threads does not strand it. Shared resources (immutable mesh templates and shader compilation) are coordinated. File textures and mutable material state are local to each worker/context.</p>
+<p>This is instance confinement, not concurrent access to one window. Construct, render, read back, edit, and destroy a renderer on its owning worker with its GL context current. Do not integrate or mutate its World on another thread while rendering. Prefer an independent World per worker. Keep application supplied mutable materials, cameras, visuals and GPU objects worker-local. Create/destroy SDL windows on the main thread and hand their contexts to workers with makeOffscreenContextCurrent after detaching them on the main thread. All renderers in the process, including prewarmers, must use this mode.</p>
+<p>What workers share and what they duplicate: immutable mesh geometry is shared between contexts in one GL share group, so a model imported by one worker costs no second vertex/index upload. Textures are not: rayrai retunes filtering and anisotropy on the texture object itself, per material and per render-quality preset, so a shared texture would let one worker’s settings rewrite another’s. Each worker therefore decodes and uploads its own copy of every image, and a textured model’s geometry is not shared either. Lifting that needs filtering to move off the texture object onto GL sampler objects bound per texture unit.</p>
 <p>Mixing the two — for example, constructing several <code class="docutils literal notranslate"><span class="pre">SingleThread</span></code> windows on different threads — is unsupported. </p>
 <p><em>Values:</em></p>
 <dl class="cpp enumerator">
@@ -463,7 +675,7 @@ program took on first use, how many are linked so far), call
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow26setAsyncMeshLoadingEnabledEb">
 <span id="_CPPv3N6raisin12RayraiWindow26setAsyncMeshLoadingEnabledEb"></span><span id="_CPPv2N6raisin12RayraiWindow26setAsyncMeshLoadingEnabledEb"></span><span id="raisin::RayraiWindow::setAsyncMeshLoadingEnabled__b"></span><span class="target" id="classraisin_1_1RayraiWindow_1a368a4549c2affecdef638f23f653c926"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setAsyncMeshLoadingEnabled</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">enabled</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow26setAsyncMeshLoadingEnabledEb" title="Link to this definition"></a><br /></dt>
 <dd><p>Enable or disable async mesh file import for future mesh visuals/world assets. </p>
-<p>Async loading parses mesh files on a worker thread, skips drawing pending assets, and finalizes ready GPU resources on the render thread. Disable it when a caller needs mesh assets to be available immediately after <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a7aee1644671e281d222696db145a199c"><span class="std std-ref">addVisualMesh()</span></a>/importVisualScene(). </p>
+<p>Async loading parses files and prepares base geometry and instanced LODs on workers. Pending instances are skipped; textures and incremental GPU uploads use the render thread. Disable it when a caller needs mesh assets to be available immediately after <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a7aee1644671e281d222696db145a199c"><span class="std std-ref">addVisualMesh()</span></a>/importVisualScene(). </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -478,7 +690,7 @@ program took on first use, how many are linked so far), call
 <dd><p>Finalize ready async mesh imports on the render thread. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>maxAssets</strong> – Maximum number of assets to finalize. </p>
+<dd class="field-odd"><p><strong>maxAssets</strong> – Maximum import/upload stages to advance (zero does no work). Instanced LOD preparation is also polled, with one submesh upload per batch. </p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Number of assets finalized. </p>
@@ -489,7 +701,28 @@ program took on first use, how many are linked so far), call
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisin12RayraiWindow25pendingAsyncMeshLoadCountEv">
 <span id="_CPPv3NK6raisin12RayraiWindow25pendingAsyncMeshLoadCountEv"></span><span id="_CPPv2NK6raisin12RayraiWindow25pendingAsyncMeshLoadCountEv"></span><span id="raisin::RayraiWindow::pendingAsyncMeshLoadCountC"></span><span class="target" id="classraisin_1_1RayraiWindow_1a8cbee8f66093a7bb3fa97b1d650268b3"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pendingAsyncMeshLoadCount</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin12RayraiWindow25pendingAsyncMeshLoadCountEv" title="Link to this definition"></a><br /></dt>
-<dd><p>Number of async mesh imports still waiting for CPU load or GPU finalization. </p>
+<dd><p>Pending imports plus instanced LOD jobs, including unfinished GPU uploads. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisin12RayraiWindow11debugAssetsEv">
+<span id="_CPPv3NK6raisin12RayraiWindow11debugAssetsEv"></span><span id="_CPPv2NK6raisin12RayraiWindow11debugAssetsEv"></span><span id="raisin::RayraiWindow::debugAssetsC"></span><span class="target" id="classraisin_1_1RayraiWindow_1a847c50ed3d03916291614020cd9da13d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisin17RayraiGlobalAssetE" title="raisin::RayraiGlobalAsset"><span class="n"><span class="pre">RayraiGlobalAsset</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">debugAssets</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin12RayraiWindow11debugAssetsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>The asset manager this renderer imports through. </p>
+<p>Exposed so tests can inspect the meshes this renderer actually holds rather than re-deriving them through a second manager, which only agrees when the asset happens to be eligible for the process-wide GPU cache. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow27setKeyboardShortcutsEnabledEb">
+<span id="_CPPv3N6raisin12RayraiWindow27setKeyboardShortcutsEnabledEb"></span><span id="_CPPv2N6raisin12RayraiWindow27setKeyboardShortcutsEnabledEb"></span><span id="raisin::RayraiWindow::setKeyboardShortcutsEnabled__b"></span><span class="target" id="classraisin_1_1RayraiWindow_1a52fe650b9edea593423fe83d3ba97825"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setKeyboardShortcutsEnabled</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">enabled</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow27setKeyboardShortcutsEnabledEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Whether this renderer reacts to global keyboard shortcuts. </p>
+<p>The renderer’s built-in shortcuts read SDL’s keyboard state, which is one array for the whole process and carries no notion of which window has focus. A process running several renderers would otherwise see a key press act on all of them at once, so a multi-window application should leave this on only for the focused renderer. Defaults to true, which is the behaviour of a single-renderer application. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisin12RayraiWindow18pbrDebugOutputModeEv">
+<span id="_CPPv3NK6raisin12RayraiWindow18pbrDebugOutputModeEv"></span><span id="_CPPv2NK6raisin12RayraiWindow18pbrDebugOutputModeEv"></span><span id="raisin::RayraiWindow::pbrDebugOutputModeC"></span><span class="target" id="classraisin_1_1RayraiWindow_1a5471f520ae4e2a158adc0a51b54199a7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pbrDebugOutputMode</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin12RayraiWindow18pbrDebugOutputModeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>PBR debug output mode in force for this renderer. </p>
+<p>The environment variable RAYRAI_PBR_DEBUG_OUTPUT sets it process-wide; captureDebugPasses overrides it for the frames it renders. The override belongs to this renderer: rewriting the process environment raced every other worker’s getenv on the render path, and a thread-local override would follow whichever thread happened to drive the renderer. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -863,6 +1096,12 @@ Prefer <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8907af
 <span id="_CPPv3N6raisin12RayraiWindow24captureRenderPassTimingsER6CameraRK15RenderOverrides"></span><span id="_CPPv2N6raisin12RayraiWindow24captureRenderPassTimingsER6CameraRK15RenderOverrides"></span><span id="raisin::RayraiWindow::captureRenderPassTimings__CameraR.RenderOverridesCR"></span><span class="target" id="classraisin_1_1RayraiWindow_1a3bf657c9ca2dccf51f02ae8caa5bcf82"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6raisin12RayraiWindow16RenderPassTimingE" title="raisin::RayraiWindow::RenderPassTiming"><span class="n"><span class="pre">RenderPassTiming</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">captureRenderPassTimings</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6raisin6CameraE" title="raisin::Camera"><span class="n"><span class="pre">Camera</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">externalCam</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisin12RayraiWindow15RenderOverridesE" title="raisin::RayraiWindow::RenderOverrides"><span class="n"><span class="pre">RenderOverrides</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">ov</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow24captureRenderPassTimingsER6CameraRK15RenderOverrides" title="Link to this definition"></a><br /></dt>
 <dd><p>Explicitly render once and return GPU elapsed-time measurements by pass. </p>
 <p>This inserts blocking OpenGL timer queries and is intended for diagnostics and benchmarks only. Normal rendering does not issue timer queries. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow24captureViewerPassTimingsEii">
+<span id="_CPPv3N6raisin12RayraiWindow24captureViewerPassTimingsEii"></span><span id="_CPPv2N6raisin12RayraiWindow24captureViewerPassTimingsEii"></span><span id="raisin::RayraiWindow::captureViewerPassTimings__i.i"></span><span class="target" id="classraisin_1_1RayraiWindow_1a36c8a4e6e505bf20e1aa17c8dd58c692"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6raisin12RayraiWindow16RenderPassTimingE" title="raisin::RayraiWindow::RenderPassTiming"><span class="n"><span class="pre">RenderPassTiming</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">captureViewerPassTimings</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">width</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">height</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow24captureViewerPassTimingsEii" title="Link to this definition"></a><br /></dt>
+<dd><p>Blocking diagnostic renders of the native viewer, including non-detectable foliage. Call with a current GL context; timings exclude presentation/UI. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -1455,14 +1694,20 @@ Prefer <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8907af
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow8getLightEv">
-<span id="_CPPv3N6raisin12RayraiWindow8getLightEv"></span><span id="_CPPv2N6raisin12RayraiWindow8getLightEv"></span><span id="raisin::RayraiWindow::getLight"></span><span class="target" id="classraisin_1_1RayraiWindow_1a92c189917ec22b21c057c53548026f71"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisin5LightE" title="raisin::Light"><span class="n"><span class="pre">Light</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getLight</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow8getLightEv" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow28setLinearHdrRenderingEnabledEb">
+<span id="_CPPv3N6raisin12RayraiWindow28setLinearHdrRenderingEnabledEb"></span><span id="_CPPv2N6raisin12RayraiWindow28setLinearHdrRenderingEnabledEb"></span><span id="raisin::RayraiWindow::setLinearHdrRenderingEnabled__b"></span><span class="target" id="classraisin_1_1RayraiWindow_1a18850c94ef4f9a737dff627f0bf35080"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setLinearHdrRenderingEnabled</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">enabled</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow28setLinearHdrRenderingEnabledEb" title="Link to this definition"></a><br /></dt>
 <dd><p>Access the main scene light. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Reference to the main light. </p>
+<dd class="field-odd"><p>Reference to the main light. Keep scene radiance linear through MSAA, fog, bloom and DoF, then apply the selected exposure/tone curve/gamma in the existing post pass. Opt-in for compatibility. External captures with postProcess=false keep their legacy contract; internal reflection captures inherit the scene domain. Bloom thresholds are scene-linear radiance in this mode. </p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisin12RayraiWindow36geometryRefractionSamplingStatisticsEv">
+<span id="_CPPv3NK6raisin12RayraiWindow36geometryRefractionSamplingStatisticsEv"></span><span id="_CPPv2NK6raisin12RayraiWindow36geometryRefractionSamplingStatisticsEv"></span><span id="raisin::RayraiWindow::geometryRefractionSamplingStatisticsC"></span><span class="target" id="classraisin_1_1RayraiWindow_1a7b867e8782f55c42a9c585cb4367f6be"></span><a class="reference internal" href="#_CPPv4N6raisin36GeometryRefractionSamplingStatisticsE" title="raisin::GeometryRefractionSamplingStatistics"><span class="n"><span class="pre">GeometryRefractionSamplingStatistics</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">geometryRefractionSamplingStatistics</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin12RayraiWindow36geometryRefractionSamplingStatisticsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Explicit GPU readback; requires this renderer’s GL context and may stall. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -1566,6 +1811,18 @@ Prefer <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8907af
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisin12RayraiWindow24getRenderQualitySettingsEv">
 <span id="_CPPv3NK6raisin12RayraiWindow24getRenderQualitySettingsEv"></span><span id="_CPPv2NK6raisin12RayraiWindow24getRenderQualitySettingsEv"></span><span id="raisin::RayraiWindow::getRenderQualitySettingsC"></span><span class="target" id="classraisin_1_1RayraiWindow_1a9e352af7929430f3c0a116f7fa66e99b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisin21RenderQualitySettingsE" title="raisin::RenderQualitySettings"><span class="n"><span class="pre">RenderQualitySettings</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getRenderQualitySettings</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin12RayraiWindow24getRenderQualitySettingsEv" title="Link to this definition"></a><br /></dt>
 <dd><p>Return the active explicit viewer-quality settings. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow24setDepthPrepassesEnabledEbb">
+<span id="_CPPv3N6raisin12RayraiWindow24setDepthPrepassesEnabledEbb"></span><span id="_CPPv2N6raisin12RayraiWindow24setDepthPrepassesEnabledEbb"></span><span id="raisin::RayraiWindow::setDepthPrepassesEnabled__b.b"></span><span class="target" id="classraisin_1_1RayraiWindow_1acb94709792f9131ef9d8e1029a41d1a0"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setDepthPrepassesEnabled</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">opaque</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">foliageAlpha</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow24setDepthPrepassesEnabledEbb" title="Link to this definition"></a><br /></dt>
+<dd><p>Toggle depth prepasses while preserving authored lights and materials. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow39setAdditionalLightContributionThresholdEf">
+<span id="_CPPv3N6raisin12RayraiWindow39setAdditionalLightContributionThresholdEf"></span><span id="_CPPv2N6raisin12RayraiWindow39setAdditionalLightContributionThresholdEf"></span><span id="raisin::RayraiWindow::setAdditionalLightContributionThreshold__float"></span><span class="target" id="classraisin_1_1RayraiWindow_1a7272fe9cca7d698b7da227c99e933a42"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setAdditionalLightContributionThreshold</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">threshold</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow39setAdditionalLightContributionThresholdEf" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the total additional-light incident-radiance cutoff budget without resetting authored lights. Zero (default) keeps exact unlimited lighting. Invalid/negative values disable culling. This is not a final-pixel tolerance. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -1911,7 +2168,7 @@ Prefer <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8907af
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow24createOffscreenGlContextERP10SDL_WindowR13SDL_GLContextPKc">
 <span id="_CPPv3N6raisin12RayraiWindow24createOffscreenGlContextERP10SDL_WindowR13SDL_GLContextPKc"></span><span id="_CPPv2N6raisin12RayraiWindow24createOffscreenGlContextERP10SDL_WindowR13SDL_GLContextPKc"></span><span id="raisin::RayraiWindow::createOffscreenGlContext__SDL_WindowPR.SDL_GLContextR.cCP"></span><span class="target" id="classraisin_1_1RayraiWindow_1a9807a8adc483bafb30eb759f2d3bc6ca"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">createOffscreenGlContext</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">SDL_Window</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">window</span></span>, <span class="n"><span class="pre">SDL_GLContext</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">glContext</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">title</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;rayrai_offscreen&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow24createOffscreenGlContextERP10SDL_WindowR13SDL_GLContextPKc" title="Link to this definition"></a><br /></dt>
 <dd><p>Create a hidden SDL window and an offscreen OpenGL context. </p>
-<p>If the calling thread already has a current SDL OpenGL context, the new context joins its share group. This lets worker renderers reuse immutable mesh buffers and textures while retaining context-local VAOs and render targets. With no current context, an independent root context is created. </p>
+<p>If the calling thread already has a current SDL OpenGL context, the new context joins its share group. This lets worker renderers reuse immutable immutable untextured mesh buffers while retaining context-local VAOs and render targets. With no current context, an independent root context is created. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1935,6 +2192,13 @@ Prefer <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8907af
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow24detachOffscreenGlContextEP10SDL_Window">
+<span id="_CPPv3N6raisin12RayraiWindow24detachOffscreenGlContextEP10SDL_Window"></span><span id="_CPPv2N6raisin12RayraiWindow24detachOffscreenGlContextEP10SDL_Window"></span><span id="raisin::RayraiWindow::detachOffscreenGlContext__SDL_WindowP"></span><span class="target" id="classraisin_1_1RayraiWindow_1af8bb2ad799fcf377f938fa8104f7bc02"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">detachOffscreenGlContext</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">SDL_Window</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">window</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow24detachOffscreenGlContextEP10SDL_Window" title="Link to this definition"></a><br /></dt>
+<dd><p>Detach the GL context currently bound to <code class="docutils literal notranslate"><span class="pre">window</span></code> on this thread. </p>
+<p>createOffscreenGlContext leaves the context it made current on the calling thread, so a context created on the main thread has to be released before a worker can adopt it with makeOffscreenContextCurrent — a context is current on at most one thread at a time. Safe to call with no context current. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -2073,7 +2337,7 @@ Prefer <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8907af
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow15RenderOverridesE">
 <span id="_CPPv3N6raisin12RayraiWindow15RenderOverridesE"></span><span id="_CPPv2N6raisin12RayraiWindow15RenderOverridesE"></span><span id="raisin::RayraiWindow::RenderOverrides"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1RenderOverrides"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RenderOverrides</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow15RenderOverridesE" title="Link to this definition"></a><br /></dt>
 <dd><p>Override shaders and rendering toggles when using external cameras. </p>
-<p>For <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Camera"><span class="std std-ref"><span class="pre">Camera</span></span></a></code>-based external renders, <code class="docutils literal notranslate"><a class="reference internal" href="#structraisin_1_1RayraiWindow_1_1RenderOverrides_1a0a4c863c3f60f7c504e24ef814296f9b"><span class="std std-ref"><span class="pre">drawVisualizationObjects</span></span></a></code> and <code class="docutils literal notranslate"><a class="reference internal" href="#structraisin_1_1RayraiWindow_1_1RenderOverrides_1ad6923f429f877a6ecbe611aef91d5c9e"><span class="std std-ref"><span class="pre">drawPointClouds</span></span></a></code> enable only custom visuals, instanced visuals, and point clouds marked <code class="docutils literal notranslate"><a class="reference internal" href="#namespaceraisin_1ae61c1b3422ee207a93b8d270eadaf402aeef9fc6a14d765b49eea3959ff70b049"><span class="std std-ref"><span class="pre">VisualCategory::Detectable</span></span></a></code>. Non-detectable helper geometry remains visible in the normal interactive viewer but is skipped by these capture paths. The RaiSim RGB/depth sensor-camera overloads disable custom visualization objects and point clouds entirely, regardless of these toggles. </p>
+<p>For <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Camera"><span class="std std-ref"><span class="pre">Camera</span></span></a></code>-based external renders, <code class="docutils literal notranslate"><span class="pre">drawVisualizationObjects</span></code> and <code class="docutils literal notranslate"><span class="pre">drawPointClouds</span></code> enable only custom visuals, instanced visuals, and point clouds marked <code class="docutils literal notranslate"><a class="reference internal" href="#namespaceraisin_1ae61c1b3422ee207a93b8d270eadaf402aeef9fc6a14d765b49eea3959ff70b049"><span class="std std-ref"><span class="pre">VisualCategory::Detectable</span></span></a></code>. Non-detectable helper geometry remains visible in the normal interactive viewer but is skipped by these capture paths. The RaiSim RGB/depth sensor-camera overloads disable custom visualization objects and point clouds entirely, regardless of these toggles. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
@@ -2402,6 +2666,27 @@ Prefer <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8907af
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow35MaterialTextureBudgetRecommendationE">
 <span id="_CPPv3N6raisin12RayraiWindow35MaterialTextureBudgetRecommendationE"></span><span id="_CPPv2N6raisin12RayraiWindow35MaterialTextureBudgetRecommendationE"></span><span id="raisin::RayraiWindow::MaterialTextureBudgetRecommendation"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1MaterialTextureBudgetRecommendation"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaterialTextureBudgetRecommendation</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow35MaterialTextureBudgetRecommendationE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow32EnvironmentBackgroundDiagnosticsE">
+<span id="_CPPv3N6raisin12RayraiWindow32EnvironmentBackgroundDiagnosticsE"></span><span id="_CPPv2N6raisin12RayraiWindow32EnvironmentBackgroundDiagnosticsE"></span><span id="raisin::RayraiWindow::EnvironmentBackgroundDiagnostics"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1EnvironmentBackgroundDiagnostics"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EnvironmentBackgroundDiagnostics</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow32EnvironmentBackgroundDiagnosticsE" title="Link to this definition"></a><br /></dt>
+<dd><p>How the last scene pass drew its environment background (see renderMeshes). </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow32EnvironmentBackgroundDiagnostics8deferredE">
+<span id="_CPPv3N6raisin12RayraiWindow32EnvironmentBackgroundDiagnostics8deferredE"></span><span id="_CPPv2N6raisin12RayraiWindow32EnvironmentBackgroundDiagnostics8deferredE"></span><span id="raisin::RayraiWindow::EnvironmentBackgroundDiagnostics::deferred__b"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1EnvironmentBackgroundDiagnostics_1a741d6104b87be3b947aca43ccbfcde33"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">deferred</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow32EnvironmentBackgroundDiagnostics8deferredE" title="Link to this definition"></a><br /></dt>
+<dd><p>Drawn inside the scene pass instead of right after the clear. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow32EnvironmentBackgroundDiagnostics11depthTestedE">
+<span id="_CPPv3N6raisin12RayraiWindow32EnvironmentBackgroundDiagnostics11depthTestedE"></span><span id="_CPPv2N6raisin12RayraiWindow32EnvironmentBackgroundDiagnostics11depthTestedE"></span><span id="raisin::RayraiWindow::EnvironmentBackgroundDiagnostics::depthTested__b"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1EnvironmentBackgroundDiagnostics_1af59f4359c560c08799abf21077cf688b"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">depthTested</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow32EnvironmentBackgroundDiagnostics11depthTestedE" title="Link to this definition"></a><br /></dt>
+<dd><p>Drawn after the depth prepass, only on uncovered samples. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow27ReflectionProbeCaptureFrameE">
@@ -2784,6 +3069,13 @@ Prefer <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8907af
 <span id="_CPPv3N6raisin6Camera19setSceneMsaaSamplesEi"></span><span id="_CPPv2N6raisin6Camera19setSceneMsaaSamplesEi"></span><span id="raisin::Camera::setSceneMsaaSamples__i"></span><span class="target" id="classraisin_1_1Camera_1af694e6513199ee2f84a9d82a2757883c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setSceneMsaaSamples</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">samples</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin6Camera19setSceneMsaaSamplesEi" title="Link to this definition"></a><br /></dt>
 <dd><p>Set scene-color MSAA samples for future scene FBO rendering. </p>
 <p>Values &lt;= 1 disable MSAA. The resolved color/depth are still written into the existing single-sample texture targets so postprocessing and readback APIs keep working. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin6Camera19setSceneMsaaSamplesEib">
+<span id="_CPPv3N6raisin6Camera19setSceneMsaaSamplesEib"></span><span id="_CPPv2N6raisin6Camera19setSceneMsaaSamplesEib"></span><span id="raisin::Camera::setSceneMsaaSamples__i.b"></span><span class="target" id="classraisin_1_1Camera_1a31c31c9f97c63e6fd3178020fb1de382"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setSceneMsaaSamples</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">samples</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">keepAllocation</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin6Camera19setSceneMsaaSamplesEib" title="Link to this definition"></a><br /></dt>
+<dd><p>Same as <a class="reference internal" href="#classraisin_1_1Camera_1af694e6513199ee2f84a9d82a2757883c"><span class="std std-ref">setSceneMsaaSamples()</span></a>, optionally keeping an existing multisampled target. </p>
+<p>With keepAllocation, disabling MSAA keeps the multisampled renderbuffers so re-enabling the same sample count reuses them instead of reallocating. Every scene render clears the target before drawing, so reuse cannot change the image. A later call without keepAllocation that leaves MSAA disabled releases the kept target. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -3325,7 +3617,7 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin17RayraiGlobalAsset14pollAsyncLoadsE6size_t">
 <span id="_CPPv3N6raisin17RayraiGlobalAsset14pollAsyncLoadsE6size_t"></span><span id="_CPPv2N6raisin17RayraiGlobalAsset14pollAsyncLoadsE6size_t"></span><span id="raisin::RayraiGlobalAsset::pollAsyncLoads__s"></span><span class="target" id="classraisin_1_1RayraiGlobalAsset_1a06be5276b1b683b001de328c6544d76f"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pollAsyncLoads</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxAssets</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin17RayraiGlobalAsset14pollAsyncLoadsE6size_t" title="Link to this definition"></a><br /></dt>
-<dd><p>Finalize any async mesh imports whose CPU-side Assimp load has completed. </p>
+<dd><p>Advance ready import, worker geometry, and incremental GPU upload stages. </p>
 <p>This must be called on the OpenGL/render thread because it creates textures, vertex buffers, and vertex array objects. Returns the number of assets finalized. </p>
 </dd></dl>
 
@@ -3442,7 +3734,16 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin17RayraiGlobalAsset19SharedGpuAssetStatsE">
 <span id="_CPPv3N6raisin17RayraiGlobalAsset19SharedGpuAssetStatsE"></span><span id="_CPPv2N6raisin17RayraiGlobalAsset19SharedGpuAssetStatsE"></span><span id="raisin::RayraiGlobalAsset::SharedGpuAssetStats"></span><span class="target" id="structraisin_1_1RayraiGlobalAsset_1_1SharedGpuAssetStats"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SharedGpuAssetStats</span></span></span><a class="headerlink" href="#_CPPv4N6raisin17RayraiGlobalAsset19SharedGpuAssetStatsE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin17RayraiGlobalAsset19SharedGpuAssetStats15cachedSnapshotsE">
+<span id="_CPPv3N6raisin17RayraiGlobalAsset19SharedGpuAssetStats15cachedSnapshotsE"></span><span id="_CPPv2N6raisin17RayraiGlobalAsset19SharedGpuAssetStats15cachedSnapshotsE"></span><span id="raisin::RayraiGlobalAsset::SharedGpuAssetStats::cachedSnapshots__s"></span><span class="target" id="structraisin_1_1RayraiGlobalAsset_1_1SharedGpuAssetStats_1af8d77074a178072bcb0eaee73c8720ae"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cachedSnapshots</span></span></span><a class="headerlink" href="#_CPPv4N6raisin17RayraiGlobalAsset19SharedGpuAssetStats15cachedSnapshotsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Live count of published templates still held, summed over every key. One per distinct asset and share group; growth beyond that means the same asset is being published repeatedly and every lookup walks them. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin17RayraiGlobalAsset12MeshLodChainE">
@@ -3620,7 +3921,7 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dd><p>Set orientation from wxyz quaternion vector. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ori</strong> – Quaternion (w, x, y, z). </p>
+<dd class="field-odd"><p><strong>ori</strong> – Quaternion (w, x, y, z): ori.x is w and ori.w is z, the same layout <a class="reference internal" href="#classraisin_1_1Visuals_1a0e6deb391f178d7f8c1d44109d1eb2ce"><span class="std std-ref">getOrientation()</span></a> returns. The identity is glm::vec4(1, 0, 0, 0). </p>
 </dd>
 </dl>
 </dd></dl>
@@ -3781,7 +4082,7 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisin7Visuals14getOrientationEv">
 <span id="_CPPv3NK6raisin7Visuals14getOrientationEv"></span><span id="_CPPv2NK6raisin7Visuals14getOrientationEv"></span><span id="raisin::Visuals::getOrientationC"></span><span class="target" id="classraisin_1_1Visuals_1a0e6deb391f178d7f8c1d44109d1eb2ce"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec4</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getOrientation</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin7Visuals14getOrientationEv" title="Link to this definition"></a><br /></dt>
-<dd><p>Get current orientation as a wxyz quaternion. </p>
+<dd><p>Get current orientation as a wxyz quaternion (x holds w, w holds z). </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -4007,6 +4308,12 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisin7Visuals11drawsInModeEN10OpenGLMesh10RenderModeE">
+<span id="_CPPv3NK6raisin7Visuals11drawsInModeEN10OpenGLMesh10RenderModeE"></span><span id="_CPPv2NK6raisin7Visuals11drawsInModeEN10OpenGLMesh10RenderModeE"></span><span id="raisin::Visuals::drawsInMode__OpenGLMesh::RenderModeC"></span><span class="target" id="classraisin_1_1Visuals_1a870d4d33337e5f72d0d55d1ef5e64af3"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">drawsInMode</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410OpenGLMesh" title="OpenGLMesh"><span class="n"><span class="pre">OpenGLMesh</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">RenderMode</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">mode</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin7Visuals11drawsInModeEN10OpenGLMesh10RenderModeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Whether <a class="reference internal" href="#classraisin_1_1Visuals_1a3abf66da8b5fe064df44acbe9047e9e2"><span class="std std-ref">drawSorted()</span></a> in this mode would rasterize anything. Transparent items are submitted once per shader, and a glass-only visual has nothing for the simple and non-transmissive passes; asking first avoids their program binds and per-object submission entirely. </p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisin7Visuals15materialSortKeyEN10OpenGLMesh10RenderModeE">
 <span id="_CPPv3NK6raisin7Visuals15materialSortKeyEN10OpenGLMesh10RenderModeE"></span><span id="_CPPv2NK6raisin7Visuals15materialSortKeyEN10OpenGLMesh10RenderModeE"></span><span id="raisin::Visuals::materialSortKey__OpenGLMesh::RenderModeC"></span><span class="target" id="classraisin_1_1Visuals_1a75438b1b90d021c9784379ac184f35c8"></span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">materialSortKey</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410OpenGLMesh" title="OpenGLMesh"><span class="n"><span class="pre">OpenGLMesh</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">RenderMode</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">mode</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin7Visuals15materialSortKeyEN10OpenGLMesh10RenderModeE" title="Link to this definition"></a><br /></dt>
 <dd><p>Compact key for sorting opaque visual draws by material/texture state. </p>
@@ -4163,7 +4470,7 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>pos</strong> – Position. </p></li>
-<li><p><strong>ori</strong> – Orientation quaternion (wxyz). </p></li>
+<li><p><strong>ori</strong> – Orientation quaternion (wxyz): ori.x is w and ori.w is z. </p></li>
 <li><p><strong>scale</strong> – Per-instance scale. </p></li>
 <li><p><strong>colorWeight</strong> – Blend between color1 and color2. </p></li>
 </ul>
@@ -4452,7 +4759,7 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals15setCastsShadowsEb">
 <span id="_CPPv3N6raisin16InstancedVisuals15setCastsShadowsEb"></span><span id="_CPPv2N6raisin16InstancedVisuals15setCastsShadowsEb"></span><span id="raisin::InstancedVisuals::setCastsShadows__b"></span><span class="target" id="classraisin_1_1InstancedVisuals_1aacadb03cd809cb2596a0328c5df16799"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setCastsShadows</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">castsShadows</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals15setCastsShadowsEb" title="Link to this definition"></a><br /></dt>
-<dd><p>Set whether this instanced visual casts shadows. </p>
+<dd><p>Set whether this instanced visual casts shadows (enabled by default). Foliage materials and grass-patch configuration preserve this setting. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -4521,6 +4828,12 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals24pollAsyncMeshPreparationEv">
+<span id="_CPPv3N6raisin16InstancedVisuals24pollAsyncMeshPreparationEv"></span><span id="_CPPv2N6raisin16InstancedVisuals24pollAsyncMeshPreparationEv"></span><span id="raisin::InstancedVisuals::pollAsyncMeshPreparation"></span><span class="target" id="classraisin_1_1InstancedVisuals_1a30b24d17078f174bf6afd08965578dc0"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pollAsyncMeshPreparation</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals24pollAsyncMeshPreparationEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Finish worker-prepared LODs incrementally on the render thread. </p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisin16InstancedVisuals23automaticMeshLodEnabledEv">
 <span id="_CPPv3NK6raisin16InstancedVisuals23automaticMeshLodEnabledEv"></span><span id="_CPPv2NK6raisin16InstancedVisuals23automaticMeshLodEnabledEv"></span><span id="raisin::InstancedVisuals::automaticMeshLodEnabledC"></span><span class="target" id="classraisin_1_1InstancedVisuals_1a49879142826d7dba937edabd1a5ce83c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">automaticMeshLodEnabled</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin16InstancedVisuals23automaticMeshLodEnabledEv" title="Link to this definition"></a><br /></dt>
 <dd><p>Check whether automatic mesh LOD is enabled for instanced mesh visuals. </p>
@@ -4530,6 +4843,12 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisin16InstancedVisuals26automaticMeshLodLevelCountEv">
 <span id="_CPPv3NK6raisin16InstancedVisuals26automaticMeshLodLevelCountEv"></span><span id="_CPPv2NK6raisin16InstancedVisuals26automaticMeshLodLevelCountEv"></span><span id="raisin::InstancedVisuals::automaticMeshLodLevelCountC"></span><span class="target" id="classraisin_1_1InstancedVisuals_1a2b4ca86e0db77987652a7e1a2fef88ba"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">automaticMeshLodLevelCount</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin16InstancedVisuals26automaticMeshLodLevelCountEv" title="Link to this definition"></a><br /></dt>
 <dd><p>Number of available instanced mesh LOD levels including the source mesh. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisin16InstancedVisuals34individualFoliageLodSelectionCountEv">
+<span id="_CPPv3NK6raisin16InstancedVisuals34individualFoliageLodSelectionCountEv"></span><span id="_CPPv2NK6raisin16InstancedVisuals34individualFoliageLodSelectionCountEv"></span><span id="raisin::InstancedVisuals::individualFoliageLodSelectionCountC"></span><span class="target" id="classraisin_1_1InstancedVisuals_1a766c86a01d1baa893d2445a0da699b97"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">individualFoliageLodSelectionCount</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin16InstancedVisuals34individualFoliageLodSelectionCountEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Number of submesh/pass visibility and LOD classifications (cache misses). </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -4600,6 +4919,18 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <span id="_CPPv3N6raisin16InstancedVisuals36setHierarchicalFoliageClustersPolicyEb6size_t6size_tf"></span><span id="_CPPv2N6raisin16InstancedVisuals36setHierarchicalFoliageClustersPolicyEb6size_t6size_tf"></span><span id="raisin::InstancedVisuals::setHierarchicalFoliageClustersPolicy__b.s.s.float"></span><span class="target" id="classraisin_1_1InstancedVisuals_1abd160654a9ea7712e5b8d5ae0d730acf"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setHierarchicalFoliageClustersPolicy</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">enabled</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">leafTargetInstances</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">32</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">minInstanceCount</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">256</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">minRejectionRatio</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.08f</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals36setHierarchicalFoliageClustersPolicyEb6size_t6size_tf" title="Link to this definition"></a><br /></dt>
 <dd><p>Configure conservative BVH/quadtree-style foliage cluster culling. </p>
 <p>Cluster culling only removes instances whose cluster bounds are outside the current view/shadow frustum. It does not reduce authored instance count or change material/mesh quality. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisin16InstancedVisuals35supportsBasicFoliageShadowTransformEv">
+<span id="_CPPv3NK6raisin16InstancedVisuals35supportsBasicFoliageShadowTransformEv"></span><span id="_CPPv2NK6raisin16InstancedVisuals35supportsBasicFoliageShadowTransformEv"></span><span id="raisin::InstancedVisuals::supportsBasicFoliageShadowTransformC"></span><span class="target" id="classraisin_1_1InstancedVisuals_1a78118fa1eb9b96bc27c9b10db1740b8d"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">supportsBasicFoliageShadowTransform</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin16InstancedVisuals35supportsBasicFoliageShadowTransformEv" title="Link to this definition"></a><br /></dt>
+<dd><p>True when every possible shadow mesh uses ordinary instance transforms. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisin16InstancedVisuals23hasDepthWritingMaterialEv">
+<span id="_CPPv3NK6raisin16InstancedVisuals23hasDepthWritingMaterialEv"></span><span id="_CPPv2NK6raisin16InstancedVisuals23hasDepthWritingMaterialEv"></span><span id="raisin::InstancedVisuals::hasDepthWritingMaterialC"></span><span class="target" id="classraisin_1_1InstancedVisuals_1a979dff8473a822b59b6b2eaa55d1f738"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hasDepthWritingMaterial</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin16InstancedVisuals23hasDepthWritingMaterialEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Whether a draw can override a surrounding pass’s disabled depth writes. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -4687,7 +5018,16 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals12InstanceSpecE">
 <span id="_CPPv3N6raisin16InstancedVisuals12InstanceSpecE"></span><span id="_CPPv2N6raisin16InstancedVisuals12InstanceSpecE"></span><span id="raisin::InstancedVisuals::InstanceSpec"></span><span class="target" id="structraisin_1_1InstancedVisuals_1_1InstanceSpec"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InstanceSpec</span></span></span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals12InstanceSpecE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals12InstanceSpec11orientationE">
+<span id="_CPPv3N6raisin16InstancedVisuals12InstanceSpec11orientationE"></span><span id="_CPPv2N6raisin16InstancedVisuals12InstanceSpec11orientationE"></span><span id="raisin::InstancedVisuals::InstanceSpec::orientation__glm::vec4"></span><span class="target" id="structraisin_1_1InstancedVisuals_1_1InstanceSpec_1a785abc9ae148fc5b622bbe9582d10400"></span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec4</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">orientation</span></span></span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals12InstanceSpec11orientationE" title="Link to this definition"></a><br /></dt>
+<dd><p>wxyz: x holds w, w holds z </p>
+</dd></dl>
+
+</div>
+</dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals21GrassPatchDiagnosticsE">
@@ -4743,6 +5083,12 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10OpenGLMesh11drawsInModeE10RenderModePKN6raisin8MaterialE">
+<span id="_CPPv3NK10OpenGLMesh11drawsInModeE10RenderModePKN6raisin8MaterialE"></span><span id="_CPPv2NK10OpenGLMesh11drawsInModeE10RenderModePKN6raisin8MaterialE"></span><span id="OpenGLMesh::drawsInMode__RenderMode.raisin::MaterialCPC"></span><span class="target" id="classOpenGLMesh_1a23b7d5678faacd8499582f91047351cd"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">drawsInMode</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">RenderMode</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">mode</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">raisin</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6raisin8MaterialE" title="raisin::Material"><span class="n"><span class="pre">Material</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">materialOverride</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10OpenGLMesh11drawsInModeE10RenderModePKN6raisin8MaterialE" title="Link to this definition"></a><br /></dt>
+<dd><p>Whether <a class="reference internal" href="#classOpenGLMesh_1a0cadf27849b7b4914974075e4dd78e6a"><span class="std std-ref">draw()</span></a> with the same arguments would rasterize anything. It mirrors the mode and transmission filters <a class="reference internal" href="#classOpenGLMesh_1a0cadf27849b7b4914974075e4dd78e6a"><span class="std std-ref">draw()</span></a> applies, including the nextPass chain, so a caller can skip a program bind and a whole submission instead of paying for a draw that returns immediately. </p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh10OpenGLMeshERKNSt6vectorI6VertexEERKNSt6vectorIjEERKNSt6vectorI7TextureEERKN3glm4vec4E17PrimitiveTopology">
 <span id="_CPPv3N10OpenGLMesh10OpenGLMeshERKNSt6vectorI6VertexEERKNSt6vectorIjEERKNSt6vectorI7TextureEERKN3glm4vec4E17PrimitiveTopology"></span><span id="_CPPv2N10OpenGLMesh10OpenGLMeshERKNSt6vectorI6VertexEERKNSt6vectorIjEERKNSt6vectorI7TextureEERKN3glm4vec4E17PrimitiveTopology"></span><span id="OpenGLMesh::OpenGLMesh__std::vector:Vertex:CR.std::vector:unsigned-i:CR.std::vector:Texture:CR.glm::vec4CR.PrimitiveTopology"></span><span class="target" id="classOpenGLMesh_1ac52acb5f3eedf691cfdc9cbdcf1dcf10"></span><span class="sig-name descname"><span class="n"><span class="pre">OpenGLMesh</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Vertex</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">vertices</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">indices</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Texture</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">textures</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec4</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">baseColor</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec4</span></span><span class="p"><span class="pre">(</span></span><span class="m"><span class="pre">1.0f</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0f</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0f</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0f</span></span><span class="p"><span class="pre">)</span></span>, <span class="n"><span class="pre">PrimitiveTopology</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">primitiveTopology</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">PrimitiveTopology</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Triangles</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10OpenGLMesh10OpenGLMeshERKNSt6vectorI6VertexEERKNSt6vectorIjEERKNSt6vectorI7TextureEERKN3glm4vec4E17PrimitiveTopology" title="Link to this definition"></a><br /></dt>
 <dd><p>Construct a mesh and upload it to the GPU. </p>
@@ -4765,6 +5111,12 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh22sharedGpuAssetSnapshotEv">
+<span id="_CPPv3N10OpenGLMesh22sharedGpuAssetSnapshotEv"></span><span id="_CPPv2N10OpenGLMesh22sharedGpuAssetSnapshotEv"></span><span id="OpenGLMesh::sharedGpuAssetSnapshot"></span><span class="target" id="classOpenGLMesh_1a2cc9355c90a93ecbf576f2afd89f1f6c"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410OpenGLMesh" title="OpenGLMesh"><span class="n"><span class="pre">OpenGLMesh</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sharedGpuAssetSnapshot</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10OpenGLMesh22sharedGpuAssetSnapshotEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Freeze metadata before publishing to the asset cache. The template owns no VAO and remains immutable while worker-local materials are edited. </p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK10OpenGLMesh34gpuGeometryVisibleInCurrentContextEv">
 <span id="_CPPv3NK10OpenGLMesh34gpuGeometryVisibleInCurrentContextEv"></span><span id="_CPPv2NK10OpenGLMesh34gpuGeometryVisibleInCurrentContextEv"></span><span id="OpenGLMesh::gpuGeometryVisibleInCurrentContextC"></span><span class="target" id="classOpenGLMesh_1ab6ebc855e01118845d4c2291017d1630"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">gpuGeometryVisibleInCurrentContext</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10OpenGLMesh34gpuGeometryVisibleInCurrentContextEv" title="Link to this definition"></a><br /></dt>
 <dd><p>True when this mesh’s VBO/EBO are visible in the current GL context. </p>
@@ -4774,6 +5126,18 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dt class="sig sig-object cpp" id="_CPPv4NK10OpenGLMesh16gpuGeometryBytesEv">
 <span id="_CPPv3NK10OpenGLMesh16gpuGeometryBytesEv"></span><span id="_CPPv2NK10OpenGLMesh16gpuGeometryBytesEv"></span><span id="OpenGLMesh::gpuGeometryBytesC"></span><span class="target" id="classOpenGLMesh_1a8625c22f78c538ab35fa42f0645d3652"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">gpuGeometryBytes</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10OpenGLMesh16gpuGeometryBytesEv" title="Link to this definition"></a><br /></dt>
 <dd><p>Requested VBO + EBO allocation size for this mesh. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh25prepareGeometryAttributesEv">
+<span id="_CPPv3N10OpenGLMesh25prepareGeometryAttributesEv"></span><span id="_CPPv2N10OpenGLMesh25prepareGeometryAttributesEv"></span><span id="OpenGLMesh::prepareGeometryAttributes"></span><span class="target" id="classOpenGLMesh_1ace12c18be211f33d464ba33f8a3b8e2c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">prepareGeometryAttributes</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10OpenGLMesh25prepareGeometryAttributesEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Compute missing tangents and UV statistics without a GL context. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh22uploadPreparedGeometryEb">
+<span id="_CPPv3N10OpenGLMesh22uploadPreparedGeometryEb"></span><span id="_CPPv2N10OpenGLMesh22uploadPreparedGeometryEb"></span><span id="OpenGLMesh::uploadPreparedGeometry__b"></span><span class="target" id="classOpenGLMesh_1af6911bc39ccb4fcf36e8218c9be52b91"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uploadPreparedGeometry</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">compactIndices</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10OpenGLMesh22uploadPreparedGeometryEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Upload an already-prepared CPU mesh on the context-owning thread. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -4883,6 +5247,12 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10OpenGLMesh17indexElementBytesEv">
+<span id="_CPPv3NK10OpenGLMesh17indexElementBytesEv"></span><span id="_CPPv2NK10OpenGLMesh17indexElementBytesEv"></span><span id="OpenGLMesh::indexElementBytesC"></span><span class="target" id="classOpenGLMesh_1a79532c450bb782f89fc9aa3ea7047715"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">indexElementBytes</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10OpenGLMesh17indexElementBytesEv" title="Link to this definition"></a><br /></dt>
+<dd><p>GPU element width (2 or 4 bytes); CPU indices remain unsigned int. Raw VAO users must choose GL_UNSIGNED_SHORT or GL_UNSIGNED_INT accordingly. </p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh20setPrimitiveTopologyE17PrimitiveTopology">
 <span id="_CPPv3N10OpenGLMesh20setPrimitiveTopologyE17PrimitiveTopology"></span><span id="_CPPv2N10OpenGLMesh20setPrimitiveTopologyE17PrimitiveTopology"></span><span id="OpenGLMesh::setPrimitiveTopology__PrimitiveTopology"></span><span class="target" id="classOpenGLMesh_1a36a379723c4a8ee652358213647a571c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setPrimitiveTopology</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PrimitiveTopology</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">topology</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10OpenGLMesh20setPrimitiveTopologyE17PrimitiveTopology" title="Link to this definition"></a><br /></dt>
 <dd><p>Set the OpenGL primitive topology used by this mesh. </p>
@@ -4930,6 +5300,12 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10OpenGLMesh19localBoundingSphereERN3glm4vec3ERf">
+<span id="_CPPv3NK10OpenGLMesh19localBoundingSphereERN3glm4vec3ERf"></span><span id="_CPPv2NK10OpenGLMesh19localBoundingSphereERN3glm4vec3ERf"></span><span id="OpenGLMesh::localBoundingSphere__glm::vec3R.floatRC"></span><span class="target" id="classOpenGLMesh_1ad04c33f5ebc1def0590a1943ea428073"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">localBoundingSphere</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec3</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">center</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">radius</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10OpenGLMesh19localBoundingSphereERN3glm4vec3ERf" title="Link to this definition"></a><br /></dt>
+<dd><p>Conservative local sphere, cached until geometry is uploaded again. Returns false when GPU-only uploads have detached the CPU geometry. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -5059,6 +5435,12 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 </dd></dl>
 
 <dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh25generatedLodRelativeErrorE">
+<span id="_CPPv3N10OpenGLMesh25generatedLodRelativeErrorE"></span><span id="_CPPv2N10OpenGLMesh25generatedLodRelativeErrorE"></span><span id="OpenGLMesh::generatedLodRelativeError__float"></span><span class="target" id="classOpenGLMesh_1adef9cafc6a1abddd233d862a14b1eb35"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generatedLodRelativeError</span></span></span><a class="headerlink" href="#_CPPv4N10OpenGLMesh25generatedLodRelativeErrorE" title="Link to this definition"></a><br /></dt>
+<dd><p>Actual normalized quadric/attribute error reported by the simplifier; -1 means unknown. </p>
+</dd></dl>
+
+<dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh3VAOE">
 <span id="_CPPv3N10OpenGLMesh3VAOE"></span><span id="_CPPv2N10OpenGLMesh3VAOE"></span><span id="OpenGLMesh::VAO__unsigned-i"></span><span class="target" id="classOpenGLMesh_1a8499e9c3ed977113dc09e9e0e408dec2"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VAO</span></span></span><a class="headerlink" href="#_CPPv4N10OpenGLMesh3VAOE" title="Link to this definition"></a><br /></dt>
 <dd><p>OpenGL vertex array object handle. </p>
@@ -5080,6 +5462,18 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <span id="_CPPv3N10OpenGLMesh27createSharedGpuGeometryViewERKNSt10shared_ptrIK10OpenGLMeshEE"></span><span id="_CPPv2N10OpenGLMesh27createSharedGpuGeometryViewERKNSt10shared_ptrIK10OpenGLMeshEE"></span><span id="OpenGLMesh::createSharedGpuGeometryView__std::shared_ptr:OpenGLMeshC:CR"></span><span class="target" id="classOpenGLMesh_1a64e4fc9ccad205e8654f16162bab5566"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv410OpenGLMesh" title="OpenGLMesh"><span class="n"><span class="pre">OpenGLMesh</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">createSharedGpuGeometryView</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410OpenGLMesh" title="OpenGLMesh"><span class="n"><span class="pre">OpenGLMesh</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">owner</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10OpenGLMesh27createSharedGpuGeometryViewERKNSt10shared_ptrIK10OpenGLMeshEE" title="Link to this definition"></a><br /></dt>
 <dd><p>Create a context-local mesh wrapper that reuses another mesh’s GPU buffers. </p>
 <p>Buffer objects and textures are shared by OpenGL context share groups, while vertex array objects are context-local. This factory copies the CPU/material metadata, retains the shared VBO/EBO allocation, and creates a VAO in the caller’s current context. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh17createCpuGeometryERKNSt6vectorI6VertexEERKNSt6vectorIjEERKNSt6vectorI7TextureEERKN3glm4vec4Eb">
+<span id="_CPPv3N10OpenGLMesh17createCpuGeometryERKNSt6vectorI6VertexEERKNSt6vectorIjEERKNSt6vectorI7TextureEERKN3glm4vec4Eb"></span><span id="_CPPv2N10OpenGLMesh17createCpuGeometryERKNSt6vectorI6VertexEERKNSt6vectorIjEERKNSt6vectorI7TextureEERKN3glm4vec4Eb"></span><span id="OpenGLMesh::createCpuGeometry__std::vector:Vertex:CR.std::vector:unsigned-i:CR.std::vector:Texture:CR.glm::vec4CR.b"></span><span class="target" id="classOpenGLMesh_1a06fb5e5b1d4a4a46d1d9dc810b2aa48f"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv410OpenGLMesh" title="OpenGLMesh"><span class="n"><span class="pre">OpenGLMesh</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">createCpuGeometry</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Vertex</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">vertices</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">indices</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Texture</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">textures</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec4</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">baseColor</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">prepareAttributes</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10OpenGLMesh17createCpuGeometryERKNSt6vectorI6VertexEERKNSt6vectorIjEERKNSt6vectorI7TextureEERKN3glm4vec4Eb" title="Link to this definition"></a><br /></dt>
+<dd><p>Prepare geometry on a worker without issuing any OpenGL calls. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh24createWithCompactIndicesERKNSt6vectorI6VertexEERKNSt6vectorIjEERKNSt6vectorI7TextureEERKN3glm4vec4E">
+<span id="_CPPv3N10OpenGLMesh24createWithCompactIndicesERKNSt6vectorI6VertexEERKNSt6vectorIjEERKNSt6vectorI7TextureEERKN3glm4vec4E"></span><span id="_CPPv2N10OpenGLMesh24createWithCompactIndicesERKNSt6vectorI6VertexEERKNSt6vectorIjEERKNSt6vectorI7TextureEERKN3glm4vec4E"></span><span id="OpenGLMesh::createWithCompactIndices__std::vector:Vertex:CR.std::vector:unsigned-i:CR.std::vector:Texture:CR.glm::vec4CR"></span><span class="target" id="classOpenGLMesh_1a53aaacf75357379db473ab796c57c147"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv410OpenGLMesh" title="OpenGLMesh"><span class="n"><span class="pre">OpenGLMesh</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">createWithCompactIndices</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Vertex</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">vertices</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">indices</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Texture</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">textures</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec4</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">baseColor</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec4</span></span><span class="p"><span class="pre">(</span></span><span class="m"><span class="pre">1.f</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10OpenGLMesh24createWithCompactIndicesERKNSt6vectorI6VertexEERKNSt6vectorIjEERKNSt6vectorI7TextureEERKN3glm4vec4E" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a new owned mesh with lossless compact GPU indices when possible. Generic constructors retain uint32 buffers for existing raw-VAO clients. </p>
 </dd></dl>
 
 </div>
@@ -5113,6 +5507,16 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin6assimp24finishImportedModelSceneER20AsyncModelLoadResult">
 <span id="_CPPv3N6raisin6assimp24finishImportedModelSceneER20AsyncModelLoadResult"></span><span id="_CPPv2N6raisin6assimp24finishImportedModelSceneER20AsyncModelLoadResult"></span><span id="raisin::assimp::finishImportedModelScene__AsyncModelLoadResultR"></span><span class="target" id="namespaceraisin_1_1assimp_1ac292b052fa307de56d7be7c77b9d0632"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv410OpenGLMesh" title="OpenGLMesh"><span class="n"><span class="pre">OpenGLMesh</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">finishImportedModelScene</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6raisin6assimp20AsyncModelLoadResultE" title="raisin::assimp::AsyncModelLoadResult"><span class="n"><span class="pre">AsyncModelLoadResult</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">imported</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin6assimp24finishImportedModelSceneER20AsyncModelLoadResult" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin6assimp25prepareImportedModelSceneER20AsyncModelLoadResult">
+<span id="_CPPv3N6raisin6assimp25prepareImportedModelSceneER20AsyncModelLoadResult"></span><span id="_CPPv2N6raisin6assimp25prepareImportedModelSceneER20AsyncModelLoadResult"></span><span id="raisin::assimp::prepareImportedModelScene__AsyncModelLoadResultR"></span><span class="target" id="namespaceraisin_1_1assimp_1aeff03f62294e804b0ecc0656313c33e5"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv410OpenGLMesh" title="OpenGLMesh"><span class="n"><span class="pre">OpenGLMesh</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">prepareImportedModelScene</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6raisin6assimp20AsyncModelLoadResultE" title="raisin::assimp::AsyncModelLoadResult"><span class="n"><span class="pre">AsyncModelLoadResult</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">imported</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin6assimp25prepareImportedModelSceneER20AsyncModelLoadResult" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin6assimp28prepareImportedModelGeometryERNSt6vectorINSt10shared_ptrI10OpenGLMeshEEEERKNSt6stringE">
+<span id="_CPPv3N6raisin6assimp28prepareImportedModelGeometryERNSt6vectorINSt10shared_ptrI10OpenGLMeshEEEERKNSt6stringE"></span><span id="_CPPv2N6raisin6assimp28prepareImportedModelGeometryERNSt6vectorINSt10shared_ptrI10OpenGLMeshEEEERKNSt6stringE"></span><span id="raisin::assimp::prepareImportedModelGeometry__std::vector:std::shared_ptr:OpenGLMesh::R.ssCR"></span><span class="target" id="namespaceraisin_1_1assimp_1ac7bd00019dd4f21bb7665f929f99d53f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">prepareImportedModelGeometry</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv410OpenGLMesh" title="OpenGLMesh"><span class="n"><span class="pre">OpenGLMesh</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">meshes</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">path</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin6assimp28prepareImportedModelGeometryERNSt6vectorINSt10shared_ptrI10OpenGLMeshEEEERKNSt6stringE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
@@ -5584,6 +5988,12 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin5Light13shadowPrePassEv">
 <span id="_CPPv3N6raisin5Light13shadowPrePassEv"></span><span id="_CPPv2N6raisin5Light13shadowPrePassEv"></span><span id="raisin::Light::shadowPrePass"></span><span class="target" id="classraisin_1_1Light_1a44232c7c230b4fbe9a11d34b1b97268a"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shadowPrePass</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin5Light13shadowPrePassEv" title="Link to this definition"></a><br /></dt>
 <dd><p>Prepare for shadow depth rendering (bind FBO, set viewport). </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin5Light18updateShadowMatrixEi">
+<span id="_CPPv3N6raisin5Light18updateShadowMatrixEi"></span><span id="_CPPv2N6raisin5Light18updateShadowMatrixEi"></span><span id="raisin::Light::updateShadowMatrix__i"></span><span class="target" id="classraisin_1_1Light_1a1e502b26ca01ae7a6d400f310ebd1da3"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">updateShadowMatrix</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">snapResolution</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin5Light18updateShadowMatrixEi" title="Link to this definition"></a><br /></dt>
+<dd><p>Recompute the matrix used by both standalone shadow maps and atlas tiles. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -6361,6 +6771,24 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisin8Material14isTransmissiveEv">
+<span id="_CPPv3NK6raisin8Material14isTransmissiveEv"></span><span id="_CPPv2NK6raisin8Material14isTransmissiveEv"></span><span id="raisin::Material::isTransmissiveC"></span><span class="target" id="classraisin_1_1Material_1a04b330bf6bd45d3031674bedc14ead18"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isTransmissive</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin8Material14isTransmissiveEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Optical transmission of this pass (does not traverse nextPass). </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisin8Material20hasProximityFadePassEv">
+<span id="_CPPv3NK6raisin8Material20hasProximityFadePassEv"></span><span id="_CPPv2NK6raisin8Material20hasProximityFadePassEv"></span><span id="raisin::Material::hasProximityFadePassC"></span><span class="target" id="classraisin_1_1Material_1a9103211ecc034acc5f7760d4c9706e58"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hasProximityFadePass</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin8Material20hasProximityFadePassEv" title="Link to this definition"></a><br /></dt>
+<dd><p>True when this pass or any nextPass enables proximity fade. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisin8Material31usesDefaultDepthAndStencilStateEv">
+<span id="_CPPv3NK6raisin8Material31usesDefaultDepthAndStencilStateEv"></span><span id="_CPPv2NK6raisin8Material31usesDefaultDepthAndStencilStateEv"></span><span id="raisin::Material::usesDefaultDepthAndStencilStateC"></span><span class="target" id="classraisin_1_1Material_1aec30ecd53b008cae8b6433bf3081ab28"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">usesDefaultDepthAndStencilState</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin8Material31usesDefaultDepthAndStencilStateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>True when this pass and every nextPass render with the pass’s own depth test/write and no stencil or decal depth handling. </p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisin8Material7applyToER6Shader">
 <span id="_CPPv3NK6raisin8Material7applyToER6Shader"></span><span id="_CPPv2NK6raisin8Material7applyToER6Shader"></span><span id="raisin::Material::applyTo__ShaderRC"></span><span class="target" id="classraisin_1_1Material_1abfaad971fe8d41ee04f6973e51d0fe8a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">applyTo</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Shader</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">shader</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin8Material7applyToER6Shader" title="Link to this definition"></a><br /></dt>
 <dd><p>Applies the material’s properties to a shader. </p>
@@ -6751,7 +7179,7 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin8Material18transmissionFactorE">
 <span id="_CPPv3N6raisin8Material18transmissionFactorE"></span><span id="_CPPv2N6raisin8Material18transmissionFactorE"></span><span id="raisin::Material::transmissionFactor__float"></span><span class="target" id="classraisin_1_1Material_1adc515a82236beea1aaed844c3989d88b"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">transmissionFactor</span></span></span><a class="headerlink" href="#_CPPv4N6raisin8Material18transmissionFactorE" title="Link to this definition"></a><br /></dt>
-<dd><p>glTF-style transmission strength for thin glass/plastic approximation. </p>
+<dd><p>Optical transmission strength for thin panes and authored-thickness volumes. </p>
 </dd></dl>
 
 <dl class="cpp var">
@@ -6763,7 +7191,19 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin8Material21volumeThicknessFactorE">
 <span id="_CPPv3N6raisin8Material21volumeThicknessFactorE"></span><span id="_CPPv2N6raisin8Material21volumeThicknessFactorE"></span><span id="raisin::Material::volumeThicknessFactor__float"></span><span class="target" id="classraisin_1_1Material_1a7197bab29c9ccf5344ace9dcfbe36034"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">volumeThicknessFactor</span></span></span><a class="headerlink" href="#_CPPv4N6raisin8Material21volumeThicknessFactorE" title="Link to this definition"></a><br /></dt>
-<dd><p>glTF-style volume thickness used for tinted transmission attenuation. </p>
+<dd><p>Authored optical path length in world units; zero denotes a thin sheet. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin8Material18dielectricPriorityE">
+<span id="_CPPv3N6raisin8Material18dielectricPriorityE"></span><span id="_CPPv2N6raisin8Material18dielectricPriorityE"></span><span id="raisin::Material::dielectricPriority__i"></span><span class="target" id="classraisin_1_1Material_1a5d40d2b736149d2c606d2ca816b75b3d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dielectricPriority</span></span></span><a class="headerlink" href="#_CPPv4N6raisin8Material18dielectricPriorityE" title="Link to this definition"></a><br /></dt>
+<dd><p>Geometry-refraction overlap precedence: larger values win. This is not renderPriority. Use distinct priorities for overlapping different media. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin8Material18dielectricVolumeIdE">
+<span id="_CPPv3N6raisin8Material18dielectricVolumeIdE"></span><span id="_CPPv2N6raisin8Material18dielectricVolumeIdE"></span><span id="raisin::Material::dielectricVolumeId__unsigned-i"></span><span class="target" id="classraisin_1_1Material_1a16f4f68a202742349cdd52943f2b809e"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dielectricVolumeId</span></span></span><a class="headerlink" href="#_CPPv4N6raisin8Material18dielectricVolumeIdE" title="Link to this definition"></a><br /></dt>
+<dd><p>Nonzero explicitly joins submeshes/visuals into one dielectric volume. Zero gives each visual (or articulated visual body) its own volume. </p>
 </dd></dl>
 
 <dl class="cpp var">
@@ -7272,13 +7712,13 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin8Material27foliageTransmissionStrengthE">
 <span id="_CPPv3N6raisin8Material27foliageTransmissionStrengthE"></span><span id="_CPPv2N6raisin8Material27foliageTransmissionStrengthE"></span><span id="raisin::Material::foliageTransmissionStrength__float"></span><span class="target" id="classraisin_1_1Material_1ae88c68eea90c3c5577fc89e61e8c9a9c"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">foliageTransmissionStrength</span></span></span><a class="headerlink" href="#_CPPv4N6raisin8Material27foliageTransmissionStrengthE" title="Link to this definition"></a><br /></dt>
-<dd><p>Thin-leaf backlight/transmission strength for viewer PBR foliage materials. </p>
+<dd><p>Thin-leaf direct and indirect transmission strength for viewer PBR foliage. High-fidelity indirect lighting also gathers the opposite hemisphere. </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin8Material24foliageTransmissionColorE">
 <span id="_CPPv3N6raisin8Material24foliageTransmissionColorE"></span><span id="_CPPv2N6raisin8Material24foliageTransmissionColorE"></span><span id="raisin::Material::foliageTransmissionColor__glm::vec3"></span><span class="target" id="classraisin_1_1Material_1a053680d980437f384efac30f48d911f9"></span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec3</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">foliageTransmissionColor</span></span></span><a class="headerlink" href="#_CPPv4N6raisin8Material24foliageTransmissionColorE" title="Link to this definition"></a><br /></dt>
-<dd><p>Tint for thin-leaf transmitted light. </p>
+<dd><p>Linear RGB tint of base color for thin-leaf transmitted light. </p>
 </dd></dl>
 
 <dl class="cpp var">
@@ -7811,6 +8251,12 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin8Material5glassENSt6stringEfRKN3glm4vec3Efff">
+<span id="_CPPv3N6raisin8Material5glassENSt6stringEfRKN3glm4vec3Efff"></span><span id="_CPPv2N6raisin8Material5glassENSt6stringEfRKN3glm4vec3Efff"></span><span id="raisin::Material::glass__ss.float.glm::vec3CR.float.float.float"></span><span class="target" id="classraisin_1_1Material_1ad80b132edf564530b3c3a6cad92f6d9a"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisin8MaterialE" title="raisin::Material"><span class="n"><span class="pre">Material</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">glass</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;Glass&quot;</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">thickness</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.0f</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec3</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">tint</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec3</span></span><span class="p"><span class="pre">(</span></span><span class="m"><span class="pre">1.0f</span></span><span class="p"><span class="pre">)</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">attenuationDistance</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1.0f</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">roughness</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.04f</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">indexOfRefraction</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1.5f</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin8Material5glassENSt6stringEfRKN3glm4vec3Efff" title="Link to this definition"></a><br /></dt>
+<dd><p>Dielectric glass. Zero thickness represents a thin window; positive thickness is an authored world-space optical path length for a solid. Tint is the transmitted color after attenuationDistance world units. Keep alpha at one: transmission, not coverage, makes glass transparent. Enable RenderQualitySettings::screenSpaceRefraction for scene transmission. </p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin8Material10unlitColorENSt6stringERKN3glm4vec4E">
 <span id="_CPPv3N6raisin8Material10unlitColorENSt6stringERKN3glm4vec4E"></span><span id="_CPPv2N6raisin8Material10unlitColorENSt6stringERKN3glm4vec4E"></span><span id="raisin::Material::unlitColor__ss.glm::vec4CR"></span><span class="target" id="classraisin_1_1Material_1a6d49c1ac50e607a5f21d1c21ea4417f5"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisin8MaterialE" title="raisin::Material"><span class="n"><span class="pre">Material</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">unlitColor</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec4</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">color</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec4</span></span><span class="p"><span class="pre">(</span></span><span class="m"><span class="pre">1.0f</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin8Material10unlitColorENSt6stringERKN3glm4vec4E" title="Link to this definition"></a><br /></dt>
 <dd><p>Build an unlit material that ignores scene lighting. </p>
@@ -7923,6 +8369,45 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 
 </div>
 <div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin21RenderQualitySettings36additionalLightContributionThresholdE">
+<span id="_CPPv3N6raisin21RenderQualitySettings36additionalLightContributionThresholdE"></span><span id="_CPPv2N6raisin21RenderQualitySettings36additionalLightContributionThresholdE"></span><span id="raisin::RenderQualitySettings::additionalLightContributionThreshold__float"></span><span class="target" id="structraisin_1_1RenderQualitySettings_1ac213cb0a0645bee088be3c2fdb2e6f45"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">additionalLightContributionThreshold</span></span></span><a class="headerlink" href="#_CPPv4N6raisin21RenderQualitySettings36additionalLightContributionThresholdE" title="Link to this definition"></a><br /></dt>
+<dd><p>Opt-in total scene-linear incident-radiance cutoff budget for local additional lights, before the material BRDF and exposure. Zero preserves unlimited lighting exactly. Not a bound on final HDR/specular pixel error. The budget is divided among uploaded lights; fade starts below that share. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin21RenderQualitySettings18geometryRefractionE">
+<span id="_CPPv3N6raisin21RenderQualitySettings18geometryRefractionE"></span><span id="_CPPv2N6raisin21RenderQualitySettings18geometryRefractionE"></span><span id="raisin::RenderQualitySettings::geometryRefraction__b"></span><span class="target" id="structraisin_1_1RenderQualitySettings_1a2298f3ab38450d6b87a704cbb4990c46"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">geometryRefraction</span></span></span><a class="headerlink" href="#_CPPv4N6raisin21RenderQualitySettings18geometryRefractionE" title="Link to this definition"></a><br /></dt>
+<dd><p>Opt-in portable triangle tracing. Positive material thickness denotes a closed volume, but distances come from geometry, not the thickness factor. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin21RenderQualitySettings25geometryRefractionBackendE">
+<span id="_CPPv3N6raisin21RenderQualitySettings25geometryRefractionBackendE"></span><span id="_CPPv2N6raisin21RenderQualitySettings25geometryRefractionBackendE"></span><span id="raisin::RenderQualitySettings::geometryRefractionBackend__GeometryRefractionBackend"></span><span class="target" id="structraisin_1_1RenderQualitySettings_1ae6505dc9bd4f0aa123b268a0555e873e"></span><a class="reference internal" href="#_CPPv4N6raisin25GeometryRefractionBackendE" title="raisin::GeometryRefractionBackend"><span class="n"><span class="pre">GeometryRefractionBackend</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">geometryRefractionBackend</span></span></span><a class="headerlink" href="#_CPPv4N6raisin21RenderQualitySettings25geometryRefractionBackendE" title="Link to this definition"></a><br /></dt>
+<dd><p>Automatic tries Vulkan hardware BVH traversal, then falls back to OpenGL. VulkanRayQuery explicitly requires that backend (errors do not silently fall back). </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin21RenderQualitySettings25geometryRefractionSamplesE">
+<span id="_CPPv3N6raisin21RenderQualitySettings25geometryRefractionSamplesE"></span><span id="_CPPv2N6raisin21RenderQualitySettings25geometryRefractionSamplesE"></span><span id="raisin::RenderQualitySettings::geometryRefractionSamples__i"></span><span class="target" id="structraisin_1_1RenderQualitySettings_1a2413b6c1c00b547e20a12553fb4224cc"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">geometryRefractionSamples</span></span></span><a class="headerlink" href="#_CPPv4N6raisin21RenderQualitySettings25geometryRefractionSamplesE" title="Link to this definition"></a><br /></dt>
+<dd><p>Paths per pixel per frame, 1..64. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin21RenderQualitySettings28geometryRefractionMaxBouncesE">
+<span id="_CPPv3N6raisin21RenderQualitySettings28geometryRefractionMaxBouncesE"></span><span id="_CPPv2N6raisin21RenderQualitySettings28geometryRefractionMaxBouncesE"></span><span id="raisin::RenderQualitySettings::geometryRefractionMaxBounces__i"></span><span class="target" id="structraisin_1_1RenderQualitySettings_1a7bd3cf46d8d4e60936fd435788750c3e"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">geometryRefractionMaxBounces</span></span></span><a class="headerlink" href="#_CPPv4N6raisin21RenderQualitySettings28geometryRefractionMaxBouncesE" title="Link to this definition"></a><br /></dt>
+<dd><p>Physical scattering events, 1..128. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin21RenderQualitySettings26geometryRefractionRevisionE">
+<span id="_CPPv3N6raisin21RenderQualitySettings26geometryRefractionRevisionE"></span><span id="_CPPv2N6raisin21RenderQualitySettings26geometryRefractionRevisionE"></span><span id="raisin::RenderQualitySettings::geometryRefractionRevision__unsigned-i"></span><span class="target" id="structraisin_1_1RenderQualitySettings_1ac168d3bb0094eac7efc74bb2546166bf"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">geometryRefractionRevision</span></span></span><a class="headerlink" href="#_CPPv4N6raisin21RenderQualitySettings26geometryRefractionRevisionE" title="Link to this definition"></a><br /></dt>
+<dd><p>Increment after editing a texture/environment in place to reset history. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin21RenderQualitySettings6presetE19RenderQualityPreset">
@@ -7971,105 +8456,105 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 </dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin15RenderOverridesE">
-<span id="_CPPv3N6raisin15RenderOverridesE"></span><span id="_CPPv2N6raisin15RenderOverridesE"></span><span id="raisin::RenderOverrides"></span><span class="target" id="structraisin_1_1RenderOverrides"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RenderOverrides</span></span></span><a class="headerlink" href="#_CPPv4N6raisin15RenderOverridesE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp">
+<span class="target" id="structraisin_1_1RayraiWindow_1_1RenderOverrides"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RenderOverrides</span></span></span><br /></dt>
 <dd><p>Override shaders and rendering toggles when using external cameras. </p>
-<p>For <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Camera"><span class="std std-ref"><span class="pre">Camera</span></span></a></code>-based external renders, <code class="docutils literal notranslate"><a class="reference internal" href="#structraisin_1_1RenderOverrides_1aefdb7197d62121468ec8f85e9c48d77f"><span class="std std-ref"><span class="pre">drawVisualizationObjects</span></span></a></code> and <code class="docutils literal notranslate"><a class="reference internal" href="#structraisin_1_1RenderOverrides_1a28616469ab7b3d8f1a22c6ac67db8b33"><span class="std std-ref"><span class="pre">drawPointClouds</span></span></a></code> enable only custom visuals, instanced visuals, and point clouds marked <code class="docutils literal notranslate"><a class="reference internal" href="#namespaceraisin_1ae61c1b3422ee207a93b8d270eadaf402aeef9fc6a14d765b49eea3959ff70b049"><span class="std std-ref"><span class="pre">VisualCategory::Detectable</span></span></a></code>. Non-detectable helper geometry remains visible in the normal interactive viewer but is skipped by these capture paths. The RaiSim RGB/depth sensor-camera overloads disable custom visualization objects and point clouds entirely, regardless of these toggles. </p>
+<p>For <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1Camera"><span class="std std-ref"><span class="pre">Camera</span></span></a></code>-based external renders, <code class="docutils literal notranslate"><span class="pre">drawVisualizationObjects</span></code> and <code class="docutils literal notranslate"><span class="pre">drawPointClouds</span></code> enable only custom visuals, instanced visuals, and point clouds marked <code class="docutils literal notranslate"><a class="reference internal" href="#namespaceraisin_1ae61c1b3422ee207a93b8d270eadaf402aeef9fc6a14d765b49eea3959ff70b049"><span class="std std-ref"><span class="pre">VisualCategory::Detectable</span></span></a></code>. Non-detectable helper geometry remains visible in the normal interactive viewer but is skipped by these capture paths. The RaiSim RGB/depth sensor-camera overloads disable custom visualization objects and point clouds entirely, regardless of these toggles. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin15RenderOverrides4meshE">
-<span id="_CPPv3N6raisin15RenderOverrides4meshE"></span><span id="_CPPv2N6raisin15RenderOverrides4meshE"></span><span id="raisin::RenderOverrides::mesh__ShaderP"></span><span class="target" id="structraisin_1_1RenderOverrides_1add250c47d73f1131c076f3b3482c15f3"></span><span class="n"><span class="pre">Shader</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">mesh</span></span></span><a class="headerlink" href="#_CPPv4N6raisin15RenderOverrides4meshE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp">
+<span class="target" id="structraisin_1_1RayraiWindow_1_1RenderOverrides_1a91d97481af2dcd1a083dd3239a04fd17"></span><span class="n"><span class="pre">Shader</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">mesh</span></span></span><br /></dt>
 <dd><p>Mesh shader override (defaults to shaders_[“mesh”]). </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin15RenderOverrides10pointcloudE">
-<span id="_CPPv3N6raisin15RenderOverrides10pointcloudE"></span><span id="_CPPv2N6raisin15RenderOverrides10pointcloudE"></span><span id="raisin::RenderOverrides::pointcloud__ShaderP"></span><span class="target" id="structraisin_1_1RenderOverrides_1a73b51f69d72fd1c6adaed26fbfe7d597"></span><span class="n"><span class="pre">Shader</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">pointcloud</span></span></span><a class="headerlink" href="#_CPPv4N6raisin15RenderOverrides10pointcloudE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp">
+<span class="target" id="structraisin_1_1RayraiWindow_1_1RenderOverrides_1a6e125e037e2ecf76b10bb0cc5f846003"></span><span class="n"><span class="pre">Shader</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">pointcloud</span></span></span><br /></dt>
 <dd><p>Point cloud shader override (defaults to shaders_[“pointcloud”]). </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin15RenderOverrides7pickingE">
-<span id="_CPPv3N6raisin15RenderOverrides7pickingE"></span><span id="_CPPv2N6raisin15RenderOverrides7pickingE"></span><span id="raisin::RenderOverrides::picking__ShaderP"></span><span class="target" id="structraisin_1_1RenderOverrides_1ae50e85088b53d993a78ed2e90988f36b"></span><span class="n"><span class="pre">Shader</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">picking</span></span></span><a class="headerlink" href="#_CPPv4N6raisin15RenderOverrides7pickingE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp">
+<span class="target" id="structraisin_1_1RayraiWindow_1_1RenderOverrides_1abad9e2394485057d07491508a8d841e5"></span><span class="n"><span class="pre">Shader</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">picking</span></span></span><br /></dt>
 <dd><p>Picking shader override (defaults to shaders_[“picking”]). </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin15RenderOverrides4postE">
-<span id="_CPPv3N6raisin15RenderOverrides4postE"></span><span id="_CPPv2N6raisin15RenderOverrides4postE"></span><span id="raisin::RenderOverrides::post__ShaderP"></span><span class="target" id="structraisin_1_1RenderOverrides_1a58afc3763f36a1ed9294cdf4608040ee"></span><span class="n"><span class="pre">Shader</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">post</span></span></span><a class="headerlink" href="#_CPPv4N6raisin15RenderOverrides4postE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp">
+<span class="target" id="structraisin_1_1RayraiWindow_1_1RenderOverrides_1aa833b62d8d65608a7b30d45456b98e56"></span><span class="n"><span class="pre">Shader</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">post</span></span></span><br /></dt>
 <dd><p>Post-process shader override (defaults to shaders_[“post”]). </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin15RenderOverrides9doShadowsE">
-<span id="_CPPv3N6raisin15RenderOverrides9doShadowsE"></span><span id="_CPPv2N6raisin15RenderOverrides9doShadowsE"></span><span id="raisin::RenderOverrides::doShadows__b"></span><span class="target" id="structraisin_1_1RenderOverrides_1a63b1e0336ccbefa4102d2a8f49759039"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">doShadows</span></span></span><a class="headerlink" href="#_CPPv4N6raisin15RenderOverrides9doShadowsE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp">
+<span class="target" id="structraisin_1_1RayraiWindow_1_1RenderOverrides_1a1ccd38c11ae26cfdaadb79ee68e51b16"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">doShadows</span></span></span><br /></dt>
 <dd><p>Enable shadow passes. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin15RenderOverrides20drawCoordinateFramesE">
-<span id="_CPPv3N6raisin15RenderOverrides20drawCoordinateFramesE"></span><span id="_CPPv2N6raisin15RenderOverrides20drawCoordinateFramesE"></span><span id="raisin::RenderOverrides::drawCoordinateFrames__b"></span><span class="target" id="structraisin_1_1RenderOverrides_1a1a3b31b474167478d8f26a8806ab3c36"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">drawCoordinateFrames</span></span></span><a class="headerlink" href="#_CPPv4N6raisin15RenderOverrides20drawCoordinateFramesE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp">
+<span class="target" id="structraisin_1_1RayraiWindow_1_1RenderOverrides_1aae9a9d41b374cd2356cf8887b4f984ae"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">drawCoordinateFrames</span></span></span><br /></dt>
 <dd><p>Draw coordinate frames. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin15RenderOverrides15drawPointCloudsE">
-<span id="_CPPv3N6raisin15RenderOverrides15drawPointCloudsE"></span><span id="_CPPv2N6raisin15RenderOverrides15drawPointCloudsE"></span><span id="raisin::RenderOverrides::drawPointClouds__b"></span><span class="target" id="structraisin_1_1RenderOverrides_1a28616469ab7b3d8f1a22c6ac67db8b33"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">drawPointClouds</span></span></span><a class="headerlink" href="#_CPPv4N6raisin15RenderOverrides15drawPointCloudsE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp">
+<span class="target" id="structraisin_1_1RayraiWindow_1_1RenderOverrides_1ad6923f429f877a6ecbe611aef91d5c9e"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">drawPointClouds</span></span></span><br /></dt>
 <dd><p>Draw point clouds that are marked detectable in external-camera captures. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin15RenderOverrides24drawVisualizationObjectsE">
-<span id="_CPPv3N6raisin15RenderOverrides24drawVisualizationObjectsE"></span><span id="_CPPv2N6raisin15RenderOverrides24drawVisualizationObjectsE"></span><span id="raisin::RenderOverrides::drawVisualizationObjects__b"></span><span class="target" id="structraisin_1_1RenderOverrides_1aefdb7197d62121468ec8f85e9c48d77f"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">drawVisualizationObjects</span></span></span><a class="headerlink" href="#_CPPv4N6raisin15RenderOverrides24drawVisualizationObjectsE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp">
+<span class="target" id="structraisin_1_1RayraiWindow_1_1RenderOverrides_1a0a4c863c3f60f7c504e24ef814296f9b"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">drawVisualizationObjects</span></span></span><br /></dt>
 <dd><p>Draw custom visuals and instanced visuals that are marked detectable. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin15RenderOverrides18drawWeatherEffectsE">
-<span id="_CPPv3N6raisin15RenderOverrides18drawWeatherEffectsE"></span><span id="_CPPv2N6raisin15RenderOverrides18drawWeatherEffectsE"></span><span id="raisin::RenderOverrides::drawWeatherEffects__b"></span><span class="target" id="structraisin_1_1RenderOverrides_1a5ecf8882a3d30430d53bf6c9f6d25990"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">drawWeatherEffects</span></span></span><a class="headerlink" href="#_CPPv4N6raisin15RenderOverrides18drawWeatherEffectsE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp">
+<span class="target" id="structraisin_1_1RayraiWindow_1_1RenderOverrides_1a9f165be0cbea7e297c168b18f8c29f16"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">drawWeatherEffects</span></span></span><br /></dt>
 <dd><p>Draw viewer-only weather effects such as precipitation particles. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin15RenderOverrides17skipGroundObjectsE">
-<span id="_CPPv3N6raisin15RenderOverrides17skipGroundObjectsE"></span><span id="_CPPv2N6raisin15RenderOverrides17skipGroundObjectsE"></span><span id="raisin::RenderOverrides::skipGroundObjects__b"></span><span class="target" id="structraisin_1_1RenderOverrides_1a12d6782a8d8a3ab638a52a9e7195bc50"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">skipGroundObjects</span></span></span><a class="headerlink" href="#_CPPv4N6raisin15RenderOverrides17skipGroundObjectsE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp">
+<span class="target" id="structraisin_1_1RayraiWindow_1_1RenderOverrides_1a17f3b41a4d813d1275f90082d4ed85ef"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">skipGroundObjects</span></span></span><br /></dt>
 <dd><p>Skip halfspace and heightmap ground objects in scene-color rendering. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin15RenderOverrides24environmentBackgroundMapE">
-<span id="_CPPv3N6raisin15RenderOverrides24environmentBackgroundMapE"></span><span id="_CPPv2N6raisin15RenderOverrides24environmentBackgroundMapE"></span><span id="raisin::RenderOverrides::environmentBackgroundMap__unsigned-i"></span><span class="target" id="structraisin_1_1RenderOverrides_1aeb9d2e490fe831dfb68793cfffcbc4ba"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">environmentBackgroundMap</span></span></span><a class="headerlink" href="#_CPPv4N6raisin15RenderOverrides24environmentBackgroundMapE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp">
+<span class="target" id="structraisin_1_1RayraiWindow_1_1RenderOverrides_1a874f14f1d9d3a27f0166195b4672baf0"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">environmentBackgroundMap</span></span></span><br /></dt>
 <dd><p>Optional cubemap rendered as a viewer background before scene geometry. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin15RenderOverrides29environmentBackgroundExposureE">
-<span id="_CPPv3N6raisin15RenderOverrides29environmentBackgroundExposureE"></span><span id="_CPPv2N6raisin15RenderOverrides29environmentBackgroundExposureE"></span><span id="raisin::RenderOverrides::environmentBackgroundExposure__float"></span><span class="target" id="structraisin_1_1RenderOverrides_1a3732c4090b76d674b081fc1118210c2e"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">environmentBackgroundExposure</span></span></span><a class="headerlink" href="#_CPPv4N6raisin15RenderOverrides29environmentBackgroundExposureE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp">
+<span class="target" id="structraisin_1_1RayraiWindow_1_1RenderOverrides_1a69eee68d2b4d4aa089515d0c7f71a765"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">environmentBackgroundExposure</span></span></span><br /></dt>
 <dd><p>Exposure applied to environmentBackgroundMap when rendered as background. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin15RenderOverrides11postProcessE">
-<span id="_CPPv3N6raisin15RenderOverrides11postProcessE"></span><span id="_CPPv2N6raisin15RenderOverrides11postProcessE"></span><span id="raisin::RenderOverrides::postProcess__b"></span><span class="target" id="structraisin_1_1RenderOverrides_1a59baf9d855074d6dddc9d62138c81e53"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">postProcess</span></span></span><a class="headerlink" href="#_CPPv4N6raisin15RenderOverrides11postProcessE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp">
+<span class="target" id="structraisin_1_1RayraiWindow_1_1RenderOverrides_1ac3a6a3002fd34e2994b5376a1ad3a046"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">postProcess</span></span></span><br /></dt>
 <dd><p>Apply external-camera postprocessing after rendering. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin15RenderOverrides15allowViewerMsaaE">
-<span id="_CPPv3N6raisin15RenderOverrides15allowViewerMsaaE"></span><span id="_CPPv2N6raisin15RenderOverrides15allowViewerMsaaE"></span><span id="raisin::RenderOverrides::allowViewerMsaa__b"></span><span class="target" id="structraisin_1_1RenderOverrides_1ad90cbd27d6309fa14942af988a00346e"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">allowViewerMsaa</span></span></span><a class="headerlink" href="#_CPPv4N6raisin15RenderOverrides15allowViewerMsaaE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp">
+<span class="target" id="structraisin_1_1RayraiWindow_1_1RenderOverrides_1af9a191af964502636aa932a86b00d26c"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">allowViewerMsaa</span></span></span><br /></dt>
 <dd><p>Allow quality preset MSAA for this external render. Sensor overloads force this off. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin15RenderOverrides15allowTemporalAaE">
-<span id="_CPPv3N6raisin15RenderOverrides15allowTemporalAaE"></span><span id="_CPPv2N6raisin15RenderOverrides15allowTemporalAaE"></span><span id="raisin::RenderOverrides::allowTemporalAa__b"></span><span class="target" id="structraisin_1_1RenderOverrides_1a9d5a8083944b53f5b0c8cbc7a68f24db"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">allowTemporalAa</span></span></span><a class="headerlink" href="#_CPPv4N6raisin15RenderOverrides15allowTemporalAaE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp">
+<span class="target" id="structraisin_1_1RayraiWindow_1_1RenderOverrides_1a262abe6a65b110a1eb7ce46c70f09b1a"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">allowTemporalAa</span></span></span><br /></dt>
 <dd><p>Allow quality preset temporal AA for this external render. Sensor overloads force this off. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin15RenderOverrides18allowViewerUpscaleE">
-<span id="_CPPv3N6raisin15RenderOverrides18allowViewerUpscaleE"></span><span id="_CPPv2N6raisin15RenderOverrides18allowViewerUpscaleE"></span><span id="raisin::RenderOverrides::allowViewerUpscale__b"></span><span class="target" id="structraisin_1_1RenderOverrides_1a86b9910baf5b4b1a71dc155418967743"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">allowViewerUpscale</span></span></span><a class="headerlink" href="#_CPPv4N6raisin15RenderOverrides18allowViewerUpscaleE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp">
+<span class="target" id="structraisin_1_1RayraiWindow_1_1RenderOverrides_1a8948993e039efa7520731d2e1768afa7"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">allowViewerUpscale</span></span></span><br /></dt>
 <dd><p>Allow quality preset lower-resolution viewer rendering followed by upscale. </p>
 </dd></dl>
 
@@ -8226,6 +8711,37 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dd></dd></dl>
 
 </dd></dl>
+
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin25GeometryRefractionBackendE">
+<span id="_CPPv3N6raisin25GeometryRefractionBackendE"></span><span id="_CPPv2N6raisin25GeometryRefractionBackendE"></span><span class="target" id="namespaceraisin_1a1deb528fd5eafab08d42b2ee072e7d6b"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">raisin</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">GeometryRefractionBackend</span></span></span><a class="headerlink" href="#_CPPv4N6raisin25GeometryRefractionBackendE" title="Link to this definition"></a><br /></dt>
+<dd><p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin25GeometryRefractionBackend9AutomaticE">
+<span id="_CPPv3N6raisin25GeometryRefractionBackend9AutomaticE"></span><span id="_CPPv2N6raisin25GeometryRefractionBackend9AutomaticE"></span><span class="target" id="namespaceraisin_1a1deb528fd5eafab08d42b2ee072e7d6ba086247a9b57fde6eefee2a0c4752242d"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Automatic</span></span></span><a class="headerlink" href="#_CPPv4N6raisin25GeometryRefractionBackend9AutomaticE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin25GeometryRefractionBackend8PortableE">
+<span id="_CPPv3N6raisin25GeometryRefractionBackend8PortableE"></span><span id="_CPPv2N6raisin25GeometryRefractionBackend8PortableE"></span><span class="target" id="namespaceraisin_1a1deb528fd5eafab08d42b2ee072e7d6baffc76680cc670c734ff4d0aeed7558f6"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Portable</span></span></span><a class="headerlink" href="#_CPPv4N6raisin25GeometryRefractionBackend8PortableE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin25GeometryRefractionBackend14VulkanRayQueryE">
+<span id="_CPPv3N6raisin25GeometryRefractionBackend14VulkanRayQueryE"></span><span id="_CPPv2N6raisin25GeometryRefractionBackend14VulkanRayQueryE"></span><span class="target" id="namespaceraisin_1a1deb528fd5eafab08d42b2ee072e7d6ba3a55abd21b8d92a0b9dc216261047d39"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VulkanRayQuery</span></span></span><a class="headerlink" href="#_CPPv4N6raisin25GeometryRefractionBackend14VulkanRayQueryE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin29GeometryRefractionDiagnosticsE">
+<span id="_CPPv3N6raisin29GeometryRefractionDiagnosticsE"></span><span id="_CPPv2N6raisin29GeometryRefractionDiagnosticsE"></span><span id="raisin::GeometryRefractionDiagnostics"></span><span class="target" id="structraisin_1_1GeometryRefractionDiagnostics"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GeometryRefractionDiagnostics</span></span></span><a class="headerlink" href="#_CPPv4N6raisin29GeometryRefractionDiagnosticsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin36GeometryRefractionSamplingStatisticsE">
+<span id="_CPPv3N6raisin36GeometryRefractionSamplingStatisticsE"></span><span id="_CPPv2N6raisin36GeometryRefractionSamplingStatisticsE"></span><span id="raisin::GeometryRefractionSamplingStatistics"></span><span class="target" id="structraisin_1_1GeometryRefractionSamplingStatistics"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GeometryRefractionSamplingStatistics</span></span></span><a class="headerlink" href="#_CPPv4N6raisin36GeometryRefractionSamplingStatisticsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
 
 </section>
 <section id="weather-scene-effects-and-reflections">

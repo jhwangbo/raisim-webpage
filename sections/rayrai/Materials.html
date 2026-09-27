@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PBR materials &mdash; raisim 2.6.0 documentation</title>
+  <title>PBR materials &mdash; raisim 2.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b6430375" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
+      <script src="../../_static/documentation_options.js?v=dfec817d"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -95,11 +95,15 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">PBR materials</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#supported-pbr-inputs">Supported PBR inputs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#material-factories">Material factories</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#glass-and-transmissive-materials">Glass and transmissive materials</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#foliage-materials">Foliage materials</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#material-import-details">Material import details</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#visual-assets-and-collision-assets">Visual assets and collision assets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gpu-capability-tiers">GPU capability tiers</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="Visuals.html">Custom visuals, instancing, and scene helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Foliage.html">Foliage and forest rendering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="PostProcess.html">Post-process effects</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Weather.html">Weather and atmospherics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Capture.html">Capture, diagnostics, and headless rendering</a></li>
@@ -109,6 +113,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#platform-support">Platform support</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#source-built-tcp-viewer-recommended">Source-built TCP viewer (recommended)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#build-and-link">Build and link</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#minimal-usage">Minimal usage</a></li>
@@ -157,7 +162,8 @@ extensions for clearcoat, sheen, transmission, anisotropy, subsurface,
 and detail textures. The importer fills these in automatically for glTF
 assets; in-process code typically constructs materials with the static
 factories described below and applies them via
-<code class="docutils literal notranslate"><span class="pre">Visuals::setMaterialOverride</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">Visuals::setMaterialOverride</span></code>. Glass and foliage have their own sections
+below, and <a class="reference internal" href="#gpu-capability-tiers">GPU capability tiers</a> lists which features a given GPU renders.</p>
 <p>Visual-level material controls (override, remap, overlay, visibility range,
 shadow casting modes) are on the <a class="reference internal" href="Visuals.html"><span class="doc">Custom visuals, instancing, and scene helpers</span></a> page. Tone mapping and
 post-process are on <a class="reference internal" href="PostProcess.html"><span class="doc">Post-process effects</span></a>.</p>
@@ -171,7 +177,8 @@ features or PBR texture maps.</p>
 <ul class="simple">
 <li><p>base color factor and base color texture</p></li>
 <li><p>metallic and roughness factors</p></li>
-<li><p>metallic-roughness texture (or separate metallic + roughness textures)</p></li>
+<li><p>metallic-roughness texture (or separate metallic + roughness textures, or an
+<code class="docutils literal notranslate"><span class="pre">ormMap</span></code> with occlusion, roughness, and metallic in R, G, and B)</p></li>
 <li><p>normal texture (with OpenGL or DirectX <code class="docutils literal notranslate"><span class="pre">NormalMapConvention</span></code>)</p></li>
 <li><p>bent-normal texture (for higher-quality AO/indirect occlusion)</p></li>
 <li><p>occlusion texture</p></li>
@@ -186,12 +193,16 @@ list is: <code class="docutils literal notranslate"><span class="pre">Albedo</sp
 <code class="docutils literal notranslate"><span class="pre">Backlight</span></code>, <code class="docutils literal notranslate"><span class="pre">Anisotropy</span></code>, <code class="docutils literal notranslate"><span class="pre">WeatherMask</span></code>, <code class="docutils literal notranslate"><span class="pre">Rim</span></code>, <code class="docutils literal notranslate"><span class="pre">Height</span></code>,
 <code class="docutils literal notranslate"><span class="pre">DetailMask</span></code> / <code class="docutils literal notranslate"><span class="pre">DetailAlbedo</span></code> / <code class="docutils literal notranslate"><span class="pre">DetailNormal</span></code>, <code class="docutils literal notranslate"><span class="pre">Lightmap</span></code>, and
 <code class="docutils literal notranslate"><span class="pre">TextureBlend</span></code>. Each slot has a per-material <code class="docutils literal notranslate"><span class="pre">UvTransform</span></code> (offset, scale,
-rotation) and an authored flag, plus a per-slot <code class="docutils literal notranslate"><span class="pre">TextureChannel</span></code> selector for
-scalar maps.</p>
+rotation) and an authored flag. Metallic, roughness, AO, and refraction maps read
+a configurable <code class="docutils literal notranslate"><span class="pre">TextureChannel</span></code> (<code class="docutils literal notranslate"><span class="pre">metallicTextureChannel</span></code>,
+<code class="docutils literal notranslate"><span class="pre">roughnessTextureChannel</span></code>, <code class="docutils literal notranslate"><span class="pre">aoTextureChannel</span></code>, <code class="docutils literal notranslate"><span class="pre">refractionTextureChannel</span></code>).</p>
 <p>Material behavior is controlled by several enums on <code class="docutils literal notranslate"><span class="pre">raisin::Material</span></code>:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">Type</span></code>: <code class="docutils literal notranslate"><span class="pre">SIMPLE_COLOR</span></code>, <code class="docutils literal notranslate"><span class="pre">TEXTURED</span></code>, <code class="docutils literal notranslate"><span class="pre">PBR</span></code> — user-facing type hint
-(the shader path is always PBR unless <code class="docutils literal notranslate"><span class="pre">forceSimpleShading</span></code> is set).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Type</span></code>: <code class="docutils literal notranslate"><span class="pre">SIMPLE_COLOR</span></code>, <code class="docutils literal notranslate"><span class="pre">TEXTURED</span></code>, <code class="docutils literal notranslate"><span class="pre">PBR</span></code> — user-facing type hint.
+<code class="docutils literal notranslate"><span class="pre">PBR</span></code> materials, and any material that sets a PBR feature or map, use the
+PBR shaders; <code class="docutils literal notranslate"><span class="pre">forceSimpleShading</span></code> forces the simple shader.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ShadingModel</span></code>: <code class="docutils literal notranslate"><span class="pre">Standard</span></code>, <code class="docutils literal notranslate"><span class="pre">Lambert</span></code>, <code class="docutils literal notranslate"><span class="pre">Toon</span></code>, <code class="docutils literal notranslate"><span class="pre">Unlit</span></code> —
+<code class="docutils literal notranslate"><span class="pre">setShadingModel()</span></code> writes the matching diffuse, specular, and unlit fields.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">AlphaMode</span></code>: <code class="docutils literal notranslate"><span class="pre">Opaque</span></code>, <code class="docutils literal notranslate"><span class="pre">Mask</span></code>, <code class="docutils literal notranslate"><span class="pre">Hash</span></code>, <code class="docutils literal notranslate"><span class="pre">Blend</span></code> — glTF-style alpha
 treatment, with optional <code class="docutils literal notranslate"><span class="pre">AlphaAntiAliasing</span></code> (<code class="docutils literal notranslate"><span class="pre">AlphaToCoverage</span></code> and
 <code class="docutils literal notranslate"><span class="pre">AlphaToCoverageAndToOne</span></code>) for masked materials.</p></li>
@@ -219,8 +230,9 @@ camera-facing rendering for foliage and sprites.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">UvLayer</span></code>: <code class="docutils literal notranslate"><span class="pre">Uv1</span></code> / <code class="docutils literal notranslate"><span class="pre">Uv2</span></code> — secondary UV channel for detail and
 lightmap textures.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">FoliageType</span></code>: <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">Grass</span></code>, <code class="docutils literal notranslate"><span class="pre">LeafCard</span></code>, <code class="docutils literal notranslate"><span class="pre">Bush</span></code>, <code class="docutils literal notranslate"><span class="pre">Branch</span></code>,
-<code class="docutils literal notranslate"><span class="pre">TreeTrunk</span></code>, <code class="docutils literal notranslate"><span class="pre">Crop</span></code>, <code class="docutils literal notranslate"><span class="pre">Vine</span></code> — wind-deformation class used by the
-foliage-wind path.</p></li>
+<code class="docutils literal notranslate"><span class="pre">TreeTrunk</span></code>, <code class="docutils literal notranslate"><span class="pre">Crop</span></code>, <code class="docutils literal notranslate"><span class="pre">Vine</span></code> — foliage classification. Any value other
+than <code class="docutils literal notranslate"><span class="pre">None</span></code> enables the fields in <a class="reference internal" href="#foliage-materials">Foliage materials</a>; the specific value
+does not change shading or wind.</p></li>
 </ul>
 <p>Most of these knobs are populated automatically by the Assimp/glTF importer.
 Authored materials can be constructed directly when in-process code needs a
@@ -246,18 +258,30 @@ filling the data members.</p>
 <span class="c1">// Simple (non-PBR) lit color that uses the cheap mesh shader.</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">debug</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Material</span><span class="o">::</span><span class="n">simpleColor</span><span class="p">(</span><span class="s">&quot;debug&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">));</span>
 
-<span class="c1">// Foliage default with two-sided lighting and wind classification.</span>
+<span class="c1">// Foliage: double-sided, rough, non-metallic. Wind and leaf transmission</span>
+<span class="c1">// stay off until you set them (see &quot;Foliage materials&quot;).</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">leaf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Material</span><span class="o">::</span><span class="n">foliage</span><span class="p">(</span><span class="s">&quot;leaf&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Material</span><span class="o">::</span><span class="n">FoliageType</span><span class="o">::</span><span class="n">LeafCard</span><span class="p">,</span>
 <span class="w">                              </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.32f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.58f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.21f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">));</span>
 
 <span class="c1">// Neutral ground material (mid-grey, rough, non-metallic).</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">ground</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Material</span><span class="o">::</span><span class="n">defaultGround</span><span class="p">();</span>
+
+<span class="c1">// Dielectric glass: thickness 0 is a thin, double-sided pane; a positive</span>
+<span class="c1">// thickness is the optical path through a closed solid (world units).</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">window</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Material</span><span class="o">::</span><span class="n">glass</span><span class="p">(</span><span class="s">&quot;window&quot;</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">block</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">Material</span><span class="o">::</span><span class="n">glass</span><span class="p">(</span><span class="s">&quot;green_block&quot;</span><span class="p">,</span><span class="w"> </span><span class="cm">/*thickness=*/</span><span class="mf">0.12f</span><span class="p">,</span>
+<span class="w">                              </span><span class="cm">/*tint=*/</span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.30f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.82f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.60f</span><span class="p">),</span>
+<span class="w">                              </span><span class="cm">/*attenuationDistance=*/</span><span class="mf">0.9f</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>A material’s intended shading path is queried with <code class="docutils literal notranslate"><span class="pre">usesPbrShading()</span></code>,
-<code class="docutils literal notranslate"><span class="pre">canUseCorePbr()</span></code> (compact core PBR shader is sufficient), and
-<code class="docutils literal notranslate"><span class="pre">requiresHighFidelityPbr()</span></code> (clearcoat, sheen, transmission, anisotropy, etc.
-require the high-fidelity PBR shader). <code class="docutils literal notranslate"><span class="pre">forceSimpleShading</span></code> is a per-material
+<code class="docutils literal notranslate"><span class="pre">canUseCorePbr()</span></code> and <code class="docutils literal notranslate"><span class="pre">canUseFoliageFastPbr()</span></code> (the compact core or
+alpha-masked foliage shader can draw it; <code class="docutils literal notranslate"><span class="pre">canUseCompactPbr()</span></code> means either),
+and <code class="docutils literal notranslate"><span class="pre">requiresHighFidelityPbr()</span></code> (transmission or refraction, volume thickness
+or attenuation, subsurface, backlight, sheen, anisotropy, or iridescence).
+<code class="docutils literal notranslate"><span class="pre">needsTransparentPass()</span></code> reports sorted transparent drawing, and
+<code class="docutils literal notranslate"><span class="pre">isTransmissive()</span></code> / <code class="docutils literal notranslate"><span class="pre">hasTransmissivePass()</span></code> report glass (the second also
+checks <code class="docutils literal notranslate"><span class="pre">nextPass</span></code>). <code class="docutils literal notranslate"><span class="pre">forceSimpleShading</span></code> is a per-material
 escape hatch to route through the cheap simple shader even when PBR fields are
 set; <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings::forceSimpleMaterialShading</span></code> is the global
 equivalent for high-throughput RL renders that do not need PBR.</p>
@@ -266,7 +290,9 @@ HDR/image-based lighting when configured, and optional reflection probes. Color 
 are uploaded as sRGB; data maps such as normal, metallic-roughness, and AO remain
 linear. Normal maps require tangent data; glTF assets usually provide it, and rayrai
 generates or imports tangent data where possible. The PBR path is suitable for preview,
-data generation, and asset inspection; it is not an offline path tracer.</p>
+data generation, and asset inspection. It is a rasterizer, not an offline path
+tracer; only the opt-in <a class="reference internal" href="#geometry-aware-refraction">Geometry-aware refraction</a> mode traces rays, and only
+through glass.</p>
 <p>Heightmap terrain uses a dedicated rough PBR material in both in-process and TCP
 viewer paths. Heightmap color maps are treated as terrain albedo, but the material
 keeps metallic at zero, roughness high, and planar reflection disabled even when
@@ -295,10 +321,307 @@ color, and energy.</p></li>
 glTF/GLB over OBJ. OBJ is useful for simple geometry interchange, but it loses too much
 of the scene-level material and light data needed for high-quality rendering.</p>
 </section>
+<section id="glass-and-transmissive-materials">
+<h2>Glass and transmissive materials<a class="headerlink" href="#glass-and-transmissive-materials" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">Material::glass(name,</span> <span class="pre">thickness,</span> <span class="pre">tint,</span> <span class="pre">attenuationDistance,</span> <span class="pre">roughness,</span>
+<span class="pre">indexOfRefraction)</span></code> builds a clear dielectric: white base color, zero metallic,
+<code class="docutils literal notranslate"><span class="pre">transmissionFactor</span> <span class="pre">=</span> <span class="pre">1</span></code>, and by default roughness 0.04 and IOR 1.5 (clamped
+to 1–3). Glass is see-through because of transmission, not coverage: keep the
+material and visual alpha at one.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">thickness</span> <span class="pre">=</span> <span class="pre">0</span></code> (the default) is a thin pane. The factory makes it
+double-sided, the pane does not bend the view, and its tint comes from
+<code class="docutils literal notranslate"><span class="pre">baseColorFactor.rgb</span></code>. Model a pane as a single quad, not a thin box.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">thickness</span> <span class="pre">&gt;</span> <span class="pre">0</span></code> sets <code class="docutils literal notranslate"><span class="pre">volumeThicknessFactor</span></code>, the optical path length
+through a solid in world units. Use a closed mesh with outward-facing
+normals; the factory keeps back-face culling.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tint</span></code> and <code class="docutils literal notranslate"><span class="pre">attenuationDistance</span></code> set <code class="docutils literal notranslate"><span class="pre">volumeAttenuationColor</span></code> and
+<code class="docutils literal notranslate"><span class="pre">volumeAttenuationDistance</span></code>. The color is the fraction of light left after
+that distance, so transmittance is <code class="docutils literal notranslate"><span class="pre">pow(tint,</span> <span class="pre">path</span> <span class="pre">/</span> <span class="pre">attenuationDistance)</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">roughnessFactor</span></code> blurs the transmitted scene; about 0.5 looks frosted.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">transmissionMap</span></code> (red) scales transmission and <code class="docutils literal notranslate"><span class="pre">thicknessMap</span></code> (green)
+scales the optical path; both honor per-slot UV transforms.
+<code class="docutils literal notranslate"><span class="pre">refractionFactor</span></code> / <code class="docutils literal notranslate"><span class="pre">refractionMap</span></code> also make a surface transmissive and
+add an artistic offset scaled by <code class="docutils literal notranslate"><span class="pre">screenSpaceRefractionStrength</span></code> ×
+<code class="docutils literal notranslate"><span class="pre">screenSpaceRefractionMaxPixels</span></code>.</p></li>
+<li><p>A nonzero <code class="docutils literal notranslate"><span class="pre">metallicFactor</span></code> suppresses transmission.</p></li>
+</ul>
+<p>A material pass with <code class="docutils literal notranslate"><span class="pre">transmissionFactor</span></code>, <code class="docutils literal notranslate"><span class="pre">refractionFactor</span></code>,
+<code class="docutils literal notranslate"><span class="pre">transmissionMap</span></code>, or <code class="docutils literal notranslate"><span class="pre">refractionMap</span></code> set is drawn in the sorted transparent
+pass by a dedicated glass shader that fits in 16 texture units, so glass renders
+the same on every GPU tier. To show the scene behind the glass, enable
+<code class="docutils literal notranslate"><span class="pre">highFidelityPbr</span></code> and <code class="docutils literal notranslate"><span class="pre">screenSpaceRefraction</span></code> (both on in the <code class="docutils literal notranslate"><span class="pre">High</span></code> and
+<code class="docutils literal notranslate"><span class="pre">Ultra</span></code> presets, see <a class="reference internal" href="RenderQuality.html"><span class="doc">Render quality, tone mapping, color grading</span></a>); otherwise glass transmits only the
+environment. The <code class="docutils literal notranslate"><span class="pre">Fast</span></code> preset forces simple shading, which draws glass as an
+ordinary surface.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">glass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Material</span><span class="o">::</span><span class="n">glass</span><span class="p">(</span><span class="s">&quot;green_block&quot;</span><span class="p">,</span><span class="w"> </span><span class="cm">/*thickness=*/</span><span class="mf">1.2f</span><span class="p">,</span>
+<span class="w">                                     </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.30f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.82f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.60f</span><span class="p">),</span>
+<span class="w">                                     </span><span class="cm">/*attenuationDistance=*/</span><span class="mf">0.9f</span><span class="p">);</span>
+<span class="n">block</span><span class="o">-&gt;</span><span class="n">setMaterialOverride</span><span class="p">(</span><span class="n">glass</span><span class="p">);</span>
+<span class="n">block</span><span class="o">-&gt;</span><span class="n">setPbrEnvironment</span><span class="p">(</span><span class="n">environmentCubemap</span><span class="p">);</span><span class="w">  </span><span class="c1">// reflections and fallback</span>
+<span class="n">block</span><span class="o">-&gt;</span><span class="n">setCastsShadows</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span><span class="w">  </span><span class="c1">// otherwise glass casts an opaque shadow</span>
+
+<span class="k">auto</span><span class="w"> </span><span class="n">quality</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">();</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">highFidelityPbr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">screenSpaceRefraction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">viewerMsaaSamples</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span><span class="w">               </span><span class="c1">// resolved before the capture</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">quality</span><span class="p">);</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setLinearHdrRenderingEnabled</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span><span class="w">   </span><span class="c1">// recommended for glass</span>
+</pre></div>
+</div>
+<p>With <code class="docutils literal notranslate"><span class="pre">screenSpaceRefraction</span></code> on, the renderer copies the opaque scene color
+(with mipmaps for rough glass) and depth before drawing transparent surfaces,
+and glass samples that copy along the refracted ray. The ray’s end point is
+projected from the authored thickness rather than traced to the exit surface,
+so screen-space glass does not show glass behind glass, nested liquids,
+internal reflections, dispersion, caustics, or colored shadows. The glass
+shader applies base and vertex color, the albedo, normal, roughness, emissive,
+transmission, thickness, and refraction maps, environment reflections, the main
+and additional lights, and the main-light shadow. It ignores clearcoat, sheen,
+subsurface, parallax, and additional-light shadows. Views that contain glass
+use sorted blending instead of weighted OIT or the transparent depth prepass.
+<code class="docutils literal notranslate"><span class="pre">InstancedVisuals</span></code> ignore transmission; use regular visuals or world meshes
+for glass.</p>
+<section id="geometry-aware-refraction">
+<h3>Geometry-aware refraction<a class="headerlink" href="#geometry-aware-refraction" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">RenderQualitySettings::geometryRefraction</span></code> (off by default and in every
+preset) replaces screen-space glass with a hybrid path tracer for dielectrics.
+Rays intersect the actual glass triangles, which handles concave and hollow
+solids, glass behind glass, intersecting solids, nested liquids and air
+cavities, total internal reflection, and multiple internal bounces. Absorption
+uses the measured distance inside each volume: a positive
+<code class="docutils literal notranslate"><span class="pre">volumeThicknessFactor</span></code> only marks a closed solid, and zero marks a thin
+sheet. Other surfaces are opaque; they take their color from the rasterized
+image where it shows them and from their base material values elsewhere.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 38.0%" />
+<col style="width: 14.0%" />
+<col style="width: 48.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Setting</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">geometryRefraction</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+<td><p>Trace transmissive materials instead of screen-space glass.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">geometryRefractionBackend</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Automatic</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Automatic</span></code> uses Vulkan ray queries when available and the portable
+OpenGL tracer otherwise. <code class="docutils literal notranslate"><span class="pre">Portable</span></code> always uses OpenGL.
+<code class="docutils literal notranslate"><span class="pre">VulkanRayQuery</span></code> requires Vulkan and fails instead of falling back.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">geometryRefractionSamples</span></code></p></td>
+<td><p>4</p></td>
+<td><p>Paths per pixel per frame (1–64).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">geometryRefractionMaxBounces</span></code></p></td>
+<td><p>32</p></td>
+<td><p>Scattering events per path (1–128); a path that reaches the limit stops
+contributing.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">geometryRefractionProgressive</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
+<td><p>Accumulate samples while the camera, scene, lights, and settings stay
+unchanged.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">geometryRefractionMaxSamples</span></code></p></td>
+<td><p>4096</p></td>
+<td><p>Samples per pixel after which accumulation stops (1–1,048,576).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">geometryRefractionLowDiscrepancy</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+<td><p>Experimental Sobol sampling.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">geometryRefractionAdaptive</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+<td><p>Experimental per-pixel early stop. Requires progressive accumulation and
+can bias the image.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">geometryRefractionMinSamples</span></code></p></td>
+<td><p>256</p></td>
+<td><p>Samples before a pixel may stop adaptively (at least 16).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">geometryRefractionRelativeError</span></code>, <code class="docutils literal notranslate"><span class="pre">geometryRefractionAbsoluteError</span></code></p></td>
+<td><p>0.02, 0.001</p></td>
+<td><p>Adaptive stopping thresholds.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">geometryRefractionSeed</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Sampling seed.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">geometryRefractionRevision</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Increment after editing a texture or environment in place to restart
+accumulation.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Author the traced scene as follows:</p>
+<ul class="simple">
+<li><p>Where media overlap, the larger <code class="docutils literal notranslate"><span class="pre">dielectricPriority</span></code> (default 0) wins. It
+is unrelated to <code class="docutils literal notranslate"><span class="pre">renderPriority</span></code>; give different overlapping media
+different priorities. For example, a glass cup at 20 holding water at 10,
+with an air bubble (IOR 1) at 30, resolves the water that overlaps the cup
+wall.</p></li>
+<li><p>Each visual (or articulated-system body) is one volume, including all of its
+submeshes. Set the same nonzero <code class="docutils literal notranslate"><span class="pre">dielectricVolumeId</span></code> to join several
+visuals into one volume, or different IDs to separate submeshes. All parts of
+one volume must share IOR, attenuation, and priority.</p></li>
+<li><p>Solids must be closed, consistently wound meshes whose normals point out of
+the material; the faces of a cavity point into the cavity. Open or
+inconsistent volumes are rejected.</p></li>
+<li><p>Glass must be homogeneous: no albedo, normal, roughness, emissive,
+transmission, thickness, or refraction maps, zero metallic, alpha one
+(including the visual color, <code class="docutils literal notranslate"><span class="pre">setTransparency</span></code>, and visibility-range
+fades), and no vertex displacement, billboarding, <code class="docutils literal notranslate"><span class="pre">nextPass</span></code>, or
+transmissive material overlay.</p></li>
+<li><p>Only regular visuals and rigid world objects are traced. <code class="docutils literal notranslate"><span class="pre">InstancedVisuals</span></code>
+are not traced, and glass on a deformable object is rejected.</p></li>
+<li><p>One environment lights the traced rays: the renderer’s background cubemap,
+or otherwise the first glass environment map.</p></li>
+</ul>
+<p>At most 16 media can be active along a ray. Exceeding that, or 512 boundary
+crossings on one ray, renders magenta rather than guessing. Invalid setups
+throw <code class="docutils literal notranslate"><span class="pre">std::runtime_error</span></code> from the render call: for example open volumes,
+mapped or deformed glass, a fisheye camera, more than 16 media around the
+camera, or a <code class="docutils literal notranslate"><span class="pre">VulkanRayQuery</span></code> backend that is unavailable.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">();</span>
+<span class="n">q</span><span class="p">.</span><span class="n">highFidelityPbr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">geometryRefraction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">temporalAaEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span><span class="w">   </span><span class="c1">// let the accumulated samples converge</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">q</span><span class="p">);</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setLinearHdrRenderingEnabled</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+
+<span class="k">auto</span><span class="w"> </span><span class="n">cup</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Material</span><span class="o">::</span><span class="n">glass</span><span class="p">(</span><span class="s">&quot;cup&quot;</span><span class="p">,</span><span class="w"> </span><span class="cm">/*thickness=*/</span><span class="mf">1.0f</span><span class="p">);</span>
+<span class="n">cup</span><span class="p">.</span><span class="n">roughnessFactor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">;</span>
+<span class="n">cup</span><span class="p">.</span><span class="n">dielectricPriority</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">water</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Material</span><span class="o">::</span><span class="n">glass</span><span class="p">(</span><span class="s">&quot;water&quot;</span><span class="p">,</span><span class="w"> </span><span class="cm">/*thickness=*/</span><span class="mf">1.0f</span><span class="p">);</span>
+<span class="n">water</span><span class="p">.</span><span class="n">ior</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.333f</span><span class="p">;</span>
+<span class="n">water</span><span class="p">.</span><span class="n">dielectricPriority</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+
+<span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">geometryRefractionDiagnostics</span><span class="p">();</span>
+<span class="c1">// d.active, d.backend, d.backendStatus, d.volumes, d.accumulatedSamples</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">geometryRefractionDiagnostics()</span></code> reports whether tracing ran, the backend
+actually used and why (<code class="docutils literal notranslate"><span class="pre">backend</span></code>, <code class="docutils literal notranslate"><span class="pre">backendStatus</span></code>), triangle, volume, and
+BVH node counts, scene rebuilds, and the scheduled samples per pixel.
+<code class="docutils literal notranslate"><span class="pre">geometryRefractionSamplingStatistics()</span></code> reads per-pixel sample counts back
+from the GPU and can stall.</p>
+<p>The Vulkan backend exists only in Linux and Windows builds made with the Vulkan
+headers and <code class="docutils literal notranslate"><span class="pre">glslc</span></code> shader compiler. Installing <code class="docutils literal notranslate"><span class="pre">glslc</span></code> later does not add
+the backend to an already-built rayrai package; use a package built with it or
+rebuild from source. See <a class="reference internal" href="../Troubleshooting.html#rayrai-vulkan-ray-query-troubleshooting"><span class="std std-ref">Vulkan Ray Queries Unavailable</span></a> for
+setup and verification. At run time it needs a Vulkan 1.2 GPU that matches
+the OpenGL device and supports ray queries, acceleration structures, and
+OpenGL memory and semaphore sharing (<code class="docutils literal notranslate"><span class="pre">GL_EXT_memory_object</span></code>, <code class="docutils literal notranslate"><span class="pre">GL_EXT_semaphore</span></code>). Set
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_DISABLE_VULKAN_RAY_QUERY=1</span></code> to force the portable tracer. Changing
+the backend restarts accumulation. While <code class="docutils literal notranslate"><span class="pre">geometryRefraction</span></code> is enabled the
+renderer’s frame caches are bypassed even when no glass is visible, so leave it
+off otherwise.</p>
+</section>
+</section>
+<section id="foliage-materials">
+<h2>Foliage materials<a class="headerlink" href="#foliage-materials" title="Link to this heading"></a></h2>
+<p>Setting <code class="docutils literal notranslate"><span class="pre">foliageType</span></code> to any value other than <code class="docutils literal notranslate"><span class="pre">None</span></code> enables the foliage
+fields below; the specific type is a label and does not change shading or
+wind. <code class="docutils literal notranslate"><span class="pre">Material::foliage</span></code> sets the type, <code class="docutils literal notranslate"><span class="pre">doubleSided</span></code> (no culling, normals
+flipped toward the viewer), roughness 0.85, and metallic 0. It leaves wind and
+leaf transmission off.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 36.0%" />
+<col style="width: 18.0%" />
+<col style="width: 46.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Effect</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">foliageWindStrength</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Wind bending on regular meshes (0–4). Zero disables wind for the
+material even when <code class="docutils literal notranslate"><span class="pre">foliageWindEnabled</span></code> is on.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">foliageRootHeight</span></code> / <code class="docutils literal notranslate"><span class="pre">foliageTipHeight</span></code></p></td>
+<td><p>0 / 1</p></td>
+<td><p>Local Z range over which bending ramps from rooted to full strength.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">foliageStiffness</span></code></p></td>
+<td><p>1</p></td>
+<td><p>Divides the bending amplitude (minimum 0.05).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">foliageFlutterWeight</span></code></p></td>
+<td><p>1</p></td>
+<td><p>Scales <code class="docutils literal notranslate"><span class="pre">foliageWindLeafFlutter</span></code> (0–4).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">foliageTwoSidedLighting</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+<td><p>Adds diffuse light from behind the leaf; required for leaf transmission.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">foliageTransmissionStrength</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Light transmitted through the leaf (0–1): direct light and, with
+high-fidelity lighting, the environment behind the leaf.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">foliageTransmissionColor</span></code></p></td>
+<td><p>(0.55, 0.95, 0.35)</p></td>
+<td><p>Linear tint multiplied with the base color for transmitted light.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">foliageWeatherResponse</span></code>, <code class="docutils literal notranslate"><span class="pre">foliageWetResponse</span></code>,
+<code class="docutils literal notranslate"><span class="pre">foliageSnowResponse</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">true</span></code>, 1, 1</p></td>
+<td><p>Let rain and snow change color, roughness, and wind damping
+(responses 0–2).</p></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">foliageSettings()</span></code> / <code class="docutils literal notranslate"><span class="pre">setFoliageSettings()</span></code> read and write these fields as
+one <code class="docutils literal notranslate"><span class="pre">Material::FoliageSettings</span></code> struct. Thin surfaces that are not foliage,
+such as paper or curtains, use <code class="docutils literal notranslate"><span class="pre">thinTwoSidedLighting</span></code>,
+<code class="docutils literal notranslate"><span class="pre">thinBackDiffuseScale</span></code> (default 0.55), <code class="docutils literal notranslate"><span class="pre">thinTransmissionStrength</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">thinTransmissionColor</span></code> instead. <code class="docutils literal notranslate"><span class="pre">InstancedVisuals</span></code> bend with their own wind
+settings rather than <code class="docutils literal notranslate"><span class="pre">foliageWindStrength</span></code>: call <code class="docutils literal notranslate"><span class="pre">configureFoliageWind</span></code>
+(root height, tip height, wind strength, stiffness, flutter weight) or
+<code class="docutils literal notranslate"><span class="pre">configureGrassPatch</span></code>. The global wind field is described in <a class="reference internal" href="Weather.html"><span class="doc">Weather and atmospherics</span></a>.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">leaf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Material</span><span class="o">::</span><span class="n">foliage</span><span class="p">(</span>
+<span class="w">  </span><span class="s">&quot;oak_leaves&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Material</span><span class="o">::</span><span class="n">FoliageType</span><span class="o">::</span><span class="n">LeafCard</span><span class="p">,</span>
+<span class="w">  </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.32f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.55f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.21f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">));</span>
+<span class="n">leaf</span><span class="p">.</span><span class="n">foliageWindStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.8f</span><span class="p">;</span><span class="w">           </span><span class="c1">// bend under foliageWindEnabled</span>
+<span class="n">leaf</span><span class="p">.</span><span class="n">foliageTipHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.2f</span><span class="p">;</span><span class="w">              </span><span class="c1">// local Z of full bending</span>
+<span class="n">leaf</span><span class="p">.</span><span class="n">foliageTwoSidedLighting</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w">       </span><span class="c1">// light from behind the leaf</span>
+<span class="n">leaf</span><span class="p">.</span><span class="n">foliageTransmissionStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.45f</span><span class="p">;</span><span class="w">  </span><span class="c1">// light through the leaf</span>
+</pre></div>
+</div>
+<p>glTF and GLB files can mark foliage materials explicitly with material extras.
+<code class="docutils literal notranslate"><span class="pre">type</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;leaf&quot;</span></code> (<code class="docutils literal notranslate"><span class="pre">LeafCard</span></code>) or <code class="docutils literal notranslate"><span class="pre">&quot;grass&quot;</span></code> (<code class="docutils literal notranslate"><span class="pre">Grass</span></code>); other values
+are ignored. <code class="docutils literal notranslate"><span class="pre">twoSidedLighting</span></code> defaults to false, <code class="docutils literal notranslate"><span class="pre">transmission</span></code> (0–1) to
+0, and <code class="docutils literal notranslate"><span class="pre">transmissionColor</span></code> to (0.55, 0.95, 0.35). The material’s import report
+then contains <code class="docutils literal notranslate"><span class="pre">authoredRayraiFoliage</span></code>.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;materials&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span>
+<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;twig&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;extras&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;rayrai&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;foliage&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;leaf&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;twoSidedLighting&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;transmission&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.45</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;transmissionColor&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">0.65</span><span class="p">,</span><span class="w"> </span><span class="mf">0.85</span><span class="p">,</span><span class="w"> </span><span class="mf">0.28</span><span class="p">]}}}</span>
+<span class="w">  </span><span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
 <section id="material-import-details">
 <h2>Material import details<a class="headerlink" href="#material-import-details" title="Link to this heading"></a></h2>
-<p>The Assimp/glTF importer is asset-agnostic. It does not special-case the blue-wall
-scene or material names. It follows this priority:</p>
+<p>The Assimp/glTF importer is asset-agnostic: it does not special-case particular
+scenes such as the blue-wall example. It follows this priority:</p>
 <ul class="simple">
 <li><p>Use explicit material texture slots from the source asset when present.</p></li>
 <li><p>Treat base-color and emissive maps as color textures.</p></li>
@@ -309,6 +632,14 @@ scene or material names. It follows this priority:</p>
 a slot but the files are packaged next to the asset.</p></li>
 <li><p>Keep simple solid-color materials on the simple path unless normal maps or PBR features
 require the PBR shader.</p></li>
+<li><p>Apply glTF <code class="docutils literal notranslate"><span class="pre">extras.rayrai.foliage</span></code> metadata (see <a class="reference internal" href="#foliage-materials">Foliage materials</a>).</p></li>
+<li><p>Detect foliage assets by keywords in the asset folder or material name
+(foliage, grass, leaf, leaves, bush, shrub, plant, flower, fern, pine,
+sapling, twig, vegetation). For those, draw an alpha-blended material as
+opaque when its albedo texture has no alpha channel and its base and vertex
+colors are fully opaque (import report <code class="docutils literal notranslate"><span class="pre">opaqueRgbFoliage=OPAQUE</span></code>), and
+possibly reorder opaque foliage vertices for the GPU vertex cache
+(<code class="docutils literal notranslate"><span class="pre">foliageVertexCache=optimized</span></code>).</p></li>
 </ul>
 <p>This fallback behavior is meant to support real downloadable assets whose Blender,
 glTF, FBX, DAE, and OBJ exports often disagree about how texture slots are authored.
@@ -347,6 +678,9 @@ slots feed a per-material thickness/transmission term. <code class="docutils lit
 <em>behind</em> the surface — useful for translucent leaves, candle wax, and thin
 fabric in rim lighting.</p></li>
 </ul>
+<p><code class="docutils literal notranslate"><span class="pre">DiffuseMode</span></code> values other than <code class="docutils literal notranslate"><span class="pre">Lambert</span></code> render only on the full GPU tier,
+and the subsurface and backlight maps are not sampled on the limited tier; see
+<a class="reference internal" href="#gpu-capability-tiers">GPU capability tiers</a>.</p>
 <p>The two showcase images contrast a wrap-only subsurface response (cheap,
 shader-side) against an authored skin material that uses the dedicated SSS
 texture slots and tuned wrap. The backlight image shows leaves lit from behind
@@ -366,12 +700,12 @@ side.</p>
 <span class="n">skin</span><span class="p">.</span><span class="n">subsurfaceMap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">subsurfaceMapId</span><span class="p">;</span>
 <span class="n">skin</span><span class="p">.</span><span class="n">subsurfaceTransmittanceMap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">transmittanceMapId</span><span class="p">;</span>
 
-<span class="c1">// Translucent leaf with backlight response.</span>
+<span class="c1">// Translucent leaf with backlight response (Material::foliage is already</span>
+<span class="c1">// double-sided).</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">leaf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Material</span><span class="o">::</span><span class="n">foliage</span><span class="p">(</span>
 <span class="w">  </span><span class="s">&quot;leaf&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Material</span><span class="o">::</span><span class="n">FoliageType</span><span class="o">::</span><span class="n">LeafCard</span><span class="p">,</span>
 <span class="w">  </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.32f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.58f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.21f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">));</span>
 <span class="n">leaf</span><span class="p">.</span><span class="n">backlightMap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">leafBacklightMapId</span><span class="p">;</span>
-<span class="n">leaf</span><span class="p">.</span><span class="n">cullMode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Material</span><span class="o">::</span><span class="n">CullMode</span><span class="o">::</span><span class="n">Disabled</span><span class="p">;</span><span class="w">  </span><span class="c1">// two-sided</span>
 </pre></div>
 </div>
 <table class="docutils align-default">
@@ -478,6 +812,73 @@ included for context.</p>
 </tbody>
 </table>
 </section>
+</section>
+<section id="gpu-capability-tiers">
+<h2>GPU capability tiers<a class="headerlink" href="#gpu-capability-tiers" title="Link to this heading"></a></h2>
+<p>Which material features render depends on how many fragment texture units the
+OpenGL driver reports (<code class="docutils literal notranslate"><span class="pre">GL_MAX_TEXTURE_IMAGE_UNITS</span></code>). rayrai picks one of
+three shader tiers when it starts:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 12.0%" />
+<col style="width: 26.0%" />
+<col style="width: 62.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Tier</p></th>
+<th class="head"><p>Used when</p></th>
+<th class="head"><p>Materials</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Full</p></td>
+<td><p>64 or more units (not macOS)</p></td>
+<td><p>Every feature on this page.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Compact</p></td>
+<td><p>17–63 units (not macOS); common desktop drivers report 32</p></td>
+<td><p>Base color, normal, metallic/roughness (separate, packed, or ORM), AO,
+and emissive maps; IBL; clearcoat strength; subsurface and backlight,
+including their maps; height-map parallax; planar reflection. PBR
+meshes do not render sheen, anisotropy, iridescence, non-default
+<code class="docutils literal notranslate"><span class="pre">DiffuseMode</span></code> / <code class="docutils literal notranslate"><span class="pre">SpecularMode</span></code>, detail, rim, lightmap, bent-normal,
+weather-mask, clearcoat, or texture-blend maps, triplanar mapping,
+alpha hash, distance or proximity fade, MSDF albedo, terrain
+splatting, wet/snow weather response, additional-light shadows, or
+light projectors.</p></td>
+</tr>
+<tr class="row-even"><td><p>Limited</p></td>
+<td><p>16 or fewer units, and every macOS build</p></td>
+<td><p>As compact, minus planar reflection, height-map parallax, and the
+subsurface, subsurface-transmittance, and backlight maps. Simple and
+instanced meshes also lose additional-light shadows and light
+projectors.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Glass uses its own shader on every tier, see
+<a class="reference internal" href="#glass-and-transmissive-materials">Glass and transmissive materials</a>; the portable geometry-refraction tracer
+also runs everywhere.</p>
+<p>Maps that do not fit the reported unit count are moved to the unit of a slot
+the material leaves empty (bent-normal, refraction, subsurface, subsurface
+transmittance, backlight, detail, rim, height, and texture-blend maps). If no
+unit is free, that map is ignored for the draw. On 16-unit GPUs the lightmap,
+sheen, transmission, thickness, anisotropy, weather-mask, and clearcoat-normal
+maps are always ignored; glass binds its own transmission, thickness, and
+refraction maps and is unaffected.</p>
+<p>On the limited tier post-processing uses a reduced program that keeps depth of
+field, FXAA, bloom, SSAO, and temporal AA, but not effects such as SSR,
+projected decals, color grading, saturation, or white balance (see
+<a class="reference internal" href="PostProcess.html"><span class="doc">Post-process effects</span></a>). On macOS, material textures are also sampled without
+mipmaps (<code class="docutils literal notranslate"><span class="pre">TextureFilter</span></code> modes with mipmaps behave like <code class="docutils literal notranslate"><span class="pre">Linear</span></code>), and
+geometry refraction always uses the portable tracer.</p>
+<p>To check the tier, set <code class="docutils literal notranslate"><span class="pre">RAYRAI_LOG_SHADER_COMPILE=1</span></code>, which prints the
+fallback in use. <code class="docutils literal notranslate"><span class="pre">RAYRAI_FORCE_COMPACT_PBR_SAMPLER_FALLBACK=1</span></code> or
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_FORCE_LIMITED_PBR_SAMPLER_FALLBACK=1</span></code>, set before the application
+starts, previews a lower tier on a capable GPU.
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_LOG_MATERIAL_BINDINGS=1</span></code> prints the texture unit each map is bound
+to; <code class="docutils literal notranslate"><span class="pre">RAYRAI_LOG_MATERIAL_BINDINGS_FILTER</span></code> limits it to material names that
+match a regular expression.</p>
 </section>
 </section>
 

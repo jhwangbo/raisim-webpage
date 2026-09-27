@@ -2,7 +2,7 @@
 Server Example: Inverse Dynamics
 ################################
 
-.. image:: ../../../image/inverse_dynamics.png
+.. image:: ../../../../rsc/docs/image/inverse_dynamics.png
    :alt: inverse_dynamics example
    :width: 100%
 

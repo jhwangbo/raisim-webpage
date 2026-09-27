@@ -1,7 +1,7 @@
 ycb_objects
 ===========
 
-.. image:: ../../../image/ycb_objects.png
+.. image:: ../../../../rsc/docs/image/ycb_objects.png
    :alt: ycb_objects example
    :width: 100%
 

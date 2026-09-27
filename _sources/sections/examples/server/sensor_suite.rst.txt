@@ -8,7 +8,7 @@ Demonstrates camera, depth, IMU, and LiDAR sensors on ANYmal, including depth-to
 
 Screenshot
 ==========
-.. image:: ../../../image/sensors_cpp.png
+.. image:: ../../../../rsc/docs/image/sensors_cpp.png
 
 Target And Source
 =================

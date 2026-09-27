@@ -12,7 +12,7 @@ In addition to visualizing a ``raisim::World``, ``raisim::RaisimServer`` can vis
 The legacy visual-object showcase is displayed as follows; use the current
 examples index for runnable source targets:
 
-.. image:: ../image/visuals.gif
+.. image:: ../../rsc/docs/image/visuals.gif
 
 Typical usage
 =========================
@@ -33,6 +33,14 @@ client requests, decides whether this call is allowed to advance the world
 (pause / step state), applies active client forces only on advancing ticks,
 runs any callback overload, integrates the world when allowed, and unlocks
 the mutex.
+
+``launchServer(port)`` binds its socket before it returns. If ``port`` is
+already in use, the server tries the next 63 ports, logs
+``Port <requested> is in use; bound to port <actual> instead``, and reports an
+error only when none of them is free. ``getPort()`` returns the port actually
+bound, and the discovery beacons advertise it (see `Discovery beacons`_). The
+server serves one client at a time and accepts the next one after the current
+client disconnects.
 
 Thread safety and lifecycle
 ===========================
@@ -60,18 +68,29 @@ streamed for inspection but the viewer does not return their samples. Use
 when the connected viewer should provide the render. See
 :ref:`tcp-viewer-sensor-round-trip` on the TCP viewer page.
 
+Streamed scene notes
+====================
+* Spatial tendons, including wires added with ``addStiffWire``,
+  ``addCompliantWire`` or ``addCustomWire``, are streamed as polylines. The TCP
+  viewer includes them in the camera images it renders for the server.
+* An object whose appearance is ``"hidden"`` or ``"invisible"``
+  (case-insensitive) is still streamed, but rayrai and the TCP viewer do not draw
+  it and it cannot be selected.
+
 Synchronous updates (optional)
 ==============================
 ``processRequests()`` implements a synchronous request/response loop used by
 clients that explicitly pull world-state updates. It returns ``false`` if the
-client does not respond or rejects the protocol version.
+client does not respond, uses another protocol version, or sends a request
+frame the server rejects (see `Request validation`_).
 
 Protocol versioning and deformable streaming
 ============================================
 The TCP wire protocol is explicitly versioned. Each request starts with a
-protocol header that advertises the negotiated feature set, and the server
-rejects newer or otherwise unsupported protocol versions with a clear error
-rather than misparsing the stream. The current feature flags are:
+protocol header that advertises the client's feature set. The server requires
+the client's protocol version to equal its own and rejects unknown feature
+bits, logging a warning and closing the connection rather than misparsing the
+stream. The current feature flags are:
 
 * ``PROTOCOL_FEATURE_EXPLICIT_HEADER``: the client and server exchange the
   explicit version header before each request.
@@ -96,24 +115,46 @@ Interactive sim control
 =======================
 When the ``SIM_CONTROL`` feature is negotiated, a connected client (such as
 ``rayrai_tcp_viewer``) can drive the simulation from its UI rather than
-just observing it. The viewer's **Object** tab gets a *Simulation* row with
-icon-text buttons for Pause / Resume / Step / Step 10.
+just observing it. The viewer's **Objects** tab has a *Simulation* row with
+icon buttons to pause or resume, step one frame and step ten frames.
 
 Client requests added by this feature:
 
 * ``CR_PAUSE`` / ``CR_RESUME`` — toggle a flag consulted in
   ``integrateWorldThreadSafe()``. While paused, ``world_->integrate()`` is not
-  called even though the network thread keeps streaming state.
+  called even though the network thread keeps streaming state. ``CR_RESUME``
+  also drops queued steps.
 * ``CR_STEP_N`` — queue *N* single-step integrations to advance while paused.
 * ``CR_APPLY_FORCE`` — apply an external force at a world-space application
-  point on a body. Drained at the next integration tick.
-* ``CR_APPLY_TORQUE`` — apply an external torque on a body.
-* ``CR_SET_POSE`` — teleport a single-body object to a position + quaternion.
+  point on a body. The server multiplies the force command by the body's
+  mass, so the command acts as an acceleration.
+* ``CR_APPLY_TORQUE`` — apply an external torque on a body (not scaled by
+  mass).
+* ``CR_SET_POSE`` — teleport a single-body object to a position and a
+  quaternion in (w, x, y, z) order.
 * ``CR_SET_GC`` — set the generalized coordinate of an articulated system.
 
+Scene-editing requests predate this feature and are accepted from any client
+with the same protocol version, whether or not ``SIM_CONTROL`` is negotiated:
+``CR_SPAWN_*`` (box, sphere, cylinder, capsule, mesh, articulated system,
+ground plane, PNG height map), ``CR_REMOVE_OBJECT`` (an object or a spatial
+tendon, by visual tag), ``CR_SAVE_THE_WORLD`` (export the world as XML), and
+the interaction wire ``CR_ATTACH_WIRE`` / ``CR_DRAG_OBJECT``. File paths in
+these requests are opened and written on the server host.
+
 There is no authentication or per-client authorization — if the connection is
-open, the client can issue any request negotiated by both ends. The bind
-address is the only access control the server provides:
+open, the client can issue any request negotiated by both ends, plus every
+scene-editing request. The bind address is the only access control the server
+provides:
+
+.. code-block:: cpp
+
+  raisim::RaisimServer server(&world);
+  server.setBindLoopbackOnly(false);  // expose on all interfaces (off by default)
+  server.launchServer();
+
+Keep the default (``127.0.0.1``-only) for development. Open the bind to a wider
+network only when you trust every host that can reach the port.
 
 The same pause / step state is reachable from your own simulation code,
 so a headless server can drive its own loop:
@@ -134,18 +175,25 @@ each integration tick until refreshed or expired. While paused, the slot can
 be refreshed but the force is not applied until a step or resume call allows
 ``integrateWorldThreadSafe()`` to advance. ``stepSimulation(N)`` queues N
 single-step integrations that drain one per ``integrateWorldThreadSafe()``
-call; ``resumeSimulation()`` clears any queued steps and resumes normal
-integration.
+call. ``resumeSimulation()`` only clears the pause flag; steps queued earlier
+stay queued and run the next time the simulation is paused.
 
+Request validation
+------------------
+The server decodes and validates a whole request frame before applying any of
+it. It rejects the frame when a request contains, for example:
 
-.. code-block:: cpp
+* a non-finite number, or a quaternion that is zero or not of unit length;
+* a non-positive mass or dimension in a spawn request;
+* a file that does not exist on the server; height maps must be PNG,
+  articulated systems URDF or XML, and meshes need a file extension;
+* a force or wire target, or a body index, that does not exist;
+* a pose target that is not a single body, or a generalized-coordinate vector
+  whose size does not match the articulated system;
+* a ``CR_SAVE_THE_WORLD`` request that is not the only request in its frame.
 
-  raisim::RaisimServer server(&world);
-  server.setBindLoopbackOnly(false);  // expose on all interfaces (off by default)
-  server.launchServer();
-
-Keep the default (``127.0.0.1``-only) for development. Open the bind to a wider
-network only when you trust every host that can reach the port.
+A rejected frame is logged as ``Rejecting malformed client frame: <reason>``,
+nothing from it is applied, and the client is disconnected.
 
 Custom mutation under the world mutex
 -------------------------------------
@@ -175,6 +223,25 @@ the example mutates the world each tick. See
 ``examples/src/server/sim_control_demo.cpp`` for a minimal demo of the
 viewer-facing controls.
 
+Viewer requests
+===============
+The server can also ask the connected viewer to act. ``rayrai_tcp_viewer``
+carries these requests out on the next scene update (see :doc:`RayraiTcpViewer`):
+
+* ``requestSaveScreenshot()`` — save a PNG of the scene in the viewer's output
+  folder, as its ``F12`` key does.
+* ``startRecordingVideo(name)`` / ``stopRecordingVideo()`` — record the scene
+  to the viewer's output folder, named after ``name`` with its extension
+  (``.mp4`` when it has none). A viewer without ``ffmpeg`` writes numbered PNGs
+  to ``<stem>_frames/`` in the output folder instead.
+* ``setCameraPositionAndLookAt(pos, lookAt)`` — place the viewer camera at
+  ``pos``, aimed at the point ``lookAt``.
+* ``focusOn(object)`` — frame ``object`` in the viewer and select it.
+
+The viewer's output folder is its ``--screenshot-dir`` or the folder chosen in
+its **Record** tab. Screenshot and recording requests stored in a recorded
+session are ignored when the session is replayed.
+
 Default bind address
 ====================
 ``RaisimServer`` binds to ``127.0.0.1`` by default rather than ``INADDR_ANY``.
@@ -195,8 +262,8 @@ While the server is running, ``RaisimServer`` advertises itself with a UDP
 beacon once per second on port ``59312``. The beacon payload contains the
 RaiSim TCP protocol version, TCP port, host name, executable name, bind mode
 (``loopback`` or ``all``), and connection status. ``rayrai_tcp_viewer``
-uses these beacons to populate the detected-server list in its **Connection**
-tab.
+lists only beacons whose protocol version equals its own, in the server table
+of an idle pane and in the **Connection** tab's endpoint popup.
 
 With the default loopback bind, beacons are sent only to ``127.0.0.1``. After
 ``server.setBindLoopbackOnly(false)``, they are broadcast on the local network

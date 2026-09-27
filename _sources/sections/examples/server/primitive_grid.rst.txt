@@ -8,7 +8,7 @@ Spawns a grid of boxes, spheres, capsules, and cylinders to show the basic primi
 
 Screenshot
 ==========
-.. image:: ../../../image/primitive_grid.png
+.. image:: ../../../../rsc/docs/image/primitive_grid.png
    :alt: primitive_grid example
    :width: 100%
 

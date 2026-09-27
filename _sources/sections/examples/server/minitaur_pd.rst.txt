@@ -8,7 +8,7 @@ Runs Minitaur with PD control, including per-joint gains that zero out unactuate
 
 Screenshot
 ==========
-.. image:: ../../../image/minitaur_pd.png
+.. image:: ../../../../rsc/docs/image/minitaur_pd.png
    :alt: minitaur_pd example
    :width: 100%
 

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Weather and atmospherics &mdash; raisim 2.6.0 documentation</title>
+  <title>Weather and atmospherics &mdash; raisim 2.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b6430375" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
+      <script src="../../_static/documentation_options.js?v=dfec817d"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -94,6 +94,7 @@
 <li class="toctree-l3"><a class="reference internal" href="Lighting.html">Lighting, shadows, and HDR/IBL</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Materials.html">PBR materials</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Visuals.html">Custom visuals, instancing, and scene helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Foliage.html">Foliage and forest rendering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="PostProcess.html">Post-process effects</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Weather and atmospherics</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#weather-presets">Weather presets</a></li>
@@ -111,6 +112,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#platform-support">Platform support</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#source-built-tcp-viewer-recommended">Source-built TCP viewer (recommended)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#build-and-link">Build and link</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#minimal-usage">Minimal usage</a></li>
@@ -156,21 +158,28 @@
 <h1>Weather and atmospherics<a class="headerlink" href="#weather-and-atmospherics" title="Link to this heading"></a></h1>
 <p>Weather is preset-driven and exposes both renderer-side state
 (<code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code>) and runtime atmospheric overrides
-(<code class="docutils literal notranslate"><span class="pre">WeatherSettings</span></code>). When <code class="docutils literal notranslate"><span class="pre">WeatherSettings::enabled</span> <span class="pre">=</span> <span class="pre">true</span></code> the
-atmospheric fields on <code class="docutils literal notranslate"><span class="pre">WeatherSettings</span></code> override the matching
-<code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code> fields for that frame.</p>
+(<code class="docutils literal notranslate"><span class="pre">WeatherSettings</span></code>). While <code class="docutils literal notranslate"><span class="pre">WeatherSettings::enabled</span> <span class="pre">=</span> <span class="pre">true</span></code>, applying
+weather writes the resolved sun, sky, fog, cloud, and wet/snow state into the
+renderer’s <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code>.</p>
 <section id="weather-presets">
 <h2>Weather presets<a class="headerlink" href="#weather-presets" title="Link to this heading"></a></h2>
 <p>Presets cover <code class="docutils literal notranslate"><span class="pre">Clear</span></code>, <code class="docutils literal notranslate"><span class="pre">Hazy</span></code>, <code class="docutils literal notranslate"><span class="pre">Overcast</span></code>, <code class="docutils literal notranslate"><span class="pre">Fog</span></code>, <code class="docutils literal notranslate"><span class="pre">Rain</span></code>,
 <code class="docutils literal notranslate"><span class="pre">HeavyRain</span></code>, <code class="docutils literal notranslate"><span class="pre">Snow</span></code>, <code class="docutils literal notranslate"><span class="pre">Storm</span></code>, <code class="docutils literal notranslate"><span class="pre">NightClear</span></code>, <code class="docutils literal notranslate"><span class="pre">NightRain</span></code>, and
 <code class="docutils literal notranslate"><span class="pre">Custom</span></code>. Quality steps (<code class="docutils literal notranslate"><span class="pre">Low</span></code>, <code class="docutils literal notranslate"><span class="pre">Medium</span></code>, <code class="docutils literal notranslate"><span class="pre">High</span></code>, <code class="docutils literal notranslate"><span class="pre">Ultra</span></code>) trade
 fidelity against particle and texture budgets.</p>
-<p><code class="docutils literal notranslate"><span class="pre">WeatherSettings</span></code> and <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code> overlap on atmospheric
-fields (fog density, wetness, volumetric fog, sky tinting). The precedence
-rule is: when <code class="docutils literal notranslate"><span class="pre">WeatherSettings::enabled</span> <span class="pre">=</span> <span class="pre">true</span></code>, the renderer reads
-weather fields and ignores the corresponding <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code>
-fields for that frame. When <code class="docutils literal notranslate"><span class="pre">enabled</span> <span class="pre">=</span> <span class="pre">false</span></code>, <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code>
-applies. Numeric units in <code class="docutils literal notranslate"><span class="pre">WeatherSettings</span></code>: <code class="docutils literal notranslate"><span class="pre">timeOfDayHours</span></code> in hours
+<p>Weather is applied by <code class="docutils literal notranslate"><span class="pre">setWeatherSettings</span></code>, <code class="docutils literal notranslate"><span class="pre">setWeatherPreset</span></code>,
+<code class="docutils literal notranslate"><span class="pre">transitionWeather</span></code>, and by <code class="docutils literal notranslate"><span class="pre">updateWeather</span></code> while a transition or wetness
+accumulation is running. Each application starts from the current
+<code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code>; overrides the main light (direction, colour,
+ambient); adjusts <code class="docutils literal notranslate"><span class="pre">shadowStrength</span></code> and <code class="docutils literal notranslate"><span class="pre">shadowPcfRadius</span></code>; sets the
+environment intensity and tints, the clouds, and the wet/snow fields; scales
+<code class="docutils literal notranslate"><span class="pre">pbrExposure</span></code>; re-enables the procedural sky; takes the larger of the two
+fog densities; and passes the result to <code class="docutils literal notranslate"><span class="pre">setRenderQualitySettings</span></code>. That
+call rebuilds the main light and removes all additional lights (see
+<a class="reference internal" href="Lighting.html"><span class="doc">Lighting, shadows, and HDR/IBL</span></a>), so add lights after weather is applied and again after
+later weather updates. Disabling weather stops further updates but does not
+restore the previous values; call <code class="docutils literal notranslate"><span class="pre">setRenderQualitySettings</span></code> with your own
+settings afterwards. Numeric units in <code class="docutils literal notranslate"><span class="pre">WeatherSettings</span></code>: <code class="docutils literal notranslate"><span class="pre">timeOfDayHours</span></code> in hours
 <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">24)</span></code>, <code class="docutils literal notranslate"><span class="pre">latitude</span></code> / <code class="docutils literal notranslate"><span class="pre">longitude</span></code> in degrees, <code class="docutils literal notranslate"><span class="pre">windSpeed</span></code> in m/s,
 <code class="docutils literal notranslate"><span class="pre">visibilityMeters</span></code> / <code class="docutils literal notranslate"><span class="pre">radius</span></code> / distance-fade fields in metres,
 <code class="docutils literal notranslate"><span class="pre">fogDensity</span></code> in metres⁻¹ (exponential extinction), <code class="docutils literal notranslate"><span class="pre">fogAnisotropy</span></code> is
@@ -285,7 +294,7 @@ every preset (Fast / Balanced / High / Ultra) renders the analytic
 Hillaire sky as the background out of the box. You do not need to do
 anything to turn it on; you only need to call the helpers below if you
 want it to <em>light</em> the scene as ambient.</p>
-<p>Two-step recipe to get a sky that also drives shaded-side ambient:</p>
+<p>To let the sky light PBR materials, bake it into cubemaps and assign them:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="w"> </span><span class="nf">viewer</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">1280</span><span class="p">,</span><span class="w"> </span><span class="mi">720</span><span class="p">);</span>
 
 <span class="c1">// 1) Pick a preset. Procedural sky is already enabled by every</span>
@@ -293,19 +302,26 @@ want it to <em>light</em> the scene as ambient.</p>
 <span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualityPreset</span><span class="p">(</span>
 <span class="w">    </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">RenderQualityPreset</span><span class="o">::</span><span class="n">High</span><span class="p">);</span>
 
-<span class="c1">// 2) Bake the procedural sky into a real IBL environment cubemap +</span>
-<span class="c1">//    irradiance cubemap so PBR materials sample sky colour for</span>
-<span class="c1">//    indirect lighting. Without this call the sky is &quot;background</span>
-<span class="c1">//    only&quot; — PBR surfaces see no environment contribution.</span>
-<span class="n">viewer</span><span class="p">.</span><span class="n">generateWeatherSkyEnvironment</span><span class="p">(</span>
+<span class="c1">// 2) Bake the current sky into an environment cubemap plus a diffuse</span>
+<span class="c1">//    irradiance cubemap. setAsBackground=true also shows the baked</span>
+<span class="c1">//    map as the background.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">sky</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">generateWeatherSkyEnvironment</span><span class="p">(</span>
 <span class="w">    </span><span class="cm">/*envFaceSize=*/</span><span class="mi">128</span><span class="p">,</span>
 <span class="w">    </span><span class="cm">/*irradianceFaceSize=*/</span><span class="mi">32</span><span class="p">,</span>
 <span class="w">    </span><span class="cm">/*setAsBackground=*/</span><span class="nb">true</span><span class="p">);</span>
+
+<span class="c1">// 3) Assign the maps to each visual that should receive sky light.</span>
+<span class="n">visual</span><span class="o">-&gt;</span><span class="n">setPbrEnvironment</span><span class="p">(</span><span class="n">sky</span><span class="p">.</span><span class="n">environmentMap</span><span class="p">,</span><span class="w"> </span><span class="n">sky</span><span class="p">.</span><span class="n">irradianceMap</span><span class="p">,</span>
+<span class="w">                          </span><span class="cm">/*prefilteredEnvironmentMap=*/</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="cm">/*brdfLut=*/</span><span class="mi">0</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>After that, <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings::pbrEnvironmentIntensity</span></code> controls
-how strong the IBL contribution is. The preset defaults are tuned for
-outdoor daylight; lower it for an overcast or indoor feel.</p>
+<p>The bake is not applied to materials automatically. Materials without an
+environment map, and all instanced visuals, use the neutral procedural
+daylight fallback tinted by <code class="docutils literal notranslate"><span class="pre">pbrEnvironmentLightingTint</span></code> (see
+<a class="reference internal" href="Lighting.html"><span class="doc">Lighting, shadows, and HDR/IBL</span></a>), not the sky’s colours.
+<code class="docutils literal notranslate"><span class="pre">RenderQualitySettings::pbrEnvironmentIntensity</span></code> scales both the fallback
+and assigned environment maps. The preset defaults are tuned for outdoor
+daylight; lower it for an overcast or indoor feel.</p>
 <p>If you want to <strong>turn the sky off</strong> (for a flat colour background or to
 use an HDR environment instead):</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">();</span>
@@ -315,17 +331,20 @@ use an HDR environment instead):</p>
 <span class="n">viewer</span><span class="p">.</span><span class="n">setBackgroundColorRgb255</span><span class="p">({</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">22</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">});</span><span class="w">  </span><span class="c1">// flat fallback</span>
 </pre></div>
 </div>
-<p>To swap in your own HDR environment (the
-<a class="reference internal" href="Lighting.html"><span class="doc">PbrEnvironment</span></a> bundle), load the HDR file, set it as
-the background, and the PBR shader will use it instead of the procedural
-sky:</p>
+<p>While weather is enabled, each weather application turns the procedural sky
+back on.</p>
+<p>To use your own HDR environment (the <a class="reference internal" href="Lighting.html"><span class="doc">PbrEnvironment</span></a>
+bundle), assign it to visuals for lighting and optionally show it as the
+background; <code class="docutils literal notranslate"><span class="pre">setEnvironmentBackground</span></code> alone only changes the background:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">PbrEnvironment</span><span class="o">::</span><span class="n">loadFromHdrFile</span><span class="p">(</span><span class="s">&quot;/path/studio.hdr&quot;</span><span class="p">);</span>
+<span class="n">visual</span><span class="o">-&gt;</span><span class="n">setPbrEnvironment</span><span class="p">(</span><span class="n">env</span><span class="p">);</span><span class="w">  </span><span class="c1">// lighting</span>
 <span class="n">viewer</span><span class="p">.</span><span class="n">setEnvironmentBackground</span><span class="p">(</span><span class="n">env</span><span class="p">.</span><span class="n">environmentCubemap</span><span class="p">,</span><span class="w"> </span><span class="cm">/*exposure=*/</span><span class="mf">1.0f</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>The procedural sky is cheap (a few small LUTs); the IBL bake is a
-one-time cost when the renderer initialises or when weather state
-changes substantially. Both are documented in more detail below.</p>
+<p>The procedural sky is cheap (a few small LUTs).
+<code class="docutils literal notranslate"><span class="pre">generateWeatherSkyEnvironment</span></code> evaluates the sky on the CPU for every
+cubemap texel, so call it at setup or at weather transitions, not every frame.
+Both are documented in more detail below.</p>
 </section>
 <section id="volumetric-fog-sky-and-light-shafts">
 <h2>Volumetric fog, sky, and light shafts<a class="headerlink" href="#volumetric-fog-sky-and-light-shafts" title="Link to this heading"></a></h2>
@@ -388,6 +407,23 @@ procedural cloud layer adds <code class="docutils literal notranslate"><span cla
 <span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">quality</span><span class="p">);</span>
 </pre></div>
 </div>
+<p>Weather drives the same height fog, which makes it a cheap way to add
+distance haze. With <code class="docutils literal notranslate"><span class="pre">WeatherSettings::enabled</span></code>, a <code class="docutils literal notranslate"><span class="pre">visibilityMeters</span></code>
+below 5000 (or a <code class="docutils literal notranslate"><span class="pre">fogDensity</span></code> above 0.001) enables height fog with an
+extinction of <code class="docutils literal notranslate"><span class="pre">max(0.85</span> <span class="pre">*</span> <span class="pre">fogDensity,</span> <span class="pre">3</span> <span class="pre">/</span> <span class="pre">visibilityMeters)</span></code> per metre,
+coloured by <code class="docutils literal notranslate"><span class="pre">WeatherSettings::fogColor</span></code>. Weather adds the volumetric fog
+pass only at <code class="docutils literal notranslate"><span class="pre">WeatherQuality::Ultra</span></code> when that extinction exceeds 0.004 per
+metre. <code class="docutils literal notranslate"><span class="pre">weatherDiagnostics()</span></code> reports <code class="docutils literal notranslate"><span class="pre">heightFogActive</span></code>,
+<code class="docutils literal notranslate"><span class="pre">heightFogDensity</span></code>, <code class="docutils literal notranslate"><span class="pre">visibilityTransmittance100m</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">visibilityTransmittance1km</span></code>.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">WeatherSettings</span><span class="w"> </span><span class="n">weather</span><span class="p">;</span>
+<span class="n">weather</span><span class="p">.</span><span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">weather</span><span class="p">.</span><span class="n">preset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">WeatherPreset</span><span class="o">::</span><span class="n">Clear</span><span class="p">;</span>
+<span class="n">weather</span><span class="p">.</span><span class="n">visibilityMeters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1200.0f</span><span class="p">;</span><span class="w">                 </span><span class="c1">// ~78% transmittance at 100 m</span>
+<span class="n">weather</span><span class="p">.</span><span class="n">fogColor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.65f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.70f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.75f</span><span class="p">);</span><span class="w">  </span><span class="c1">// cool grey haze</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setWeatherSettings</span><span class="p">(</span><span class="n">weather</span><span class="p">);</span>
+</pre></div>
+</div>
 <a class="reference internal image-reference" href="../../_images/rayrai_volumetric_fog.png"><img alt="Pillars slicing the main light into volumetric shafts" src="../../_images/rayrai_volumetric_fog.png" style="width: 100%;" />
 </a>
 <table class="docutils align-default">
@@ -427,15 +463,25 @@ procedural cloud layer adds <code class="docutils literal notranslate"><span cla
 </section>
 <section id="foliage-wind">
 <h2>Foliage wind<a class="headerlink" href="#foliage-wind" title="Link to this heading"></a></h2>
+<p>See <a class="reference internal" href="Foliage.html"><span class="doc">Foliage and forest rendering</span></a> for foliage materials, instance LOD and shadows, and the
+<a class="reference internal" href="../examples/rayrai/rayrai_forest.html"><span class="doc">dense forest example</span></a> for a complete
+terrain-grounded scene with animated vegetation.</p>
 <p>Authored foliage and instanced grass deform under a global wind field when
 <code class="docutils literal notranslate"><span class="pre">foliageWindEnabled</span></code> is set. <code class="docutils literal notranslate"><span class="pre">foliageWindDirection</span></code> and
 <code class="docutils literal notranslate"><span class="pre">foliageWindSpeed</span></code> drive the base motion; <code class="docutils literal notranslate"><span class="pre">foliageWindTimeSeconds</span></code> is
 the wind clock the application drives from its frame loop.
 <code class="docutils literal notranslate"><span class="pre">foliageWindGustStrength</span></code> and <code class="docutils literal notranslate"><span class="pre">foliageWindGustScale</span></code> add slower gust
 noise on top, while <code class="docutils literal notranslate"><span class="pre">foliageWindBranchBend</span></code> controls coarse trunk/branch
-bend and <code class="docutils literal notranslate"><span class="pre">foliageWindLeafFlutter</span></code> controls fine leaf flutter. The
-per-mesh response amplitude comes from the material’s <code class="docutils literal notranslate"><span class="pre">FoliageType</span></code> and
-the vertex color channels populated by the importer.</p>
+bend and <code class="docutils literal notranslate"><span class="pre">foliageWindLeafFlutter</span></code> controls fine leaf flutter.
+<code class="docutils literal notranslate"><span class="pre">WeatherSettings::windSpeed</span></code> does not move foliage.</p>
+<p>Only materials with <code class="docutils literal notranslate"><span class="pre">foliageWindStrength</span> <span class="pre">&gt;</span> <span class="pre">0</span></code> move. The bend grows from
+<code class="docutils literal notranslate"><span class="pre">foliageRootHeight</span></code> to <code class="docutils literal notranslate"><span class="pre">foliageTipHeight</span></code> in mesh-local height and is
+divided by <code class="docutils literal notranslate"><span class="pre">foliageStiffness</span></code>; <code class="docutils literal notranslate"><span class="pre">foliageFlutterWeight</span></code> scales the flutter,
+and wet or snowy foliage moves less. <code class="docutils literal notranslate"><span class="pre">FoliageType</span></code> classifies the material
+but does not enable wind by itself. For instanced batches,
+<code class="docutils literal notranslate"><span class="pre">InstancedVisuals::configureFoliageWind</span></code> (and <code class="docutils literal notranslate"><span class="pre">configureGrassPatch</span></code> for
+grass) sets the same response per batch; see <a class="reference internal" href="Materials.html"><span class="doc">PBR materials</span></a> for foliage
+materials.</p>
 <p>Foliage uses two-sided lighting and weather-driven leaf colour shifts.
 Grass patches and dense bushes are usually rendered through
 <code class="docutils literal notranslate"><span class="pre">InstancedVisuals</span></code> so thousands of blades share one upload, with
@@ -444,17 +490,23 @@ per-instance scale and rotation driving subtle variation.</p>
 <span class="n">quality</span><span class="p">.</span><span class="n">foliageWindEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
 <span class="n">quality</span><span class="p">.</span><span class="n">foliageWindDirection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec2</span><span class="p">(</span><span class="mf">0.7f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.7f</span><span class="p">);</span><span class="w">  </span><span class="c1">// diagonal wind</span>
 <span class="n">quality</span><span class="p">.</span><span class="n">foliageWindSpeed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.4f</span><span class="p">;</span><span class="w">                       </span><span class="c1">// base m/s</span>
-<span class="n">quality</span><span class="p">.</span><span class="n">foliageWindTimeSeconds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">currentTimeSeconds</span><span class="p">;</span><span class="w">   </span><span class="c1">// animation clock</span>
 <span class="n">quality</span><span class="p">.</span><span class="n">foliageWindGustStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.6f</span><span class="p">;</span><span class="w">                </span><span class="c1">// gust amplitude</span>
 <span class="n">quality</span><span class="p">.</span><span class="n">foliageWindGustScale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.2f</span><span class="p">;</span><span class="w">                   </span><span class="c1">// gust spatial scale</span>
 <span class="n">quality</span><span class="p">.</span><span class="n">foliageWindBranchBend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.22f</span><span class="p">;</span><span class="w">                 </span><span class="c1">// coarse trunk bend</span>
 <span class="n">quality</span><span class="p">.</span><span class="n">foliageWindLeafFlutter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.10f</span><span class="p">;</span><span class="w">                </span><span class="c1">// fine flutter</span>
 <span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">quality</span><span class="p">);</span>
 
-<span class="c1">// Mark a material as foliage so the wind shader applies to it.</span>
+<span class="c1">// Per frame: advance the wind clock. Unlike setRenderQualitySettings,</span>
+<span class="c1">// this does not rebuild the lights.</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">advanceFoliageWindTime</span><span class="p">(</span><span class="n">dt</span><span class="p">);</span><span class="w">   </span><span class="c1">// or setFoliageWindTimeSeconds(t)</span>
+
+<span class="c1">// A foliage material only moves with a positive wind strength.</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">leaf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Material</span><span class="o">::</span><span class="n">foliage</span><span class="p">(</span>
 <span class="w">  </span><span class="s">&quot;oak_leaves&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Material</span><span class="o">::</span><span class="n">FoliageType</span><span class="o">::</span><span class="n">LeafCard</span><span class="p">,</span>
 <span class="w">  </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.32f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.55f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.21f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">));</span>
+<span class="n">leaf</span><span class="p">.</span><span class="n">foliageWindStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">;</span>
+<span class="n">leaf</span><span class="p">.</span><span class="n">foliageRootHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">;</span><span class="w">   </span><span class="c1">// mesh-local height where bending starts</span>
+<span class="n">leaf</span><span class="p">.</span><span class="n">foliageTipHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">;</span><span class="w">    </span><span class="c1">// full bend at this height</span>
 </pre></div>
 </div>
 <table class="docutils align-default">
@@ -506,7 +558,9 @@ can ramp it independently of the weather state. Enable
 <code class="docutils literal notranslate"><span class="pre">weatherSnowRoughness</span></code>, <code class="docutils literal notranslate"><span class="pre">weatherSnowMetallicScale</span></code>, and
 <code class="docutils literal notranslate"><span class="pre">weatherSnowNormalSoftening</span></code>. The <code class="docutils literal notranslate"><span class="pre">WeatherMask</span></code> texture slot on
 <code class="docutils literal notranslate"><span class="pre">Material</span></code> masks these effects per-asset, so authored awnings or
-undersides of overhangs stay dry.</p>
+undersides of overhangs stay dry. PBR meshes show the wet and snow response
+only in the full PBR program; see the GPU capability tiers in
+<a class="reference internal" href="Materials.html"><span class="doc">PBR materials</span></a>.</p>
 <p>Wet response darkens albedo, drops roughness, and adds animated rain
 ripples on upward-facing surfaces; <code class="docutils literal notranslate"><span class="pre">wetnessAccumulationEnabled</span></code> lets the
 value ramp up over time during rain and ramp back down during dry intervals,
@@ -583,7 +637,11 @@ than configured independently. Storms add stochastic lightning controlled by
 <code class="docutils literal notranslate"><span class="pre">lightningRate</span></code> and the <code class="docutils literal notranslate"><span class="pre">lightningLocalPoint*</span></code> fields; subscribe with
 <code class="docutils literal notranslate"><span class="pre">setWeatherThunderCallback</span></code> to play audio cues. Solar position uses the
 configured latitude / longitude / date and shifts the directional light
-accordingly throughout <code class="docutils literal notranslate"><span class="pre">timeOfDayHours</span></code>.</p>
+accordingly throughout <code class="docutils literal notranslate"><span class="pre">timeOfDayHours</span></code>, which is civil time at
+<code class="docutils literal notranslate"><span class="pre">utcOffsetHours</span></code> (default 9) or local solar time when
+<code class="docutils literal notranslate"><span class="pre">automaticUtcOffset</span></code> derives the offset from <code class="docutils literal notranslate"><span class="pre">longitude</span> <span class="pre">/</span> <span class="pre">15</span></code>. Set
+<code class="docutils literal notranslate"><span class="pre">useExplicitSunAngles</span></code> with <code class="docutils literal notranslate"><span class="pre">sunAzimuthDegrees</span></code> and
+<code class="docutils literal notranslate"><span class="pre">sunElevationDegrees</span></code> (clamped to -8..89) to place the sun directly.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">weather</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">defaultWeatherSettings</span><span class="p">(</span>
 <span class="w">  </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">WeatherPreset</span><span class="o">::</span><span class="n">Storm</span><span class="p">);</span>
 <span class="n">weather</span><span class="p">.</span><span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>

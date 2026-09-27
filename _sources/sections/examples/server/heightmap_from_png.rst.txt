@@ -8,7 +8,7 @@ Loads a PNG heightmap (Zurich dataset) and drops ANYmal on it. This is the refer
 
 Screenshot
 ==========
-.. image:: ../../../image/heightmap_from_png.png
+.. image:: ../../../../rsc/docs/image/heightmap_from_png.png
    :alt: heightmap_from_png example
    :width: 100%
 

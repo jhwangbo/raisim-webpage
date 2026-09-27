@@ -12,7 +12,7 @@ CPU fallback for headless ray-query use.
 
 Screenshot
 ==========
-.. image:: ../../../image/rayrai_depth_camera.png
+.. image:: ../../../../rsc/docs/image/rayrai_depth_camera.png
    :alt: rayrai_depth_camera example
    :width: 100%
 

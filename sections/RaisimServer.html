@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Raisim Server &mdash; raisim 2.6.0 documentation</title>
+  <title>Raisim Server &mdash; raisim 2.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b6430375" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=ae39cb24"></script>
+      <script src="../_static/documentation_options.js?v=dfec817d"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -76,12 +76,15 @@
 <li class="toctree-l2"><a class="reference internal" href="#typical-usage">Typical usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#thread-safety-and-lifecycle">Thread safety and lifecycle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#sensor-measurements">Sensor measurements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#streamed-scene-notes">Streamed scene notes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#synchronous-updates-optional">Synchronous updates (optional)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#protocol-versioning-and-deformable-streaming">Protocol versioning and deformable streaming</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#interactive-sim-control">Interactive sim control</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#request-validation">Request validation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#custom-mutation-under-the-world-mutex">Custom mutation under the world mutex</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#viewer-requests">Viewer requests</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#default-bind-address">Default bind address</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#discovery-beacons">Discovery beacons</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#raisimserver-api">RaisimServer API</a><ul>
@@ -275,6 +278,13 @@ client requests, decides whether this call is allowed to advance the world
 (pause / step state), applies active client forces only on advancing ticks,
 runs any callback overload, integrates the world when allowed, and unlocks
 the mutex.</p>
+<p><code class="docutils literal notranslate"><span class="pre">launchServer(port)</span></code> binds its socket before it returns. If <code class="docutils literal notranslate"><span class="pre">port</span></code> is
+already in use, the server tries the next 63 ports, logs
+<code class="docutils literal notranslate"><span class="pre">Port</span> <span class="pre">&lt;requested&gt;</span> <span class="pre">is</span> <span class="pre">in</span> <span class="pre">use;</span> <span class="pre">bound</span> <span class="pre">to</span> <span class="pre">port</span> <span class="pre">&lt;actual&gt;</span> <span class="pre">instead</span></code>, and reports an
+error only when none of them is free. <code class="docutils literal notranslate"><span class="pre">getPort()</span></code> returns the port actually
+bound, and the discovery beacons advertise it (see <a class="reference internal" href="#discovery-beacons">Discovery beacons</a>). The
+server serves one client at a time and accepts the next one after the current
+client disconnects.</p>
 </section>
 <section id="thread-safety-and-lifecycle">
 <h2>Thread safety and lifecycle<a class="headerlink" href="#thread-safety-and-lifecycle" title="Link to this heading"></a></h2>
@@ -300,18 +310,31 @@ streamed for inspection but the viewer does not return their samples. Use
 when the connected viewer should provide the render. See
 <a class="reference internal" href="RayraiTcpViewer.html#tcp-viewer-sensor-round-trip"><span class="std std-ref">RGB/depth sensor round trip</span></a> on the TCP viewer page.</p>
 </section>
+<section id="streamed-scene-notes">
+<h2>Streamed scene notes<a class="headerlink" href="#streamed-scene-notes" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Spatial tendons, including wires added with <code class="docutils literal notranslate"><span class="pre">addStiffWire</span></code>,
+<code class="docutils literal notranslate"><span class="pre">addCompliantWire</span></code> or <code class="docutils literal notranslate"><span class="pre">addCustomWire</span></code>, are streamed as polylines. The TCP
+viewer includes them in the camera images it renders for the server.</p></li>
+<li><p>An object whose appearance is <code class="docutils literal notranslate"><span class="pre">&quot;hidden&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;invisible&quot;</span></code>
+(case-insensitive) is still streamed, but rayrai and the TCP viewer do not draw
+it and it cannot be selected.</p></li>
+</ul>
+</section>
 <section id="synchronous-updates-optional">
 <h2>Synchronous updates (optional)<a class="headerlink" href="#synchronous-updates-optional" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">processRequests()</span></code> implements a synchronous request/response loop used by
 clients that explicitly pull world-state updates. It returns <code class="docutils literal notranslate"><span class="pre">false</span></code> if the
-client does not respond or rejects the protocol version.</p>
+client does not respond, uses another protocol version, or sends a request
+frame the server rejects (see <a class="reference internal" href="#request-validation">Request validation</a>).</p>
 </section>
 <section id="protocol-versioning-and-deformable-streaming">
 <h2>Protocol versioning and deformable streaming<a class="headerlink" href="#protocol-versioning-and-deformable-streaming" title="Link to this heading"></a></h2>
 <p>The TCP wire protocol is explicitly versioned. Each request starts with a
-protocol header that advertises the negotiated feature set, and the server
-rejects newer or otherwise unsupported protocol versions with a clear error
-rather than misparsing the stream. The current feature flags are:</p>
+protocol header that advertises the client’s feature set. The server requires
+the client’s protocol version to equal its own and rejects unknown feature
+bits, logging a warning and closing the connection rather than misparsing the
+stream. The current feature flags are:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">PROTOCOL_FEATURE_EXPLICIT_HEADER</span></code>: the client and server exchange the
 explicit version header before each request.</p></li>
@@ -334,23 +357,42 @@ headers.</p>
 <span id="id1"></span><h2>Interactive sim control<a class="headerlink" href="#interactive-sim-control" title="Link to this heading"></a></h2>
 <p>When the <code class="docutils literal notranslate"><span class="pre">SIM_CONTROL</span></code> feature is negotiated, a connected client (such as
 <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code>) can drive the simulation from its UI rather than
-just observing it. The viewer’s <strong>Object</strong> tab gets a <em>Simulation</em> row with
-icon-text buttons for Pause / Resume / Step / Step 10.</p>
+just observing it. The viewer’s <strong>Objects</strong> tab has a <em>Simulation</em> row with
+icon buttons to pause or resume, step one frame and step ten frames.</p>
 <p>Client requests added by this feature:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">CR_PAUSE</span></code> / <code class="docutils literal notranslate"><span class="pre">CR_RESUME</span></code> — toggle a flag consulted in
 <code class="docutils literal notranslate"><span class="pre">integrateWorldThreadSafe()</span></code>. While paused, <code class="docutils literal notranslate"><span class="pre">world_-&gt;integrate()</span></code> is not
-called even though the network thread keeps streaming state.</p></li>
+called even though the network thread keeps streaming state. <code class="docutils literal notranslate"><span class="pre">CR_RESUME</span></code>
+also drops queued steps.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">CR_STEP_N</span></code> — queue <em>N</em> single-step integrations to advance while paused.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">CR_APPLY_FORCE</span></code> — apply an external force at a world-space application
-point on a body. Drained at the next integration tick.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">CR_APPLY_TORQUE</span></code> — apply an external torque on a body.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">CR_SET_POSE</span></code> — teleport a single-body object to a position + quaternion.</p></li>
+point on a body. The server multiplies the force command by the body’s
+mass, so the command acts as an acceleration.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CR_APPLY_TORQUE</span></code> — apply an external torque on a body (not scaled by
+mass).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CR_SET_POSE</span></code> — teleport a single-body object to a position and a
+quaternion in (w, x, y, z) order.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">CR_SET_GC</span></code> — set the generalized coordinate of an articulated system.</p></li>
 </ul>
+<p>Scene-editing requests predate this feature and are accepted from any client
+with the same protocol version, whether or not <code class="docutils literal notranslate"><span class="pre">SIM_CONTROL</span></code> is negotiated:
+<code class="docutils literal notranslate"><span class="pre">CR_SPAWN_*</span></code> (box, sphere, cylinder, capsule, mesh, articulated system,
+ground plane, PNG height map), <code class="docutils literal notranslate"><span class="pre">CR_REMOVE_OBJECT</span></code> (an object or a spatial
+tendon, by visual tag), <code class="docutils literal notranslate"><span class="pre">CR_SAVE_THE_WORLD</span></code> (export the world as XML), and
+the interaction wire <code class="docutils literal notranslate"><span class="pre">CR_ATTACH_WIRE</span></code> / <code class="docutils literal notranslate"><span class="pre">CR_DRAG_OBJECT</span></code>. File paths in
+these requests are opened and written on the server host.</p>
 <p>There is no authentication or per-client authorization — if the connection is
-open, the client can issue any request negotiated by both ends. The bind
-address is the only access control the server provides:</p>
+open, the client can issue any request negotiated by both ends, plus every
+scene-editing request. The bind address is the only access control the server
+provides:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">RaisimServer</span><span class="w"> </span><span class="nf">server</span><span class="p">(</span><span class="o">&amp;</span><span class="n">world</span><span class="p">);</span>
+<span class="n">server</span><span class="p">.</span><span class="n">setBindLoopbackOnly</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span><span class="w">  </span><span class="c1">// expose on all interfaces (off by default)</span>
+<span class="n">server</span><span class="p">.</span><span class="n">launchServer</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>Keep the default (<code class="docutils literal notranslate"><span class="pre">127.0.0.1</span></code>-only) for development. Open the bind to a wider
+network only when you trust every host that can reach the port.</p>
 <p>The same pause / step state is reachable from your own simulation code,
 so a headless server can drive its own loop:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">server</span><span class="p">.</span><span class="n">pauseSimulation</span><span class="p">();</span>
@@ -368,15 +410,25 @@ each integration tick until refreshed or expired. While paused, the slot can
 be refreshed but the force is not applied until a step or resume call allows
 <code class="docutils literal notranslate"><span class="pre">integrateWorldThreadSafe()</span></code> to advance. <code class="docutils literal notranslate"><span class="pre">stepSimulation(N)</span></code> queues N
 single-step integrations that drain one per <code class="docutils literal notranslate"><span class="pre">integrateWorldThreadSafe()</span></code>
-call; <code class="docutils literal notranslate"><span class="pre">resumeSimulation()</span></code> clears any queued steps and resumes normal
-integration.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">RaisimServer</span><span class="w"> </span><span class="nf">server</span><span class="p">(</span><span class="o">&amp;</span><span class="n">world</span><span class="p">);</span>
-<span class="n">server</span><span class="p">.</span><span class="n">setBindLoopbackOnly</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span><span class="w">  </span><span class="c1">// expose on all interfaces (off by default)</span>
-<span class="n">server</span><span class="p">.</span><span class="n">launchServer</span><span class="p">();</span>
-</pre></div>
-</div>
-<p>Keep the default (<code class="docutils literal notranslate"><span class="pre">127.0.0.1</span></code>-only) for development. Open the bind to a wider
-network only when you trust every host that can reach the port.</p>
+call. <code class="docutils literal notranslate"><span class="pre">resumeSimulation()</span></code> only clears the pause flag; steps queued earlier
+stay queued and run the next time the simulation is paused.</p>
+<section id="request-validation">
+<h3>Request validation<a class="headerlink" href="#request-validation" title="Link to this heading"></a></h3>
+<p>The server decodes and validates a whole request frame before applying any of
+it. It rejects the frame when a request contains, for example:</p>
+<ul class="simple">
+<li><p>a non-finite number, or a quaternion that is zero or not of unit length;</p></li>
+<li><p>a non-positive mass or dimension in a spawn request;</p></li>
+<li><p>a file that does not exist on the server; height maps must be PNG,
+articulated systems URDF or XML, and meshes need a file extension;</p></li>
+<li><p>a force or wire target, or a body index, that does not exist;</p></li>
+<li><p>a pose target that is not a single body, or a generalized-coordinate vector
+whose size does not match the articulated system;</p></li>
+<li><p>a <code class="docutils literal notranslate"><span class="pre">CR_SAVE_THE_WORLD</span></code> request that is not the only request in its frame.</p></li>
+</ul>
+<p>A rejected frame is logged as <code class="docutils literal notranslate"><span class="pre">Rejecting</span> <span class="pre">malformed</span> <span class="pre">client</span> <span class="pre">frame:</span> <span class="pre">&lt;reason&gt;</span></code>,
+nothing from it is applied, and the client is disconnected.</p>
+</section>
 <section id="custom-mutation-under-the-world-mutex">
 <h3>Custom mutation under the world mutex<a class="headerlink" href="#custom-mutation-under-the-world-mutex" title="Link to this heading"></a></h3>
 <p>Examples that need to spawn / move / modify world objects every tick can pass
@@ -404,6 +456,25 @@ the example mutates the world each tick. See
 viewer-facing controls.</p>
 </section>
 </section>
+<section id="viewer-requests">
+<h2>Viewer requests<a class="headerlink" href="#viewer-requests" title="Link to this heading"></a></h2>
+<p>The server can also ask the connected viewer to act. <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code>
+carries these requests out on the next scene update (see <a class="reference internal" href="RayraiTcpViewer.html"><span class="doc">Rayrai TCP Viewer</span></a>):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">requestSaveScreenshot()</span></code> — save a PNG of the scene in the viewer’s output
+folder, as its <code class="docutils literal notranslate"><span class="pre">F12</span></code> key does.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">startRecordingVideo(name)</span></code> / <code class="docutils literal notranslate"><span class="pre">stopRecordingVideo()</span></code> — record the scene
+to the viewer’s output folder, named after <code class="docutils literal notranslate"><span class="pre">name</span></code> with its extension
+(<code class="docutils literal notranslate"><span class="pre">.mp4</span></code> when it has none). A viewer without <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> writes numbered PNGs
+to <code class="docutils literal notranslate"><span class="pre">&lt;stem&gt;_frames/</span></code> in the output folder instead.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setCameraPositionAndLookAt(pos,</span> <span class="pre">lookAt)</span></code> — place the viewer camera at
+<code class="docutils literal notranslate"><span class="pre">pos</span></code>, aimed at the point <code class="docutils literal notranslate"><span class="pre">lookAt</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">focusOn(object)</span></code> — frame <code class="docutils literal notranslate"><span class="pre">object</span></code> in the viewer and select it.</p></li>
+</ul>
+<p>The viewer’s output folder is its <code class="docutils literal notranslate"><span class="pre">--screenshot-dir</span></code> or the folder chosen in
+its <strong>Record</strong> tab. Screenshot and recording requests stored in a recorded
+session are ignored when the session is replayed.</p>
+</section>
 <section id="default-bind-address">
 <h2>Default bind address<a class="headerlink" href="#default-bind-address" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> binds to <code class="docutils literal notranslate"><span class="pre">127.0.0.1</span></code> by default rather than <code class="docutils literal notranslate"><span class="pre">INADDR_ANY</span></code>.
@@ -422,8 +493,8 @@ spawn-remove. There is no token or authorization layer to fall back on.</p>
 beacon once per second on port <code class="docutils literal notranslate"><span class="pre">59312</span></code>. The beacon payload contains the
 RaiSim TCP protocol version, TCP port, host name, executable name, bind mode
 (<code class="docutils literal notranslate"><span class="pre">loopback</span></code> or <code class="docutils literal notranslate"><span class="pre">all</span></code>), and connection status. <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code>
-uses these beacons to populate the detected-server list in its <strong>Connection</strong>
-tab.</p>
+lists only beacons whose protocol version equals its own, in the server table
+of an idle pane and in the <strong>Connection</strong> tab’s endpoint popup.</p>
 <p>With the default loopback bind, beacons are sent only to <code class="docutils literal notranslate"><span class="pre">127.0.0.1</span></code>. After
 <code class="docutils literal notranslate"><span class="pre">server.setBindLoopbackOnly(false)</span></code>, they are broadcast on the local network
 so another machine can discover the server. Discovery is only a convenience

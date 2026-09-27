@@ -8,7 +8,7 @@ Builds a compound object from many capsule children with random transforms, then
 
 Screenshot
 ==========
-.. image:: ../../../image/compound_object.png
+.. image:: ../../../../rsc/docs/image/compound_object.png
    :alt: compound_object example
    :width: 100%
 

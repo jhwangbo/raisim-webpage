@@ -13,7 +13,7 @@ loops on a fixed cadence so the build-up and decay are easy to compare.
 The matching renderer-side reference image (smaller grid, captured
 headlessly) is regenerated as part of the documentation build:
 
-.. image:: ../../../image/rayrai/rayrai_rolling_spinning_friction.gif
+.. image:: ../../../../rsc/docs/image/rayrai/rayrai_rolling_spinning_friction.gif
    :alt: rolling and spinning friction demo — spheres and cylinders settling on a checkered ground
    :width: 100%
 

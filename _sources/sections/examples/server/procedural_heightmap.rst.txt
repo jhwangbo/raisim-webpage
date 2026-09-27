@@ -8,7 +8,7 @@ Creates a procedural heightmap and places ANYmal on top. Use this to see how to 
 
 Screenshot
 ==========
-.. image:: ../../../image/procedural_heightmap.png
+.. image:: ../../../../rsc/docs/image/procedural_heightmap.png
    :alt: procedural_heightmap example
    :width: 100%
 

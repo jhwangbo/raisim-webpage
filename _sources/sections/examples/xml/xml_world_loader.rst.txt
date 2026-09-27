@@ -11,7 +11,7 @@ after printing an instruction.
 
 Screenshot
 ==========
-.. image:: ../../../image/heightMapUsingPNG.gif
+.. image:: ../../../../rsc/docs/image/heightMapUsingPNG.gif
 
 Target
 ======

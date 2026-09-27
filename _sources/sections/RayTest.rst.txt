@@ -2,7 +2,7 @@
 Ray Test
 #############################
 
-.. image:: ../image/raytest.gif
+.. image:: ../../rsc/docs/image/raytest.gif
 
 A ray test is a collision check between the world and a ray.
 Users specify the starting point, direction, and length. It returns the closest hit

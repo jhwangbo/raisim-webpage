@@ -74,10 +74,95 @@ platform install script and rebuild ``rayrai_tcp_viewer`` in
 rayrai Window Or Offscreen Context Fails
 ========================================
 
-rayrai requires a working OpenGL context. On Linux, make sure OpenGL and SDL2
-development/runtime packages are available. On headless systems, use the
-offscreen context helpers documented in :doc:`Rayrai` and verify that the
-machine provides a usable software or hardware OpenGL stack.
+rayrai requires a working OpenGL 3.3 core-profile context; its context helpers
+request 4.3 first. On Linux, make sure OpenGL and SDL2 development/runtime
+packages are available. On headless systems, use the offscreen context helpers
+documented in :doc:`Rayrai` and verify that the machine provides a usable
+software or hardware OpenGL stack.
+
+.. _rayrai-vulkan-ray-query-troubleshooting:
+
+Vulkan Ray Queries Unavailable
+==============================
+
+Geometry-traced glass can use Vulkan ray queries on Linux and Windows. If
+rayrai was built without the optional Vulkan backend, the portable OpenGL
+tracer remains available. Installing a compiler or driver after a binary
+package was built does not add the missing backend to that package. Use a
+package built with Vulkan support or rebuild rayrai from source. A
+``RayraiWindow`` from a build configured without ``glslc`` prints a warning
+once to standard output with installation and rebuild steps. An existing
+Vulkan-enabled binary does not need ``glslc`` at run time.
+
+For a source build on Ubuntu, install the Vulkan development files and the
+``glslc`` shader compiler (Python 3 is also required):
+
+.. code-block:: bash
+
+    sudo apt update
+    sudo apt install libvulkan-dev glslc
+    glslc --version
+
+A source build enables the optional Vulkan ray-query backend automatically
+when these tools are present; ``RAYRAI_ENABLE_VULKAN_RAY_QUERY`` defaults to
+``ON``. Reconfigure and build after installing ``glslc``:
+
+.. code-block:: bash
+
+    cmake -S /path/to/raisim-source -B /path/to/existing-build
+    cmake --build /path/to/existing-build
+
+An existing CMake cache with ``RAYRAI_ENABLE_VULKAN_RAY_QUERY=OFF`` keeps that
+explicit setting; change it to ``ON`` when reconfiguring. If tests were
+enabled in that source build, check the hardware cases with
+``ctest --test-dir /path/to/existing-build -j12 -L hardware-ray-query``.
+
+Check for the CMake message
+``optional Vulkan ray queries enabled``. A message about ``portable glass
+tracing only`` means the optional backend was not built. The
+``raisim2Lib`` example build links to a prebuilt rayrai library; configuring
+that example build cannot change which backend the library contains.
+
+At run time, the active OpenGL device must match a non-CPU Vulkan 1.2 GPU
+with ray queries, acceleration structures, buffer device addresses, and
+external memory and semaphore sharing (including the OpenGL FD extensions
+``GL_EXT_memory_object_fd`` and ``GL_EXT_semaphore_fd`` on Linux). On Ubuntu,
+``vulkan-tools`` provides ``vulkaninfo`` for checking the visible Vulkan
+devices:
+
+.. code-block:: bash
+
+    sudo apt install vulkan-tools
+    vulkaninfo --summary
+
+Run the viewer and hardware tests in a graphical session with GPU device
+access. Containers and sandboxes may hide ``/dev/dri`` or NVIDIA device
+nodes even when the host driver works. If ``VulkanRayQuery`` was explicitly
+selected, an unavailable backend raises an error; ``Automatic`` uses the
+portable tracer when hardware ray queries cannot be used. See
+:doc:`rayrai/Materials` for these backend settings.
+
+Post-Processing Effect Missing On macOS
+=======================================
+
+macOS provides OpenGL 4.1 with 16 fragment texture units, so rayrai uses its
+compact PBR programs and the common post-process program there. Effects such
+as screen-space reflections, volumetric fog, color grading, saturation, and
+white balance are not applied on macOS; see :ref:`rayrai-platform-support` for
+the full list.
+
+Some rayrai examples print the Apple driver message ``unit 10
+GLD_TEXTURE_INDEX_2D is unloadable``. No program samples a 2D texture on that
+unit at those draws, so the message has no visible effect.
+
+First Launch Of An Example Is Slow
+==================================
+
+``rayrai_coacd_mesh_approximation`` runs CoACD for every mesh on its first run,
+which can take a few minutes; Ctrl-C stops it during that phase. RaiSim caches
+the parts beside each mesh, so later runs load them directly. ``rayrai_forest``
+builds mesh LODs on its first launch and saves them as ``rayrai_cache_*.lods``
+files beside its assets. Delete these cache files to force regeneration.
 
 Example Asset Missing
 =====================

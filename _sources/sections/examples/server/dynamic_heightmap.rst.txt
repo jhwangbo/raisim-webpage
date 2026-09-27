@@ -9,7 +9,7 @@ Use ``rayrai_tcp_viewer`` for supported visualization.
 
 Screenshot
 ==========
-.. image:: ../../../image/dynamic_heightmap.png
+.. image:: ../../../../rsc/docs/image/dynamic_heightmap.png
    :alt: dynamic_heightmap example
    :width: 100%
 

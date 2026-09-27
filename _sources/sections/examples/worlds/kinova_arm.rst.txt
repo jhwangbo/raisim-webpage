@@ -2,7 +2,7 @@
 Kinova Arm
 #########################
 
-.. image:: ../../../image/kinova_arm.png
+.. image:: ../../../../rsc/docs/image/kinova_arm.png
    :alt: kinova_arm example
    :width: 100%
 

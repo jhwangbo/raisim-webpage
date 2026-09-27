@@ -2,7 +2,7 @@
 Height Map Using a Text File
 #########################################
 
-.. image:: ../image/heightMapUsingTxt.gif
+.. image:: ../../rsc/docs/image/heightMapUsingTxt.gif
 
 An example text file is shown below:
 

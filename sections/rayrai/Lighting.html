@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lighting, shadows, and HDR/IBL &mdash; raisim 2.6.0 documentation</title>
+  <title>Lighting, shadows, and HDR/IBL &mdash; raisim 2.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b6430375" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
+      <script src="../../_static/documentation_options.js?v=dfec817d"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -93,12 +93,16 @@
 <li class="toctree-l3"><a class="reference internal" href="RenderQuality.html">Render quality, tone mapping, color grading</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Lighting, shadows, and HDR/IBL</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#shadows-and-lights">Shadows and lights</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cascaded-and-soft-directional-shadows">Cascaded and soft directional shadows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#additional-light-range-cutoff">Additional-light range cutoff</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#hdr-image-based-lighting-and-reflections">HDR, image-based lighting, and reflections</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reflections-decals-irradiance-volumes-and-lightmaps">Reflections, decals, irradiance volumes, and lightmaps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sky-visibility-and-baked-diffuse-light">Sky visibility and baked diffuse light</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="Materials.html">PBR materials</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Visuals.html">Custom visuals, instancing, and scene helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Foliage.html">Foliage and forest rendering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="PostProcess.html">Post-process effects</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Weather.html">Weather and atmospherics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Capture.html">Capture, diagnostics, and headless rendering</a></li>
@@ -108,6 +112,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#platform-support">Platform support</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#source-built-tcp-viewer-recommended">Source-built TCP viewer (recommended)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#build-and-link">Build and link</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#minimal-usage">Minimal usage</a></li>
@@ -152,10 +157,11 @@
   <section id="lighting-shadows-and-hdr-ibl">
 <h1>Lighting, shadows, and HDR/IBL<a class="headerlink" href="#lighting-shadows-and-hdr-ibl" title="Link to this heading"></a></h1>
 <p>This page covers the main directional light, additional spot/point/area lights,
-shadow budgets, HDR/image-based lighting, and reflection probes. For the
-overall render-quality preset that controls shadow defaults, see
-<a class="reference internal" href="RenderQuality.html"><span class="doc">Render quality, tone mapping, color grading</span></a>. For weather-driven lighting (sun position over time of
-day, lightning, cloud shadows) see <a class="reference internal" href="Weather.html"><span class="doc">Weather and atmospherics</span></a>.</p>
+shadow budgets, cascaded and soft sun shadows, HDR/image-based lighting,
+reflection probes, and baked indirect lighting. For the overall render-quality
+preset that controls shadow defaults, see <a class="reference internal" href="RenderQuality.html"><span class="doc">Render quality, tone mapping, color grading</span></a>. For
+weather-driven lighting (sun position over time of day, lightning, cloud
+shadows) see <a class="reference internal" href="Weather.html"><span class="doc">Weather and atmospherics</span></a>.</p>
 <section id="shadows-and-lights">
 <h2>Shadows and lights<a class="headerlink" href="#shadows-and-lights" title="Link to this heading"></a></h2>
 <p>rayrai has a fast single-main-light path for robotics workloads and a higher-quality
@@ -168,8 +174,9 @@ ortho box (<code class="docutils literal notranslate"><span class="pre">halfSize
 cascade, which keeps each shadow-map texel small enough that the resulting
 shadow stays crisp even with bright IBL fill. Balanced and High use brighter
 ambient/IBL defaults than older releases so smooth metallic surfaces do not
-read black under sky fill; Ultra keeps more contrast through lower direct
-ambient, stronger IBL, and AgX tone mapping. Raise <code class="docutils literal notranslate"><span class="pre">mainLightAmbient</span></code> or
+read black under sky fill; Ultra keeps more contrast through the lowest direct
+ambient and environment intensity of the PBR presets and AgX tone mapping (see
+the preset reference in <a class="reference internal" href="RenderQuality.html"><span class="doc">Render quality, tone mapping, color grading</span></a>). Raise <code class="docutils literal notranslate"><span class="pre">mainLightAmbient</span></code> or
 lower <code class="docutils literal notranslate"><span class="pre">shadowStrength</span></code> for a flatter indoor look; the defaults are aimed at
 outdoor daylight.</p>
 <p>By default, the main shadow center tracks a point in front of the camera and the shadow
@@ -180,11 +187,17 @@ box is fixed in size. You can customize both via <code class="docutils literal n
 <span class="n">viewer</span><span class="p">.</span><span class="n">setShadowOrtho</span><span class="p">(</span><span class="mf">20.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1f</span><span class="p">,</span><span class="w"> </span><span class="mf">80.0f</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>If you need a fully custom shadow view/projection, use the lower-level
+<p><code class="docutils literal notranslate"><span class="pre">setRenderQualitySettings</span></code> re-applies <code class="docutils literal notranslate"><span class="pre">shadowCenterOffset</span></code>,
+<code class="docutils literal notranslate"><span class="pre">shadowOrthoHalfSize</span></code>, <code class="docutils literal notranslate"><span class="pre">shadowNear</span></code>, and <code class="docutils literal notranslate"><span class="pre">shadowFar</span></code> from the settings, so
+set those fields instead when you also change quality settings later. If you
+need a fully custom shadow view/projection, use the lower-level
 <code class="docutils literal notranslate"><span class="pre">raisin::Light</span></code> API directly.</p>
 <p>Additional lights are controlled explicitly and capped so the fast path stays fast.
-Rayrai currently supports up to <code class="docutils literal notranslate"><span class="pre">RayraiWindow::kMaxAdditionalLights</span></code> additional lights
-and up to <code class="docutils literal notranslate"><span class="pre">RayraiWindow::kMaxAdditionalShadowLights</span></code> additional shadow maps. Directional,
+Rayrai currently supports up to <code class="docutils literal notranslate"><span class="pre">RayraiWindow::kMaxAdditionalLights</span></code> (16) additional
+lights and up to <code class="docutils literal notranslate"><span class="pre">RayraiWindow::kMaxAdditionalShadowLights</span></code> (8) additional shadow maps.
+<code class="docutils literal notranslate"><span class="pre">RenderQualitySettings::shadowedLightBudget</span></code> counts the shadowed lights including the
+main light, so additional lights get shadow maps only when it is greater than 1 (it is 1
+by default and in Fast/Balanced, 2 in High/Ultra). Directional,
 spot, and area-style lights use 2D shadow maps. Point lights use cubemap shadow maps.
 Shadow framebuffer setup validates the current OpenGL context and recreates stale
 framebuffer/texture names when a viewer context is rebuilt; this matters for TCP-viewer
@@ -207,6 +220,7 @@ is assigned to additional lights.</p>
 <span class="n">spot</span><span class="p">.</span><span class="n">spotOuterCos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">cos</span><span class="p">(</span><span class="n">glm</span><span class="o">::</span><span class="n">radians</span><span class="p">(</span><span class="mf">28.0f</span><span class="p">));</span>
 <span class="c1">// Optional spotlight projector cookie, color temperature, and distance fade.</span>
 <span class="n">spot</span><span class="p">.</span><span class="n">projectorMap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">projectorTextureId</span><span class="p">;</span>
+<span class="n">spot</span><span class="p">.</span><span class="n">projectorStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">;</span><span class="w">  </span><span class="c1">// 0..1; the default 0 disables the cookie</span>
 <span class="n">spot</span><span class="p">.</span><span class="n">temperatureEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
 <span class="n">spot</span><span class="p">.</span><span class="n">temperatureKelvin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">4200.0f</span><span class="p">;</span>
 <span class="n">spot</span><span class="p">.</span><span class="n">distanceFadeEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
@@ -230,9 +244,14 @@ is assigned to additional lights.</p>
 </a>
 <p>Each <code class="docutils literal notranslate"><span class="pre">AdditionalLight</span></code> supports the basic attenuation/spot/area parameters above plus
 optional projector cookie texture, color-temperature override (Kelvin), distance fade for
-both lighting and shadow casting, and a per-light shadow toggle. Imported scenes can be
-brought in with <code class="docutils literal notranslate"><span class="pre">importSceneLights(sceneFile,</span> <span class="pre">intensityScale)</span></code>, and
-<code class="docutils literal notranslate"><span class="pre">promoteDominantAdditionalLightToMainShadowCaster()</span></code> reassigns the strongest imported
+both lighting and shadow casting, and a per-light shadow toggle. The cookie needs
+<code class="docutils literal notranslate"><span class="pre">projectorStrength</span> <span class="pre">&gt;</span> <span class="pre">0</span></code> and is ignored for point lights. <code class="docutils literal notranslate"><span class="pre">castsShadows</span></code> defaults to
+<code class="docutils literal notranslate"><span class="pre">true</span></code>, so every additional light, including imported ones, competes for the additional
+shadow budget. PBR meshes drawn by the compact PBR program receive neither
+additional-light shadows nor cookies (see the GPU capability tiers in <a class="reference internal" href="Materials.html"><span class="doc">PBR materials</span></a>).
+<code class="docutils literal notranslate"><span class="pre">updateAdditionalLight(index,</span> <span class="pre">light)</span></code> replaces one light in place.
+Imported scenes can be brought in with <code class="docutils literal notranslate"><span class="pre">importSceneLights(sceneFile,</span> <span class="pre">intensityScale)</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">promoteDominantAdditionalLightToMainShadowCaster()</span></code> reassigns the strongest imported
 light to the main shadow path so the remaining shadow budget covers the rest.</p>
 <p>The main <code class="docutils literal notranslate"><span class="pre">raisin::Light</span></code> returned by <code class="docutils literal notranslate"><span class="pre">RayraiWindow::getLight()</span></code> exposes
 ergonomic helpers for spotlight angles and point-light
@@ -250,6 +269,17 @@ takes degrees (and stores the cosines internally so the raw
 <code class="docutils literal notranslate"><span class="pre">spotInnerCos</span></code> / <code class="docutils literal notranslate"><span class="pre">spotOuterCos</span></code> fields are still meaningful). The
 <code class="docutils literal notranslate"><span class="pre">AdditionalLight</span></code> plain-data struct uses the same field conventions, so
 <code class="docutils literal notranslate"><span class="pre">std::cos(glm::radians(deg))</span></code> is still the manual recipe for those.</p>
+<p><code class="docutils literal notranslate"><span class="pre">setRenderQualitySettings</span></code> and <code class="docutils literal notranslate"><span class="pre">setRenderQualityPreset</span></code> rebuild the main light
+from the <code class="docutils literal notranslate"><span class="pre">mainLight*</span></code> and <code class="docutils literal notranslate"><span class="pre">shadow*</span></code> fields (it becomes directional again) and remove
+every additional light. Applying weather (see <a class="reference internal" href="Weather.html"><span class="doc">Weather and atmospherics</span></a>), an environment sidecar,
+or a reflection-probe sidecar goes through the same call. Apply quality settings first
+and add or import lights afterwards; <code class="docutils literal notranslate"><span class="pre">setAdditionalLightContributionThreshold</span></code> and
+<code class="docutils literal notranslate"><span class="pre">setDepthPrepassesEnabled</span></code> change their settings without touching the lights.</p>
+<p>With <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings::addViewerFillLights</span></code> (on by default) every
+<code class="docutils literal notranslate"><span class="pre">setRenderQualitySettings</span></code> call also re-adds two viewer lights: a directional fill at
+16% of <code class="docutils literal notranslate"><span class="pre">mainLightDiffuse</span></code> and a warm point rim light at (-2, -3, 3). They take two
+additional-light slots and cast shadows like any other additional light, so turn the flag
+off for authored lighting.</p>
 <p>Shadow update cost is configurable. Dynamic scenes can update shadows every frame; static
 visual scenes can bake shadow maps at startup or refresh them only when light/object
 placement changes.</p>
@@ -257,7 +287,7 @@ placement changes.</p>
 <span class="w">  </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">RenderQualityPreset</span><span class="o">::</span><span class="n">Ultra</span><span class="p">);</span>
 <span class="n">quality</span><span class="p">.</span><span class="n">updateShadowsEveryFrame</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span><span class="w">       </span><span class="c1">// startup/on-demand shadow bake</span>
 <span class="n">quality</span><span class="p">.</span><span class="n">maxAdditionalLightsPerFrame</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">12</span><span class="p">;</span><span class="w">      </span><span class="c1">// light evaluation budget</span>
-<span class="n">quality</span><span class="p">.</span><span class="n">maxAdditionalShadowLights</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span><span class="w">         </span><span class="c1">// 2D shadow-map budget</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">shadowedLightBudget</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w">               </span><span class="c1">// main light + 4 additional maps</span>
 <span class="n">quality</span><span class="p">.</span><span class="n">maxPointShadowLights</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w">              </span><span class="c1">// cubemap shadow budget</span>
 <span class="n">quality</span><span class="p">.</span><span class="n">additionalShadowResolutionScale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5f</span><span class="p">;</span>
 <span class="n">quality</span><span class="p">.</span><span class="n">pointShadowResolutionScale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5f</span><span class="p">;</span>
@@ -267,6 +297,58 @@ placement changes.</p>
 <p>Use lower budgets for interactive editing or RL throughput. Use higher budgets for
 offline screenshots, inspection, or demos where visual fidelity is more important than
 frame time.</p>
+<p>Instanced foliage and grass patches cast shadows by default, like other instanced
+visuals. Call <code class="docutils literal notranslate"><span class="pre">InstancedVisuals::setCastsShadows(false)</span></code> to opt a batch out (the choice
+survives later wind or grass-patch configuration), and use <code class="docutils literal notranslate"><span class="pre">setShadowFoliageLodPolicy</span></code>
+to bound the shadow-pass cost of dense vegetation.</p>
+</section>
+<section id="cascaded-and-soft-directional-shadows">
+<h2>Cascaded and soft directional shadows<a class="headerlink" href="#cascaded-and-soft-directional-shadows" title="Link to this heading"></a></h2>
+<p>Presets render the main directional light into one shadow map. Large outdoor
+scenes can split it into up to four cascades, and the sun can use a
+blocker-aware penumbra instead of the fixed PCF kernel. Both are off by
+default.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">quality</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">();</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">directionalShadowCascadeCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w">           </span><span class="c1">// 1..4; 1 = single map</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">directionalShadowCascadeMaxDistance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">80.0f</span><span class="p">;</span><span class="w"> </span><span class="c1">// metres; 0 = shadowFar</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">directionalShadowSoftnessDegrees</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.53f</span><span class="p">;</span><span class="w">    </span><span class="c1">// sun diameter; 0 = PCF</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">directionalShadowSoftnessMaxRadius</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">8.0f</span><span class="p">;</span><span class="w">   </span><span class="c1">// cap in shadow-map texels</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">quality</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">directionalShadowCascadeLambda</span></code> blends uniform and logarithmic split
+distances; <code class="docutils literal notranslate"><span class="pre">directionalShadowCascadeSplitOverrides</span></code> sets explicit split
+distances (ignored unless they increase and stay below the far plane). Each
+cascade is padded for the filter footprint and snapped to a world-anchored
+texel grid, so it stays stable while the camera moves. Cascades also work on
+macOS and other GPUs limited to 16 fragment texture units.</p>
+<p>Soft shadows search the shadow map for blockers and widen the filter with the
+blocker-to-receiver distance, a bounded approximation of percentage-closer soft
+shadows. They apply only to the main directional light, replace
+<code class="docutils literal notranslate"><span class="pre">shadowContactHardening</span></code> for it, never filter narrower than
+<code class="docutils literal notranslate"><span class="pre">shadowPcfRadius</span></code>, and are clamped to 0-4 degrees and 1-16 texels. The
+physical sun is about 0.53 degrees across; larger values give wider penumbrae.
+The extra shadow-map lookups cost GPU time. Point, spot, and area shadows keep
+PCF.</p>
+</section>
+<section id="additional-light-range-cutoff">
+<h2>Additional-light range cutoff<a class="headerlink" href="#additional-light-range-cutoff" title="Link to this heading"></a></h2>
+<p>Point, spot, and area lights normally shade every object in view. An opt-in
+cutoff derives a finite range for each of them from its intensity and
+attenuation and fades it out smoothly, so objects outside the range skip that
+light:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span><span class="p">.</span><span class="n">setAdditionalLightContributionThreshold</span><span class="p">(</span><span class="mf">1.0e-4f</span><span class="p">);</span><span class="w">  </span><span class="c1">// keeps authored lights</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setAdditionalLightContributionThreshold</span><span class="p">(</span><span class="mf">0.0f</span><span class="p">);</span><span class="w">     </span><span class="c1">// default: no cutoff</span>
+</pre></div>
+</div>
+<p>The same value is <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings::additionalLightContributionThreshold</span></code>
+(0 in every preset). The value is a total scene-linear incident-radiance budget
+shared by the uploaded lights, not a bound on final pixel error. Directional
+lights, lights without distance falloff, lights with an ambient term, and lights
+with a projector cookie are never cut off. <code class="docutils literal notranslate"><span class="pre">rayrai/LightInfluence.hpp</span></code> provides
+<code class="docutils literal notranslate"><span class="pre">additionalLightInfluenceRange()</span></code> (pass one light’s share of the budget) to
+inspect the range a light gets. The cutoff saves shading when lights are far
+apart; when their ranges overlap it only adds CPU work.</p>
 </section>
 <section id="hdr-image-based-lighting-and-reflections">
 <h2>HDR, image-based lighting, and reflections<a class="headerlink" href="#hdr-image-based-lighting-and-reflections" title="Link to this heading"></a></h2>
@@ -305,8 +387,21 @@ working. <code class="docutils literal notranslate"><span class="pre">rayrai_pbr
 <code class="docutils literal notranslate"><span class="pre">rayrai_visual_asset_support</span></code> use HDR/image-based lighting so metallic and
 glossy surfaces show visible reflections while non-metallic assets remain
 mostly diffuse.</p>
+<p>Materials without an environment cubemap use a procedural daylight fallback: a
+neutral sky term tinted by <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings::pbrEnvironmentLightingTint</span></code>
+(default white) over a ground term tinted by <code class="docutils literal notranslate"><span class="pre">pbrEnvironmentGroundTint</span></code>, scaled
+by <code class="docutils literal notranslate"><span class="pre">pbrEnvironmentIntensity</span></code>. It does not follow the visible sky or fog colours;
+<code class="docutils literal notranslate"><span class="pre">pbrEnvironmentSkyTint</span></code>, <code class="docutils literal notranslate"><span class="pre">pbrEnvironmentHorizonTint</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">pbrEnvironmentHorizonStrength</span></code> only tint the procedural background. HDR
+environments keep their captured colour. Instanced visuals with PBR materials use
+a hemispheric version of the same fallback and never sample environment cubemaps;
+<code class="docutils literal notranslate"><span class="pre">Material::iblStrength</span></code> and <code class="docutils literal notranslate"><span class="pre">environmentMapStrength</span></code> scale it.
+<code class="docutils literal notranslate"><span class="pre">RayraiWindow::setEnvironmentBackground</span></code> only draws the background; assign
+environment maps to visuals with <code class="docutils literal notranslate"><span class="pre">setPbrEnvironment</span></code>.</p>
 <p>For scene-wide reflections, rayrai also has static reflection probe capture, local
 probe selection, reflection-probe sidecars, and planar ground reflection support.
+Planar reflections clip the reflected view at the ground plane, so geometry below
+the floor does not show up in them.
 These are real-time approximation tools: they improve visual fidelity without
 enabling path tracing or other slow offline rendering mechanisms. Choose lower
 environment resolution, fewer prefilter samples, and fewer reflection updates for
@@ -350,7 +445,10 @@ symmetric:</p>
 <span class="w">    </span><span class="s">&quot;/path/to/scene.weather.json&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">weatherSettings</span><span class="p">,</span><span class="w"> </span><span class="n">localFogVolumes</span><span class="p">);</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">suggestReflectionProbePlacementFromSceneBounds()</span></code> is a non-mutating helper that
+<p>The <code class="docutils literal notranslate"><span class="pre">apply*</span></code> sidecar calls go through <code class="docutils literal notranslate"><span class="pre">setRenderQualitySettings</span></code> (a weather
+sidecar that enables weather through <code class="docutils literal notranslate"><span class="pre">setWeatherSettings</span></code>), so they remove
+additional lights; apply sidecars before adding or importing lights.
+<code class="docutils literal notranslate"><span class="pre">suggestReflectionProbePlacementFromSceneBounds()</span></code> is a non-mutating helper that
 proposes probe positions from current scene AABBs; use it as a starting point when
 authoring a sidecar by hand.</p>
 </section>
@@ -368,6 +466,12 @@ without a full GI bake.</p></li>
 <li><p><strong>Lightmaps</strong> — populate <code class="docutils literal notranslate"><span class="pre">Material::lightmapMap</span></code> from an external bake
 tool to drive <code class="docutils literal notranslate"><span class="pre">92_lightmap_gi</span></code>-style authored interiors.</p></li>
 </ul>
+<p>Irradiance volumes and lightmaps are evaluated only by the full PBR program;
+PBR meshes drawn by the compact program get neither. rayrai picks the program
+from the GPU’s fragment texture units; see the GPU capability tiers in
+<a class="reference internal" href="Materials.html"><span class="doc">PBR materials</span></a>. Projected decals are a post-process pass and are not drawn on
+macOS or other GPUs limited to 16 fragment texture units; see
+<a class="reference internal" href="PostProcess.html"><span class="doc">Post-process effects</span></a>.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Projected sign / poster decal.</span>
 <span class="n">raisin</span><span class="o">::</span><span class="n">ProjectedDecal</span><span class="w"> </span><span class="n">sign</span><span class="p">;</span>
 <span class="n">sign</span><span class="p">.</span><span class="n">center</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">2.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.6f</span><span class="p">);</span>
@@ -425,6 +529,53 @@ tool to drive <code class="docutils literal notranslate"><span class="pre">92_li
 </tr>
 </tbody>
 </table>
+</section>
+<section id="sky-visibility-and-baked-diffuse-light">
+<h2>Sky visibility and baked diffuse light<a class="headerlink" href="#sky-visibility-and-baked-diffuse-light" title="Link to this heading"></a></h2>
+<p>Two optional world-space grids add spatial variation to indirect light, for
+example under a forest canopy. Both hold static data that the application
+bakes offline; rayrai only samples them. Upload them on the rendering thread
+with the renderer’s GL context current. The data is copied.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Scalar sky visibility: 1 = open sky, 0 = fully occluded.</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">SkyVisibilityGrid</span><span class="w"> </span><span class="n">sky</span><span class="p">;</span>
+<span class="n">sky</span><span class="p">.</span><span class="n">dimensions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">41</span><span class="p">,</span><span class="w"> </span><span class="mi">51</span><span class="p">,</span><span class="w"> </span><span class="mi">21</span><span class="p">};</span>
+<span class="n">sky</span><span class="p">.</span><span class="n">minimum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">-40.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">-50.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">-4.0f</span><span class="p">};</span><span class="w">  </span><span class="c1">// centres of the outermost samples</span>
+<span class="n">sky</span><span class="p">.</span><span class="n">maximum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">40.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">50.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">36.0f</span><span class="p">};</span>
+<span class="n">sky</span><span class="p">.</span><span class="n">values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">visibility</span><span class="p">;</span><span class="w">                 </span><span class="c1">// x fastest, then y, then z</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setSkyVisibilityGrid</span><span class="p">(</span><span class="n">sky</span><span class="p">,</span><span class="w"> </span><span class="cm">/*strength=*/</span><span class="mf">0.65f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*edgeFadeMeters=*/</span><span class="mf">2.0f</span><span class="p">);</span>
+
+<span class="c1">// Diffuse irradiance as first-order spherical harmonics per probe.</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">BakedIrradianceGrid</span><span class="w"> </span><span class="n">bounce</span><span class="p">;</span>
+<span class="n">bounce</span><span class="p">.</span><span class="n">dimensions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">17</span><span class="p">,</span><span class="w"> </span><span class="mi">21</span><span class="p">,</span><span class="w"> </span><span class="mi">9</span><span class="p">};</span>
+<span class="n">bounce</span><span class="p">.</span><span class="n">minimum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">-40.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">-50.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">-4.0f</span><span class="p">};</span>
+<span class="n">bounce</span><span class="p">.</span><span class="n">maximum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">40.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">50.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">28.0f</span><span class="p">};</span>
+<span class="n">bounce</span><span class="p">.</span><span class="n">probes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">probes</span><span class="p">;</span><span class="w">                  </span><span class="c1">// one IrradianceProbe per sample</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setBakedIrradianceGrid</span><span class="p">(</span><span class="n">bounce</span><span class="p">,</span><span class="w"> </span><span class="cm">/*strength=*/</span><span class="mf">1.0f</span><span class="p">);</span>
+
+<span class="n">viewer</span><span class="p">.</span><span class="n">clearSkyVisibilityGrid</span><span class="p">();</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">clearBakedIrradianceGrid</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>The sky-visibility grid attenuates only environment lighting (the environment
+map or the procedural fallback, diffuse and specular) on PBR and instanced PBR
+materials. Direct light, the <code class="docutils literal notranslate"><span class="pre">mainLightAmbient</span></code> floor, lightmaps, irradiance
+volumes, and the baked grid keep their own visibility. It is sampled per
+vertex, so coarse meshes interpolate it across each triangle. Its strength
+range is 0-1.</p>
+<p>The baked grid adds light reflected from surrounding surfaces on top of the
+environment term. Each <code class="docutils literal notranslate"><span class="pre">IrradianceProbe</span></code> stores, per RGB channel, the
+constant and x/y/z coefficients of cosine-convolved irradiance divided by pi,
+in linear scene units before exposure; <code class="docutils literal notranslate"><span class="pre">raisin::accumulateIrradiance</span></code> and
+<code class="docutils literal notranslate"><span class="pre">raisin::deringIrradiance</span></code> in <code class="docutils literal notranslate"><span class="pre">rayrai/BakedIrradiance.hpp</span></code> help build them.
+It respects material AO and metallic, scales with <code class="docutils literal notranslate"><span class="pre">Material::iblStrength</span></code>,
+and lights the back of thin foliage through <code class="docutils literal notranslate"><span class="pre">foliageTransmissionColor</span></code> and
+<code class="docutils literal notranslate"><span class="pre">foliageTransmissionStrength</span></code>. Its strength range is 0-4.</p>
+<p>Outside its bounds each grid has no effect; <code class="docutils literal notranslate"><span class="pre">edgeFadeMeters</span></code> fades it in at
+the boundary. Each axis needs 2-256 samples and a grid holds at most 2,097,152
+samples. Unlike the resource-creation calls, the setters throw
+<code class="docutils literal notranslate"><span class="pre">std::invalid_argument</span></code> for invalid data and <code class="docutils literal notranslate"><span class="pre">std::runtime_error</span></code> when no
+GL context is current. Moving geometry or changing the lighting requires a new
+bake.</p>
 </section>
 </section>
 

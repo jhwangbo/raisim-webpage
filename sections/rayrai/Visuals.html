@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Custom visuals, instancing, and scene helpers &mdash; raisim 2.6.0 documentation</title>
+  <title>Custom visuals, instancing, and scene helpers &mdash; raisim 2.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b6430375" />
@@ -14,13 +14,13 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
+      <script src="../../_static/documentation_options.js?v=dfec817d"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Post-process effects" href="PostProcess.html" />
+    <link rel="next" title="Foliage and forest rendering" href="Foliage.html" />
     <link rel="prev" title="PBR materials" href="Materials.html" /> 
 </head>
 
@@ -97,11 +97,13 @@
 <li class="toctree-l4"><a class="reference internal" href="#coacd-mesh-approximation-visualization">CoACD mesh approximation visualization</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#custom-visuals-and-instancing">Custom visuals and instancing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dense-foliage">Dense foliage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#detectability-and-capture-render-passes">Detectability and capture render passes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#visual-shadow-casting-visibility-range-and-material-overrides">Visual shadow casting, visibility range, and material overrides</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#point-clouds-and-coordinate-frames">Point clouds and coordinate frames</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="Foliage.html">Foliage and forest rendering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="PostProcess.html">Post-process effects</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Weather.html">Weather and atmospherics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Capture.html">Capture, diagnostics, and headless rendering</a></li>
@@ -111,6 +113,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#platform-support">Platform support</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#source-built-tcp-viewer-recommended">Source-built TCP viewer (recommended)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#build-and-link">Build and link</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#minimal-usage">Minimal usage</a></li>
@@ -156,9 +159,9 @@
 <h1>Custom visuals, instancing, and scene helpers<a class="headerlink" href="#custom-visuals-instancing-and-scene-helpers" title="Link to this heading"></a></h1>
 <p>The renderer mirrors RaiSim objects automatically; this page covers the
 <em>extra</em> viewer-only entities you can add — visual primitives, instanced
-visuals, custom meshes, point clouds, coordinate frames, and the per-visual
-controls for visibility range, material override/overlay, and shadow casting
-modes. CoACD mesh approximation is also covered here.</p>
+visuals and dense foliage, custom meshes, point clouds, coordinate frames, and
+the per-visual controls for visibility range, material override/overlay, and
+shadow casting modes. CoACD mesh approximation is also covered here.</p>
 <section id="coacd-mesh-approximation-visualization">
 <h2>CoACD mesh approximation visualization<a class="headerlink" href="#coacd-mesh-approximation-visualization" title="Link to this heading"></a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">rayrai_coacd_mesh_approximation</span></code> example visualizes CoACD collision
@@ -166,7 +169,7 @@ mesh approximation. It shows the source mesh and generated convex parts side by
 side. The decomposition side uses per-part colors so individual convex bodies
 can be inspected. The example is registered as the
 <code class="docutils literal notranslate"><span class="pre">rayrai_coacd_mesh_approximation</span></code> target. Package examples keep its source
-under <code class="docutils literal notranslate"><span class="pre">examples/src/rayrai/assets</span></code>.</p>
+under <code class="docutils literal notranslate"><span class="pre">rsc/rayrai/flaticon</span></code>.</p>
 <p>This example uses real meshes from <code class="docutils literal notranslate"><span class="pre">rsc</span></code> such as YCB and Minitaur assets. Some robot
 visual meshes are intentionally not used because they are non-manifold visual shells and
 are rejected by the minimal CoACD integration.</p>
@@ -214,22 +217,22 @@ rendering, depth readback, point-cloud visualization, and marker rendering.</p><
 <code class="docutils literal notranslate"><span class="pre">rayrai_pointcloud_animation</span></code>: visual primitives, instancing, and dynamic
 point-cloud streaming.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">rayrai_pbr_material_grid</span></code> / <code class="docutils literal notranslate"><span class="pre">rayrai_pbr_texture_maps</span></code> /
-<code class="docutils literal notranslate"><span class="pre">rayrai_quality_lighting</span></code>: PBR materials, texture slots, quality presets,
-and additional-light configurations.</p></li>
+<code class="docutils literal notranslate"><span class="pre">rayrai_quality_lighting</span></code>: PBR materials, bundled glTF PBR sample assets,
+texture slots, quality presets, and additional-light configurations.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">rayrai_visual_asset_support</span></code>: authored glTF/GLB scene import with PBR
-materials, embedded lights, and reflection-probe sidecars.</p></li>
+materials, imported lights, HDR IBL, optional reflection-probe sidecars, and
+screenshots.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">rayrai_coacd_mesh_approximation</span></code>: in-process comparison of source meshes
 and CoACD convex approximation parts generated through <code class="docutils literal notranslate"><span class="pre">World::addMesh</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">rayrai_runtime_scene_editing</span></code>: runtime add/remove of RaiSim objects and
 rayrai visuals with stable ids, snapshots, collision filters, and cloning.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">rayrai_rolling_spinning_friction</span></code> / <code class="docutils literal notranslate"><span class="pre">rayrai_swept_ccd</span></code>: physics-focused
 scenes that visualize rolling/spinning friction and swept CCD.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_pbr_material_grid</span></code> and <code class="docutils literal notranslate"><span class="pre">rayrai_pbr_texture_maps</span></code>: bundled glTF
-PBR sample assets under rayrai quality settings.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_forest</span></code>: a physics heightmap covered with instanced plants and
+rocks, loaded asynchronously behind a progress overlay; see
+<a class="reference internal" href="../examples/rayrai/rayrai_forest.html"><span class="doc">Rayrai Example: Forest</span></a> and <a class="reference internal" href="#dense-foliage">Dense foliage</a> below.</p></li>
 <li><p>OpenUSD visual meshes can be loaded through <code class="docutils literal notranslate"><span class="pre">RayraiWindow::addVisualMesh</span></code>;
 see <a class="reference internal" href="../OpenUSD.html"><span class="doc">OpenUSD Loading</span></a> for importer scope and runtime layout.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_visual_asset_support</span></code>: glTF/GLB scene import with imported lights,
-HDR IBL, optional reflection probes, and screenshots.</p></li>
 </ul>
 </section>
 <section id="custom-visuals-and-instancing">
@@ -257,9 +260,31 @@ are preferred in new code. <code class="docutils literal notranslate"><span clas
 <span class="n">instanced</span><span class="o">-&gt;</span><span class="n">addInstance</span><span class="p">(</span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.2f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1f</span><span class="p">),</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">);</span>
 </pre></div>
 </div>
+<p>The last argument is the per-instance colour weight: <code class="docutils literal notranslate"><span class="pre">0</span></code> uses the first
+colour, <code class="docutils literal notranslate"><span class="pre">1</span></code> the second, and values in between blend the two.</p>
+<p>Quaternions passed as <code class="docutils literal notranslate"><span class="pre">glm::vec4</span></code> are in (w, x, y, z) order: <code class="docutils literal notranslate"><span class="pre">ori.x</span></code> is w
+and <code class="docutils literal notranslate"><span class="pre">ori.w</span></code> is z. This applies to the <code class="docutils literal notranslate"><span class="pre">glm::vec4</span></code> overload of
+<code class="docutils literal notranslate"><span class="pre">Visuals::setOrientation</span></code>, to <code class="docutils literal notranslate"><span class="pre">InstancedVisuals::addInstance</span></code> and
+<code class="docutils literal notranslate"><span class="pre">InstancedVisuals::setOrientation(id,</span> <span class="pre">ori)</span></code>, and to
+<code class="docutils literal notranslate"><span class="pre">InstancedVisuals::InstanceSpec::orientation</span></code>. The order matches the scalar
+<code class="docutils literal notranslate"><span class="pre">setOrientation(w,</span> <span class="pre">x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code> overload and the <code class="docutils literal notranslate"><span class="pre">getOrientation</span></code> getters, so
+a value that is read back can be set again unchanged, and
+<code class="docutils literal notranslate"><span class="pre">glm::vec4(1,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">0)</span></code> is the identity.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In 2.6.1 and earlier, these <code class="docutils literal notranslate"><span class="pre">glm::vec4</span></code> arguments were read as
+(x, y, z, w). Code that passed <code class="docutils literal notranslate"><span class="pre">glm::vec4(0,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">1)</span></code> as the identity,
+or built orientations in x, y, z, w order, must switch to w, x, y, z.</p>
+</div>
 <p>If you want to load meshes once and share them across visuals, use
-<code class="docutils literal notranslate"><span class="pre">raisin::RayraiGlobalAsset</span></code> and <code class="docutils literal notranslate"><span class="pre">addVisualCustomMesh</span></code>:</p>
+<code class="docutils literal notranslate"><span class="pre">raisin::RayraiGlobalAsset</span></code> and <code class="docutils literal notranslate"><span class="pre">addVisualCustomMesh</span></code>. A standalone
+<code class="docutils literal notranslate"><span class="pre">RayraiGlobalAsset</span></code> imports asynchronously by default: <code class="docutils literal notranslate"><span class="pre">getMeshes</span></code> then
+returns an empty list that is filled only by <code class="docutils literal notranslate"><span class="pre">pollAsyncLoads()</span></code> on that same
+object, because the renderer polls only its own asset manager. Disable
+asynchronous loading on a standalone manager when the meshes are needed
+immediately:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">assets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiGlobalAsset</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="n">assets</span><span class="o">-&gt;</span><span class="n">setAsyncMeshLoadingEnabled</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span><span class="w">  </span><span class="c1">// getMeshes loads before returning</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">meshes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">assets</span><span class="o">-&gt;</span><span class="n">getMeshes</span><span class="p">(</span><span class="s">&quot;/path/to/model.obj&quot;</span><span class="p">);</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">custom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addVisualCustomMesh</span><span class="p">(</span><span class="s">&quot;custom&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">meshes</span><span class="p">,</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.9f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.9f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">));</span>
 <span class="n">custom</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">);</span>
@@ -279,6 +304,129 @@ and camera framing. Unlike <code class="docutils literal notranslate"><span clas
 and deformables. Use <code class="docutils literal notranslate"><span class="pre">setCustomBounds(localCenter,</span> <span class="pre">localRadius)</span></code> when a
 programmatically deformed visual needs a tighter or more stable bound than its
 source mesh provides.</p>
+<section id="bulk-instances-and-instanced-lod">
+<h3>Bulk instances and instanced LOD<a class="headerlink" href="#bulk-instances-and-instanced-lod" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">InstancedVisuals::addInstances</span></code> appends a span of <code class="docutils literal notranslate"><span class="pre">InstanceSpec</span></code> records
+(<code class="docutils literal notranslate"><span class="pre">position</span></code>, <code class="docutils literal notranslate"><span class="pre">orientation</span></code>, <code class="docutils literal notranslate"><span class="pre">scale</span></code>, <code class="docutils literal notranslate"><span class="pre">colorWeight</span></code>) and marks the batch
+for upload once, which is much cheaper than thousands of <code class="docutils literal notranslate"><span class="pre">addInstance</span></code> calls.
+<code class="docutils literal notranslate"><span class="pre">reserveInstances</span></code> preallocates storage. The scale given to <code class="docutils literal notranslate"><span class="pre">addInstance</span></code>
+or <code class="docutils literal notranslate"><span class="pre">InstanceSpec</span></code> is multiplied by the batch’s base size, while
+<code class="docutils literal notranslate"><span class="pre">setScale(id,</span> <span class="pre">s)</span></code> and <code class="docutils literal notranslate"><span class="pre">getScale(id)</span></code> use the final per-instance scale.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">pines</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addInstancedVisuals</span><span class="p">(</span>
+<span class="w">  </span><span class="s">&quot;pines&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">Shape</span><span class="o">::</span><span class="n">Mesh</span><span class="p">,</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">),</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">),</span>
+<span class="w">  </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.85f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.92f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.75f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;/path/pine.glb&quot;</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">raisin</span><span class="o">::</span><span class="n">InstancedVisuals</span><span class="o">::</span><span class="n">InstanceSpec</span><span class="o">&gt;</span><span class="w"> </span><span class="n">specs</span><span class="p">;</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">placements</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">raisin</span><span class="o">::</span><span class="n">InstancedVisuals</span><span class="o">::</span><span class="n">InstanceSpec</span><span class="w"> </span><span class="n">s</span><span class="p">;</span>
+<span class="w">  </span><span class="n">s</span><span class="p">.</span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">position</span><span class="p">;</span>
+<span class="w">  </span><span class="c1">// Yaw about +z, in (w, x, y, z) order.</span>
+<span class="w">  </span><span class="n">s</span><span class="p">.</span><span class="n">orientation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">cos</span><span class="p">(</span><span class="mf">0.5f</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">yaw</span><span class="p">),</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span>
+<span class="w">                            </span><span class="n">std</span><span class="o">::</span><span class="n">sin</span><span class="p">(</span><span class="mf">0.5f</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">yaw</span><span class="p">));</span>
+<span class="w">  </span><span class="n">s</span><span class="p">.</span><span class="n">scale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">scale</span><span class="p">);</span><span class="w">  </span><span class="c1">// relative to the base size</span>
+<span class="w">  </span><span class="n">s</span><span class="p">.</span><span class="n">colorWeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">shade</span><span class="p">;</span><span class="w">        </span><span class="c1">// 0 = first colour, 1 = second</span>
+<span class="w">  </span><span class="n">specs</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="n">pines</span><span class="o">-&gt;</span><span class="n">reserveInstances</span><span class="p">(</span><span class="n">specs</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+<span class="n">pines</span><span class="o">-&gt;</span><span class="n">addInstances</span><span class="p">(</span><span class="n">specs</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Draws can be thinned without changing the authored instances:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">setMaxRenderedInstances(n)</span></code> draws at most <code class="docutils literal notranslate"><span class="pre">n</span></code> instances; <code class="docutils literal notranslate"><span class="pre">0</span></code> (the
+default) draws all of them.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setRenderedInstanceStride(k)</span></code> draws every <code class="docutils literal notranslate"><span class="pre">k</span></code>-th instance (default 1).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setProjectedLodPolicy(enabled,</span> <span class="pre">minProjectedRadiusPixels</span> <span class="pre">=</span> <span class="pre">2,</span>
+<span class="pre">maxStride</span> <span class="pre">=</span> <span class="pre">8)</span></code> raises the stride when instances project below the given
+radius. It is off by default, and the explicit stride stays a lower bound.</p></li>
+<li><p>Automatic mesh LOD (<code class="docutils literal notranslate"><span class="pre">setAutomaticMeshLodEnabled</span></code>, on by default, or the
+<code class="docutils literal notranslate"><span class="pre">automaticMeshLodEnabled</span></code> argument of <code class="docutils literal notranslate"><span class="pre">addInstancedVisuals</span></code>) generates
+simplified meshes for file-backed batches and picks a level from the
+projected size when drawing.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setDoubleBufferedInstanceUploads(true)</span></code> helps when full instance-buffer
+rebuilds are frequent, and <code class="docutils literal notranslate"><span class="pre">setSortTransparentInstances(true)</span></code> sorts
+transparent instances back to front. Both are off by default.</p></li>
+</ul>
+<p>With asynchronous mesh loading (the default, see <a class="reference internal" href="Capture.html"><span class="doc">Capture, diagnostics, and headless rendering</span></a>) and automatic
+mesh LOD enabled, a batch created while its mesh file is still importing builds
+its LOD chain on a worker thread and uploads it one submesh per poll. The batch
+is not drawn until that finishes. <code class="docutils literal notranslate"><span class="pre">hasPendingAsyncMeshPreparation()</span></code> reports
+this state, <code class="docutils literal notranslate"><span class="pre">RayraiWindow::pendingAsyncMeshLoadCount()</span></code> includes these jobs,
+and every <code class="docutils literal notranslate"><span class="pre">update()</span></code>, external-camera render, or <code class="docutils literal notranslate"><span class="pre">pollAsyncMeshLoads</span></code> call
+advances them.</p>
+</section>
+<section id="meshes-prepared-off-the-render-thread">
+<h3>Meshes prepared off the render thread<a class="headerlink" href="#meshes-prepared-off-the-render-thread" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">OpenGLMesh::createCpuGeometry(vertices,</span> <span class="pre">indices,</span> <span class="pre">textures,</span> <span class="pre">baseColor)</span></code>
+builds a mesh without any OpenGL call and computes missing tangents, so it can
+run on a worker thread. Call <code class="docutils literal notranslate"><span class="pre">uploadPreparedGeometry()</span></code> later on the thread
+that owns the GL context, then add the mesh to a <code class="docutils literal notranslate"><span class="pre">MeshList</span></code> for
+<code class="docutils literal notranslate"><span class="pre">addVisualCustomMesh</span></code> or <code class="docutils literal notranslate"><span class="pre">addInstancedVisuals</span></code>.</p>
+<p>Prepared uploads, <code class="docutils literal notranslate"><span class="pre">OpenGLMesh::createWithCompactIndices</span></code>, and generated
+foliage LODs store 16-bit indices when every index fits. Code that draws an
+<code class="docutils literal notranslate"><span class="pre">OpenGLMesh</span></code> VAO directly must use <code class="docutils literal notranslate"><span class="pre">indexElementBytes()</span></code> (2 or 4) to choose
+<code class="docutils literal notranslate"><span class="pre">GL_UNSIGNED_SHORT</span></code> or <code class="docutils literal notranslate"><span class="pre">GL_UNSIGNED_INT</span></code>. Set
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_DISABLE_16BIT_MESH_INDICES=1</span></code> to keep 32-bit indices.</p>
+</section>
+</section>
+<section id="dense-foliage">
+<h2>Dense foliage<a class="headerlink" href="#dense-foliage" title="Link to this heading"></a></h2>
+<p>An instanced mesh visual is treated as foliage when one of its materials is
+alpha-masked, blended, or has a <code class="docutils literal notranslate"><span class="pre">FoliageType</span></code>, or when its mesh path contains
+one of the words <code class="docutils literal notranslate"><span class="pre">foliage</span></code>, <code class="docutils literal notranslate"><span class="pre">grass</span></code>, <code class="docutils literal notranslate"><span class="pre">leaf</span></code>, <code class="docutils literal notranslate"><span class="pre">leaves</span></code>, <code class="docutils literal notranslate"><span class="pre">bush</span></code>,
+<code class="docutils literal notranslate"><span class="pre">shrub</span></code>, <code class="docutils literal notranslate"><span class="pre">plant</span></code>, <code class="docutils literal notranslate"><span class="pre">flower</span></code>, <code class="docutils literal notranslate"><span class="pre">fern</span></code>, <code class="docutils literal notranslate"><span class="pre">pine</span></code>, <code class="docutils literal notranslate"><span class="pre">sapling</span></code>, <code class="docutils literal notranslate"><span class="pre">twig</span></code>, or
+<code class="docutils literal notranslate"><span class="pre">vegetation</span></code>. The path test is a plain substring match on the full path, and
+with asynchronous loading only the path is known when the batch is created, so
+set the policies below explicitly when the path does not identify the asset.</p>
+<p>For foliage batches rayrai:</p>
+<ul class="simple">
+<li><p>enables shadow-only instance LOD, hierarchical cluster culling, and distant
+impostors when the batch is created;</p></li>
+<li><p>builds a seven-level LOD chain and selects levels from the projected
+simplification error, separately for the camera and for shadow maps, and
+culls instances individually in large batches;</p></li>
+<li><p>merges compatible opaque and alpha-masked batches that share a mesh, material,
+and wind settings, across visuals. Materials with custom depth or stencil
+state, a render priority, a non-default blend mode, billboarding, fixed size,
+or heightmap displacement are drawn separately;</p></li>
+<li><p>casts shadows like any other instanced visual. In 2.6.1 and earlier, foliage
+and grass batches turned shadow casting off automatically; call
+<code class="docutils literal notranslate"><span class="pre">setCastsShadows(false)</span></code> to keep that behaviour, for example for dense grass.</p></li>
+</ul>
+<p>The policies can also be set explicitly:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">setShadowFoliageLodPolicy(enabled,</span> <span class="pre">minProjectedRadiusPixels</span> <span class="pre">=</span> <span class="pre">2.5,</span>
+<span class="pre">maxStride</span> <span class="pre">=</span> <span class="pre">16,</span> <span class="pre">maxShadowDistance</span> <span class="pre">=</span> <span class="pre">0)</span></code> thins instances in shadow passes
+only. A positive <code class="docutils literal notranslate"><span class="pre">maxShadowDistance</span></code> leaves the batch out of shadow maps
+when it is farther away than that.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setFoliageImpostorPolicy(enabled,</span> <span class="pre">maxProjectedRadiusPixels</span> <span class="pre">=</span> <span class="pre">1.15,</span>
+<span class="pre">minInstanceCount</span> <span class="pre">=</span> <span class="pre">1024)</span></code> draws camera-facing quads for batches whose source
+mesh projects below the radius.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setHierarchicalFoliageClustersPolicy(enabled,</span> <span class="pre">leafTargetInstances</span> <span class="pre">=</span> <span class="pre">32,</span>
+<span class="pre">minInstanceCount</span> <span class="pre">=</span> <span class="pre">256,</span> <span class="pre">minRejectionRatio</span> <span class="pre">=</span> <span class="pre">0.08)</span></code> culls groups of instances
+against the view and shadow frusta.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">configureFoliageWind(rootHeight,</span> <span class="pre">tipHeight,</span> <span class="pre">windStrength,</span> <span class="pre">stiffness</span> <span class="pre">=</span> <span class="pre">0.5,</span>
+<span class="pre">flutterWeight</span> <span class="pre">=</span> <span class="pre">0.15)</span></code> adds wind bending to the batch and also enables
+impostors, shadow LOD, and clusters. Call <code class="docutils literal notranslate"><span class="pre">setFoliageImpostorPolicy(false)</span></code>
+afterwards to keep impostors off.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">configureGrassPatch(...)</span></code> marks the batch as a grass patch with a draw
+budget, fade distances, and wind response, and enables projected LOD, shadow
+LOD, and clusters. Instances are still authored with <code class="docutils literal notranslate"><span class="pre">addInstance</span></code> or
+<code class="docutils literal notranslate"><span class="pre">addInstances</span></code>.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">RAYRAI_FOLIAGE_LOD_PIXEL_ERROR</span></code> (default <code class="docutils literal notranslate"><span class="pre">2.25</span></code>, valid range <code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">8]</span></code>)
+sets the projected error budget in pixels for camera LODs, and
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_FOLIAGE_SHADOW_LOD_PIXEL_ERROR</span></code> (default <code class="docutils literal notranslate"><span class="pre">2.5</span></code>; it follows the
+camera value when only that one is set) the budget for shadow maps. Both are
+read once per process.</p>
+<p>GPU instance culling, GPU cluster culling, and indirect multi-draws need
+OpenGL 4.3. On older contexts, such as OpenGL 4.1 on macOS, rayrai uses its
+CPU paths and prints a one-time fallback warning.</p>
+<p>Per-batch diagnostics (<code class="docutils literal notranslate"><span class="pre">shadowFoliageLodDiagnostics()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">foliageImpostorDiagnostics()</span></code>, <code class="docutils literal notranslate"><span class="pre">hierarchicalFoliageClusterDiagnostics()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">grassPatchDiagnostics()</span></code>) and <code class="docutils literal notranslate"><span class="pre">RayraiWindow::foliageRenderDiagnostics()</span></code>
+describe the last rendered frame; see <a class="reference internal" href="Capture.html"><span class="doc">Capture, diagnostics, and headless rendering</span></a>. The wind clock can follow
+simulation time with <code class="docutils literal notranslate"><span class="pre">viewer.setFoliageWindTimeSeconds(t)</span></code>; the global wind
+field is described in <a class="reference internal" href="Weather.html"><span class="doc">Weather and atmospherics</span></a>.</p>
 </section>
 <section id="detectability-and-capture-render-passes">
 <h2>Detectability and capture render passes<a class="headerlink" href="#detectability-and-capture-render-passes" title="Link to this heading"></a></h2>
@@ -344,15 +492,21 @@ intended for thin foliage cards.</p></li>
 changing the rest of its state. This is lower-level than <code class="docutils literal notranslate"><span class="pre">ShadowsOnly</span></code> and
 is used internally for TCP mesh-batch proxy visuals.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">setVisibilityRange(begin,</span> <span class="pre">end,</span> <span class="pre">beginMargin,</span> <span class="pre">endMargin,</span>
-<span class="pre">VisibilityRangeFadeMode)</span></code> — <code class="docutils literal notranslate"><span class="pre">Self</span></code> fades the visual itself near the
-range bounds; <code class="docutils literal notranslate"><span class="pre">Dependencies</span></code> fades dependent LOD pairs at the same time.</p></li>
+<span class="pre">VisibilityRangeFadeMode)</span></code> — draw the visual only while the camera’s
+distance to its bounds center lies between <code class="docutils literal notranslate"><span class="pre">begin</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span></code> (<code class="docutils literal notranslate"><span class="pre">0</span></code>
+disables that side). With <code class="docutils literal notranslate"><span class="pre">Self</span></code> the visual fades over
+<code class="docutils literal notranslate"><span class="pre">threshold</span> <span class="pre">±</span> <span class="pre">margin</span></code>, a window centered on each threshold; <code class="docutils literal notranslate"><span class="pre">Disabled</span></code>
+(the default) cuts off hard. <code class="docutils literal notranslate"><span class="pre">Dependencies</span></code> is reserved and currently
+behaves like <code class="docutils literal notranslate"><span class="pre">Disabled</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">setMaterialOverride(material)</span></code> — replace all materials on this visual.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">setMaterialRemap(sourceName,</span> <span class="pre">material)</span></code> — remap a specific imported
 material slot by name without touching the rest.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">setMaterialOverlay(material)</span></code> — additional draw pass on top of the base
 material (selection outlines, x-ray decals, ghost previews).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">setTwoSided</span></code> / <code class="docutils literal notranslate"><span class="pre">setFlatShading</span></code> / <code class="docutils literal notranslate"><span class="pre">setUseMeshColor</span></code> — quick toggles
-for inspection visuals.</p></li>
+for inspection visuals. With <code class="docutils literal notranslate"><span class="pre">setUseMeshColor(true)</span></code> the alpha of the
+visual’s <code class="docutils literal notranslate"><span class="pre">setColor</span></code> value still scales the mesh colour, so lowering it
+makes a textured mesh translucent.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">setCategory</span></code> / <code class="docutils literal notranslate"><span class="pre">setDetectable</span></code> — assign the <code class="docutils literal notranslate"><span class="pre">VisualCategory</span></code> used by
 detectable-only external-camera, reflection-probe, documentation-capture, and
 point-cloud render filters. It is render metadata only, not physics or
@@ -369,24 +523,24 @@ selection for imported meshes.</p></li>
 frustum culling and shadow planning for skinned or programmatically-deformed
 meshes.</p></li>
 </ul>
-<p><code class="docutils literal notranslate"><span class="pre">raisin::InstancedVisuals</span></code> mirrors many of these (<code class="docutils literal notranslate"><span class="pre">setCastsShadows</span></code>,
-<code class="docutils literal notranslate"><span class="pre">setUseMeshColor</span></code>, <code class="docutils literal notranslate"><span class="pre">setMaxRenderedInstances</span></code>,
-<code class="docutils literal notranslate"><span class="pre">setRenderedInstanceStride</span></code>, <code class="docutils literal notranslate"><span class="pre">setProjectedLodPolicy</span></code>,
-<code class="docutils literal notranslate"><span class="pre">setDoubleBufferedInstanceUploads</span></code>, <code class="docutils literal notranslate"><span class="pre">setSortTransparentInstances</span></code>) so
-high-instance-count visuals can be tuned without affecting unrelated draws.
-For mesh instances, <code class="docutils literal notranslate"><span class="pre">setUseMeshColor(true)</span></code> preserves mesh-authored base
-colors or texture colors instead of forcing the per-instance blend colors.</p>
+<p><code class="docutils literal notranslate"><span class="pre">raisin::InstancedVisuals</span></code> mirrors a subset of these (<code class="docutils literal notranslate"><span class="pre">setCastsShadows</span></code>,
+<code class="docutils literal notranslate"><span class="pre">setUseMeshColor</span></code>, <code class="docutils literal notranslate"><span class="pre">setCategory</span></code> / <code class="docutils literal notranslate"><span class="pre">setDetectable</span></code>); its draw-cost
+controls are described in <a class="reference internal" href="#bulk-instances-and-instanced-lod">Bulk instances and instanced LOD</a> above. Instanced
+shadow casting is a plain on/off switch that defaults to on, foliage included;
+there is no <code class="docutils literal notranslate"><span class="pre">ShadowCastingMode</span></code>, visibility range, or material override per
+batch. For mesh instances, <code class="docutils literal notranslate"><span class="pre">setUseMeshColor(true)</span></code> preserves mesh-authored
+base colors or texture colors instead of forcing the per-instance blend colors.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Two LODs of the same prop: high-detail near, low-poly far.</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">highLod</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addVisualMesh</span><span class="p">(</span><span class="s">&quot;crate_hi&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/path/crate_hi.glb&quot;</span><span class="p">,</span>
 <span class="w">                                    </span><span class="n">glm</span><span class="o">::</span><span class="n">dvec3</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">));</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">lowLod</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addVisualMesh</span><span class="p">(</span><span class="s">&quot;crate_lo&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/path/crate_lo.glb&quot;</span><span class="p">,</span>
 <span class="w">                                    </span><span class="n">glm</span><span class="o">::</span><span class="n">dvec3</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">));</span>
 
-<span class="c1">// High-detail visible 0..10 m, soft fade-out over the last 1 m.</span>
+<span class="c1">// High detail up to 10 m; it fades out between 9 m and 11 m.</span>
 <span class="n">highLod</span><span class="o">-&gt;</span><span class="n">setVisibilityRange</span><span class="p">(</span><span class="cm">/*begin=*/</span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*end=*/</span><span class="mf">10.0f</span><span class="p">,</span>
 <span class="w">                            </span><span class="cm">/*beginMargin=*/</span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*endMargin=*/</span><span class="mf">1.0f</span><span class="p">,</span>
 <span class="w">                            </span><span class="n">raisin</span><span class="o">::</span><span class="n">Visuals</span><span class="o">::</span><span class="n">VisibilityRangeFadeMode</span><span class="o">::</span><span class="n">Self</span><span class="p">);</span>
-<span class="c1">// Low-detail visible 10..80 m, soft fade-in over the first 1 m.</span>
+<span class="c1">// Low detail from 10 m (fading in between 9 m and 11 m) out to 80 m.</span>
 <span class="n">lowLod</span><span class="o">-&gt;</span><span class="n">setVisibilityRange</span><span class="p">(</span><span class="cm">/*begin=*/</span><span class="mf">10.0f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*end=*/</span><span class="mf">80.0f</span><span class="p">,</span>
 <span class="w">                           </span><span class="cm">/*beginMargin=*/</span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*endMargin=*/</span><span class="mf">0.0f</span><span class="p">,</span>
 <span class="w">                           </span><span class="n">raisin</span><span class="o">::</span><span class="n">Visuals</span><span class="o">::</span><span class="n">VisibilityRangeFadeMode</span><span class="o">::</span><span class="n">Self</span><span class="p">);</span>
@@ -407,10 +561,12 @@ colors or texture colors instead of forcing the per-instance blend colors.</p>
 <span class="n">inspect</span><span class="o">-&gt;</span><span class="n">setMaterialOverride</span><span class="p">(</span><span class="n">ghost</span><span class="p">);</span>
 <span class="n">inspect</span><span class="o">-&gt;</span><span class="n">setMaterialOverlay</span><span class="p">(</span><span class="n">outline</span><span class="p">);</span>
 
-<span class="c1">// Remap a single material slot on a multi-material imported asset.</span>
-<span class="n">inspect</span><span class="o">-&gt;</span><span class="n">setMaterialRemap</span><span class="p">(</span><span class="cm">/*sourceName=*/</span><span class="s">&quot;GlassPanes&quot;</span><span class="p">,</span>
-<span class="w">                          </span><span class="n">raisin</span><span class="o">::</span><span class="n">Material</span><span class="o">::</span><span class="n">pbr</span><span class="p">(</span><span class="s">&quot;tinted_glass&quot;</span><span class="p">,</span>
-<span class="w">                                                </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.1f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4f</span><span class="p">)));</span>
+<span class="c1">// Remap a single material slot on a multi-material imported asset. Thin</span>
+<span class="c1">// glass is see-through by transmission, so its alpha stays at one; see</span>
+<span class="c1">// the glass section of the Materials page.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">tinted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Material</span><span class="o">::</span><span class="n">glass</span><span class="p">(</span><span class="s">&quot;tinted_glass&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// thin pane</span>
+<span class="n">tinted</span><span class="p">.</span><span class="n">baseColorFactor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.1f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">);</span><span class="w">  </span><span class="c1">// pane tint</span>
+<span class="n">inspect</span><span class="o">-&gt;</span><span class="n">setMaterialRemap</span><span class="p">(</span><span class="cm">/*sourceName=*/</span><span class="s">&quot;GlassPanes&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">tinted</span><span class="p">);</span>
 </pre></div>
 </div>
 </section>
@@ -513,7 +669,7 @@ geometry without rendering colour.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="Materials.html" class="btn btn-neutral float-left" title="PBR materials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="PostProcess.html" class="btn btn-neutral float-right" title="Post-process effects" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Foliage.html" class="btn btn-neutral float-right" title="Foliage and forest rendering" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -149,7 +149,7 @@ next. Each branch starts and ends with sites. The initial divisor is 1; a leadin
 pulley element can replace it. Each subsequent pulley sets the following
 branch's divisor directly, rather than multiplying the previous divisor.
 
-.. image:: ../../image/tendon_transmission.svg
+.. image:: ../../../rsc/docs/image/tendon_transmission.svg
    :alt: Two independent branches: length L equals LA plus LB over two; branch tensions are T and T over two
    :width: 100%
 

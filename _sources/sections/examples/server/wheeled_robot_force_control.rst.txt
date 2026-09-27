@@ -8,7 +8,7 @@ Loads a wheeled robot (SMB/megabot) and applies wheel forces in force-control mo
 
 Screenshot
 ==========
-.. image:: ../../../image/wheeled_robot_force_control.png
+.. image:: ../../../../rsc/docs/image/wheeled_robot_force_control.png
    :alt: wheeled_robot_force_control example
    :width: 100%
 

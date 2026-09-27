@@ -8,7 +8,7 @@ Runs two ANYmal variants (B and C) with PD control in a world scene. This exampl
 
 Screenshot
 ==========
-.. image:: ../../../image/anymal_pair.png
+.. image:: ../../../../rsc/docs/image/anymal_pair.png
    :alt: anymal_pair example
    :width: 100%
 

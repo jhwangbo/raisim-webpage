@@ -2,9 +2,10 @@
 Sensors and depth/LiDAR
 #######################
 
-This page covers aligning rayrai to RaiSim camera sensors, rendering depth
-and LiDAR data, and the picking pipeline. For the general camera control
-APIs (free-fly, orbit, picking from the viewer) see :doc:`Capture`.
+This page covers aligning rayrai to RaiSim camera sensors, fisheye lenses,
+CPU readback, rendering depth and LiDAR data, and the TCP viewer protocol. For
+the general camera control and picking APIs (free-fly, orbit, picking from the
+viewer) see :doc:`Capture`.
 
 Sensor alignment
 ================
@@ -27,7 +28,7 @@ For runnable coverage, see
 :doc:`Rayrai ArUco marker <../examples/rayrai/rayrai_aruco_marker>` for dedicated
 sensor examples. ``rayrai_complete_showcase`` combines RGB/depth cameras, LiDAR
 visualization, camera frustums, raw buffer readback, and custom visuals in one
-runnable scene. The sensor overview in :doc:`Sensors <Sensors>` includes a
+runnable scene. The sensor overview in :doc:`Sensors <../Sensors>` includes a
 longer RGB/depth readback example.
 
 RGB/Depth camera workflow (manual source + external camera):
@@ -63,6 +64,46 @@ constructing ``Camera`` from a ``DepthCamera`` allocates depth targets without
 also eagerly allocating the RGB/post-processing targets. Keep the camera alive
 across frames to reuse its buffers, and destroy it while its owning GL context
 is current. ``Camera`` cannot be copied or moved because it owns GL handles.
+
+The ``RGBCamera``/``DepthCamera`` overloads of ``renderWithExternalCamera``
+always render without MSAA, temporal AA, or viewer upscaling, whatever the
+quality preset. They do run the built-in postprocessing unless
+``RenderOverrides::postProcess`` is ``false``, so enabling
+``setLinearHdrRenderingEnabled(true)`` (see :doc:`Capture`) also changes RGB
+sensor images; pass ``postProcess = false`` to keep the previous output.
+
+Asynchronous readback
+=====================
+``getRawImage`` is synchronous. For high-rate capture,
+``Camera::setAsyncReadbackEnabled(true, ringSize)`` (ring size at least 2,
+default 3) enables a ring of pixel-buffer objects:
+``readSceneColorRgbaAsync(rgba)`` and ``readLinearDepthAsync(depth)`` start a
+readback of the current frame and return ``true`` once they have copied an
+earlier one. The first calls return ``false`` until the ring is full, and the
+copied frame then lags the latest render by ``ringSize`` calls.
+
+.. code-block:: cpp
+
+    rgbCamera.setAsyncReadbackEnabled(true, 3);
+    std::vector<unsigned char> rgba;
+    viewer.renderWithExternalCamera(*rgbCam, rgbCamera, {});
+    if (rgbCamera.readSceneColorRgbaAsync(rgba, /*flipVertical=*/true)) {
+      // rgba holds the frame rendered three calls earlier.
+    }
+
+Fisheye lenses
+==============
+A RaiSim camera whose ``lens`` property is an equidistant fisheye model
+(``raisim::CameraLensModel::setOpenCvFisheye(fx, fy, cx, cy, k1, k2, k3, k4)``)
+is honoured by ``raisin::Camera``. The ``RGBCamera`` and ``DepthCamera``
+constructors copy the lens, ``isFisheyeLens()`` reports it, and
+``renderWithExternalCamera`` resamples the rendered colour image through the
+OpenCV/ROS equidistant model with ``k1``–``k4`` distortion. The source view is
+rasterized with a horizontal field of view of at most 179°. Only the colour
+image is remapped; depth from ``renderDepthPlaneDistance`` stays rectilinear.
+For a camera that is not built from a RaiSim sensor, call
+``Camera::setLensModel(lens, hFovRad)`` and set ``zoom`` (the vertical field of
+view of the rasterized source view) yourself.
 
 TCP viewer protocol
 ===================
@@ -130,9 +171,13 @@ The renderer supports a linear depth plane and a GPU-assisted LiDAR pass. These 
 passes render RaiSim world objects only; visualization-only objects are intentionally
 ignored so they cannot leak into training observations.
 
-* ``renderDepthPlaneDistance`` renders a linear depth texture.
+* ``renderDepthPlaneDistance`` renders a linear depth texture. Its optional
+  ``drawVisualizationObjects`` argument (default ``false``) adds custom and
+  instanced visuals; only detectable ones are included unless
+  ``visualizationObjectsMustBeDetectable`` is ``false``.
 * ``measureSpinningLidarSingleDrawGPU`` renders a LiDAR slice using a
-  spherical chunk shader.
+  spherical chunk shader. Pass ``objectToExclude`` (for example the robot
+  carrying the sensor) to leave one object out of the scan.
 
 You can retrieve the depth texture via ``getDepthPlaneTexture()``.
 

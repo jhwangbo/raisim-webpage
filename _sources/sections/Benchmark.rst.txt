@@ -141,13 +141,13 @@ charts below show both the median timings and the relative speedup.
 
 .. container:: benchmark-graph-block
 
-   .. figure:: ../image/benchmark_backend_times.svg
+   .. figure:: ../../rsc/docs/image/benchmark_backend_times.svg
       :alt: Bar chart comparing median RaiSim and MuJoCo wall-clock times for the benchmark suite.
       :width: 100%
 
 .. container:: benchmark-graph-block
 
-   .. figure:: ../image/benchmark_speedup.svg
+   .. figure:: ../../rsc/docs/image/benchmark_speedup.svg
       :alt: Bar chart showing MuJoCo time divided by RaiSim time for each benchmark.
       :width: 100%
 

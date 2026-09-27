@@ -8,7 +8,7 @@ Spawns Atlas in a world scene and applies external force and torque to perturb t
 
 Screenshot
 ==========
-.. image:: ../../../image/atlas.png
+.. image:: ../../../../rsc/docs/image/atlas.png
    :alt: atlas example
    :width: 100%
 

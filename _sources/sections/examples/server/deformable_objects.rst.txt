@@ -12,7 +12,7 @@ so they share the same volumetric behavior.
 Use this example as the starting point for soft-body setup. It shows explicit
 cloth topology and deformable mesh construction from closed OBJ meshes.
 
-.. image:: ../../../image/deformable_objects.png
+.. image:: ../../../../rsc/docs/image/deformable_objects.png
    :alt: deformable_objects example
    :width: 100%
 

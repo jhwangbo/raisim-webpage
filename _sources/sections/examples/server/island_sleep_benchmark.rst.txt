@@ -2,7 +2,7 @@
 Island Sleep Benchmark
 ########################
 
-.. image:: ../../../image/island_sleep_benchmark.png
+.. image:: ../../../../rsc/docs/image/island_sleep_benchmark.png
    :alt: island_sleep_benchmark example
    :width: 100%
 

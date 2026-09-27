@@ -8,7 +8,7 @@ Renders a large grid of instanced boxes to demonstrate instancing performance an
 
 Screenshot
 ==========
-.. image:: ../../../image/rayrai_instancing_grid.png
+.. image:: ../../../../rsc/docs/image/rayrai_instancing_grid.png
    :alt: rayrai_instancing_grid example
    :width: 100%
 

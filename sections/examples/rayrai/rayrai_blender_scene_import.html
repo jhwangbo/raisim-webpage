@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rayrai_blender_scene_import &mdash; raisim 2.6.0 documentation</title>
+  <title>rayrai_blender_scene_import &mdash; raisim 2.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=b6430375" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=ae39cb24"></script>
+      <script src="../../../_static/documentation_options.js?v=dfec817d"></script>
       <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -80,15 +80,18 @@
 <li class="toctree-l3"><a class="reference internal" href="rayrai_aruco_marker.html">Rayrai Example: Aruco Marker</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_custom_visuals.html">Rayrai Example: Custom Visuals</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_instancing_grid.html">Rayrai Example: Instancing Grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_forest.html">Rayrai Example: Forest</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_pointcloud_animation.html">Rayrai Example: Pointcloud Animation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_pbr_material_grid.html">Rayrai Example: PBR Material Grid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_pbr_texture_maps.html">Rayrai Example: PBR Texture Maps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_nested_glass.html">Rayrai Example: Nested Glass</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_quality_lighting.html">Rayrai Example: Quality Lighting and FXAA</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_visual_asset_support.html">rayrai_visual_asset_support</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_coacd_mesh_approximation.html">Rayrai Example: CoACD Mesh Approximation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_runtime_scene_editing.html">Rayrai Example: Runtime Scene Editing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_rolling_spinning_friction.html">Rayrai Example: Rolling And Spinning Friction</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_swept_ccd.html">Rayrai Example: Swept CCD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_forest.html">Rayrai Example: Forest</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_tcp_viewer.html">Rayrai Example: TCP Viewer</a></li>
 </ul>
 </li>
@@ -311,7 +314,387 @@ light rather than an area light with an appropriate size.</p></li>
 </section>
 <section id="exporter-source">
 <h2>Exporter source<a class="headerlink" href="#exporter-source" title="Link to this heading"></a></h2>
-<p>For reference, the installed exporter is:</p>
+<p><code class="docutils literal notranslate"><span class="pre">--lights-only</span></code> and <code class="docutils literal notranslate"><span class="pre">--probes-only</span></code> rewrite only the light sidecar or the
+reflection-probe sidecar (<code class="docutils literal notranslate"><span class="pre">scene.glb.rayrai_probes.json</span></code>) of an existing
+glTF/GLB export. The probe sidecar lists Blender objects named
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_PROBE*</span></code> or carrying the <code class="docutils literal notranslate"><span class="pre">rayrai_reflection_probe</span></code> custom property.
+For reference, the exporter source is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="sd">&quot;&quot;&quot;General Blender scene exporter for RayRai examples.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">bpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mathutils</span><span class="w"> </span><span class="kn">import</span> <span class="n">Vector</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_args</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">:</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="vm">__doc__</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--output&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Path</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Output path. Defaults next to the .blend file.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;--format&quot;</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;obj&quot;</span><span class="p">,</span> <span class="s2">&quot;glb&quot;</span><span class="p">,</span> <span class="s2">&quot;gltf&quot;</span><span class="p">),</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;glb&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Export format.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;--material-diffuse&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;MATERIAL=TEXTURE&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;OBJ-only MTL map_Kd override. May be repeated.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;--lights-only&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Only write RayRai light sidecar metadata for an existing glTF/GLB export.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;--probes-only&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Only write RayRai reflection probe sidecar metadata for an existing glTF/GLB export.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">argv</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span>
+    <span class="k">if</span> <span class="s2">&quot;--&quot;</span> <span class="ow">in</span> <span class="n">argv</span><span class="p">:</span>
+        <span class="n">argv</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="n">argv</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;--&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">argv</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">renderable_objects</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">bpy</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">Object</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">obj</span>
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">objects</span>
+        <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">type</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;MESH&quot;</span><span class="p">,</span> <span class="s2">&quot;CURVE&quot;</span><span class="p">,</span> <span class="s2">&quot;SURFACE&quot;</span><span class="p">,</span> <span class="s2">&quot;FONT&quot;</span><span class="p">,</span> <span class="s2">&quot;META&quot;</span><span class="p">}</span>
+        <span class="ow">and</span> <span class="ow">not</span> <span class="n">obj</span><span class="o">.</span><span class="n">hide_get</span><span class="p">()</span>
+        <span class="ow">and</span> <span class="ow">not</span> <span class="n">obj</span><span class="o">.</span><span class="n">hide_render</span>
+    <span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">default_output_path</span><span class="p">(</span><span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+    <span class="n">blend</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">filepath</span><span class="p">)</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;.obj&quot;</span> <span class="k">if</span> <span class="n">fmt</span> <span class="o">==</span> <span class="s2">&quot;obj&quot;</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;.</span><span class="si">{</span><span class="n">fmt</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">blend</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="n">suffix</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">export_obj</span><span class="p">(</span><span class="n">output</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">material_diffuse</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">select_all</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;DESELECT&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">renderable_objects</span><span class="p">():</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">select_set</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">view_layer</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">obj</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">renderable_objects</span><span class="p">()),</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">wm</span><span class="o">.</span><span class="n">obj_export</span><span class="p">(</span>
+        <span class="n">filepath</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">output</span><span class="p">),</span>
+        <span class="n">export_selected_objects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">export_materials</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">export_uv</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">export_normals</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">export_triangulated_mesh</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">apply_modifiers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">path_mode</span><span class="o">=</span><span class="s2">&quot;RELATIVE&quot;</span><span class="p">,</span>
+        <span class="n">forward_axis</span><span class="o">=</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span>
+        <span class="n">up_axis</span><span class="o">=</span><span class="s2">&quot;Z&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">material_diffuse</span><span class="p">:</span>
+        <span class="n">patch_mtl</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.mtl&quot;</span><span class="p">),</span> <span class="n">material_diffuse</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">patch_mtl</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">overrides</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">return</span>
+    <span class="n">mapping</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">overrides</span><span class="p">:</span>
+        <span class="n">name</span><span class="p">,</span> <span class="n">sep</span><span class="p">,</span> <span class="n">texture</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sep</span><span class="p">:</span>
+            <span class="n">mapping</span><span class="p">[</span><span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span> <span class="o">=</span> <span class="n">texture</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">mapping</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+    <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">current</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">wrote_map</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;newmtl &quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">current</span> <span class="ow">in</span> <span class="n">mapping</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">wrote_map</span><span class="p">:</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;map_Kd </span><span class="si">{</span><span class="n">mapping</span><span class="p">[</span><span class="n">current</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">current</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">&quot;newmtl &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">wrote_map</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">current</span> <span class="ow">in</span> <span class="n">mapping</span> <span class="ow">and</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;map_Kd &quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">wrote_map</span><span class="p">:</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;map_Kd </span><span class="si">{</span><span class="n">mapping</span><span class="p">[</span><span class="n">current</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">wrote_map</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">continue</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">current</span> <span class="ow">in</span> <span class="n">mapping</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">wrote_map</span><span class="p">:</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;map_Kd </span><span class="si">{</span><span class="n">mapping</span><span class="p">[</span><span class="n">current</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">export_gltf</span><span class="p">(</span><span class="n">output</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">export_scene</span><span class="o">.</span><span class="n">gltf</span><span class="p">(</span>
+            <span class="n">filepath</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">output</span><span class="p">),</span>
+            <span class="n">export_format</span><span class="o">=</span><span class="s2">&quot;GLB&quot;</span> <span class="k">if</span> <span class="n">fmt</span> <span class="o">==</span> <span class="s2">&quot;glb&quot;</span> <span class="k">else</span> <span class="s2">&quot;GLTF_SEPARATE&quot;</span><span class="p">,</span>
+            <span class="n">export_yup</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">export_apply</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">export_lights</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">export_cameras</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">export_materials</span><span class="o">=</span><span class="s2">&quot;EXPORT&quot;</span><span class="p">,</span>
+            <span class="n">export_image_format</span><span class="o">=</span><span class="s2">&quot;AUTO&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">export_rayrai_light_sidecar</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="n">export_rayrai_probe_sidecar</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">vec3</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Vector</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">x</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">y</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">z</span><span class="p">)]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">custom_property</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">bpy</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">default</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">custom_bool</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">bpy</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">custom_property</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span> <span class="s2">&quot;on&quot;</span><span class="p">}</span>
+    <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">custom_float</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">bpy</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">custom_property</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">default</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">custom_int</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">bpy</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">minimum</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">maximum</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">custom_property</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">minimum</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">maximum</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">default</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">custom_vec3</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">bpy</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">custom_property</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">values</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">rayrai_probe_objects</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">bpy</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">Object</span><span class="p">]:</span>
+    <span class="n">probes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">bpy</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">Object</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">objects</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">hide_get</span><span class="p">()</span> <span class="ow">or</span> <span class="n">obj</span><span class="o">.</span><span class="n">hide_render</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">custom_bool</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;rayrai_reflection_probe&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">or</span> <span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;RAYRAI_PROBE&quot;</span><span class="p">):</span>
+            <span class="n">probes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">probes</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">object_world_aabb</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">bpy</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">Object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">corners</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Vector</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;EMPTY&quot;</span><span class="p">:</span>
+        <span class="n">corners</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">matrix_world</span> <span class="o">@</span> <span class="n">Vector</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+        <span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;bound_box&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">corners</span> <span class="o">=</span> <span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">matrix_world</span> <span class="o">@</span> <span class="n">Vector</span><span class="p">(</span><span class="n">corner</span><span class="p">)</span> <span class="k">for</span> <span class="n">corner</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">bound_box</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">corners</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">min_corner</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">((</span><span class="nb">min</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">x</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">corners</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">y</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">corners</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">z</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">corners</span><span class="p">)))</span>
+    <span class="n">max_corner</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">((</span><span class="nb">max</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">x</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">corners</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">y</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">corners</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">z</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">corners</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="nb">min</span><span class="p">((</span><span class="n">max_corner</span> <span class="o">-</span> <span class="n">min_corner</span><span class="p">)</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="n">max_corner</span> <span class="o">-</span> <span class="n">min_corner</span><span class="p">)</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="p">(</span><span class="n">max_corner</span> <span class="o">-</span> <span class="n">min_corner</span><span class="p">)</span><span class="o">.</span><span class="n">z</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">1.0e-4</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">vec3</span><span class="p">(</span><span class="n">min_corner</span><span class="p">),</span> <span class="n">vec3</span><span class="p">(</span><span class="n">max_corner</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">probe_filter_settings</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">bpy</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">Object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">custom_bool</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_filter&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;irradiance_resolution&quot;</span><span class="p">:</span> <span class="n">custom_int</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_irradiance_resolution&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">128</span><span class="p">),</span>
+        <span class="s2">&quot;irradiance_samples&quot;</span><span class="p">:</span> <span class="n">custom_int</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_irradiance_samples&quot;</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4096</span><span class="p">),</span>
+        <span class="s2">&quot;prefiltered_resolution&quot;</span><span class="p">:</span> <span class="n">custom_int</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_prefiltered_resolution&quot;</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span>
+        <span class="s2">&quot;prefiltered_mip_levels&quot;</span><span class="p">:</span> <span class="n">custom_int</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_prefiltered_mip_levels&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span>
+        <span class="s2">&quot;prefiltered_samples&quot;</span><span class="p">:</span> <span class="n">custom_int</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_prefiltered_samples&quot;</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4096</span><span class="p">),</span>
+        <span class="s2">&quot;brdf_lut_size&quot;</span><span class="p">:</span> <span class="n">custom_int</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_brdf_lut_size&quot;</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span>
+        <span class="s2">&quot;brdf_lut_samples&quot;</span><span class="p">:</span> <span class="n">custom_int</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_brdf_lut_samples&quot;</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4096</span><span class="p">),</span>
+    <span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">export_rayrai_probe_sidecar</span><span class="p">(</span><span class="n">output</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write explicit static reflection probe authoring metadata.</span>
+
+<span class="sd">    Add a Blender object with custom property ``rayrai_reflection_probe=true``.</span>
+<span class="sd">    Empty cube objects are useful for box-projected room probes; their world-space</span>
+<span class="sd">    bounding box is exported when ``rayrai_probe_box_projection=true``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">probes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">rayrai_probe_objects</span><span class="p">():</span>
+        <span class="n">probe</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;position&quot;</span><span class="p">:</span> <span class="n">vec3</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">matrix_world</span><span class="o">.</span><span class="n">translation</span><span class="p">),</span>
+            <span class="s2">&quot;radius&quot;</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">custom_float</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_radius&quot;</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)),</span>
+            <span class="s2">&quot;strength&quot;</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">custom_float</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_strength&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)),</span>
+            <span class="s2">&quot;capture&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;resolution&quot;</span><span class="p">:</span> <span class="n">custom_int</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_resolution&quot;</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span>
+                <span class="s2">&quot;visualization_objects&quot;</span><span class="p">:</span> <span class="n">custom_bool</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_visualization_objects&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+                <span class="s2">&quot;coordinate_frames&quot;</span><span class="p">:</span> <span class="n">custom_bool</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_coordinate_frames&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="s2">&quot;point_clouds&quot;</span><span class="p">:</span> <span class="n">custom_bool</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_point_clouds&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="s2">&quot;shadows&quot;</span><span class="p">:</span> <span class="n">custom_bool</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_shadows&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="s2">&quot;environment_background&quot;</span><span class="p">:</span> <span class="n">custom_bool</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_environment_background&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="s2">&quot;environment_exposure&quot;</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span>
+                    <span class="mf">0.0</span><span class="p">,</span> <span class="n">custom_float</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_environment_exposure&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+                <span class="p">),</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+
+        <span class="n">box_projection</span> <span class="o">=</span> <span class="n">custom_bool</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_box_projection&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">box_min</span> <span class="o">=</span> <span class="n">custom_vec3</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_box_min&quot;</span><span class="p">)</span>
+        <span class="n">box_max</span> <span class="o">=</span> <span class="n">custom_vec3</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_box_max&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">box_projection</span> <span class="ow">and</span> <span class="p">(</span><span class="n">box_min</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">box_max</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">aabb</span> <span class="o">=</span> <span class="n">object_world_aabb</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">aabb</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">box_min</span><span class="p">,</span> <span class="n">box_max</span> <span class="o">=</span> <span class="n">aabb</span>
+        <span class="k">if</span> <span class="n">box_projection</span> <span class="ow">and</span> <span class="n">box_min</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">box_max</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="n">box_max</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">box_min</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mf">1.0e-4</span><span class="p">:</span>
+                <span class="n">probe</span><span class="p">[</span><span class="s2">&quot;box_projection&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">probe</span><span class="p">[</span><span class="s2">&quot;box_min&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">box_min</span>
+                <span class="n">probe</span><span class="p">[</span><span class="s2">&quot;box_max&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">box_max</span>
+
+        <span class="n">filter_settings</span> <span class="o">=</span> <span class="n">probe_filter_settings</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">filter_settings</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">probe</span><span class="p">[</span><span class="s2">&quot;filter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filter_settings</span>
+        <span class="n">probes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probe</span><span class="p">)</span>
+
+    <span class="n">sidecar</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">suffix</span> <span class="o">+</span> <span class="s2">&quot;.rayrai_probes.json&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">probes</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sidecar</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">sidecar</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+        <span class="k">return</span>
+
+    <span class="n">quality</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">scene</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">scene</span>
+    <span class="k">if</span> <span class="n">custom_property</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_max_reflection_probes_per_selection&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">quality</span><span class="p">[</span><span class="s2">&quot;max_reflection_probes_per_selection&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">custom_int</span><span class="p">(</span>
+            <span class="n">scene</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_max_reflection_probes_per_selection&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">custom_property</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_min_reflection_probe_weight&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">quality</span><span class="p">[</span><span class="s2">&quot;min_reflection_probe_weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="mf">0.0</span><span class="p">,</span> <span class="n">custom_float</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_min_reflection_probe_weight&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">custom_property</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_filtering_enabled&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">quality</span><span class="p">[</span><span class="s2">&quot;filtering_enabled&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">custom_bool</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="s2">&quot;rayrai_probe_filtering_enabled&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">document</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">&quot;coordinate_system&quot;</span><span class="p">:</span> <span class="s2">&quot;z_up&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;probes&quot;</span><span class="p">:</span> <span class="n">probes</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="n">quality</span><span class="p">:</span>
+        <span class="n">document</span><span class="p">[</span><span class="s2">&quot;quality&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">quality</span>
+    <span class="n">sidecar</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exported RayRai reflection probe sidecar: </span><span class="si">{</span><span class="n">sidecar</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">export_rayrai_light_sidecar</span><span class="p">(</span><span class="n">output</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Preserve Blender lights that glTF cannot represent directly.</span>
+
+<span class="sd">    The standard KHR_lights_punctual extension only supports directional, point,</span>
+<span class="sd">    and spot lights. Blender area lights are important for authored indoor scenes,</span>
+<span class="sd">    so RayRai stores them in a small sidecar next to the exported glTF/GLB.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">lights</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">objects</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="s2">&quot;LIGHT&quot;</span> <span class="ow">or</span> <span class="n">obj</span><span class="o">.</span><span class="n">hide_get</span><span class="p">()</span> <span class="ow">or</span> <span class="n">obj</span><span class="o">.</span><span class="n">hide_render</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">light</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">if</span> <span class="n">light</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="s2">&quot;AREA&quot;</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">matrix</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">matrix_world</span>
+        <span class="n">quat</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">to_quaternion</span><span class="p">()</span>
+        <span class="n">direction</span> <span class="o">=</span> <span class="n">quat</span> <span class="o">@</span> <span class="n">Vector</span><span class="p">((</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">))</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="n">quat</span> <span class="o">@</span> <span class="n">Vector</span><span class="p">((</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+        <span class="n">up</span> <span class="o">=</span> <span class="n">quat</span> <span class="o">@</span> <span class="n">Vector</span><span class="p">((</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+        <span class="n">size_x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">light</span><span class="p">,</span> <span class="s2">&quot;size&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+        <span class="n">size_y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">light</span><span class="p">,</span> <span class="s2">&quot;size_y&quot;</span><span class="p">,</span> <span class="n">size_x</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">light</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">,</span> <span class="s2">&quot;SQUARE&quot;</span><span class="p">)</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;SQUARE&quot;</span><span class="p">,</span> <span class="s2">&quot;DISK&quot;</span><span class="p">}:</span>
+            <span class="n">size_y</span> <span class="o">=</span> <span class="n">size_x</span>
+
+        <span class="n">lights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;area&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;position&quot;</span><span class="p">:</span> <span class="n">vec3</span><span class="p">(</span><span class="n">matrix</span><span class="o">.</span><span class="n">translation</span><span class="p">),</span>
+                <span class="s2">&quot;direction&quot;</span><span class="p">:</span> <span class="n">vec3</span><span class="p">(</span><span class="n">direction</span><span class="o">.</span><span class="n">normalized</span><span class="p">()),</span>
+                <span class="s2">&quot;right&quot;</span><span class="p">:</span> <span class="n">vec3</span><span class="p">(</span><span class="n">right</span><span class="o">.</span><span class="n">normalized</span><span class="p">()),</span>
+                <span class="s2">&quot;up&quot;</span><span class="p">:</span> <span class="n">vec3</span><span class="p">(</span><span class="n">up</span><span class="o">.</span><span class="n">normalized</span><span class="p">()),</span>
+                <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">size_x</span><span class="p">,</span> <span class="n">size_y</span><span class="p">],</span>
+                <span class="s2">&quot;energy&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">light</span><span class="p">,</span> <span class="s2">&quot;energy&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)),</span>
+                <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">light</span><span class="p">,</span> <span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))],</span>
+                <span class="s2">&quot;shape&quot;</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">light</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">,</span> <span class="s2">&quot;RECTANGLE&quot;</span><span class="p">),</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+    <span class="n">sidecar</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">suffix</span> <span class="o">+</span> <span class="s2">&quot;.rayrai_lights.json&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">lights</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sidecar</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">sidecar</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+        <span class="k">return</span>
+    <span class="n">sidecar</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;coordinate_system&quot;</span><span class="p">:</span> <span class="s2">&quot;z_up&quot;</span><span class="p">,</span> <span class="s2">&quot;lights&quot;</span><span class="p">:</span> <span class="n">lights</span><span class="p">},</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exported RayRai light sidecar: </span><span class="si">{</span><span class="n">sidecar</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">output</span> <span class="ow">or</span> <span class="n">default_output_path</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
+    <span class="n">output</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">wrote_scene</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">lights_only</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">probes_only</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">lights_only</span><span class="p">:</span>
+        <span class="n">export_rayrai_light_sidecar</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">probes_only</span><span class="p">:</span>
+        <span class="n">export_rayrai_probe_sidecar</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span> <span class="o">==</span> <span class="s2">&quot;obj&quot;</span><span class="p">:</span>
+        <span class="n">export_obj</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">material_diffuse</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">export_gltf</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">wrote_scene</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exported </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">output</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
 </section>
 </section>
 

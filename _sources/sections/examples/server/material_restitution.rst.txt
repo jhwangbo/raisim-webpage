@@ -8,7 +8,7 @@ Drops spheres with different material labels (steel, rubber, copper) and configu
 
 Screenshot
 ==========
-.. image:: ../../../image/material_restitution.png
+.. image:: ../../../../rsc/docs/image/material_restitution.png
    :alt: material_restitution example
    :width: 100%
 

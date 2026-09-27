@@ -15,6 +15,8 @@ Key characteristics:
 * In-process rendering with direct OpenGL texture access, plus the standalone TCP viewer for ``RaisimServer`` scenes
 * ``Fast``/``Balanced``/``High``/``Ultra`` quality presets with explicit settings for shadows, post-process, render scale, and texture filtering
 * glTF/GLB visual-scene import with PBR materials, normal maps, authored lights, HDR image-based lighting, reflection probes, and planar reflections
+* Glass materials (``Material::glass``) with screen-space refraction or opt-in geometry-traced refraction, optionally accelerated by Vulkan hardware ray queries on Linux and Windows
+* Dense instanced foliage with automatic mesh LOD, wind, shadow LOD, and asynchronous loading with reusable LOD cache files
 * Weather and scene effects: time-of-day sky, fog/local fog, rain, snow, lightning diagnostics, wet/snow material response, projected decals, and irradiance volumes
 * Capture and diagnostics helpers for screenshots, debug passes, GPU pass timings, exposure/luminance analysis, and JSON reports
 * Support for RGB/depth sensor alignment, GPU LiDAR slices, point clouds, coordinate frames, camera frustums, and picking
@@ -32,6 +34,7 @@ point is ``raisin::RayraiWindow``.
    rayrai/Lighting
    rayrai/Materials
    rayrai/Visuals
+   rayrai/Foliage
    rayrai/PostProcess
    rayrai/Weather
    rayrai/Capture
@@ -41,9 +44,48 @@ point is ``raisin::RayraiWindow``.
 
 Dependencies
 ============
-rayrai depends on SDL2, OpenGL, glbinding, glm, assimp, stb, and imgui. The
-current package uses the flat ``rayrai`` prefix and ships the headers,
-libraries, and CMake configuration for these dependencies there.
+rayrai depends on RaiSim, SDL2, OpenGL, glbinding, glm, assimp, stb, imgui, and
+Eigen. The flat ``rayrai`` prefix ships the headers, libraries, and CMake
+configuration for glbinding, glm, imgui, and stb. assimp ships in the ``raisim``
+prefix, so downstream projects need both prefixes. SDL2 and Eigen come from the
+system package manager, or from vcpkg on Windows.
+
+Vulkan is optional. A rayrai build with Vulkan support (Linux and Windows only)
+loads the Vulkan runtime the first time geometry-traced glass renders and falls
+back to OpenGL tracing when hardware ray queries are unavailable. Set
+``RAYRAI_DISABLE_VULKAN_RAY_QUERY=1`` to force the OpenGL path.
+For source-build prerequisites and driver checks, see
+:ref:`rayrai-vulkan-ray-query-troubleshooting`.
+
+.. _rayrai-platform-support:
+
+Platform support
+================
+The rayrai context helpers (``ExampleApp`` in ``rayrai/example_common.hpp`` and
+``RayraiWindow::createOffscreenGlContext``) request an OpenGL 4.3 core-profile
+context and fall back to 3.3 core. When the application creates the context
+itself, use a core profile of version 3.3 or newer. Features that need more than
+the base context fall back automatically:
+
+* GPU instance culling needs compute shaders (OpenGL 4.3), and
+  multi-draw-indirect submission needs OpenGL 4.3 or
+  ``GL_ARB_multi_draw_indirect``. Without them rayrai culls on the CPU and
+  issues one draw per mesh. Hi-Z occlusion culling builds its depth pyramid
+  with compute where available and by rasterization otherwise.
+* Geometry-traced glass uses Vulkan hardware ray queries when they are
+  available and the portable OpenGL tracer otherwise.
+
+macOS provides OpenGL 4.1 with 16 fragment texture units, so rayrai uses its
+limited material tier and the common post-process program there (see the GPU
+capability tiers in :doc:`rayrai/Materials`). The same applies to any GPU that
+reports 16 or fewer fragment texture units. The common
+program applies depth of field, FXAA, bloom, SSAO, and TAA. Effects that need
+the full post-process program have no effect on these platforms: screen-space
+reflections, screen-space indirect lighting, volumetric fog and lighting, local
+fog volumes, projected decals, light shafts, lens flares, contact shadows,
+motion and zoom blur, aerial perspective, color grading, saturation, white
+balance, vignette, chromatic aberration, film grain, and the stylized filters.
+Vulkan ray queries are not available on macOS.
 
 Source-built TCP viewer (recommended)
 =====================================
@@ -107,7 +149,7 @@ The typical workflow is:
       }
     }
 
-.. image:: ../image/rayrai/rayrai_minimal_usage.png
+.. image:: ../../rsc/docs/image/rayrai/rayrai_minimal_usage.png
    :alt: Minimal usage output — a red sphere above a ground plane
    :width: 100%
 
@@ -123,16 +165,34 @@ live on one thread, which is the normal RaiSim workflow.
 
 ``ThreadingMode::MultiThread`` is an explicit opt-in for batch/offscreen render
 setups that create one ``RayraiWindow`` per worker thread, each with its own
-OpenGL context. Do not mix threading modes inside one process; all windows must
-use the same mode. A threading-mode mismatch at construction is treated as a
-fatal error (``RSFATAL``).
+OpenGL context. Each renderer belongs to its worker: construct, render, read
+back, edit, and destroy it on that thread with its context current, and do not
+step or edit its world on another thread while it renders. Create and destroy
+SDL windows on the main thread. A context created there with
+``createOffscreenGlContext`` is current on the main thread; release it with
+``RayraiWindow::detachOffscreenGlContext`` before a worker adopts it with
+``makeOffscreenContextCurrent``. Contexts in one share group share immutable
+untextured mesh geometry; textures and textured models are uploaded separately
+for each context.
+
+Do not mix threading modes inside one process; all renderers, including shader
+prewarmers, must use the same mode. A threading-mode mismatch at construction
+is reported through RaiSim's fatal handler (``RSFATAL``), which exits the
+process unless the application installs another handler with
+``raisim::RaiSimMsg::setFatalCallback``.
+
+Several renderers in one process read the same SDL keyboard state. Call
+``setKeyboardInputEnabled(false)`` and ``setKeyboardShortcutsEnabled(false)`` on
+renderers without focus so that one key press does not move every camera or
+trigger every shortcut.
 
 Lifetime and error model
 ========================
-``RayraiWindow`` does not own the ``raisim::World`` passed to its constructor.
-The world must outlive the window. Either the ``raisim::World*`` or
-``std::shared_ptr<raisim::World>`` constructor is acceptable; the shared-pointer
-overload uses a non-owning deleter internally.
+``RayraiWindow`` has two world constructors. The
+``std::shared_ptr<raisim::World>`` overload keeps a reference to the world, so
+the world stays alive at least as long as the window. The ``raisim::World&``
+overload does not own the world; that world must outlive the window.
+``swapWorld`` switches the renderer to another shared world.
 
 Mutation methods that target an entity by name — for example,
 ``removeVisualObject``, ``clearAdditionalLights``, ``clearLocalFogVolumes`` —
@@ -147,6 +207,19 @@ error to stderr. The list includes ``loadColorTextureWithTiling``,
 ``createHdrIrradianceCubemap``, ``createHdrPrefilteredEnvironmentCubemap``,
 ``createSplitSumBrdfLut``, ``PbrEnvironment::loadFromHdrFile``,
 ``addVisualMesh``, ``addVisualCustomMesh``, and ``importVisualScene``.
+
+Newer APIs report invalid input with exceptions. ``setSkyVisibilityGrid`` and
+``setBakedIrradianceGrid`` throw ``std::invalid_argument`` for an invalid grid,
+strength, or edge fade, and ``std::runtime_error`` when no GL context is
+current. With ``RenderQualitySettings::geometryRefraction`` enabled, render
+calls throw ``std::runtime_error`` when the scene cannot be traced: a fisheye
+camera, glass with a visibility-range fade, unsupported glass material settings
+such as overlays, deformable boundaries, or inconsistent IOR within one volume,
+more than 16 media containing the camera, scenes beyond the tracer's capacity,
+or an explicitly requested ``GeometryRefractionBackend::VulkanRayQuery`` that is
+unavailable. See the geometry-aware refraction section of
+:doc:`rayrai/Materials`. ``createOffscreenGlContext`` reports window or context
+creation failure through ``RSFATAL``.
 
 Built-in shader programs are registered during construction and compiled
 lazily on first use. ``shaderWarmupDiagnostics`` reports the measured
@@ -186,7 +259,7 @@ APIs such as ``setBackgroundColorRgb255`` or ``setBackgroundColorLinear``.
       }
     }
 
-.. image:: ../image/rayrai/rayrai_custom_visuals.png
+.. image:: ../../rsc/docs/image/rayrai/rayrai_custom_visuals.png
    :alt: Marker prop on a tinted background
    :width: 100%
 
@@ -196,10 +269,12 @@ Where to go next
 * Light the scene and set up HDR/IBL reflections — :doc:`rayrai/Lighting`
 * Apply PBR materials and authored asset imports — :doc:`rayrai/Materials`
 * Add visual primitives, instanced visuals, and overlays — :doc:`rayrai/Visuals`
+* Render dense vegetation with wind, leaf lighting, and LOD — :doc:`rayrai/Foliage`
 * Enable cinematic post-process / SSR / SSAO / DoF — :doc:`rayrai/PostProcess`
 * Drive weather and atmospherics — :doc:`rayrai/Weather`
 * Run headlessly, capture screenshots, and run diagnostics — :doc:`rayrai/Capture`
 * Align to RGB/depth/LiDAR sensors and pick objects — :doc:`rayrai/Sensors`
 * Write a custom TCP client — :doc:`RayraiTcpViewer`
 * List of shipped example targets — :doc:`rayrai/Examples`
+* Check OpenGL requirements and macOS limits — :ref:`rayrai-platform-support`
 * Performance notes and the full C++ API reference — :doc:`rayrai/Performance`

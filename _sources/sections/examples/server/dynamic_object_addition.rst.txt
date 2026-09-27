@@ -8,7 +8,7 @@ Runs an ANYmal with PD control and periodically throws balls into the scene. It 
 
 Screenshot
 ==========
-.. image:: ../../../image/dynamic_object_addition.png
+.. image:: ../../../../rsc/docs/image/dynamic_object_addition.png
    :alt: dynamic_object_addition example
    :width: 100%
 

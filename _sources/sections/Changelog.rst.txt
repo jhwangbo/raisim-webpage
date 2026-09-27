@@ -15,6 +15,8 @@ shown in the documentation title and reported by ``RAISIM_VERSION``.
    :maxdepth: 1
    :caption: Releases
 
+   changelog/upcoming
+   changelog/v2.6.1
    changelog/v2.5.8
    changelog/v2.4.5
    changelog/v2.4.3
@@ -30,6 +32,13 @@ Versions at a glance
 
    * - Version
      - Headline
+   * - :doc:`Upcoming <changelog/upcoming>`
+     - glm::vec4 orientations read as (w, x, y, z) (breaking); geometry-traced
+       glass; foliage LOD, batching and caches; faster frames with identical
+       images; screen-space AO and macOS fixes.
+   * - :doc:`v2.6.1 <changelog/v2.6.1>`
+     - Tendons; TCP viewer split panes, local world simulation, recording,
+       Live Signals and scene editing; restored panes reconnect (2.6.1).
    * - :doc:`v2.5.8 <changelog/v2.5.8>`
      - Shared GPU mesh buffers for compatible rayrai contexts; depth-camera
        target allocation fixes; current TCP sensor and heightmap workflows.

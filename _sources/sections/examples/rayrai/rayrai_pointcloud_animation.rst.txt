@@ -8,7 +8,7 @@ Generates animated ring point clouds to show per-point color updates and dynamic
 
 Screenshot
 ==========
-.. image:: ../../../image/rayrai_pointcloud_animation.png
+.. image:: ../../../../rsc/docs/image/rayrai_pointcloud_animation.png
    :alt: rayrai_pointcloud_animation example
    :width: 100%
 

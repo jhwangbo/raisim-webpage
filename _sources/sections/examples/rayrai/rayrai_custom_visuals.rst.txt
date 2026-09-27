@@ -8,7 +8,7 @@ Demonstrates custom visual primitives (sphere, box, cylinder, capsule, mesh) and
 
 Screenshot
 ==========
-.. image:: ../../../image/rayrai_custom_visuals.png
+.. image:: ../../../../rsc/docs/image/rayrai_custom_visuals.png
    :alt: rayrai_custom_visuals example
    :width: 100%
 

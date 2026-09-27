@@ -8,7 +8,7 @@ Renders the Khronos MetalRoughSpheres glTF asset to check metallic-roughness mat
 
 Screenshot
 ==========
-.. image:: ../../../image/rayrai_pbr_material_grid.png
+.. image:: ../../../../rsc/docs/image/rayrai_pbr_material_grid.png
    :alt: rayrai_pbr_material_grid example
    :width: 100%
 

@@ -19,7 +19,9 @@ Minimum requirements:
 * A supported 64-bit operating system.
 * CMake 3.18 or newer for the top-level package workspace.
 * A C++20-capable compiler when building your own application against RaiSim.
-* OpenGL runtime support for rayrai.
+* OpenGL 3.3 core profile or newer for rayrai. OpenGL 4.3 enables the full
+  renderer; macOS provides OpenGL 4.1 and runs a reduced feature set (see
+  :ref:`rayrai-platform-support`).
 * SDL2 runtime libraries for rayrai on Linux or macOS when they are not bundled
   with the package.
 * Visual Studio 2019 or newer on Windows when compiling downstream C++ projects.
@@ -195,7 +197,9 @@ it in:
 
 RaiSim also checks the path passed to
 ``raisim::World::setActivationKey()``. If that file is not found, it falls back
-to the user-directory location above.
+to the user-directory location above. RaiSim locates and validates the key once
+per process, when the first ``raisim::World`` is constructed, so call
+``setActivationKey()`` before creating any world.
 
 Rayrai
 ======

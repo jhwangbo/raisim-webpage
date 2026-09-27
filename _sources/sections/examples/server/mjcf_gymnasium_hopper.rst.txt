@@ -1,7 +1,7 @@
 mjcf_gymnasium_hopper
 =====================
 
-.. image:: ../../../image/mjcf_gymnasium_hopper.png
+.. image:: ../../../../rsc/docs/image/mjcf_gymnasium_hopper.png
    :alt: mjcf_gymnasium_hopper example
    :width: 100%
 

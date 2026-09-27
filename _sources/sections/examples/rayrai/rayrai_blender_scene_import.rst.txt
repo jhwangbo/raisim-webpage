@@ -162,4 +162,11 @@ If the imported scene looks wrong, check these first:
 
 Exporter source
 ---------------
-For reference, the installed exporter is:
+``--lights-only`` and ``--probes-only`` rewrite only the light sidecar or the
+reflection-probe sidecar (``scene.glb.rayrai_probes.json``) of an existing
+glTF/GLB export. The probe sidecar lists Blender objects named
+``RAYRAI_PROBE*`` or carrying the ``rayrai_reflection_probe`` custom property.
+For reference, the exporter source is:
+
+.. literalinclude:: ../../../../scripts/export_blender_scene.py
+   :language: python

@@ -8,7 +8,7 @@ Loads the office1 XML world, adds a dynamic ball, and spawns Aliengo with PD con
 
 Screenshot
 ==========
-.. image:: ../../../image/office1_scene.png
+.. image:: ../../../../rsc/docs/image/office1_scene.png
    :alt: office1_scene example
    :width: 100%
 

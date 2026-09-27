@@ -1,7 +1,7 @@
 granular_media
 ==============
 
-.. image:: ../../../image/granular_media.png
+.. image:: ../../../../rsc/docs/image/granular_media.png
    :alt: granular_media example
    :width: 100%
 

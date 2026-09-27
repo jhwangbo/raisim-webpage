@@ -8,7 +8,7 @@ Renders the Go1 RGB camera into an ImGui window and draws the camera frustum in 
 
 Screenshot
 ==========
-.. image:: ../../../image/rayrai_rgb_camera.png
+.. image:: ../../../../rsc/docs/image/rayrai_rgb_camera.png
    :alt: rayrai_rgb_camera example
    :width: 100%
 

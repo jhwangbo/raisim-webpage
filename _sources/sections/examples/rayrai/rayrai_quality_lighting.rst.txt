@@ -13,7 +13,7 @@ batch data-generation throughput.
 
 Screenshot
 ==========
-.. image:: ../../../image/rayrai_quality_lighting.png
+.. image:: ../../../../rsc/docs/image/rayrai_quality_lighting.png
    :alt: rayrai_quality_lighting example
    :width: 100%
 

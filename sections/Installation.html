@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; raisim 2.6.0 documentation</title>
+  <title>Installation &mdash; raisim 2.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=a5c4661c" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=ae39cb24"></script>
+      <script src="../_static/documentation_options.js?v=dfec817d"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../_static/tabs.js?v=3030b3cb"></script>
@@ -150,7 +150,9 @@ libraries with headers, example and rayrai viewer sources, and documentation.</p
 <li><p>A supported 64-bit operating system.</p></li>
 <li><p>CMake 3.18 or newer for the top-level package workspace.</p></li>
 <li><p>A C++20-capable compiler when building your own application against RaiSim.</p></li>
-<li><p>OpenGL runtime support for rayrai.</p></li>
+<li><p>OpenGL 3.3 core profile or newer for rayrai. OpenGL 4.3 enables the full
+renderer; macOS provides OpenGL 4.1 and runs a reduced feature set (see
+<a class="reference internal" href="Rayrai.html#rayrai-platform-support"><span class="std std-ref">Platform support</span></a>).</p></li>
 <li><p>SDL2 runtime libraries for rayrai on Linux or macOS when they are not bundled
 with the package.</p></li>
 <li><p>Visual Studio 2019 or newer on Windows when compiling downstream C++ projects.</p></li>
@@ -292,7 +294,9 @@ it in:</p>
 </ul>
 <p>RaiSim also checks the path passed to
 <code class="docutils literal notranslate"><span class="pre">raisim::World::setActivationKey()</span></code>. If that file is not found, it falls back
-to the user-directory location above.</p>
+to the user-directory location above. RaiSim locates and validates the key once
+per process, when the first <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> is constructed, so call
+<code class="docutils literal notranslate"><span class="pre">setActivationKey()</span></code> before creating any world.</p>
 </section>
 <section id="rayrai">
 <h2>Rayrai<a class="headerlink" href="#rayrai" title="Link to this heading"></a></h2>

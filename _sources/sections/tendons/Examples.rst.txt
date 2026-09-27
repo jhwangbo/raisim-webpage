@@ -47,7 +47,7 @@ produce visible cables; the three fixed tendons provide joint transmissions.
 All moving bodies respond to simulated forces and constraints. The controller
 changes servo targets instead of assigning animated body poses.
 
-.. image:: ../../image/tendon_coupling.png
+.. image:: ../../../rsc/docs/image/tendon_coupling.png
    :alt: Orange shoulder cable and turquoise elbow cable coupled by their physical lengths
    :width: 100%
 
@@ -109,7 +109,7 @@ selection, and independent pulley branches. Each tendon uses an instanced
 cylinder batch. Curves are tessellated for drawing; that tessellation does not
 replace the analytic length calculation used by physics.
 
-.. image:: ../../image/tendons.png
+.. image:: ../../../rsc/docs/image/tendons.png
    :alt: Four stations in the automatic Rayrai tendon showcase
    :width: 100%
 

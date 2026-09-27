@@ -2,7 +2,7 @@
 XML Example: Templated World
 ############################
 
-.. image:: ../../../image/xml_templated_world.png
+.. image:: ../../../../rsc/docs/image/xml_templated_world.png
    :alt: xml_templated_world example
    :width: 100%
 

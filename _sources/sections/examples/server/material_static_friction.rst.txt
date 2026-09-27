@@ -8,7 +8,7 @@ Compares static and dynamic friction by pushing a box across a ground plane. Mat
 
 Screenshot
 ==========
-.. image:: ../../../image/material_static_friction.png
+.. image:: ../../../../rsc/docs/image/material_static_friction.png
    :alt: material_static_friction example
    :width: 100%
 

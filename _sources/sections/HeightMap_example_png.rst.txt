@@ -2,7 +2,7 @@
 Height Map Using a PNG File
 #############################
 
-.. image:: ../image/heightMapUsingPNG.gif
+.. image:: ../../rsc/docs/image/heightMapUsingPNG.gif
 
 XML approach
 -----------------------------

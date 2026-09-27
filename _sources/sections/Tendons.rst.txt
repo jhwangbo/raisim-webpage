@@ -13,7 +13,7 @@ through ``<raisim/World.hpp>``. The world owns them and advances their physics
 with the contact solver. Spatial tendons are drawn automatically by Rayrai and
 by the TCP viewer connected to ``RaisimServer``.
 
-.. image:: ../image/tendons.png
+.. image:: ../../rsc/docs/image/tendons.png
    :alt: Elastic suspensions, cylinder and sphere wrapping, and coupled joints in Rayrai
    :width: 100%
 

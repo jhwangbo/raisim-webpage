@@ -6,7 +6,7 @@ RaisimGymTorch
 What is RaisimGymTorch?
 ===========================
 
-.. image:: ../image/raisimGymTorch.png
+.. image:: ../../rsc/docs/image/raisimGymTorch.png
   :width: 600
   :alt: RaiSimPy demo (robots.py)
 
@@ -21,10 +21,10 @@ Why RaisimGymTorch?
 RaisimGymTorch is designed to collect **tens of billions of state transitions** with a single desktop machine.
 Such a number of state transitions can be necessary for challenging tasks. An example of a trained policy is shown below.
 
-.. image:: ../image/raisimGymTorch_trainedPolicy1.gif
+.. image:: ../../rsc/docs/image/raisimGymTorch_trainedPolicy1.gif
   :alt: trained policy 1
 
-.. image:: ../image/raisimGymTorch_trainedPolicy2.gif
+.. image:: ../../rsc/docs/image/raisimGymTorch_trainedPolicy2.gif
   :alt: trained policy 2
 
 Approximately **160 billion time steps** were used to train the above controller.

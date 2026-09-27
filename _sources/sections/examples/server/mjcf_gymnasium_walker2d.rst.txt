@@ -1,7 +1,7 @@
 mjcf_gymnasium_walker2d
 =======================
 
-.. image:: ../../../image/mjcf_gymnasium_walker2d.png
+.. image:: ../../../../rsc/docs/image/mjcf_gymnasium_walker2d.png
    :alt: mjcf_gymnasium_walker2d example
    :width: 100%
 

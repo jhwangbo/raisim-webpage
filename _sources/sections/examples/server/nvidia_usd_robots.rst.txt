@@ -9,7 +9,7 @@ Loads several bundled Isaac Sim robot USD scenes with
 ``RaisimServer``. The example is intentionally limited to assets that were
 smoke-tested as RaiSim articulated systems with supported collision bodies.
 
-.. image:: ../../../image/rayrai/rayrai_usd_nvidia_robots.png
+.. image:: ../../../../rsc/docs/image/rayrai/rayrai_usd_nvidia_robots.png
    :alt: Collision bodies from three Isaac Sim USD robot assets imported into RaiSim
    :width: 100%
 

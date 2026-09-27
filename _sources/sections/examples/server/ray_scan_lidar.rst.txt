@@ -8,7 +8,7 @@ Sweeps rays from a robot frame to emulate a LiDAR scan and visualizes hits with 
 
 Screenshot
 ==========
-.. image:: ../../../image/ray_scan_lidar.png
+.. image:: ../../../../rsc/docs/image/ray_scan_lidar.png
    :alt: ray_scan_lidar example
    :width: 100%
 

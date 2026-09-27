@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rayrai Visualizer &mdash; raisim 2.6.0 documentation</title>
+  <title>rayrai Visualizer &mdash; raisim 2.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b6430375" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=ae39cb24"></script>
+      <script src="../_static/documentation_options.js?v=dfec817d"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -94,6 +94,7 @@
 <li class="toctree-l3"><a class="reference internal" href="rayrai/Lighting.html">Lighting, shadows, and HDR/IBL</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai/Materials.html">PBR materials</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai/Visuals.html">Custom visuals, instancing, and scene helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai/Foliage.html">Foliage and forest rendering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai/PostProcess.html">Post-process effects</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai/Weather.html">Weather and atmospherics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai/Capture.html">Capture, diagnostics, and headless rendering</a></li>
@@ -103,6 +104,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#platform-support">Platform support</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#source-built-tcp-viewer-recommended">Source-built TCP viewer (recommended)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#build-and-link">Build and link</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#minimal-usage">Minimal usage</a></li>
@@ -157,6 +159,8 @@ access to render targets, picking, and custom visuals.</p>
 <li><p>In-process rendering with direct OpenGL texture access, plus the standalone TCP viewer for <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> scenes</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Fast</span></code>/<code class="docutils literal notranslate"><span class="pre">Balanced</span></code>/<code class="docutils literal notranslate"><span class="pre">High</span></code>/<code class="docutils literal notranslate"><span class="pre">Ultra</span></code> quality presets with explicit settings for shadows, post-process, render scale, and texture filtering</p></li>
 <li><p>glTF/GLB visual-scene import with PBR materials, normal maps, authored lights, HDR image-based lighting, reflection probes, and planar reflections</p></li>
+<li><p>Glass materials (<code class="docutils literal notranslate"><span class="pre">Material::glass</span></code>) with screen-space refraction or opt-in geometry-traced refraction, optionally accelerated by Vulkan hardware ray queries on Linux and Windows</p></li>
+<li><p>Dense instanced foliage with automatic mesh LOD, wind, shadow LOD, and asynchronous loading with reusable LOD cache files</p></li>
 <li><p>Weather and scene effects: time-of-day sky, fog/local fog, rain, snow, lightning diagnostics, wet/snow material response, projected decals, and irradiance volumes</p></li>
 <li><p>Capture and diagnostics helpers for screenshots, debug passes, GPU pass timings, exposure/luminance analysis, and JSON reports</p></li>
 <li><p>Support for RGB/depth sensor alignment, GPU LiDAR slices, point clouds, coordinate frames, camera frustums, and picking</p></li>
@@ -172,6 +176,7 @@ point is <code class="docutils literal notranslate"><span class="pre">raisin::Ra
 <li class="toctree-l1"><a class="reference internal" href="rayrai/Lighting.html">Lighting, shadows, and HDR/IBL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rayrai/Materials.html">PBR materials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rayrai/Visuals.html">Custom visuals, instancing, and scene helpers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rayrai/Foliage.html">Foliage and forest rendering</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rayrai/PostProcess.html">Post-process effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rayrai/Weather.html">Weather and atmospherics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rayrai/Capture.html">Capture, diagnostics, and headless rendering</a></li>
@@ -183,9 +188,45 @@ point is <code class="docutils literal notranslate"><span class="pre">raisin::Ra
 </section>
 <section id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading"></a></h2>
-<p>rayrai depends on SDL2, OpenGL, glbinding, glm, assimp, stb, and imgui. The
-current package uses the flat <code class="docutils literal notranslate"><span class="pre">rayrai</span></code> prefix and ships the headers,
-libraries, and CMake configuration for these dependencies there.</p>
+<p>rayrai depends on RaiSim, SDL2, OpenGL, glbinding, glm, assimp, stb, imgui, and
+Eigen. The flat <code class="docutils literal notranslate"><span class="pre">rayrai</span></code> prefix ships the headers, libraries, and CMake
+configuration for glbinding, glm, imgui, and stb. assimp ships in the <code class="docutils literal notranslate"><span class="pre">raisim</span></code>
+prefix, so downstream projects need both prefixes. SDL2 and Eigen come from the
+system package manager, or from vcpkg on Windows.</p>
+<p>Vulkan is optional. A rayrai build with Vulkan support (Linux and Windows only)
+loads the Vulkan runtime the first time geometry-traced glass renders and falls
+back to OpenGL tracing when hardware ray queries are unavailable. Set
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_DISABLE_VULKAN_RAY_QUERY=1</span></code> to force the OpenGL path.
+For source-build prerequisites and driver checks, see
+<a class="reference internal" href="Troubleshooting.html#rayrai-vulkan-ray-query-troubleshooting"><span class="std std-ref">Vulkan Ray Queries Unavailable</span></a>.</p>
+</section>
+<section id="platform-support">
+<span id="rayrai-platform-support"></span><h2>Platform support<a class="headerlink" href="#platform-support" title="Link to this heading"></a></h2>
+<p>The rayrai context helpers (<code class="docutils literal notranslate"><span class="pre">ExampleApp</span></code> in <code class="docutils literal notranslate"><span class="pre">rayrai/example_common.hpp</span></code> and
+<code class="docutils literal notranslate"><span class="pre">RayraiWindow::createOffscreenGlContext</span></code>) request an OpenGL 4.3 core-profile
+context and fall back to 3.3 core. When the application creates the context
+itself, use a core profile of version 3.3 or newer. Features that need more than
+the base context fall back automatically:</p>
+<ul class="simple">
+<li><p>GPU instance culling needs compute shaders (OpenGL 4.3), and
+multi-draw-indirect submission needs OpenGL 4.3 or
+<code class="docutils literal notranslate"><span class="pre">GL_ARB_multi_draw_indirect</span></code>. Without them rayrai culls on the CPU and
+issues one draw per mesh. Hi-Z occlusion culling builds its depth pyramid
+with compute where available and by rasterization otherwise.</p></li>
+<li><p>Geometry-traced glass uses Vulkan hardware ray queries when they are
+available and the portable OpenGL tracer otherwise.</p></li>
+</ul>
+<p>macOS provides OpenGL 4.1 with 16 fragment texture units, so rayrai uses its
+limited material tier and the common post-process program there (see the GPU
+capability tiers in <a class="reference internal" href="rayrai/Materials.html"><span class="doc">PBR materials</span></a>). The same applies to any GPU that
+reports 16 or fewer fragment texture units. The common
+program applies depth of field, FXAA, bloom, SSAO, and TAA. Effects that need
+the full post-process program have no effect on these platforms: screen-space
+reflections, screen-space indirect lighting, volumetric fog and lighting, local
+fog volumes, projected decals, light shafts, lens flares, contact shadows,
+motion and zoom blur, aerial perspective, color grading, saturation, white
+balance, vignette, chromatic aberration, film grain, and the stylized filters.
+Vulkan ray queries are not available on macOS.</p>
 </section>
 <section id="source-built-tcp-viewer-recommended">
 <h2>Source-built TCP viewer (recommended)<a class="headerlink" href="#source-built-tcp-viewer-recommended" title="Link to this heading"></a></h2>
@@ -257,16 +298,32 @@ full headless capture-to-PNG example.</p>
 live on one thread, which is the normal RaiSim workflow.</p>
 <p><code class="docutils literal notranslate"><span class="pre">ThreadingMode::MultiThread</span></code> is an explicit opt-in for batch/offscreen render
 setups that create one <code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> per worker thread, each with its own
-OpenGL context. Do not mix threading modes inside one process; all windows must
-use the same mode. A threading-mode mismatch at construction is treated as a
-fatal error (<code class="docutils literal notranslate"><span class="pre">RSFATAL</span></code>).</p>
+OpenGL context. Each renderer belongs to its worker: construct, render, read
+back, edit, and destroy it on that thread with its context current, and do not
+step or edit its world on another thread while it renders. Create and destroy
+SDL windows on the main thread. A context created there with
+<code class="docutils literal notranslate"><span class="pre">createOffscreenGlContext</span></code> is current on the main thread; release it with
+<code class="docutils literal notranslate"><span class="pre">RayraiWindow::detachOffscreenGlContext</span></code> before a worker adopts it with
+<code class="docutils literal notranslate"><span class="pre">makeOffscreenContextCurrent</span></code>. Contexts in one share group share immutable
+untextured mesh geometry; textures and textured models are uploaded separately
+for each context.</p>
+<p>Do not mix threading modes inside one process; all renderers, including shader
+prewarmers, must use the same mode. A threading-mode mismatch at construction
+is reported through RaiSim’s fatal handler (<code class="docutils literal notranslate"><span class="pre">RSFATAL</span></code>), which exits the
+process unless the application installs another handler with
+<code class="docutils literal notranslate"><span class="pre">raisim::RaiSimMsg::setFatalCallback</span></code>.</p>
+<p>Several renderers in one process read the same SDL keyboard state. Call
+<code class="docutils literal notranslate"><span class="pre">setKeyboardInputEnabled(false)</span></code> and <code class="docutils literal notranslate"><span class="pre">setKeyboardShortcutsEnabled(false)</span></code> on
+renderers without focus so that one key press does not move every camera or
+trigger every shortcut.</p>
 </section>
 <section id="lifetime-and-error-model">
 <h2>Lifetime and error model<a class="headerlink" href="#lifetime-and-error-model" title="Link to this heading"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> does not own the <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> passed to its constructor.
-The world must outlive the window. Either the <code class="docutils literal notranslate"><span class="pre">raisim::World*</span></code> or
-<code class="docutils literal notranslate"><span class="pre">std::shared_ptr&lt;raisim::World&gt;</span></code> constructor is acceptable; the shared-pointer
-overload uses a non-owning deleter internally.</p>
+<p><code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> has two world constructors. The
+<code class="docutils literal notranslate"><span class="pre">std::shared_ptr&lt;raisim::World&gt;</span></code> overload keeps a reference to the world, so
+the world stays alive at least as long as the window. The <code class="docutils literal notranslate"><span class="pre">raisim::World&amp;</span></code>
+overload does not own the world; that world must outlive the window.
+<code class="docutils literal notranslate"><span class="pre">swapWorld</span></code> switches the renderer to another shared world.</p>
 <p>Mutation methods that target an entity by name — for example,
 <code class="docutils literal notranslate"><span class="pre">removeVisualObject</span></code>, <code class="docutils literal notranslate"><span class="pre">clearAdditionalLights</span></code>, <code class="docutils literal notranslate"><span class="pre">clearLocalFogVolumes</span></code> —
 are silent no-ops when the target does not exist. They never throw and never
@@ -279,6 +336,18 @@ error to stderr. The list includes <code class="docutils literal notranslate"><s
 <code class="docutils literal notranslate"><span class="pre">createHdrIrradianceCubemap</span></code>, <code class="docutils literal notranslate"><span class="pre">createHdrPrefilteredEnvironmentCubemap</span></code>,
 <code class="docutils literal notranslate"><span class="pre">createSplitSumBrdfLut</span></code>, <code class="docutils literal notranslate"><span class="pre">PbrEnvironment::loadFromHdrFile</span></code>,
 <code class="docutils literal notranslate"><span class="pre">addVisualMesh</span></code>, <code class="docutils literal notranslate"><span class="pre">addVisualCustomMesh</span></code>, and <code class="docutils literal notranslate"><span class="pre">importVisualScene</span></code>.</p>
+<p>Newer APIs report invalid input with exceptions. <code class="docutils literal notranslate"><span class="pre">setSkyVisibilityGrid</span></code> and
+<code class="docutils literal notranslate"><span class="pre">setBakedIrradianceGrid</span></code> throw <code class="docutils literal notranslate"><span class="pre">std::invalid_argument</span></code> for an invalid grid,
+strength, or edge fade, and <code class="docutils literal notranslate"><span class="pre">std::runtime_error</span></code> when no GL context is
+current. With <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings::geometryRefraction</span></code> enabled, render
+calls throw <code class="docutils literal notranslate"><span class="pre">std::runtime_error</span></code> when the scene cannot be traced: a fisheye
+camera, glass with a visibility-range fade, unsupported glass material settings
+such as overlays, deformable boundaries, or inconsistent IOR within one volume,
+more than 16 media containing the camera, scenes beyond the tracer’s capacity,
+or an explicitly requested <code class="docutils literal notranslate"><span class="pre">GeometryRefractionBackend::VulkanRayQuery</span></code> that is
+unavailable. See the geometry-aware refraction section of
+<a class="reference internal" href="rayrai/Materials.html"><span class="doc">PBR materials</span></a>. <code class="docutils literal notranslate"><span class="pre">createOffscreenGlContext</span></code> reports window or context
+creation failure through <code class="docutils literal notranslate"><span class="pre">RSFATAL</span></code>.</p>
 <p>Built-in shader programs are registered during construction and compiled
 lazily on first use. <code class="docutils literal notranslate"><span class="pre">shaderWarmupDiagnostics</span></code> reports the measured
 compile/link cost and linked program count so both startup stalls and
@@ -325,12 +394,14 @@ APIs such as <code class="docutils literal notranslate"><span class="pre">setBac
 <li><p>Light the scene and set up HDR/IBL reflections — <a class="reference internal" href="rayrai/Lighting.html"><span class="doc">Lighting, shadows, and HDR/IBL</span></a></p></li>
 <li><p>Apply PBR materials and authored asset imports — <a class="reference internal" href="rayrai/Materials.html"><span class="doc">PBR materials</span></a></p></li>
 <li><p>Add visual primitives, instanced visuals, and overlays — <a class="reference internal" href="rayrai/Visuals.html"><span class="doc">Custom visuals, instancing, and scene helpers</span></a></p></li>
+<li><p>Render dense vegetation with wind, leaf lighting, and LOD — <a class="reference internal" href="rayrai/Foliage.html"><span class="doc">Foliage and forest rendering</span></a></p></li>
 <li><p>Enable cinematic post-process / SSR / SSAO / DoF — <a class="reference internal" href="rayrai/PostProcess.html"><span class="doc">Post-process effects</span></a></p></li>
 <li><p>Drive weather and atmospherics — <a class="reference internal" href="rayrai/Weather.html"><span class="doc">Weather and atmospherics</span></a></p></li>
 <li><p>Run headlessly, capture screenshots, and run diagnostics — <a class="reference internal" href="rayrai/Capture.html"><span class="doc">Capture, diagnostics, and headless rendering</span></a></p></li>
 <li><p>Align to RGB/depth/LiDAR sensors and pick objects — <a class="reference internal" href="rayrai/Sensors.html"><span class="doc">Sensors and depth/LiDAR</span></a></p></li>
 <li><p>Write a custom TCP client — <a class="reference internal" href="RayraiTcpViewer.html"><span class="doc">Rayrai TCP Viewer</span></a></p></li>
 <li><p>List of shipped example targets — <a class="reference internal" href="rayrai/Examples.html"><span class="doc">Example targets</span></a></p></li>
+<li><p>Check OpenGL requirements and macOS limits — <a class="reference internal" href="#rayrai-platform-support"><span class="std std-ref">Platform support</span></a></p></li>
 <li><p>Performance notes and the full C++ API reference — <a class="reference internal" href="rayrai/Performance.html"><span class="doc">Performance notes and the C++ API reference</span></a></p></li>
 </ul>
 </section>

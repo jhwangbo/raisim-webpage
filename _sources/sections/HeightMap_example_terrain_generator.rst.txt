@@ -2,7 +2,7 @@
 Height Map Using the Terrain Generator
 #########################################
 
-.. image:: ../image/heightMapUsingTerrainGenerator.gif
+.. image:: ../../rsc/docs/image/heightMapUsingTerrainGenerator.gif
 
 XML approach
 -----------------------------

@@ -17,7 +17,7 @@ RaiSim currently utilizes seven material properties:
 The bounce velocity is computed as :math:`c_{th}(v_i-c_{th})`, where :math:`v_i` represents the impact velocity.
 The following graphs illustrate the effects of these material properties.
 
-.. image:: ../image/materials.png
+.. image:: ../../rsc/docs/image/materials.png
 
 Current runnable examples are listed in the examples index. The material API
 below is unchanged and can be applied to any world object material name.
@@ -250,7 +250,7 @@ for visual inspection.
 Example - Single Bodies
 =============================
 
-.. image:: ../image/materials.gif
+.. image:: ../../rsc/docs/image/materials.gif
 
 XML Approach
 -----------------------------

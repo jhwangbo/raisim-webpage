@@ -8,7 +8,7 @@ Minimal scene with Go1 on a textured ground plane. It is a quick sanity check fo
 
 Screenshot
 ==========
-.. image:: ../../../image/rayrai_basic_scene.png
+.. image:: ../../../../rsc/docs/image/rayrai_basic_scene.png
    :alt: rayrai_basic_scene example
    :width: 100%
 

@@ -13,7 +13,7 @@ as a RaiSim articulated system.
 The cube is a native RaiSim box. The example fails fast if the ShadowHand
 articulation, collision bodies, or visual meshes are not imported.
 
-.. image:: ../../../image/rayrai/rayrai_usd_shadow_hand_cube.png
+.. image:: ../../../../rsc/docs/image/rayrai/rayrai_usd_shadow_hand_cube.png
    :alt: ShadowHand USD collision geometry with a cube above the hand
    :width: 100%
 

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Post-process effects &mdash; raisim 2.6.0 documentation</title>
+  <title>Post-process effects &mdash; raisim 2.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b6430375" />
@@ -14,14 +14,14 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
+      <script src="../../_static/documentation_options.js?v=dfec817d"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Weather and atmospherics" href="Weather.html" />
-    <link rel="prev" title="Custom visuals, instancing, and scene helpers" href="Visuals.html" /> 
+    <link rel="prev" title="Foliage and forest rendering" href="Foliage.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -94,6 +94,7 @@
 <li class="toctree-l3"><a class="reference internal" href="Lighting.html">Lighting, shadows, and HDR/IBL</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Materials.html">PBR materials</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Visuals.html">Custom visuals, instancing, and scene helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Foliage.html">Foliage and forest rendering</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Post-process effects</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#cinematic-post-process-effects">Cinematic post-process effects</a></li>
 </ul>
@@ -106,6 +107,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#platform-support">Platform support</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#source-built-tcp-viewer-recommended">Source-built TCP viewer (recommended)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#build-and-link">Build and link</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#minimal-usage">Minimal usage</a></li>
@@ -151,10 +153,12 @@
 <h1>Post-process effects<a class="headerlink" href="#post-process-effects" title="Link to this heading"></a></h1>
 <p>This page covers cinematic and screen-space effects driven by
 <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code> — DoF, lens flares, vignette, motion blur, SSR,
-SSAO, SSIL, contact shadows, refraction, and stylized looks plus the debug
-visualisation passes. <code class="docutils literal notranslate"><span class="pre">WeatherSettings</span></code> overrides atmospheric state (fog,
-wetness, sky) and is documented in <a class="reference internal" href="Weather.html"><span class="doc">Weather and atmospherics</span></a>. Bloom, HDR/IBL, and PBR
-materials live in <a class="reference internal" href="Materials.html"><span class="doc">PBR materials</span></a> and <a class="reference internal" href="Lighting.html"><span class="doc">Lighting, shadows, and HDR/IBL</span></a>.</p>
+SSAO, SSIL, contact shadows, refraction, bloom, temporal AA, linear HDR
+output, and stylized looks plus the debug visualisation passes.
+<code class="docutils literal notranslate"><span class="pre">WeatherSettings</span></code> overrides atmospheric state (fog, wetness, sky) and is
+documented in <a class="reference internal" href="Weather.html"><span class="doc">Weather and atmospherics</span></a>. HDR/IBL environments and PBR materials live in
+<a class="reference internal" href="Lighting.html"><span class="doc">Lighting, shadows, and HDR/IBL</span></a> and <a class="reference internal" href="Materials.html"><span class="doc">PBR materials</span></a>. Many effects are not available on
+macOS; see <a class="reference internal" href="#platform-notes">Platform notes</a> below.</p>
 <section id="cinematic-post-process-effects">
 <h2>Cinematic post-process effects<a class="headerlink" href="#cinematic-post-process-effects" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code> exposes a large set of optional screen-space effects.
@@ -206,8 +210,12 @@ monochrome green amplification.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">ssrEnabled</span></code>, <code class="docutils literal notranslate"><span class="pre">ssrStrength</span></code>, <code class="docutils literal notranslate"><span class="pre">ssrSteps</span></code>, <code class="docutils literal notranslate"><span class="pre">ssrMaxDistance</span></code>,
 <code class="docutils literal notranslate"><span class="pre">ssrThickness</span></code> — depth-only screen-space reflections.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">screenSpaceRefraction</span></code>, <code class="docutils literal notranslate"><span class="pre">screenSpaceRefractionStrength</span></code>,
-<code class="docutils literal notranslate"><span class="pre">screenSpaceRefractionMaxPixels</span></code> — IOR-aware refraction for transparent
-meshes.</p></li>
+<code class="docutils literal notranslate"><span class="pre">screenSpaceRefractionMaxPixels</span></code> — refraction of the opaque scene through
+transmissive (glass) materials. It requires <code class="docutils literal notranslate"><span class="pre">highFidelityPbr</span></code> and resolves
+MSAA before sampling; rough glass reads a blurred copy of the scene.
+<code class="docutils literal notranslate"><span class="pre">Strength</span></code> and <code class="docutils literal notranslate"><span class="pre">MaxPixels</span></code> only scale the artistic screen-space offset.
+Other transparent layers and exit faces are not traced; see <a class="reference internal" href="Materials.html"><span class="doc">PBR materials</span></a>
+for glass materials and the <code class="docutils literal notranslate"><span class="pre">geometryRefraction</span></code> tracer.</p></li>
 </ul>
 <p>Indirect lighting and contact effects:</p>
 <ul class="simple">
@@ -240,7 +248,13 @@ for soft subsurface response on skin and foliage.</p></li>
 <p>Bloom controls (<code class="docutils literal notranslate"><span class="pre">bloomEnabled</span></code>, <code class="docutils literal notranslate"><span class="pre">bloomThreshold</span></code>, <code class="docutils literal notranslate"><span class="pre">bloomStrength</span></code>,
 <code class="docutils literal notranslate"><span class="pre">bloomRadius</span></code>, <code class="docutils literal notranslate"><span class="pre">bloomKnee</span></code>, <code class="docutils literal notranslate"><span class="pre">bloomQuality</span></code>, <code class="docutils literal notranslate"><span class="pre">bloomSourceClamp</span></code>,
 <code class="docutils literal notranslate"><span class="pre">bloomAnamorphic</span></code>, <code class="docutils literal notranslate"><span class="pre">bloomDirtStrength</span></code>, <code class="docutils literal notranslate"><span class="pre">bloomDirtScale</span></code>,
-<code class="docutils literal notranslate"><span class="pre">bloomDirtTexture</span></code>, <code class="docutils literal notranslate"><span class="pre">bloomMix</span></code>) cover both clean and lens-dirt looks.</p>
+<code class="docutils literal notranslate"><span class="pre">bloomDirtTexture</span></code>) cover both clean and lens-dirt looks.
+<code class="docutils literal notranslate"><span class="pre">bloomBlendMode</span></code> (<code class="docutils literal notranslate"><span class="pre">GlowBlendMode</span></code>) sets how the glow is composited:
+<code class="docutils literal notranslate"><span class="pre">Additive</span></code> (default), <code class="docutils literal notranslate"><span class="pre">Screen</span></code>, <code class="docutils literal notranslate"><span class="pre">Softlight</span></code>, <code class="docutils literal notranslate"><span class="pre">Replace</span></code> (glow only), or
+<code class="docutils literal notranslate"><span class="pre">Mix</span></code>, which scales the scene by <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">-</span> <span class="pre">bloomMix</span></code> before adding the glow. In
+the default pipeline, materials are already tone-mapped and gamma-encoded when
+bloom runs; with <a class="reference internal" href="#linear-hdr-rendering">Linear HDR rendering</a> <code class="docutils literal notranslate"><span class="pre">bloomThreshold</span></code> is compared against
+scene-linear radiance.</p>
 <p>Diagnostics: <code class="docutils literal notranslate"><span class="pre">PostProcessDebugMode</span></code> (<code class="docutils literal notranslate"><span class="pre">Final</span></code>, <code class="docutils literal notranslate"><span class="pre">BloomSource</span></code>,
 <code class="docutils literal notranslate"><span class="pre">AmbientOcclusion</span></code>, <code class="docutils literal notranslate"><span class="pre">AmbientOcclusionRaw</span></code>, <code class="docutils literal notranslate"><span class="pre">FogTransmittance</span></code>,
 <code class="docutils literal notranslate"><span class="pre">FogDensity</span></code>, <code class="docutils literal notranslate"><span class="pre">FogScattering</span></code>, <code class="docutils literal notranslate"><span class="pre">WorldNormal</span></code>, <code class="docutils literal notranslate"><span class="pre">DepthHeatmap</span></code>,
@@ -303,6 +317,12 @@ corners, and tight contacts using <code class="docutils literal notranslate"><sp
 (<code class="docutils literal notranslate"><span class="pre">screenSpaceAoDenoiseEnabled</span></code>) is geometry-aware and preserves edges.
 <code class="docutils literal notranslate"><span class="pre">contactAoRadius</span></code> / <code class="docutils literal notranslate"><span class="pre">contactAoStrength</span></code> add a separate tight contact-AO
 pass on top of SSAO for surfaces that touch.</p>
+<p>With the denoiser on and temporal AA off (as in the High preset), AO is
+computed once per pixel in a prepass and the denoiser reuses it; results can
+differ from per-tap evaluation by a few 8-bit levels. With temporal AA on
+(Ultra) each denoise tap evaluates AO again, which costs noticeably more. Set
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_DISABLE_CACHED_AO=1</span></code> to force the per-tap path. AO is stable from
+frame to frame at sky silhouettes, including on Apple GPUs.</p>
 <p>Screen-space indirect lighting (<code class="docutils literal notranslate"><span class="pre">screenSpaceIndirectLightingEnabled</span></code>)
 bounces one indirect ray per pixel against the colour buffer to add coloured
 fill light from nearby diffuse surfaces; <code class="docutils literal notranslate"><span class="pre">Radius</span></code>, <code class="docutils literal notranslate"><span class="pre">Strength</span></code>, <code class="docutils literal notranslate"><span class="pre">Samples</span></code>,
@@ -577,6 +597,60 @@ looks; the calibration reference is intended to drive
 </tbody>
 </table>
 </section>
+<section id="linear-hdr-rendering">
+<h3>Linear HDR rendering<a class="headerlink" href="#linear-hdr-rendering" title="Link to this heading"></a></h3>
+<p>By default each material shader applies exposure, the tone curve, and gamma
+before writing the scene buffer, so MSAA resolve, fog, bloom, and depth of
+field work on display-encoded colour.
+<code class="docutils literal notranslate"><span class="pre">RayraiWindow::setLinearHdrRenderingEnabled(true)</span></code> keeps scene radiance
+linear until the final post pass, which then applies <code class="docutils literal notranslate"><span class="pre">pbrExposure</span></code> (times
+the auto-exposure factor), the <code class="docutils literal notranslate"><span class="pre">colorMode</span></code> curve when <code class="docutils literal notranslate"><span class="pre">pbrToneMapping</span></code> is
+set, and <code class="docutils literal notranslate"><span class="pre">gamma</span></code> once. It is a renderer toggle, not a
+<code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code> field, so presets do not change it.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span><span class="p">.</span><span class="n">setLinearHdrRenderingEnabled</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">();</span>
+<span class="n">q</span><span class="p">.</span><span class="n">bloomEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">bloomThreshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.3f</span><span class="p">;</span><span class="w">   </span><span class="c1">// scene-linear radiance in this mode</span>
+<span class="n">q</span><span class="p">.</span><span class="n">bloomKnee</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5f</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">bloomStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.045f</span><span class="p">;</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">q</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Bright highlights keep their energy through MSAA and bloom, FXAA picks edges
+on perceptual luminance, and white balance, saturation, and colour grading run
+on linear colour before the tone curve. The sky background keeps its own
+exposure and goes through the same tone curve. Bloom thresholds tuned for the
+default pipeline need to be raised. Frames rendered with a
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_PBR_DEBUG_OUTPUT</span></code> view keep the previous output, and
+<a class="reference internal" href="Capture.html"><span class="doc">Capture, diagnostics, and headless rendering</span></a> describes how the mode affects captures and RGB sensor images.
+Changing the exposure, tone curve, or gamma resets temporal-AA history, which
+also happens while auto exposure adapts.</p>
+</section>
+<section id="temporal-anti-aliasing">
+<h3>Temporal anti-aliasing<a class="headerlink" href="#temporal-anti-aliasing" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">temporalAaEnabled</span></code> blends each frame with the previous result, sampled at
+the same screen position and clamped to the current pixel neighbourhood;
+<code class="docutils literal notranslate"><span class="pre">temporalAaBlend</span></code> (default 0.08, at most 0.95) is the history weight. There
+are no motion vectors, so moving content relies on that clamp. Ultra enables
+temporal AA with <code class="docutils literal notranslate"><span class="pre">temporalAaJitterScale</span> <span class="pre">=</span> <span class="pre">0</span></code>. Keep the jitter at zero: the
+resolve does not compensate for it, so a non-zero jitter shifts static images
+every frame. <code class="docutils literal notranslate"><span class="pre">RenderOverrides::allowTemporalAa</span></code> turns it off for an
+individual external render.</p>
+</section>
+<section id="platform-notes">
+<h3>Platform notes<a class="headerlink" href="#platform-notes" title="Link to this heading"></a></h3>
+<p>On macOS, and on other GPUs that expose 16 or fewer fragment texture units,
+rayrai uses a reduced post-process program (see the GPU capability tiers in
+<a class="reference internal" href="Materials.html"><span class="doc">PBR materials</span></a>). FXAA, additive bloom, SSAO and contact AO with denoising,
+temporal AA, depth of field, and linear HDR output work. The rest of this page
+is not rendered there: white balance, saturation, colour grading, vignette,
+chromatic aberration, film grain, lens flare, starburst, lens distortion,
+letterbox, motion and zoom blur, SSR, SSIL, contact shadows, aerial
+perspective, volumetric fog and lighting, light shafts, local fog volumes,
+projected decals, heat haze, underwater, the stylized looks, non-<code class="docutils literal notranslate"><span class="pre">Additive</span></code>
+bloom blend modes, and every <code class="docutils literal notranslate"><span class="pre">postProcessDebugMode</span></code> except <code class="docutils literal notranslate"><span class="pre">Final</span></code>. Lens
+droplets and precipitation are separate passes and still render.</p>
+</section>
 </section>
 </section>
 
@@ -584,7 +658,7 @@ looks; the calibration reference is intended to drive
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="Visuals.html" class="btn btn-neutral float-left" title="Custom visuals, instancing, and scene helpers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Foliage.html" class="btn btn-neutral float-left" title="Foliage and forest rendering" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="Weather.html" class="btn btn-neutral float-right" title="Weather and atmospherics" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

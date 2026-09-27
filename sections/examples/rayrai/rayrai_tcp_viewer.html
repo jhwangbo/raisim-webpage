@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rayrai Example: TCP Viewer &mdash; raisim 2.6.0 documentation</title>
+  <title>Rayrai Example: TCP Viewer &mdash; raisim 2.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=b6430375" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=ae39cb24"></script>
+      <script src="../../../_static/documentation_options.js?v=dfec817d"></script>
       <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -69,15 +69,18 @@
 <li class="toctree-l3"><a class="reference internal" href="rayrai_aruco_marker.html">Rayrai Example: Aruco Marker</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_custom_visuals.html">Rayrai Example: Custom Visuals</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_instancing_grid.html">Rayrai Example: Instancing Grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_forest.html">Rayrai Example: Forest</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_pointcloud_animation.html">Rayrai Example: Pointcloud Animation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_pbr_material_grid.html">Rayrai Example: PBR Material Grid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_pbr_texture_maps.html">Rayrai Example: PBR Texture Maps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_nested_glass.html">Rayrai Example: Nested Glass</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_quality_lighting.html">Rayrai Example: Quality Lighting and FXAA</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_visual_asset_support.html">rayrai_visual_asset_support</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_coacd_mesh_approximation.html">Rayrai Example: CoACD Mesh Approximation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_runtime_scene_editing.html">Rayrai Example: Runtime Scene Editing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_rolling_spinning_friction.html">Rayrai Example: Rolling And Spinning Friction</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_swept_ccd.html">Rayrai Example: Swept CCD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_forest.html">Rayrai Example: Forest</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Rayrai Example: TCP Viewer</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#overview">Overview</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#target">Target</a></li>
@@ -172,7 +175,8 @@
 connects to a running server, downloads the remote scene, and renders it with
 rayrai and ImGui controls. Build the <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> target from this
 repository for interactive viewing. The target also exposes batch and
-diagnostics command-line options.</p>
+diagnostics command-line options. <a class="reference internal" href="../../RayraiTcpViewer.html"><span class="doc">Rayrai TCP Viewer</span></a> is the full
+reference for its panels, options and wire format.</p>
 </section>
 <section id="target">
 <h2>Target<a class="headerlink" href="#target" title="Link to this heading"></a></h2>
@@ -201,10 +205,13 @@ window and do not need it.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rayrai_tcp_viewer<span class="w"> </span>--connect<span class="w"> </span><span class="m">127</span>.0.0.1:8080<span class="w"> </span>--auto-frame
 rayrai_tcp_viewer<span class="w"> </span>--host<span class="w"> </span><span class="m">192</span>.168.1.42<span class="w"> </span>--port<span class="w"> </span><span class="m">8081</span><span class="w"> </span>--auto-connect
 rayrai_tcp_viewer<span class="w"> </span>--connect<span class="w"> </span><span class="s1">&#39;[2001:db8::10]:8080&#39;</span>
+rayrai_tcp_viewer<span class="w"> </span>--simulate<span class="w"> </span>/path/to/world.xml
+rayrai_tcp_viewer<span class="w"> </span>--inspect<span class="w"> </span>/path/to/robot.urdf
 rayrai_tcp_viewer<span class="w"> </span>--resource-dir<span class="w"> </span>/path/to/rsc<span class="w"> </span>--window-size<span class="w"> </span>1600x900
 rayrai_tcp_viewer<span class="w"> </span>--fullscreen<span class="w"> </span>--minimize-panels<span class="w"> </span>--keep-overlay-open
 rayrai_tcp_viewer<span class="w"> </span>--no-pre-warm
 rayrai_tcp_viewer<span class="w"> </span>--warm-at-startup
+rayrai_tcp_viewer<span class="w"> </span>--no-save-settings
 rayrai_tcp_viewer<span class="w"> </span>--camera-lookat<span class="w"> </span><span class="m">3</span>,-4,2,0,0,0<span class="w"> </span>--force-camera-lookat
 rayrai_tcp_viewer<span class="w"> </span>--camera-offset<span class="w"> </span><span class="m">2</span>,-3,1
 rayrai_tcp_viewer<span class="w"> </span>--screenshot<span class="w"> </span>/tmp/rayrai_tcp_viewer.png
@@ -222,23 +229,32 @@ rayrai_tcp_viewer<span class="w"> </span>--server-list<span class="w"> </span>/t
 <h2>Details<a class="headerlink" href="#details" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Connects to a running RaisimServer over TCP and downloads the remote scene.</p></li>
-<li><p>Renders the streamed scene with rayrai and exposes an ImGui control panel.</p></li>
-<li><p>Supports explicit host/port selection, <code class="docutils literal notranslate"><span class="pre">--connect</span></code> endpoint shortcuts, local
-TCP-listener discovery, and LAN RaisimServer beacon discovery.</p></li>
+<li><p>Renders the streamed scene with rayrai and exposes an ImGui control panel
+with Connection, Options, Record, Render, Objects, Diagnostics and Help tabs.</p></li>
+<li><p>Supports explicit host/port selection, <code class="docutils literal notranslate"><span class="pre">--connect</span></code> endpoint shortcuts, and
+LAN RaisimServer beacon discovery.</p></li>
+<li><p>Splits its window into independent panes, each with its own connection, and
+restores the layout and endpoints on the next launch.</p></li>
+<li><p>Runs a dropped RaiSim world XML (or <code class="docutils literal notranslate"><span class="pre">--simulate</span> <span class="pre">FILE</span></code>) in a child
+simulation process, and opens dropped URDF/MJCF files in a kinematic
+inspector.</p></li>
 <li><p>Supports repeatable <code class="docutils literal notranslate"><span class="pre">--resource-dir</span></code> entries for resolving streamed mesh and
 texture resources.</p></li>
 <li><p>Provides camera framing, orthographic view snaps, fullscreen startup, panel
-minimization, screenshots, PNG sequence output, raw TCP session recording,
-offline replay, trajectory CSV logging, target update-rate control, and
-scene/object JSON diagnostics.</p></li>
-<li><p>Interactive tools include Shift+left-drag force application, a 2-point ruler,
-3-point angle measurement, pose grabber axes, body frames, COM markers, and
-keyboard shortcut help.</p></li>
+minimization, screenshots, MP4 video recording through <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code>, PNG
+sequence output, raw TCP session recording, offline replay with a timeline,
+trajectory CSV logging, target update-rate control, and scene/object JSON
+diagnostics.</p></li>
+<li><p>Interactive tools include Shift+left-drag force application, Ctrl+left-drag
+(Cmd on macOS) interaction-wire pulling, a 2-point ruler, 3-point angle
+measurement, pose grabber axes, body frames, COM markers, scene editing
+(spawn, delete, world export), live signal plots with CSV export, and a Help
+tab listing the keyboard and mouse shortcuts.</p></li>
 <li><p>Rebuild the <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> target after changing its checked-in source
 or the packaged rayrai library.</p></li>
 <li><p>Services manual RGB/depth camera requests from <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code>, returns
-completed BGRA/metric-depth buffers, and shows previews and camera frustums
-in the selected-object Sensors tab.</p></li>
+completed BGRA/metric-depth buffers, and shows previews, camera frustums and
+camera frames in the selected-object Sensors tab.</p></li>
 <li><p>Prefer in-process rayrai when the application must own the render context or
 access textures without a viewer process and TCP round trip.</p></li>
 </ul>

@@ -8,7 +8,7 @@ Attaches a Livox LiDAR module to Go1 and visualizes the scan as a point cloud ev
 
 Screenshot
 ==========
-.. image:: ../../../image/rayrai_lidar_pointcloud.png
+.. image:: ../../../../rsc/docs/image/rayrai_lidar_pointcloud.png
    :alt: rayrai_lidar_pointcloud example
    :width: 100%
 
