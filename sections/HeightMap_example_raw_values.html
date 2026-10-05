@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Height Map Using Raw Values &mdash; raisim 2.7.0 documentation</title>
+  <title>Height Map Using Raw Values &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -74,6 +74,10 @@
 <li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
@@ -94,12 +98,8 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -147,7 +147,11 @@ world configuration constructor in your application:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">(</span><span class="s">&quot;/path/to/raisim2Lib/rsc/xmlScripts/heightMaps/heightMapUsingRawValues.xml&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>The XML file is constructed as follows:</p>
+<p>The XML file is equivalent to the following. The asset spells the attributes
+in snake_case (<code class="docutils literal notranslate"><span class="pre">x_sample</span></code>, <code class="docutils literal notranslate"><span class="pre">x_size</span></code>, <code class="docutils literal notranslate"><span class="pre">center_x</span></code>, <code class="docutils literal notranslate"><span class="pre">lin_vel</span></code>, …); the
+reader accepts both spellings. <code class="docutils literal notranslate"><span class="pre">xSample</span></code> and <code class="docutils literal notranslate"><span class="pre">ySample</span></code> are the numbers of
+samples, and <code class="docutils literal notranslate"><span class="pre">height</span></code> lists <code class="docutils literal notranslate"><span class="pre">xSample</span> <span class="pre">*</span> <span class="pre">ySample</span></code> values row by row (x varies
+fastest).</p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; ?&gt;</span>
 <span class="nt">&lt;raisim</span><span class="w"> </span><span class="na">version=</span><span class="s">&quot;2.0.0&quot;</span><span class="nt">&gt;</span>
 <span class="w">    </span><span class="nt">&lt;timeStep</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;0.001&quot;</span><span class="nt">/&gt;</span>
@@ -176,9 +180,15 @@ world configuration constructor in your application:</p>
 </section>
 <section id="c-approach">
 <h2>C++ approach<a class="headerlink" href="#c-approach" title="Link to this heading"></a></h2>
+<p>The arguments are <code class="docutils literal notranslate"><span class="pre">xSamples</span></code>, <code class="docutils literal notranslate"><span class="pre">ySamples</span></code>, <code class="docutils literal notranslate"><span class="pre">xSize</span></code>, <code class="docutils literal notranslate"><span class="pre">ySize</span></code>,
+<code class="docutils literal notranslate"><span class="pre">centerX</span></code>, <code class="docutils literal notranslate"><span class="pre">centerY</span></code>, and the height samples (one row of five values per
+line below):</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">height</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">  </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">  </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">   </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">   </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">   </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">   </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span>
 <span class="p">};</span>
 <span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">heightMap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addHeightMap</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">height</span><span class="p">);</span>
 </pre></div>

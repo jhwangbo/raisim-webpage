@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ray Test &mdash; raisim 2.7.0 documentation</title>
+  <title>Ray Test &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,14 +14,14 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Sensors" href="Sensors.html" />
+    <link rel="next" title="rayrai Visualizer" href="Rayrai.html" />
     <link rel="prev" title="Tendon examples and Rayrai" href="tendons/Examples.html" /> 
 </head>
 
@@ -75,14 +75,15 @@
 <li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Ray Test</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#arguments">Arguments</a><ul>
@@ -117,7 +118,6 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -164,21 +164,26 @@ along the ray (if any).</p>
 <section id="single-ray-test-raytest">
 <h3>Single-ray test (<code class="code docutils literal notranslate"><span class="pre">rayTest</span></code>)<a class="headerlink" href="#single-ray-test-raytest" title="Link to this heading"></a></h3>
 <p>Signature (C++):</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="n">RayCollisionList</span><span class="o">&amp;</span><span class="w"> </span><span class="nf">rayTest</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">start</span><span class="p">,</span>
-<span class="w">                                </span><span class="k">const</span><span class="w"> </span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">direction</span><span class="p">,</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="n">RayCollisionList</span><span class="o">&amp;</span><span class="w"> </span><span class="nf">rayTest</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Ref</span><span class="o">&lt;</span><span class="k">const</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span><span class="p">,</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Unaligned</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">start</span><span class="p">,</span>
+<span class="w">                                </span><span class="k">const</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Ref</span><span class="o">&lt;</span><span class="k">const</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span><span class="p">,</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Unaligned</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">direction</span><span class="p">,</span>
 <span class="w">                                </span><span class="kt">double</span><span class="w"> </span><span class="n">length</span><span class="p">,</span>
 <span class="w">                                </span><span class="kt">size_t</span><span class="w"> </span><span class="n">objectId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">size_t</span><span class="p">(</span><span class="mi">-10</span><span class="p">),</span>
 <span class="w">                                </span><span class="kt">size_t</span><span class="w"> </span><span class="n">localId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">size_t</span><span class="p">(</span><span class="mi">-10</span><span class="p">),</span>
 <span class="w">                                </span><span class="n">CollisionGroup</span><span class="w"> </span><span class="n">collisionMask</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CollisionGroup</span><span class="p">(</span><span class="mi">-1</span><span class="p">));</span>
 </pre></div>
 </div>
+<p>Overloads accept <code class="docutils literal notranslate"><span class="pre">{x,</span> <span class="pre">y,</span> <span class="pre">z}</span></code> initializer lists for <code class="docutils literal notranslate"><span class="pre">start</span></code>, <code class="docutils literal notranslate"><span class="pre">direction</span></code>,
+or both. Pass a <code class="docutils literal notranslate"><span class="pre">raisim::Vec&lt;3&gt;</span></code> as <code class="docutils literal notranslate"><span class="pre">vec.e()</span></code>.</p>
 <ul class="simple">
 <li><p><code class="code docutils literal notranslate"><span class="pre">start</span></code>: ray origin in world frame.</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">direction</span></code>: ray direction in world frame. It does not need to be normalized.</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">length</span></code>: ray length in meters. Only hits within [0, length] are returned.</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">objectId</span></code> / <code class="code docutils literal notranslate"><span class="pre">localId</span></code>: optional self-filter. Collisions with the given
-object and local body id pair are ignored (useful for sensors attached to robots).
-The defaults disable this filter.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">direction</span></code>: ray direction in world frame. It is normalized internally,
+so it does not need to be a unit vector; a zero vector is treated as +z.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">length</span></code>: ray length in meters. Only hits within [0, length] are returned;
+a non-positive length returns no hit.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">objectId</span></code> / <code class="code docutils literal notranslate"><span class="pre">localId</span></code>: optional self-filter. Collisions with the body
+whose object world index (<code class="docutils literal notranslate"><span class="pre">Object::getIndexInWorld()</span></code>) and local body index
+match are ignored (useful for sensors attached to robots). Both must be set for
+the filter to take effect; the defaults disable it.</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">collisionMask</span></code>: collision mask to filter which groups the ray can hit.
 The default (-1) allows all groups.</p></li>
 </ul>
@@ -187,11 +192,12 @@ The default (-1) allows all groups.</p></li>
 </section>
 <section id="example">
 <h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
-<p>Only the following line</p>
+<p>The ray test itself is a single call:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">rayTest</span><span class="p">({</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">},</span><span class="w"> </span><span class="n">direction</span><span class="p">,</span><span class="w"> </span><span class="mf">50.</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>performs the ray test. The rest of the code is for demonstration only. The ray test stores only the closest hit.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">ray_casting</span></code> example sweeps this ray over the ground and visualizes the
+hit point through <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code>.</p>
 <section id="getting-the-hit-object-example">
 <h3>Getting the hit object (example)<a class="headerlink" href="#getting-the-hit-object-example" title="Link to this heading"></a></h3>
 <p>To identify what was hit, check the returned <code class="code docutils literal notranslate"><span class="pre">RayCollisionList</span></code>.</p>
@@ -246,9 +252,19 @@ For sample indices <span class="math notranslate nohighlight">\(y\)</span> and <
 <p>where <span class="math notranslate nohighlight">\(0 \le y &lt; \mathrm{yawCount}\)</span> and
 <span class="math notranslate nohighlight">\(0 \le p &lt; \mathrm{pitchCount}\)</span>. Increments are signed: use a negative
 increment to scan an axis in the decreasing-angle direction. A single-sample
-axis normally uses an increment of zero. If either count is zero, <code class="code docutils literal notranslate"><span class="pre">scan</span></code>
-is cleared and no rays are cast.</p>
-<p>Minimal example for a complete yaw revolution with 16 pitch channels:</p>
+axis normally uses an increment of zero. If either count is zero, an angle is
+not finite, or <code class="code docutils literal notranslate"><span class="pre">rangeMax</span> <span class="pre">&lt;=</span> <span class="pre">rangeMin</span></code>, <code class="code docutils literal notranslate"><span class="pre">scan</span></code> is cleared and no
+rays are cast.</p>
+<p>Each ray direction in the sensor frame is</p>
+<div class="math notranslate nohighlight">
+\[\boldsymbol{d} = (\cos\mathrm{pitch}\cos\mathrm{yaw},\;
+              \cos\mathrm{pitch}\sin\mathrm{yaw},\;
+              \sin\mathrm{pitch}),\]</div>
+<p>so yaw rotates about the sensor z axis starting from the sensor x axis, and a
+positive pitch tilts the ray toward the sensor +z axis.</p>
+<p>Minimal example for a complete yaw revolution with 16 pitch channels
+(<code class="docutils literal notranslate"><span class="pre">rot</span></code>, <code class="docutils literal notranslate"><span class="pre">pos</span></code>, <code class="docutils literal notranslate"><span class="pre">rangeMin</span></code>, <code class="docutils literal notranslate"><span class="pre">rangeMax</span></code>, <code class="docutils literal notranslate"><span class="pre">objectId</span></code>, <code class="docutils literal notranslate"><span class="pre">localId</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">collisionMask</span></code> come from the application):</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">constexpr</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">pi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3.14159265358979323846</span><span class="p">;</span>
 <span class="k">constexpr</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">yawCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1024</span><span class="p">;</span>
 <span class="k">constexpr</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">pitchCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">16</span><span class="p">;</span>
@@ -311,12 +327,14 @@ BVH instead. Small scenes use a scan-wide conservative cull and a compact flat
 candidate list. These fallbacks preserve the same closest-hit and compact-output
 semantics.</p>
 <p>Use the public <code class="docutils literal notranslate"><span class="pre">ray_scan_lidar</span></code> example to inspect structured scans and
-<code class="docutils literal notranslate"><span class="pre">large_scale_ray_test</span></code> to inspect repeated ray queries:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>--build<span class="w"> </span>build-examples<span class="w"> </span>--target<span class="w"> </span>ray_scan_lidar<span class="w"> </span>large_scale_ray_test<span class="w"> </span>--parallel<span class="w"> </span><span class="m">12</span>
+<code class="docutils literal notranslate"><span class="pre">large_scale_ray_test</span></code> to inspect repeated ray queries. Build them together
+with the TCP viewer and start the viewer:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>--build<span class="w"> </span>build-examples<span class="w"> </span>--target<span class="w"> </span>ray_scan_lidar<span class="w"> </span>large_scale_ray_test<span class="w"> </span>rayrai_tcp_viewer<span class="w"> </span>--parallel<span class="w"> </span><span class="m">12</span>
 ./build-examples/examples/rayrai_tcp_viewer
 </pre></div>
 </div>
-<p>Start either simulation in another terminal. These examples visualize the APIs;
+<p>Then start either simulation (for example,
+<code class="docutils literal notranslate"><span class="pre">./build-examples/examples/ray_scan_lidar</span></code>) in another terminal. These examples visualize the APIs;
 they are not timing comparisons. For application benchmarks, time
 <code class="docutils literal notranslate"><span class="pre">World::rayTestLidar</span></code> and repeated <code class="docutils literal notranslate"><span class="pre">World::rayTest</span></code> calls with identical
 sensor poses, rays, ranges, and collision filters on one thread, and verify the
@@ -331,8 +349,8 @@ motion, filters, and scan shape.</p>
 <p>Each hit entry stores:</p>
 <ul class="simple">
 <li><p><code class="code docutils literal notranslate"><span class="pre">getObject()</span></code>: pointer to the hit <code class="code docutils literal notranslate"><span class="pre">raisim::Object</span></code> (or nullptr if none).</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">getPosition()</span></code>: world-frame hit position (contact point).</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">getCollisionBody()</span></code>: collision body handle for the hit (may be null for some objects).</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">getPosition()</span></code>: world-frame hit position as an <code class="docutils literal notranslate"><span class="pre">Eigen::Vector3d</span></code>.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">getCollisionBody()</span></code>: pointer to the collision body that was hit (may be null for some objects).</p></li>
 </ul>
 </section>
 <section id="raycollisionlist-summary">
@@ -351,8 +369,9 @@ motion, filters, and scan shape.</p>
 <section id="notes">
 <h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p><code class="code docutils literal notranslate"><span class="pre">RayCollisionList</span></code> is a lightweight container reused across calls. It is
-cleared and populated by <code class="code docutils literal notranslate"><span class="pre">rayTest(...)</span></code>.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">RayCollisionList</span></code> is a lightweight container owned by the world and
+reused across calls. Every <code class="code docutils literal notranslate"><span class="pre">rayTest(...)</span></code> call overwrites it, so copy
+any hit you need before the next ray test.</p></li>
 <li><p>It contains <strong>at most one item</strong> because RaiSim keeps only the closest hit
 along the ray. Use <code class="code docutils literal notranslate"><span class="pre">list.size()</span></code> to check whether a hit occurred (0 or 1).</p></li>
 </ul>
@@ -364,7 +383,8 @@ along the ray. Use <code class="code docutils literal notranslate"><span class="
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim16RayCollisionItemE">
 <span id="_CPPv3N6raisim16RayCollisionItemE"></span><span id="_CPPv2N6raisim16RayCollisionItemE"></span><span id="raisim::RayCollisionItem"></span><span class="target" id="classraisim_1_1RayCollisionItem"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RayCollisionItem</span></span></span><a class="headerlink" href="#_CPPv4N6raisim16RayCollisionItemE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
+<dd><p>One ray hit returned by <a class="reference internal" href="WorldSystem.html#classraisim_1_1World_1a14d9f4679733dd7053c6ed9349c929d8"><span class="std std-ref">World::rayTest()</span></a>. </p>
+<div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim16RayCollisionItem9getObjectEv">
@@ -405,7 +425,23 @@ along the ray. Use <code class="code docutils literal notranslate"><span class="
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim16RayCollisionListE">
 <span id="_CPPv3N6raisim16RayCollisionListE"></span><span id="_CPPv2N6raisim16RayCollisionListE"></span><span id="raisim::RayCollisionList"></span><span class="target" id="classraisim_1_1RayCollisionList"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RayCollisionList</span></span></span><a class="headerlink" href="#_CPPv4N6raisim16RayCollisionListE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
+<dd><p>Hit list returned by <a class="reference internal" href="WorldSystem.html#classraisim_1_1World_1a14d9f4679733dd7053c6ed9349c929d8"><span class="std std-ref">World::rayTest()</span></a>. Only the first <a class="reference internal" href="#classraisim_1_1RayCollisionList_1ad5d6e1131390a8bc181027e8e489cf61"><span class="std std-ref">size()</span></a> entries are valid; the storage is reused by the next ray test. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16RayCollisionList8iteratorE">
+<span id="_CPPv3N6raisim16RayCollisionList8iteratorE"></span><span id="_CPPv2N6raisim16RayCollisionList8iteratorE"></span><span class="target" id="classraisim_1_1RayCollisionList_1a6b479d61cc3fec151a868ab70c0dc0df"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">iterator</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_bEN6raisim16RayCollisionList14basic_iteratorE" title="raisim::RayCollisionList::basic_iterator"><span class="n"><span class="pre">basic_iterator</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">false</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N6raisim16RayCollisionList8iteratorE" title="Link to this definition"></a><br /></dt>
+<dd><p>Mutable hit iterator. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16RayCollisionList14const_iteratorE">
+<span id="_CPPv3N6raisim16RayCollisionList14const_iteratorE"></span><span id="_CPPv2N6raisim16RayCollisionList14const_iteratorE"></span><span class="target" id="classraisim_1_1RayCollisionList_1a39333f71c5127c7d287e3de277f9bc4d"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">const_iterator</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_bEN6raisim16RayCollisionList14basic_iteratorE" title="raisim::RayCollisionList::basic_iterator"><span class="n"><span class="pre">basic_iterator</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">true</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N6raisim16RayCollisionList14const_iteratorE" title="Link to this definition"></a><br /></dt>
+<dd><p>Const hit iterator. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim16RayCollisionListixE6size_t">
@@ -413,7 +449,7 @@ along the ray. Use <code class="code docutils literal notranslate"><span class="
 <dd><p>Access an item by index. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>i</strong> – <strong>[in]</strong> Index into the hit list. </p>
+<dd class="field-odd"><p><strong>i</strong> – <strong>[in]</strong> Index into the hit list. Not bounds-checked; only indices below <a class="reference internal" href="#classraisim_1_1RayCollisionList_1ad5d6e1131390a8bc181027e8e489cf61"><span class="std std-ref">size()</span></a> hold valid hits. </p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Hit entry at the given index. </p>
@@ -447,7 +483,7 @@ along the ray. Use <code class="code docutils literal notranslate"><span class="
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim16RayCollisionList5beginEv">
-<span id="_CPPv3N6raisim16RayCollisionList5beginEv"></span><span id="_CPPv2N6raisim16RayCollisionList5beginEv"></span><span id="raisim::RayCollisionList::begin"></span><span class="target" id="classraisim_1_1RayCollisionList_1a0a6987850cf7e1bb23e90f5539e6e8b3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">iterator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">begin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16RayCollisionList5beginEv" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N6raisim16RayCollisionList5beginEv"></span><span id="_CPPv2N6raisim16RayCollisionList5beginEv"></span><span id="raisim::RayCollisionList::begin"></span><span class="target" id="classraisim_1_1RayCollisionList_1a0a6987850cf7e1bb23e90f5539e6e8b3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim16RayCollisionList8iteratorE" title="raisim::RayCollisionList::iterator"><span class="n"><span class="pre">iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">begin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16RayCollisionList5beginEv" title="Link to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Iterator to the first hit. </p>
@@ -457,7 +493,7 @@ along the ray. Use <code class="code docutils literal notranslate"><span class="
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim16RayCollisionList3endEv">
-<span id="_CPPv3N6raisim16RayCollisionList3endEv"></span><span id="_CPPv2N6raisim16RayCollisionList3endEv"></span><span id="raisim::RayCollisionList::end"></span><span class="target" id="classraisim_1_1RayCollisionList_1ae70d1bd6f3ad8f2baf9d93ded33384bc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">iterator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16RayCollisionList3endEv" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N6raisim16RayCollisionList3endEv"></span><span id="_CPPv2N6raisim16RayCollisionList3endEv"></span><span id="raisim::RayCollisionList::end"></span><span class="target" id="classraisim_1_1RayCollisionList_1ae70d1bd6f3ad8f2baf9d93ded33384bc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim16RayCollisionList8iteratorE" title="raisim::RayCollisionList::iterator"><span class="n"><span class="pre">iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16RayCollisionList3endEv" title="Link to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Iterator past the last hit. </p>
@@ -466,11 +502,61 @@ along the ray. Use <code class="code docutils literal notranslate"><span class="
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisim16RayCollisionList4backEv">
-<span id="_CPPv3N6raisim16RayCollisionList4backEv"></span><span id="_CPPv2N6raisim16RayCollisionList4backEv"></span><span id="raisim::RayCollisionList::back"></span><span class="target" id="classraisim_1_1RayCollisionList_1af387b01af9cb1ea0ccf51a6aa6dff886"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">iterator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">back</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16RayCollisionList4backEv" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16RayCollisionList5beginEv">
+<span id="_CPPv3NK6raisim16RayCollisionList5beginEv"></span><span id="_CPPv2NK6raisim16RayCollisionList5beginEv"></span><span id="raisim::RayCollisionList::beginC"></span><span class="target" id="classraisim_1_1RayCollisionList_1ae870b9b1814d94d394abe30a25c6af17"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim16RayCollisionList14const_iteratorE" title="raisim::RayCollisionList::const_iterator"><span class="n"><span class="pre">const_iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">begin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16RayCollisionList5beginEv" title="Link to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Iterator to the last hit. </p>
+<dd class="field-odd"><p>const iterator to the first hit </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16RayCollisionList3endEv">
+<span id="_CPPv3NK6raisim16RayCollisionList3endEv"></span><span id="_CPPv2NK6raisim16RayCollisionList3endEv"></span><span id="raisim::RayCollisionList::endC"></span><span class="target" id="classraisim_1_1RayCollisionList_1a3e6413dab3b2f3ae6d7002e81c22ebbb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim16RayCollisionList14const_iteratorE" title="raisim::RayCollisionList::const_iterator"><span class="n"><span class="pre">const_iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16RayCollisionList3endEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>const iterator past the last hit </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16RayCollisionList6cbeginEv">
+<span id="_CPPv3NK6raisim16RayCollisionList6cbeginEv"></span><span id="_CPPv2NK6raisim16RayCollisionList6cbeginEv"></span><span id="raisim::RayCollisionList::cbeginC"></span><span class="target" id="classraisim_1_1RayCollisionList_1af3be275e2a44f15a22ae948ce211e636"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim16RayCollisionList14const_iteratorE" title="raisim::RayCollisionList::const_iterator"><span class="n"><span class="pre">const_iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cbegin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16RayCollisionList6cbeginEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>const iterator to the first hit </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16RayCollisionList4cendEv">
+<span id="_CPPv3NK6raisim16RayCollisionList4cendEv"></span><span id="_CPPv2NK6raisim16RayCollisionList4cendEv"></span><span id="raisim::RayCollisionList::cendC"></span><span class="target" id="classraisim_1_1RayCollisionList_1adc77f7e12ce8ed13895aab1dde251bc9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim16RayCollisionList14const_iteratorE" title="raisim::RayCollisionList::const_iterator"><span class="n"><span class="pre">const_iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cend</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16RayCollisionList4cendEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>const iterator past the last hit </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16RayCollisionList4backEv">
+<span id="_CPPv3N6raisim16RayCollisionList4backEv"></span><span id="_CPPv2N6raisim16RayCollisionList4backEv"></span><span id="raisim::RayCollisionList::back"></span><span class="target" id="classraisim_1_1RayCollisionList_1af387b01af9cb1ea0ccf51a6aa6dff886"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim16RayCollisionList8iteratorE" title="raisim::RayCollisionList::iterator"><span class="n"><span class="pre">iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">back</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16RayCollisionList4backEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Iterator to the last hit (a null iterator if the list is empty). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16RayCollisionList4backEv">
+<span id="_CPPv3NK6raisim16RayCollisionList4backEv"></span><span id="_CPPv2NK6raisim16RayCollisionList4backEv"></span><span id="raisim::RayCollisionList::backC"></span><span class="target" id="classraisim_1_1RayCollisionList_1aa618f72d25926e17ca014950f162aabe"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim16RayCollisionList14const_iteratorE" title="raisim::RayCollisionList::const_iterator"><span class="n"><span class="pre">const_iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">back</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16RayCollisionList4backEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>const iterator to the last hit (a null iterator if the list is empty) </p>
 </dd>
 </dl>
 </dd></dl>
@@ -481,7 +567,7 @@ along the ray. Use <code class="code docutils literal notranslate"><span class="
 <dd><p>Set the number of valid hits in the list. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>size</strong> – <strong>[in]</strong> Number of hits. </p>
+<dd class="field-odd"><p><strong>size</strong> – <strong>[in]</strong> Number of hits, clamped to the storage size. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -512,18 +598,96 @@ along the ray. Use <code class="code docutils literal notranslate"><span class="
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4I_bEN6raisim16RayCollisionList14basic_iteratorE">
 <span id="_CPPv3I_bEN6raisim16RayCollisionList14basic_iteratorE"></span><span id="_CPPv2I_bEN6raisim16RayCollisionList14basic_iteratorE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsConst</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classraisim_1_1RayCollisionList_1_1basic__iterator"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">basic_iterator</span></span></span><a class="headerlink" href="#_CPPv4I_bEN6raisim16RayCollisionList14basic_iteratorE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
+<dd><p>Forward iterator over the valid hits (const or mutable). </p>
+<div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16RayCollisionList14basic_iterator14basic_iteratorE7pointer">
+<span id="_CPPv3N6raisim16RayCollisionList14basic_iterator14basic_iteratorE7pointer"></span><span id="_CPPv2N6raisim16RayCollisionList14basic_iterator14basic_iteratorE7pointer"></span><span id="raisim::RayCollisionList::basic_iterator::basic_iterator__pointer"></span><span class="target" id="classraisim_1_1RayCollisionList_1_1basic__iterator_1a0a619aa6de6b6c4a8c8057a789ffc52c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">basic_iterator</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">pointer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16RayCollisionList14basic_iterator14basic_iteratorE7pointer" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ptr</strong> – <strong>[in]</strong> item the iterator points to </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_b0EN6raisim16RayCollisionList14basic_iterator14basic_iteratorERK14basic_iteratorI10OtherConstE">
+<span id="_CPPv3I_b0EN6raisim16RayCollisionList14basic_iterator14basic_iteratorERK14basic_iteratorI10OtherConstE"></span><span id="_CPPv2I_b0EN6raisim16RayCollisionList14basic_iterator14basic_iteratorERK14basic_iteratorI10OtherConstE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OtherConst</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enable_if_t</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_bEN6raisim16RayCollisionList14basic_iteratorE" title="raisim::RayCollisionList::basic_iterator::IsConst"><span class="n"><span class="pre">IsConst</span></span></a><span class="w"> </span><span class="o"><span class="pre">&amp;&amp;</span></span><span class="w"> </span><span class="o"><span class="pre">!</span></span><a class="reference internal" href="#_CPPv4I_b0EN6raisim16RayCollisionList14basic_iterator14basic_iteratorERK14basic_iteratorI10OtherConstE" title="raisim::RayCollisionList::basic_iterator::basic_iterator::OtherConst"><span class="n"><span class="pre">OtherConst</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classraisim_1_1RayCollisionList_1_1basic__iterator_1ab4948172351156f627258c9ffd6683b7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">basic_iterator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_b0EN6raisim16RayCollisionList14basic_iterator14basic_iteratorERK14basic_iteratorI10OtherConstE" title="raisim::RayCollisionList::basic_iterator::basic_iterator"><span class="n"><span class="pre">basic_iterator</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_b0EN6raisim16RayCollisionList14basic_iterator14basic_iteratorERK14basic_iteratorI10OtherConstE" title="raisim::RayCollisionList::basic_iterator::basic_iterator::OtherConst"><span class="n"><span class="pre">OtherConst</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_b0EN6raisim16RayCollisionList14basic_iterator14basic_iteratorERK14basic_iteratorI10OtherConstE" title="Link to this definition"></a><br /></dt>
+<dd><p>Conversion from a mutable to a const iterator. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> – <strong>[in]</strong> mutable iterator </p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim16RayCollisionList14basic_iteratorppEv">
 <span id="_CPPv3N6raisim16RayCollisionList14basic_iteratorppEv"></span><span id="_CPPv2N6raisim16RayCollisionList14basic_iteratorppEv"></span><span id="raisim::RayCollisionList::basic_iterator::inc-operator"></span><span class="target" id="classraisim_1_1RayCollisionList_1_1basic__iterator_1a5c01993bb28f808311e256f9c8311a6b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">self_type</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">++</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16RayCollisionList14basic_iteratorppEv" title="Link to this definition"></a><br /></dt>
 <dd><p>prefix: advance, then return the new (incremented) iterator </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>this iterator </p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim16RayCollisionList14basic_iteratorppEi">
 <span id="_CPPv3N6raisim16RayCollisionList14basic_iteratorppEi"></span><span id="_CPPv2N6raisim16RayCollisionList14basic_iteratorppEi"></span><span id="raisim::RayCollisionList::basic_iterator::inc-operator__i"></span><span class="target" id="classraisim_1_1RayCollisionList_1_1basic__iterator_1a8aa22fae2bbf71332f70955ab3617aef"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">self_type</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">++</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim16RayCollisionList14basic_iteratorppEi" title="Link to this definition"></a><br /></dt>
 <dd><p>postfix: return a copy of the pre-increment value </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the iterator before incrementing </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16RayCollisionList14basic_iteratormlEv">
+<span id="_CPPv3NK6raisim16RayCollisionList14basic_iteratormlEv"></span><span id="_CPPv2NK6raisim16RayCollisionList14basic_iteratormlEv"></span><span id="raisim::RayCollisionList::basic_iterator::mul-operatorC"></span><span class="target" id="classraisim_1_1RayCollisionList_1_1basic__iterator_1a863da0adf6904e6079ee3d64fbec2737"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">reference</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">*</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16RayCollisionList14basic_iteratormlEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the current item </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16RayCollisionList14basic_iteratorptEv">
+<span id="_CPPv3NK6raisim16RayCollisionList14basic_iteratorptEv"></span><span id="_CPPv2NK6raisim16RayCollisionList14basic_iteratorptEv"></span><span id="raisim::RayCollisionList::basic_iterator::pointer-operatorC"></span><span class="target" id="classraisim_1_1RayCollisionList_1_1basic__iterator_1a14bd78d9c1c1aaa73e2ea8fc94c863e9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">pointer</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">-&gt;</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16RayCollisionList14basic_iteratorptEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pointer to the current item </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16RayCollisionList14basic_iteratoreqERK9self_type">
+<span id="_CPPv3NK6raisim16RayCollisionList14basic_iteratoreqERK9self_type"></span><span id="_CPPv2NK6raisim16RayCollisionList14basic_iteratoreqERK9self_type"></span><span id="raisim::RayCollisionList::basic_iterator::eq-operator__self_typeCRC"></span><span class="target" id="classraisim_1_1RayCollisionList_1_1basic__iterator_1a33011d54e350d6192580cfa01aba768c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">==</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">self_type</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rhs</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16RayCollisionList14basic_iteratoreqERK9self_type" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rhs</strong> – <strong>[in]</strong> other iterator </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>true if both point to the same item </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim16RayCollisionList14basic_iteratorneERK9self_type">
+<span id="_CPPv3NK6raisim16RayCollisionList14basic_iteratorneERK9self_type"></span><span id="_CPPv2NK6raisim16RayCollisionList14basic_iteratorneERK9self_type"></span><span id="raisim::RayCollisionList::basic_iterator::neq-operator__self_typeCRC"></span><span class="target" id="classraisim_1_1RayCollisionList_1_1basic__iterator_1a871917d69e290c417623e0bae86cd32b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">!=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">self_type</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rhs</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim16RayCollisionList14basic_iteratorneERK9self_type" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rhs</strong> – <strong>[in]</strong> other iterator </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>true if they point to different items </p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -540,7 +704,7 @@ along the ray. Use <code class="code docutils literal notranslate"><span class="
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="tendons/Examples.html" class="btn btn-neutral float-left" title="Tendon examples and Rayrai" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="Sensors.html" class="btn btn-neutral float-right" title="Sensors" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Rayrai.html" class="btn btn-neutral float-right" title="rayrai Visualizer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

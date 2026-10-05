@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Introduction &mdash; raisim 2.7.0 documentation</title>
+  <title>Introduction &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -78,17 +78,17 @@
 <li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -133,11 +133,12 @@ particles.</p>
 <p><strong>Why RaiSim?</strong></p>
 <ul class="simple">
 <li><p>RaiSim is optimized for high-throughput robotics simulation.</p></li>
-<li><p>The accuracy of RaiSim has been validated in numerous academic publications (<a class="reference external" href="https://robotics.sciencemag.org/content/4/26/eaau5872/tab-article-info">[2]</a>, <a class="reference external" href="https://arxiv.org/pdf/1901.07517.pdf">[3]</a>, <a class="reference external" href="https://robotics.sciencemag.org/content/5/47/eabc5986">[4]</a>,  <a class="reference external" href="https://arxiv.org/abs/1909.08399">[5]</a>,  <a class="reference external" href="https://arxiv.org/abs/2011.08811">[6]</a>)</p></li>
+<li><p>The accuracy of RaiSim has been validated in numerous academic publications (<a class="reference external" href="https://robotics.sciencemag.org/content/4/26/eaau5872/tab-article-info">[1]</a>, <a class="reference external" href="https://arxiv.org/pdf/1901.07517.pdf">[2]</a>, <a class="reference external" href="https://robotics.sciencemag.org/content/5/47/eabc5986">[3]</a>, <a class="reference external" href="https://arxiv.org/abs/1909.08399">[4]</a>, <a class="reference external" href="https://arxiv.org/abs/2011.08811">[5]</a>).</p></li>
 <li><p>The C++ API is organized around explicit worlds, objects, materials, sensors,
 and visualizer integration.</p></li>
-<li><p>The binary distribution ships headers, libraries, example sources, prebuilt
-rayrai tools, and documentation.</p></li>
+<li><p>The public <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> repository provides example and rayrai viewer
+sources, resources, and documentation; its release archives provide the
+prebuilt RaiSim and rayrai headers and libraries.</p></li>
 </ul>
 <section id="system-requirements">
 <h2>System Requirements<a class="headerlink" href="#system-requirements" title="Link to this heading"></a></h2>
@@ -153,17 +154,19 @@ require AVX2.</p></li>
 <h2>Example Code<a class="headerlink" href="#example-code" title="Link to this heading"></a></h2>
 <p>The following is the shape of a simple RaiSim application. It creates a world,
 adds objects, publishes the scene through <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code>, and steps the world
-through the server’s thread-safe helper. Use <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> for current
-visualization.</p>
+through the server’s thread-safe helper. Run <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> to see the
+scene (see <a class="reference internal" href="QuickStart.html"><span class="doc">Quick Start</span></a>).</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;raisim/World.hpp&quot;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;raisim/RaisimServer.hpp&quot;</span>
 
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">::</span><span class="n">setActivationKey</span><span class="p">(</span><span class="s">&quot;PATH_TO_THE_ACTIVATION_KEY&quot;</span><span class="p">);</span>
+<span class="w">  </span><span class="c1">// Optional when the key is at the default location (see Installation).</span>
+<span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">::</span><span class="n">setActivationKey</span><span class="p">(</span><span class="s">&quot;/path/to/activation.raisim&quot;</span><span class="p">);</span>
 
 <span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
-<span class="w">  </span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">anymal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addArticulatedSystem</span><span class="p">(</span><span class="n">PATH_TO_URDF</span><span class="p">);</span>
-<span class="w">  </span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">ball</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="w">  </span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">robot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addArticulatedSystem</span><span class="p">(</span><span class="s">&quot;/path/to/robot.urdf&quot;</span><span class="p">);</span>
+<span class="w">  </span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">ball</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span><span class="w">  </span><span class="c1">// radius 0.5 m, mass 1 kg</span>
+<span class="w">  </span><span class="n">ball</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">);</span>
 <span class="w">  </span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">ground</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addGround</span><span class="p">();</span>
 <span class="w">  </span><span class="n">world</span><span class="p">.</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.002</span><span class="p">);</span>
 
@@ -177,7 +180,10 @@ visualization.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Below is a minimal downstream CMake file for an installed RaiSim package.</p>
+<p>Below is a minimal downstream CMake file for an installed RaiSim package.
+Configure it with <code class="docutils literal notranslate"><span class="pre">-DCMAKE_PREFIX_PATH=/path/to/raisim2Lib/raisim</span></code> (add the
+<code class="docutils literal notranslate"><span class="pre">rayrai</span></code> prefix as well when the application uses rayrai). The
+<code class="docutils literal notranslate"><span class="pre">raisim::raisim</span></code> target brings in Eigen and requires C++20.</p>
 <div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.16</span><span class="p">)</span>
 <span class="nb">project</span><span class="p">(</span><span class="s">raisim_examples</span><span class="w"> </span><span class="s">LANGUAGES</span><span class="w"> </span><span class="s">CXX</span><span class="p">)</span>
 

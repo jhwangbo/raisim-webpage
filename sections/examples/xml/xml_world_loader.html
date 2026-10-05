@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>XML Example: World Loader &mdash; raisim 2.7.0 documentation</title>
+  <title>XML Example: World Loader &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../../../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -56,7 +56,6 @@
 <li class="toctree-l2"><a class="reference internal" href="../../Examples.html#example-layout">Example layout</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../Examples.html#choosing-an-example">Choosing an example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../Examples.html#runtime-assets">Runtime assets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../Examples.html#current-package-examples">Current Package Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../Examples.html#benchmark-examples">Benchmark Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../Examples.html#rayrai-tools-and-examples">Rayrai Tools And Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../Examples.html#server-examples">Server Examples</a></li>
@@ -98,17 +97,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../../OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -149,14 +148,14 @@
 <h1>XML Example: World Loader<a class="headerlink" href="#xml-example-world-loader" title="Link to this heading"></a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
-<p>Provides a small editable source template for loading a world XML file and
-running a <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> session. It is not a generic command-line XML
-loader: the shipped public example keeps its <code class="docutils literal notranslate"><span class="pre">xmlScript</span></code> constant empty and exits
-after printing an instruction.</p>
+<p>Loads a world XML file and publishes it through <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code>. With no
+argument it loads <code class="docutils literal notranslate"><span class="pre">objects/SingleBodies.xml</span></code>; pass another file to load it
+instead. See <a class="reference internal" href="../../WorldConfigurationFile.html"><span class="doc">World Configuration File</span></a> for the XML format.</p>
 </section>
 <section id="screenshot">
 <h2>Screenshot<a class="headerlink" href="#screenshot" title="Link to this heading"></a></h2>
-<img alt="../../../_images/heightMapUsingPNG.gif" src="../../../_images/heightMapUsingPNG.gif" />
+<img alt="xml_world_loader running heightMaps/heightMapUsingPng.xml" src="../../../_images/heightMapUsingPNG.gif" />
+<p>The screenshot shows <code class="docutils literal notranslate"><span class="pre">heightMaps/heightMapUsingPng.xml</span></code>.</p>
 </section>
 <section id="target">
 <h2>Target<a class="headerlink" href="#target" title="Link to this heading"></a></h2>
@@ -164,23 +163,26 @@ after printing an instruction.</p>
 </section>
 <section id="run">
 <h2>Run<a class="headerlink" href="#run" title="Link to this heading"></a></h2>
-<p>To use the template, set <code class="docutils literal notranslate"><span class="pre">xmlScript</span></code> in
-<code class="docutils literal notranslate"><span class="pre">examples/src/xml/xml_world_loader.cpp</span></code> to a path relative to
-<code class="docutils literal notranslate"><span class="pre">rsc/xmlScripts</span></code>, rebuild the target, and run:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>--build<span class="w"> </span>build-examples<span class="w"> </span>--target<span class="w"> </span>xml_world_loader<span class="w"> </span>--parallel<span class="w"> </span><span class="m">12</span>
-./build-examples/examples/xml_world_loader
+<p>Run the build-tree executable, optionally with an XML file:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build-examples/examples/xml_world_loader
+./build-examples/examples/xml_world_loader<span class="w"> </span>heightMaps/heightMapUsingPng.xml
+./build-examples/examples/xml_world_loader<span class="w"> </span>/absolute/path/to/world.xml
 </pre></div>
 </div>
 <p>On Windows, run <code class="docutils literal notranslate"><span class="pre">xml_world_loader.exe</span></code> instead.
-This example uses RaisimServer. Start <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> and connect to port 8080.</p>
+This example uses RaisimServer. Start <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> and connect to port 8080.
+<code class="docutils literal notranslate"><span class="pre">--help</span></code> prints the usage.</p>
 </section>
 <section id="details">
 <h2>Details<a class="headerlink" href="#details" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Resolves the selected file below the copied <code class="docutils literal notranslate"><span class="pre">rsc/xmlScripts</span></code> directory.</p></li>
-<li><p>Constructs <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> from that XML path and publishes it through
+<li><p>Uses the argument as given if that file exists; otherwise looks for it under
+the <code class="docutils literal notranslate"><span class="pre">rsc/xmlScripts</span></code> copy next to the executable. It exits with an error if
+neither exists.</p></li>
+<li><p>The bundled worlds under <code class="docutils literal notranslate"><span class="pre">rsc/xmlScripts</span></code> include <code class="docutils literal notranslate"><span class="pre">objects/</span></code>,
+<code class="docutils literal notranslate"><span class="pre">heightMaps/</span></code>, <code class="docutils literal notranslate"><span class="pre">material/</span></code>, <code class="docutils literal notranslate"><span class="pre">templatedWorld/</span></code>, and <code class="docutils literal notranslate"><span class="pre">wire/</span></code> examples.</p></li>
+<li><p>Constructs <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> from the resolved path and publishes it through
 <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code>.</p></li>
-<li><p>Does not parse command-line arguments or record video in the shipped example.</p></li>
 </ul>
 <p>For application code that already has a path, construct the world directly:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">(</span><span class="s">&quot;/absolute/path/to/world.xml&quot;</span><span class="p">);</span>

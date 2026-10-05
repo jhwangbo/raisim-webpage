@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Constraints &mdash; raisim 2.7.0 documentation</title>
+  <title>Constraints &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -74,25 +74,30 @@
 <li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#migrating-the-former-wire-api">Migrating the former wire API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#historical-class-links">Historical class links</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="StiffLengthConstraint.html">StiffLengthConstraint migration</a></li>
-<li class="toctree-l3"><a class="reference internal" href="CompliantLengthConstraint.html">CompliantLengthConstraint migration</a></li>
-<li class="toctree-l3"><a class="reference internal" href="CustomLengthConstraint.html">CustomLengthConstraint migration</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Constraints</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#length-constraints-use-tendons">Length constraints use tendons</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#migrating-the-former-wire-api">Migrating the former wire API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#historical-class-links">Historical class links</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="StiffLengthConstraint.html">StiffLengthConstraint migration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CompliantLengthConstraint.html">CompliantLengthConstraint migration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CustomLengthConstraint.html">CustomLengthConstraint migration</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="#pin-constraints">Pin constraints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pin-constraints">Pin constraints</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -130,9 +135,8 @@
              
   <section id="constraints">
 <h1>Constraints<a class="headerlink" href="#constraints" title="Link to this heading"></a></h1>
-</section>
 <section id="length-constraints-use-tendons">
-<h1>Length constraints use tendons<a class="headerlink" href="#length-constraints-use-tendons" title="Link to this heading"></a></h1>
+<h2>Length constraints use tendons<a class="headerlink" href="#length-constraints-use-tendons" title="Link to this heading"></a></h2>
 <p>A straight length constraint is a spatial tendon with two sites. Use
 <code class="docutils literal notranslate"><span class="pre">World::addSpatialTendon</span></code> for hard limits, a length lock, springs, or commanded
 tension. Routed cables and fixed joint transmissions use the same properties,
@@ -140,11 +144,18 @@ solver, inspection, rendering, checkpoint, and removal interfaces. See
 <a class="reference internal" href="Tendons.html"><span class="doc">Tendons</span></a>, <a class="reference internal" href="tendons/CodeExamples.html"><span class="doc">Tendon code examples</span></a>, and <a class="reference internal" href="tendons/Physics.html"><span class="doc">Tendon physics</span></a>.</p>
 </section>
 <section id="migrating-the-former-wire-api">
-<h1>Migrating the former wire API<a class="headerlink" href="#migrating-the-former-wire-api" title="Link to this heading"></a></h1>
-<p>The C++ and Python <code class="docutils literal notranslate"><span class="pre">addStiffWire</span></code>, <code class="docutils literal notranslate"><span class="pre">addCompliantWire</span></code>, <code class="docutils literal notranslate"><span class="pre">addCustomWire</span></code>,
-<code class="docutils literal notranslate"><span class="pre">getWire</span></code>, <code class="docutils literal notranslate"><span class="pre">getWires</span></code>, and <code class="docutils literal notranslate"><span class="pre">LengthConstraint</span></code> types have been removed.
-Use <code class="docutils literal notranslate"><span class="pre">addSpatialTendon</span></code>, <code class="docutils literal notranslate"><span class="pre">getTendon</span></code>, <code class="docutils literal notranslate"><span class="pre">getTendons</span></code>, and <code class="docutils literal notranslate"><span class="pre">removeTendon</span></code>.
-Recompile applications and bindings against matching headers and libraries.</p>
+<h2>Migrating the former wire API<a class="headerlink" href="#migrating-the-former-wire-api" title="Link to this heading"></a></h2>
+<p>New code should use <code class="docutils literal notranslate"><span class="pre">addSpatialTendon</span></code>, <code class="docutils literal notranslate"><span class="pre">getTendon</span></code>, <code class="docutils literal notranslate"><span class="pre">getTendons</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">removeTendon</span></code>. The Python bindings no longer provide <code class="docutils literal notranslate"><span class="pre">addStiffWire</span></code>,
+<code class="docutils literal notranslate"><span class="pre">addCompliantWire</span></code>, <code class="docutils literal notranslate"><span class="pre">addCustomWire</span></code>, <code class="docutils literal notranslate"><span class="pre">getWire</span></code>, <code class="docutils literal notranslate"><span class="pre">getWires</span></code>, or the
+<code class="docutils literal notranslate"><span class="pre">LengthConstraint</span></code> types.</p>
+<p>In C++, these functions and classes remain only as source-compatibility
+adapters. Each <code class="docutils literal notranslate"><span class="pre">add*Wire</span></code> call creates an ordinary two-site tendon (named
+<code class="docutils literal notranslate"><span class="pre">legacy_wire_&lt;n&gt;</span></code>) and returns a thin <code class="docutils literal notranslate"><span class="pre">LengthConstraint</span></code> view of it;
+<code class="docutils literal notranslate"><span class="pre">LengthConstraint::getTendon()</span></code> returns the underlying tendon, and removing
+the view removes the tendon. The tendon physics described below applies to
+both. Recompile applications and bindings against matching headers and
+libraries.</p>
 <table class="docutils align-default" id="id1">
 <caption><span class="caption-text">Configure a two-site Tendon with target length L</span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
 <colgroup>
@@ -193,15 +204,17 @@ couplings that reference them. Removing an attached object removes its tendons.<
 them immediately into ordinary two-site tendons, including stretch mode, body
 attachments, nominal length, stiffness, and appearance. A custom wire’s optional
 <code class="docutils literal notranslate"><span class="pre">tension</span></code> attribute becomes its tension command; absent commands default to
-zero. New XML exports write only <code class="docutils literal notranslate"><span class="pre">&lt;tendon&gt;</span></code> elements. Legacy XML support is an
-import conversion, with no second runtime type or API.</p>
+zero. In C++, each converted wire is also reachable by its name through the
+legacy <code class="docutils literal notranslate"><span class="pre">World::getWire</span></code> view. New XML exports write only <code class="docutils literal notranslate"><span class="pre">&lt;tendon&gt;</span></code>
+elements; converted wires carry <code class="docutils literal notranslate"><span class="pre">legacy_*</span></code> attributes so that the view
+survives a reload.</p>
 <p>The mapping preserves the intended physical model, but does not promise
 identical trajectories. Former compliant wires applied explicit spring forces;
 tendon springs and damping use the implicit velocity solve described in
 <a class="reference internal" href="tendons/Physics.html"><span class="doc">Tendon physics</span></a>. Hard bounds also use tendon constraint rows now. Recheck
 timestep, damping, and tolerances when migrating a tuned simulation.</p>
 <section id="historical-class-links">
-<h2>Historical class links<a class="headerlink" href="#historical-class-links" title="Link to this heading"></a></h2>
+<h3>Historical class links<a class="headerlink" href="#historical-class-links" title="Link to this heading"></a></h3>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="StiffLengthConstraint.html">StiffLengthConstraint migration</a></li>
@@ -212,11 +225,16 @@ timestep, damping, and tolerances when migrating a tuned simulation.</p>
 </section>
 </section>
 <section id="pin-constraints">
-<h1>Pin constraints<a class="headerlink" href="#pin-constraints" title="Link to this heading"></a></h1>
-<p>Pin constraints impose coincidence of attachment points in closed-loop systems
-and are specified under URDF <code class="docutils literal notranslate"><span class="pre">&lt;constraints&gt;</span></code>. They retain their independent
-API because they constrain vector position, whereas a tendon constrains one
-scalar transmission coordinate.</p>
+<h2>Pin constraints<a class="headerlink" href="#pin-constraints" title="Link to this heading"></a></h2>
+<p>Pin and equality constraints close the loops of a closed-loop articulated
+system and are specified under URDF <code class="docutils literal notranslate"><span class="pre">&lt;constraints&gt;</span></code>. A pin keeps two attachment
+points coincident in all three directions; an equality constraint keeps them
+coincident along one or two axes fixed in its first body. They are eliminated
+exactly before the contact solve rather than iterated by it; see
+<a class="reference internal" href="articulated_system/ClosedLoopSystems.html"><span class="doc">Closed-Loop Systems</span></a>. They retain their independent API
+because they constrain vector position, whereas a tendon constrains one scalar
+transmission coordinate.</p>
+</section>
 </section>
 
 

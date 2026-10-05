@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Logging System &mdash; raisim 2.7.0 documentation</title>
+  <title>Logging System &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -68,6 +68,8 @@
 <li class="toctree-l1"><a class="reference internal" href="Determinism.html">Determinism</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Math.html">Math Classes</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Logging System</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#fatal-callback">Fatal callback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#debug-only-macros">Debug-only macros</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#api">API</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#raisimmsg">RaiSimMsg</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim9RaiSimMsgE"><code class="docutils literal notranslate"><span class="pre">raisim::RaiSimMsg</span></code></a></li>
@@ -83,17 +85,17 @@
 <li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -131,8 +133,13 @@
              
   <section id="logging-system">
 <h1>Logging System<a class="headerlink" href="#logging-system" title="Link to this heading"></a></h1>
-<p>The RaiSim logging system, inspired by the <code class="docutils literal notranslate"><span class="pre">glog</span></code> library, offers a compact method for representing multi-line log entries.
-Messages are streamed exclusively to standard output (<code class="docutils literal notranslate"><span class="pre">std::cout</span></code>) and are not persisted to a file.
+<p>The RaiSim logging system, inspired by the <code class="docutils literal notranslate"><span class="pre">glog</span></code> library, provides one-line
+macros (<code class="docutils literal notranslate"><span class="pre">raisim/raisim_message.hpp</span></code>, included by <code class="docutils literal notranslate"><span class="pre">raisim/World.hpp</span></code>) that
+print a message together with a time stamp and its source location, in the form
+<code class="docutils literal notranslate"><span class="pre">[YYYY:MM:DD:HH:MM:SS</span> <span class="pre">file.cpp:42]</span> <span class="pre">message</span></code>.
+Messages are written only to standard output (<code class="docutils literal notranslate"><span class="pre">std::cout</span></code>); they are not saved to a file.
+The message argument can be anything that can be streamed with <code class="docutils literal notranslate"><span class="pre">&lt;&lt;</span></code>, e.g.
+<code class="docutils literal notranslate"><span class="pre">RSWARN(&quot;mass</span> <span class="pre">is</span> <span class="pre">&quot;</span> <span class="pre">&lt;&lt;</span> <span class="pre">mass)</span></code>.
 For instance, rather than:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="p">(</span><span class="n">fail</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">date</span><span class="o">&lt;&lt;</span><span class="n">FILENAME</span><span class="o">&lt;&lt;</span><span class="n">LINENUMBER</span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;failed here </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
@@ -146,22 +153,47 @@ For instance, rather than:</p>
 </div>
 <p>The available logging macros are as follows:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">RSINFO(msg)</span></code>: Prints the message in white.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RSINFO(msg)</span></code>: Prints the message in the default terminal color.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">RSWARN(msg)</span></code>: Prints the message in yellow.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">RSFATAL(msg)</span></code>: Prints the message in red and executes the fatal function.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">RSINFO_IF(con,</span> <span class="pre">msg)</span></code>: Prints the message in white if the condition evaluates to true.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RSFATAL(msg)</span></code>: Prints the message in bold red and calls the fatal callback.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RSINFO_IF(con,</span> <span class="pre">msg)</span></code>: Prints the message in the default color if the condition evaluates to true.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">RSWARN_IF(con,</span> <span class="pre">msg)</span></code>: Prints the message in yellow if the condition evaluates to true.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">RSFATAL_IF(con,</span> <span class="pre">msg)</span></code>: Prints the message in red and invokes the fatal function if the condition evaluates to true.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">RSASSERT(con,</span> <span class="pre">msg)</span></code>: Prints the message in red and invokes the fatal function if the condition evaluates to false.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">RSRETURN_IF(con,</span> <span class="pre">msg)</span></code>: Prints the message in white and executes a <code class="docutils literal notranslate"><span class="pre">return</span></code> statement if the condition evaluates to true.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">RSISNAN(val)</span></code>: Prints “${val} is NaN” and invokes the fatal function if the value is NaN (Not a Number).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">RSISNAN_MSG(val,</span> <span class="pre">msg)</span></code>: Prints the specified message and invokes the fatal function if the value is NaN.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RSFATAL_IF(con,</span> <span class="pre">msg)</span></code>: Prints the message in bold red and calls the fatal callback if the condition evaluates to true.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RSASSERT(con,</span> <span class="pre">msg)</span></code>: Prints the message in bold red and calls the fatal callback if the condition evaluates to false. It is active in all builds.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RSRETURN_IF(con,</span> <span class="pre">msg)</span></code>: Prints the message in the default color and executes <code class="docutils literal notranslate"><span class="pre">return;</span></code> if the condition evaluates to true. Use it only in functions that return <code class="docutils literal notranslate"><span class="pre">void</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RSISNAN(val)</span></code>: Prints <code class="docutils literal notranslate"><span class="pre">val</span> <span class="pre">is</span> <span class="pre">nan</span></code> (with the expression text in place of <code class="docutils literal notranslate"><span class="pre">val</span></code>) and calls the fatal callback if the value is NaN (Not a Number).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RSISNAN_MSG(val,</span> <span class="pre">msg)</span></code>: Prints the specified message and calls the fatal callback if the value is NaN.</p></li>
 </ul>
-<p>The default fatal function is <code class="docutils literal notranslate"><span class="pre">std::exit(1);</span></code>.
-This behavior can be overridden as follows:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">RaiSimMsg</span><span class="o">::</span><span class="n">setFatalCallback</span><span class="p">([](){</span><span class="k">throw</span><span class="p">;});</span>
+<p><code class="docutils literal notranslate"><span class="pre">printf</span></code>-style variants take a format string and arguments: <code class="docutils literal notranslate"><span class="pre">RSINFOF</span></code>,
+<code class="docutils literal notranslate"><span class="pre">RSWARNF</span></code>, <code class="docutils literal notranslate"><span class="pre">RSFATALF</span></code>, <code class="docutils literal notranslate"><span class="pre">RSINFO_IFF</span></code>, <code class="docutils literal notranslate"><span class="pre">RSWARN_IFF</span></code>, <code class="docutils literal notranslate"><span class="pre">RSFATAL_IFF</span></code>,
+<code class="docutils literal notranslate"><span class="pre">RSASSERTF</span></code>, <code class="docutils literal notranslate"><span class="pre">RSRETURN_IFF</span></code>, and <code class="docutils literal notranslate"><span class="pre">RSISNAN_MSGF</span></code>, e.g.
+<code class="docutils literal notranslate"><span class="pre">RSWARNF(&quot;mass</span> <span class="pre">is</span> <span class="pre">%f&quot;,</span> <span class="pre">mass)</span></code>. The formatted message is truncated to 1023
+characters.</p>
+<section id="fatal-callback">
+<h2>Fatal callback<a class="headerlink" href="#fatal-callback" title="Link to this heading"></a></h2>
+<p>By default, a fatal message calls <code class="docutils literal notranslate"><span class="pre">std::exit(1)</span></code>.
+Install a global callback to handle fatal errors differently, for example by
+throwing an exception that the application can catch:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">RaiSimMsg</span><span class="o">::</span><span class="n">setFatalCallback</span><span class="p">([]()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">throw</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">runtime_error</span><span class="p">(</span><span class="s">&quot;RaiSim fatal error; see the log above&quot;</span><span class="p">);</span>
+<span class="p">});</span>
 </pre></div>
 </div>
+<p>Execution continues after the fatal macro if the callback returns, so a custom
+callback should normally throw or terminate. Do not use <code class="docutils literal notranslate"><span class="pre">[](){</span> <span class="pre">throw;</span> <span class="pre">}</span></code>: a
+<code class="docutils literal notranslate"><span class="pre">throw;</span></code> without an exception being handled calls <code class="docutils literal notranslate"><span class="pre">std::terminate</span></code>.
+Passing an empty function restores the default.</p>
+<p><code class="docutils literal notranslate"><span class="pre">RaiSimMsg::setThreadFatalCallback(callback)</span></code> installs a callback for the
+calling thread only; it takes precedence over the global callback on that
+thread and returns the thread’s previous callback. The RAII helper
+<code class="docutils literal notranslate"><span class="pre">raisim::ScopedRaiSimFatalCallback</span></code> installs a thread callback and restores
+the previous one when it goes out of scope. Thread callbacks are kept by thread
+id, so remove one (pass an empty function, or let the scoped helper do it)
+before its thread exits; a callback left behind would be inherited by a later
+thread that is given the same id.</p>
+</section>
+<section id="debug-only-macros">
+<h2>Debug-only macros<a class="headerlink" href="#debug-only-macros" title="Link to this heading"></a></h2>
 <p>These macros impact performance; for example, all <code class="docutils literal notranslate"><span class="pre">_IF</span></code> macros involve boolean checks and potential branching.</p>
 <p>To avoid performance overhead from branching in release builds, the following debug-only versions of the macros are available:</p>
 <ul class="simple">
@@ -176,7 +208,13 @@ This behavior can be overridden as follows:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">DRSISNAN(val)</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">DRSISNAN_MSG(val,</span> <span class="pre">msg)</span></code></p></li>
 </ul>
-<p>These macros are compiled out unless the build type is set to Debug.</p>
+<p>They expand to the corresponding <code class="docutils literal notranslate"><span class="pre">RS*</span></code> macros only when <code class="docutils literal notranslate"><span class="pre">RSDEBUG</span></code> is
+defined, and to nothing otherwise; <code class="docutils literal notranslate"><span class="pre">printf</span></code>-style <code class="docutils literal notranslate"><span class="pre">DRS*F</span></code> variants exist as
+well. The exported <code class="docutils literal notranslate"><span class="pre">raisim::raisim</span></code> CMake target defines <code class="docutils literal notranslate"><span class="pre">RSDEBUG</span></code> when your
+build links the Debug RaiSim library, so a Debug build of your application has
+these checks only if the RaiSim package contains the Debug library (see
+<a class="reference internal" href="BuildAndTest.html"><span class="doc">Build, Test, and Benchmark</span></a>).</p>
+</section>
 <section id="api">
 <h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
 <section id="raisimmsg">
@@ -184,7 +222,17 @@ This behavior can be overridden as follows:</p>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9RaiSimMsgE">
 <span id="_CPPv3N6raisim9RaiSimMsgE"></span><span id="_CPPv2N6raisim9RaiSimMsgE"></span><span id="raisim::RaiSimMsg"></span><span class="target" id="classraisim_1_1RaiSimMsg"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RaiSimMsg</span></span></span><a class="headerlink" href="#_CPPv4N6raisim9RaiSimMsgE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
+<dd><p>Message printer behind the RSINFO / RSWARN / RSFATAL macros (raisim_message.hpp). Messages go to std::cout with a time stamp and the source location. A fatal message then calls the fatal callback: the calling thread’s callback if one is installed, otherwise the global callback, which defaults to std::exit(1). Execution continues after RSFATAL if the callback returns, so a custom callback should normally throw. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim9RaiSimMsg13FatalCallbackE">
+<span id="_CPPv3N6raisim9RaiSimMsg13FatalCallbackE"></span><span id="_CPPv2N6raisim9RaiSimMsg13FatalCallbackE"></span><span class="target" id="classraisim_1_1RaiSimMsg_1a6e3f8b1563ddecfa513a25ac14c8b36d"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FatalCallback</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N6raisim9RaiSimMsg13FatalCallbackE" title="Link to this definition"></a><br /></dt>
+<dd><p>Callback invoked after a fatal message is printed. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9RaiSimMsg6streamEPKciRNSt12stringstreamEi">
@@ -207,19 +255,27 @@ This behavior can be overridden as follows:</p>
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9RaiSimMsg16setFatalCallbackE13FatalCallback">
-<span id="_CPPv3N6raisim9RaiSimMsg16setFatalCallbackE13FatalCallback"></span><span id="_CPPv2N6raisim9RaiSimMsg16setFatalCallbackE13FatalCallback"></span><span id="raisim::RaiSimMsg::setFatalCallback__FatalCallback"></span><span class="target" id="classraisim_1_1RaiSimMsg_1a5c8c0544457c81393a6a333125f2f39b"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setFatalCallback</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">FatalCallback</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fatalCallback</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim9RaiSimMsg16setFatalCallbackE13FatalCallback" title="Link to this definition"></a><br /></dt>
-<dd><p>Set the callback invoked on fatal messages. </p>
+<span id="_CPPv3N6raisim9RaiSimMsg16setFatalCallbackE13FatalCallback"></span><span id="_CPPv2N6raisim9RaiSimMsg16setFatalCallbackE13FatalCallback"></span><span id="raisim::RaiSimMsg::setFatalCallback__FatalCallback"></span><span class="target" id="classraisim_1_1RaiSimMsg_1a5c8c0544457c81393a6a333125f2f39b"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setFatalCallback</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6raisim9RaiSimMsg13FatalCallbackE" title="raisim::RaiSimMsg::FatalCallback"><span class="n"><span class="pre">FatalCallback</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">fatalCallback</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim9RaiSimMsg16setFatalCallbackE13FatalCallback" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the global callback invoked on fatal messages (used by threads without their own callback). </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>fatalCallback</strong> – <strong>[in]</strong> Callback function. </p>
+<dd class="field-odd"><p><strong>fatalCallback</strong> – <strong>[in]</strong> Callback function. An empty function restores the default std::exit(1). </p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9RaiSimMsg22setThreadFatalCallbackE13FatalCallback">
-<span id="_CPPv3N6raisim9RaiSimMsg22setThreadFatalCallbackE13FatalCallback"></span><span id="_CPPv2N6raisim9RaiSimMsg22setThreadFatalCallbackE13FatalCallback"></span><span id="raisim::RaiSimMsg::setThreadFatalCallback__FatalCallback"></span><span class="target" id="classraisim_1_1RaiSimMsg_1ac32ddf66a9fa15023ce8c48a77050aed"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">FatalCallback</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setThreadFatalCallback</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">FatalCallback</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fatalCallback</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim9RaiSimMsg22setThreadFatalCallbackE13FatalCallback" title="Link to this definition"></a><br /></dt>
-<dd><p>Install a callback for the calling thread and return its previous callback. </p>
+<span id="_CPPv3N6raisim9RaiSimMsg22setThreadFatalCallbackE13FatalCallback"></span><span id="_CPPv2N6raisim9RaiSimMsg22setThreadFatalCallbackE13FatalCallback"></span><span id="raisim::RaiSimMsg::setThreadFatalCallback__FatalCallback"></span><span class="target" id="classraisim_1_1RaiSimMsg_1ac32ddf66a9fa15023ce8c48a77050aed"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim9RaiSimMsg13FatalCallbackE" title="raisim::RaiSimMsg::FatalCallback"><span class="n"><span class="pre">FatalCallback</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setThreadFatalCallback</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6raisim9RaiSimMsg13FatalCallbackE" title="raisim::RaiSimMsg::FatalCallback"><span class="n"><span class="pre">FatalCallback</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">fatalCallback</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim9RaiSimMsg22setThreadFatalCallbackE13FatalCallback" title="Link to this definition"></a><br /></dt>
+<dd><p>Install a callback for the calling thread and return its previous callback. It takes precedence over the global callback on this thread. Callbacks are kept per thread id, so remove it (pass an empty function, or use ScopedRaiSimFatalCallback) before the thread exits; otherwise a later thread that is given the same id inherits it. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fatalCallback</strong> – <strong>[in]</strong> callback for this thread; an empty function removes it </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the previous callback of this thread (empty if none) </p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tendon API and model files &mdash; raisim 2.7.0 documentation</title>
+  <title>Tendon API and model files &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -74,14 +74,15 @@
 <li class="toctree-l1"><a class="reference internal" href="../OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../Tendons.html">Tendons</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="CodeExamples.html">Tendon code examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Physics.html">Tendon physics</a></li>
@@ -105,7 +106,6 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -199,7 +199,8 @@ different concepts.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Deformable/granular system</p></td>
 <td><p>Particle index</p></td>
-<td><p>Use zero offset to attach directly to the particle.</p></td>
+<td><p>World-aligned offset from the particle center (particles have no
+orientation). Use zero to attach directly to the particle.</p></td>
 </tr>
 </tbody>
 </table>
@@ -219,7 +220,9 @@ body index. All referenced objects must belong to the same world as the tendon.<
 suitable exterior placement. <code class="docutils literal notranslate"><span class="pre">sphere(center,</span> <span class="pre">radius)</span></code> supplies a sphere guide.
 <code class="docutils literal notranslate"><span class="pre">cylinder(center,</span> <span class="pre">radius,</span> <span class="pre">axis)</span></code> defaults to the local +Z axis. The axis is
 normalized during validation; it must be finite and nonzero. Both radii and
-pulley divisors must be finite and strictly positive.</p>
+pulley divisors must be finite and strictly positive. A guide center must be in
+the world frame, on a single rigid body, or on an articulated-system body;
+particles cannot carry a wrapping guide.</p>
 <p>Every branch needs at least two sites, starting and ending with sites. A wrap
 must have an immediate site on both sides. Consequently two consecutive wraps
 need an intervening via-point. <code class="docutils literal notranslate"><span class="pre">E::pulley(divisor)</span></code> starts a new branch; a
@@ -246,7 +249,10 @@ records identify the instantaneous tangency points on that guide.</p></li>
 repeated contributions even though the returned term list retains them.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">VisualSegment::start</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span></code>: world-space endpoints of one drawing
 segment; <code class="docutils literal notranslate"><span class="pre">wrapped</span></code>: whether it tessellates the curved surface portion.
-These records are refreshed only when visual geometry is requested.</p></li>
+<code class="docutils literal notranslate"><span class="pre">getVisualSegments()</span></code> returns the records cached by the last
+<code class="docutils literal notranslate"><span class="pre">updateGeometry(true)</span></code> call. <code class="docutils literal notranslate"><span class="pre">computeVisualSegments(segments)</span></code> instead
+fills a caller-owned vector at the current poses without modifying the
+tendon; renderers use this const function.</p></li>
 </ul>
 </section>
 <section id="tendon-properties">
@@ -504,14 +510,16 @@ attributes. A missing cylinder axis defaults to local +Z.</p></li>
 <p>A fixed tendon instead contains <code class="docutils literal notranslate"><span class="pre">&lt;joint</span> <span class="pre">object=&quot;robot&quot;</span> <span class="pre">joint=&quot;joint_name&quot;</span>
 <span class="pre">coefficient=&quot;0.65&quot;/&gt;</span></code> children. The object name must identify an articulated
 system; joint names identify its revolute/prismatic coordinates.</p>
-<p>A coupling uses <code class="docutils literal notranslate"><span class="pre">name</span></code>, required <code class="docutils literal notranslate"><span class="pre">first</span></code>, optional <code class="docutils literal notranslate"><span class="pre">second</span></code>,
-<code class="docutils literal notranslate"><span class="pre">coefficients=&quot;c0,</span> <span class="pre">c1,</span> <span class="pre">c2,</span> <span class="pre">c3,</span> <span class="pre">c4&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">compliance</span></code>,
+<p>A coupling uses the required <code class="docutils literal notranslate"><span class="pre">name</span></code> and <code class="docutils literal notranslate"><span class="pre">first</span></code> attributes and the optional
+<code class="docutils literal notranslate"><span class="pre">second</span></code>, <code class="docutils literal notranslate"><span class="pre">coefficients=&quot;c0,</span> <span class="pre">c1,</span> <span class="pre">c2,</span> <span class="pre">c3,</span> <span class="pre">c4&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">compliance</span></code>,
 <code class="docutils literal notranslate"><span class="pre">position_correction</span></code>, and <code class="docutils literal notranslate"><span class="pre">enabled</span></code> attributes. The referenced tendons must
-exist. Omitting the second fixes the first relative to its creation reference.</p>
+exist. Omitting the second fixes the first relative to its reference length.</p>
 <p>Give referenced objects unique names. Unknown or ambiguous object names and
 unknown tendon references are rejected. Export writes the current reference and
 activation state as well as properties and commands. It does not serialize an
-arbitrary C++ controller or a future schedule of changing servo targets.</p>
+arbitrary C++ controller or a future schedule of changing servo targets. A
+tendon that backs a legacy C++ wire adapter is exported with additional
+<code class="docutils literal notranslate"><span class="pre">legacy_*</span></code> attributes, so loading the file restores the wire view as well.</p>
 <p>For a complete scene, prefer <code class="docutils literal notranslate"><span class="pre">World::exportToXml</span></code>. The example programs expose
 <code class="docutils literal notranslate"><span class="pre">--export</span> <span class="pre">PATH</span></code> and export initial scenes. Their embedded articulated models
 produce URDF sidecar files, with absolute references in the XML. Keep those

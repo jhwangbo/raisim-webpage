@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Troubleshooting &mdash; raisim 2.7.0 documentation</title>
+  <title>Troubleshooting &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -86,17 +86,17 @@
 <li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -143,7 +143,8 @@ under the build directory:</p>
 ./build-examples/examples/rayrai_tcp_viewer
 </pre></div>
 </div>
-<p>The unpacked package does not include a prebuilt TCP viewer. Build the
+<p>On Windows, the executables are under <code class="docutils literal notranslate"><span class="pre">build-examples\bin</span></code> instead.
+The unpacked package does not include a prebuilt TCP viewer. Build the
 <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> example target and run it from the build tree.
 If a command from old docs uses an <code class="docutils literal notranslate"><span class="pre">example_</span></code> prefix, check <a class="reference internal" href="Examples.html"><span class="doc">Examples</span></a>
 for the current target name.</p>
@@ -158,6 +159,9 @@ running examples, rayrai tools, applications, or importing <code class="docutils
 </div>
 <p>The script adds both RaiSim and rayrai libraries to the platform loader path.
 On macOS this is <code class="docutils literal notranslate"><span class="pre">DYLD_LIBRARY_PATH</span></code>. On Linux this is <code class="docutils literal notranslate"><span class="pre">LD_LIBRARY_PATH</span></code>.
+On Windows, run <code class="docutils literal notranslate"><span class="pre">raisim_env.bat</span></code> (Command Prompt) or <code class="docutils literal notranslate"><span class="pre">raisim_env.ps1</span></code>
+(PowerShell), which add the library directories to <code class="docutils literal notranslate"><span class="pre">PATH</span></code>; the examples build
+also copies the runtime DLLs next to the example executables.
 Because this is a per-terminal shell setting, source the script again in every
 new terminal before starting a viewer, an example, or Python with <code class="docutils literal notranslate"><span class="pre">raisimPy</span></code>.</p>
 </section>
@@ -167,10 +171,14 @@ new terminal before starting a viewer, an example, or Python with <code class="d
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$HOME/.raisim/activation.raisim
 </pre></div>
 </div>
-<p>or pass an explicit path before creating worlds:</p>
+<p>(<code class="docutils literal notranslate"><span class="pre">$HOME/raisim/activation.raisim</span></code> is also checked), or pass an explicit path
+before creating the first world:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">::</span><span class="n">setActivationKey</span><span class="p">(</span><span class="s">&quot;/absolute/path/to/activation.raisim&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
+<p>RaiSim looks up the key once per process, when the first <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> is
+created, so calling <code class="docutils literal notranslate"><span class="pre">setActivationKey</span></code> after that has no effect. If no key is
+found, RaiSim prints the paths it checked and your machine id, then stops.</p>
 </section>
 <section id="tcp-viewer-does-not-connect">
 <h2>TCP Viewer Does Not Connect<a class="headerlink" href="#tcp-viewer-does-not-connect" title="Link to this heading"></a></h2>
@@ -179,16 +187,25 @@ new terminal before starting a viewer, an example, or Python with <code class="d
 <li><p>The simulation must create <code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code> and call
 <code class="docutils literal notranslate"><span class="pre">launchServer</span></code>.</p></li>
 <li><p>The server-based example and TCP viewer must use the same port. The default
-is <code class="docutils literal notranslate"><span class="pre">8080</span></code>.</p></li>
-<li><p>Run <code class="docutils literal notranslate"><span class="pre">linux_install.sh</span></code>, <code class="docutils literal notranslate"><span class="pre">mac_install.sh</span></code>, or <code class="docutils literal notranslate"><span class="pre">win_install.ps1</span></code> after
-updating the package, then rebuild the examples copy of
-<code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code>. A stale viewer source can connect but disagree with
-the installed rayrai/RaiSim protocol implementation.</p></li>
+is <code class="docutils literal notranslate"><span class="pre">8080</span></code>. If that port is already in use, the server moves to the next
+free port; <code class="docutils literal notranslate"><span class="pre">RaisimServer::getPort()</span></code> returns the port it actually bound.</p></li>
+<li><p>By default the server listens only on <code class="docutils literal notranslate"><span class="pre">127.0.0.1</span></code>. To connect a viewer
+from another machine, call <code class="docutils literal notranslate"><span class="pre">server.setBindLoopbackOnly(false)</span></code> before
+<code class="docutils literal notranslate"><span class="pre">launchServer</span></code>. Any client that can reach the port can then control the
+simulation, so do this only on a trusted network.</p></li>
+<li><p>Keep the viewer source in sync with the installed packages: build
+<code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> from a <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> checkout whose pinned version
+(<code class="docutils literal notranslate"><span class="pre">RAISIM_VERSION</span></code> in the top-level <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code>) matches the
+installed RaiSim and rayrai libraries. If you installed another version with
+<code class="docutils literal notranslate"><span class="pre">raisim_upgrade.sh</span></code> or <code class="docutils literal notranslate"><span class="pre">raisim_upgrade.ps1</span></code>, check out the matching
+<code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> release, or configure again so that CMake restores the pinned
+packages (see <a class="reference internal" href="Installation.html"><span class="doc">Installation</span></a>). A stale viewer source can connect but
+disagree with the installed rayrai/RaiSim protocol implementation.</p></li>
 </ul>
 <p>For manual RGB/depth cameras, keep the examples-built viewer connected. It
 renders requested frames and returns them to <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code>. If the viewer
-reports <code class="docutils literal notranslate"><span class="pre">Refusing</span> <span class="pre">RGB</span> <span class="pre">sensor</span> <span class="pre">update</span> <span class="pre">without</span> <span class="pre">a</span> <span class="pre">complete</span> <span class="pre">render</span></code>, rerun the
-platform install script and rebuild <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> in
+reports <code class="docutils literal notranslate"><span class="pre">Refusing</span> <span class="pre">RGB</span> <span class="pre">sensor</span> <span class="pre">update</span> <span class="pre">without</span> <span class="pre">a</span> <span class="pre">complete</span> <span class="pre">render</span></code>, update the
+viewer sources as described above and rebuild <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> in
 <code class="docutils literal notranslate"><span class="pre">build-examples</span></code>; do not launch an older installed viewer binary.</p>
 </section>
 <section id="rayrai-window-or-offscreen-context-fails">
@@ -205,20 +222,14 @@ software or hardware OpenGL stack.</p>
 rayrai was built without the optional Vulkan backend, the portable OpenGL
 tracer remains available. Installing a compiler or driver after a binary
 package was built does not add the missing backend to that package. Use a
-package built with Vulkan support or rebuild rayrai from source. A
-<code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> from a build configured without <code class="docutils literal notranslate"><span class="pre">glslc</span></code> prints a warning
-once to standard output with installation and rebuild steps. An existing
-Vulkan-enabled binary does not need <code class="docutils literal notranslate"><span class="pre">glslc</span></code> at run time.</p>
-<p>For a source build on Ubuntu, install the Vulkan development files and the
-<code class="docutils literal notranslate"><span class="pre">glslc</span></code> shader compiler (Python 3 is also required):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>update
-sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>libvulkan-dev<span class="w"> </span>glslc
-glslc<span class="w"> </span>--version
-</pre></div>
-</div>
-<p>A source build enables the optional Vulkan ray-query backend automatically
-when these tools are present; <code class="docutils literal notranslate"><span class="pre">RAYRAI_ENABLE_VULKAN_RAY_QUERY</span></code> defaults to
-<code class="docutils literal notranslate"><span class="pre">ON</span></code>. Reconfigure and build after installing <code class="docutils literal notranslate"><span class="pre">glslc</span></code>:</p>
+package built with Vulkan support or rebuild rayrai from source. Source and
+binary builds use checked-in SPIR-V shaders and vendored Vulkan headers. CMake
+verifies the source manifest and binary hashes without Python. Building and
+running the backend requires neither a shader compiler nor a Vulkan SDK; the
+Vulkan driver is loaded at run time. Regenerating shaders after editing their
+GLSL requires <code class="docutils literal notranslate"><span class="pre">glslc</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">RAYRAI_ENABLE_VULKAN_RAY_QUERY</span></code> defaults to <code class="docutils literal notranslate"><span class="pre">ON</span></code> on Linux and Windows.
+Reconfigure and build to enable it:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-S<span class="w"> </span>/path/to/raisim-source<span class="w"> </span>-B<span class="w"> </span>/path/to/existing-build
 cmake<span class="w"> </span>--build<span class="w"> </span>/path/to/existing-build
 </pre></div>
@@ -226,7 +237,7 @@ cmake<span class="w"> </span>--build<span class="w"> </span>/path/to/existing-bu
 <p>An existing CMake cache with <code class="docutils literal notranslate"><span class="pre">RAYRAI_ENABLE_VULKAN_RAY_QUERY=OFF</span></code> keeps that
 explicit setting; change it to <code class="docutils literal notranslate"><span class="pre">ON</span></code> when reconfiguring. If tests were
 enabled in that source build, check the hardware cases with
-<code class="docutils literal notranslate"><span class="pre">ctest</span> <span class="pre">--test-dir</span> <span class="pre">/path/to/existing-build</span> <span class="pre">-j12</span> <span class="pre">-L</span> <span class="pre">hardware-ray-query</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">ctest</span> <span class="pre">--test-dir</span> <span class="pre">/path/to/existing-build</span> <span class="pre">-j1</span> <span class="pre">-L</span> <span class="pre">hardware-ray-query</span></code>.</p>
 <p>Check for the CMake message
 <code class="docutils literal notranslate"><span class="pre">optional</span> <span class="pre">Vulkan</span> <span class="pre">ray</span> <span class="pre">queries</span> <span class="pre">enabled</span></code>. A message about <code class="docutils literal notranslate"><span class="pre">portable</span> <span class="pre">glass</span>
 <span class="pre">tracing</span> <span class="pre">only</span></code> means the optional backend was not built. The
@@ -264,9 +275,10 @@ unit at those draws, so the message has no visible effect.</p>
 <h2>First Launch Of An Example Is Slow<a class="headerlink" href="#first-launch-of-an-example-is-slow" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">rayrai_coacd_mesh_approximation</span></code> runs CoACD for every mesh on its first run,
 which can take a few minutes; Ctrl-C stops it during that phase. RaiSim caches
-the parts beside each mesh, so later runs load them directly. <code class="docutils literal notranslate"><span class="pre">rayrai_forest</span></code>
-builds mesh LODs on its first launch and saves them as <code class="docutils literal notranslate"><span class="pre">rayrai_cache_*.lods</span></code>
-files beside its assets. Delete these cache files to force regeneration.</p>
+the parts beside each mesh as <code class="docutils literal notranslate"><span class="pre">raisim_coacd_*.obj</span></code> files, so later runs load
+them directly. <code class="docutils literal notranslate"><span class="pre">rayrai_forest</span></code> builds mesh LODs on its first launch and saves
+them as <code class="docutils literal notranslate"><span class="pre">rayrai_cache_*.lods</span></code> files beside its assets. Delete these cache
+files to force regeneration.</p>
 </section>
 <section id="example-asset-missing">
 <h2>Example Asset Missing<a class="headerlink" href="#example-asset-missing" title="Link to this heading"></a></h2>
@@ -277,14 +289,15 @@ that the top-level <code class="docutils literal notranslate"><span class="pre">
 </section>
 <section id="openusd-runtime-or-plugin-missing">
 <h2>OpenUSD Runtime Or Plugin Missing<a class="headerlink" href="#openusd-runtime-or-plugin-missing" title="Link to this heading"></a></h2>
-<p>USD mesh loading uses the bundled OpenUSD runtime. Keep the installed
-<code class="docutils literal notranslate"><span class="pre">openusd</span></code> directory and USD shared libraries next to the RaiSim binaries:
-<code class="docutils literal notranslate"><span class="pre">raisim/lib/openusd</span></code> on Linux, and <code class="docutils literal notranslate"><span class="pre">raisim/bin/openusd</span></code> plus the <code class="docutils literal notranslate"><span class="pre">usd_*.dll</span></code>
-files on Windows.</p>
+<p>USD loading (USD meshes and USD worlds) uses the bundled OpenUSD runtime. Keep
+the installed <code class="docutils literal notranslate"><span class="pre">openusd</span></code> directory and USD shared libraries next to the RaiSim
+binaries: <code class="docutils literal notranslate"><span class="pre">raisim/lib/openusd</span></code> on Linux and macOS, and <code class="docutils literal notranslate"><span class="pre">raisim/bin/openusd</span></code>
+plus the <code class="docutils literal notranslate"><span class="pre">usd_*.dll</span></code> files on Windows. See <a class="reference internal" href="OpenUSD.html"><span class="doc">OpenUSD Loading</span></a>.</p>
 <p>If an executable is launched from another directory, run the package environment
 script first so the runtime loader can find RaiSim and OpenUSD. If an OpenUSD
 runtime is missing from the public package, reinstall or upgrade the matching
-<code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> release instead of trying to rebuild the closed-source engine.</p>
+<code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> release (for example, with <code class="docutils literal notranslate"><span class="pre">raisim_upgrade.sh</span></code> or
+<code class="docutils literal notranslate"><span class="pre">raisim_upgrade.ps1</span></code>) instead of trying to rebuild the closed-source engine.</p>
 </section>
 </section>
 

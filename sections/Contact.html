@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contact and Collision &mdash; raisim 2.7.0 documentation</title>
+  <title>Contact and Collision &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,14 +14,14 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Collision Detection and Colliders" href="CollisionDetection.html" />
-    <link rel="prev" title="Granular Media" href="GranularMedia.html" /> 
+    <link rel="prev" title="Granular Pool Sleep" href="GranularPoolSleep.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -74,6 +74,10 @@
 <li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Contact and Collision</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#collision-group-and-mask">Collision Group and Mask</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#contacts">Contacts</a></li>
@@ -81,6 +85,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#contact-solver-notes">Contact Solver Notes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#api">API</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6raisim7ContactE"><code class="docutils literal notranslate"><span class="pre">raisim::Contact</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim7Contact7ContactERK3VecIXL3EEERK3VecIXL3EEERK3MatIXL3EEXL3EEEb6size_t6size_t6size_t8BodyType6size_t6size_td22CollisionBodyHandlePtr22CollisionBodyHandlePtr"><code class="docutils literal notranslate"><span class="pre">Contact()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisim7Contact11getPositionEv"><code class="docutils literal notranslate"><span class="pre">getPosition()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisim7Contact17getSolverPositionEv"><code class="docutils literal notranslate"><span class="pre">getSolverPosition()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisim7Contact9getNormalEv"><code class="docutils literal notranslate"><span class="pre">getNormal()</span></code></a></li>
@@ -100,6 +105,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisim7Contact4skipEv"><code class="docutils literal notranslate"><span class="pre">skip()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim7Contact17getCollisionBodyAEv"><code class="docutils literal notranslate"><span class="pre">getCollisionBodyA()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim7Contact17getCollisionBodyBEv"><code class="docutils literal notranslate"><span class="pre">getCollisionBodyB()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim7Contact12computeFrameERK3VecIXL3EEER3MatIXL3EEXL3EEE"><code class="docutils literal notranslate"><span class="pre">computeFrame()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -110,12 +116,8 @@
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -155,7 +157,8 @@
 <h1>Contact and Collision<a class="headerlink" href="#contact-and-collision" title="Link to this heading"></a></h1>
 <section id="collision-group-and-mask">
 <h2>Collision Group and Mask<a class="headerlink" href="#collision-group-and-mask" title="Link to this heading"></a></h2>
-<p>Collision groups and masks in RaiSim use bit operations, as in most other physics engines. The example below is self-explanatory.</p>
+<p>Collision groups and masks in RaiSim are 64-bit bit sets (<code class="docutils literal notranslate"><span class="pre">raisim::CollisionGroup</span></code>), as in most other physics engines.
+<code class="docutils literal notranslate"><span class="pre">raisim::COLLISION(n)</span></code> returns the bit for group <code class="docutils literal notranslate"><span class="pre">n</span></code> (<code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">&lt;&lt;</span> <span class="pre">n</span></code>). Consider the following example:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">sphere0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;default&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">COLLISION</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">COLLISION</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">COLLISION</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">sphere1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;default&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">COLLISION</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">COLLISION</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">COLLISION</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
@@ -163,17 +166,19 @@
 <span class="k">auto</span><span class="w"> </span><span class="n">sphere3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;default&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">COLLISION</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="mi">-1</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>In the above example, <code class="docutils literal notranslate"><span class="pre">sphere0</span></code> is in collision group 0 and can collide with collision group 0 and 1.
-<code class="docutils literal notranslate"><span class="pre">sphere1</span></code> is in collision group 1 and can collide with collision group 0 and 1.
+<p>In the above example, <code class="docutils literal notranslate"><span class="pre">sphere0</span></code> is in collision group 0 and can collide with collision groups 0 and 1.
+<code class="docutils literal notranslate"><span class="pre">sphere1</span></code> is in collision group 1 and can collide with collision groups 0 and 1.
 <code class="docutils literal notranslate"><span class="pre">sphere2</span></code> is in collision group 2 and can collide with collision group 1.
-<code class="docutils literal notranslate"><span class="pre">sphere3</span></code> is in collision group 3 and can collide with any object (-1 means all groups).</p>
+<code class="docutils literal notranslate"><span class="pre">sphere3</span></code> is in collision group 3 and its mask accepts every group (-1 sets all bits).</p>
 <p><strong>The collision group and mask use AND logic</strong>.
-For A and B to collide, A must be able to collide with B and vice versa.</p>
+For A and B to collide, A’s group must be in B’s mask and B’s group must be in A’s mask.</p>
 <p><code class="docutils literal notranslate"><span class="pre">sphere0</span></code> can collide with <code class="docutils literal notranslate"><span class="pre">sphere1</span></code>.
-<code class="docutils literal notranslate"><span class="pre">sphere1</span></code> cannot collide with <code class="docutils literal notranslate"><span class="pre">sphere2</span></code> (both conditions must be satisfied).
-<code class="docutils literal notranslate"><span class="pre">sphere3</span></code> cannot collide with any objects (because <code class="docutils literal notranslate"><span class="pre">sphere0</span></code>, <code class="docutils literal notranslate"><span class="pre">sphere1</span></code> and <code class="docutils literal notranslate"><span class="pre">sphere2</span></code> cannot collide with the collision group 3).</p>
-<p>By default, movable objects are in collision group 1 and can collide with anything (collision mask = -1).
-All static objects (e.g., ground and heightmap) are in collision group 63 and can collide with anything.</p>
+<code class="docutils literal notranslate"><span class="pre">sphere1</span></code> cannot collide with <code class="docutils literal notranslate"><span class="pre">sphere2</span></code> (<code class="docutils literal notranslate"><span class="pre">sphere1</span></code>’s mask does not include group 2).
+<code class="docutils literal notranslate"><span class="pre">sphere3</span></code> cannot collide with any of the other spheres, because none of their masks includes group 3.
+It can still collide with a ground added with <code class="docutils literal notranslate"><span class="pre">world.addGround()</span></code>, whose default mask is -1.</p>
+<p>By default, movable objects use <code class="docutils literal notranslate"><span class="pre">collisionGroup</span> <span class="pre">=</span> <span class="pre">1</span></code> (that is, <code class="docutils literal notranslate"><span class="pre">COLLISION(0)</span></code>) and <code class="docutils literal notranslate"><span class="pre">collisionMask</span> <span class="pre">=</span> <span class="pre">-1</span></code>, so they collide with everything.
+Static objects (e.g., ground and heightmap) are in the static collision group <code class="docutils literal notranslate"><span class="pre">RAISIM_STATIC_COLLISION_GROUP</span></code>
+(bit 63; bit 31 on Windows) and their default mask is -1.</p>
 </section>
 <section id="contacts">
 <h2>Contacts<a class="headerlink" href="#contacts" title="Link to this heading"></a></h2>
@@ -183,26 +188,30 @@ For example,</p>
 </pre></div>
 </div>
 <p>The Contact class is header-only and can be found at <code class="code docutils literal notranslate"><span class="pre">include/raisim/contact/Contact.hpp</span></code>.</p>
-<p>Note that all vector quantities are expressed in the respective <strong>Contact Frame</strong>.
-A contact frame is defined such that its z-axis is colinear with the contact normal and its origin is at the contact point.
+<p>Each contact has two participants, objectA and objectB. The position (<code class="docutils literal notranslate"><span class="pre">getPosition()</span></code>) and
+normal (<code class="docutils literal notranslate"><span class="pre">getNormal()</span></code>) are expressed in the world frame; the normal points from objectB to objectA.
+The impulse (<code class="docutils literal notranslate"><span class="pre">getImpulse()</span></code>) is the impulse acting on objectA, expressed in the <strong>contact frame</strong>;
+objectB receives the negated impulse. Divide it by the time step to obtain a force.
+A contact frame is defined such that its z-axis is collinear with the contact normal and its origin is at the contact point.
 Its x- and y-axes are chosen arbitrarily.
+<code class="docutils literal notranslate"><span class="pre">getContactFrame()</span></code> returns the transpose of the contact frame’s rotation: each row is a contact-frame axis in world coordinates.
 Here is a more detailed example:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">/// Check all contact impulses acting on &quot;LF_SHANK&quot;</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">footIndex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getBodyIdx</span><span class="p">(</span><span class="s">&quot;LF_SHANK&quot;</span><span class="p">);</span>
 
 <span class="c1">/// For all contacts on the robot, check ...</span>
 <span class="k">for</span><span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">contact</span><span class="o">:</span><span class="w"> </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getContacts</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">contact</span><span class="p">.</span><span class="n">skip</span><span class="p">())</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span><span class="w"> </span><span class="c1">/// if the contact is internal, one contact point is set to &#39;skip&#39;</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">contact</span><span class="p">.</span><span class="n">skip</span><span class="p">())</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span><span class="w"> </span><span class="c1">/// the second entry of a self-collision point is set to &#39;skip&#39;</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">footIndex</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">contact</span><span class="p">.</span><span class="n">getlocalBodyIndex</span><span class="p">()</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;Contact impulse in the contact frame: &quot;</span><span class="o">&lt;&lt;</span><span class="n">contact</span><span class="p">.</span><span class="n">getImpulse</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">e</span><span class="p">()</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-<span class="w">    </span><span class="c1">/// the impulse acts from objectB to objectA. You can check if this object is objectA or B by:</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;Contact impulse in the contact frame: &quot;</span><span class="o">&lt;&lt;</span><span class="n">contact</span><span class="p">.</span><span class="n">getImpulse</span><span class="p">().</span><span class="n">e</span><span class="p">().</span><span class="n">transpose</span><span class="p">()</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">/// the impulse acts on objectA. You can check if this object is objectA or B by:</span>
 <span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;is ObjectA: &quot;</span><span class="o">&lt;&lt;</span><span class="n">contact</span><span class="p">.</span><span class="n">isObjectA</span><span class="p">()</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 <span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;Contact frame: </span><span class="se">\n</span><span class="s">&quot;</span><span class="o">&lt;&lt;</span><span class="n">contact</span><span class="p">.</span><span class="n">getContactFrame</span><span class="p">().</span><span class="n">e</span><span class="p">().</span><span class="n">transpose</span><span class="p">()</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-<span class="w">    </span><span class="c1">/// the contact frame is transposed.</span>
-<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;Contact impulse in the world frame: &quot;</span><span class="o">&lt;&lt;</span><span class="n">contact</span><span class="p">.</span><span class="n">getContactFrame</span><span class="p">().</span><span class="n">e</span><span class="p">().</span><span class="n">transpose</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">contact</span><span class="p">.</span><span class="n">getImpulse</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">e</span><span class="p">()</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">/// getContactFrame() is transposed, so transpose it back to map contact-frame vectors to the world frame.</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;Contact impulse in the world frame: &quot;</span><span class="o">&lt;&lt;</span><span class="p">(</span><span class="n">contact</span><span class="p">.</span><span class="n">getContactFrame</span><span class="p">().</span><span class="n">e</span><span class="p">().</span><span class="n">transpose</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">contact</span><span class="p">.</span><span class="n">getImpulse</span><span class="p">().</span><span class="n">e</span><span class="p">()).</span><span class="n">transpose</span><span class="p">()</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 <span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;Contact Normal in the world frame: &quot;</span><span class="o">&lt;&lt;</span><span class="n">contact</span><span class="p">.</span><span class="n">getNormal</span><span class="p">().</span><span class="n">e</span><span class="p">().</span><span class="n">transpose</span><span class="p">()</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 <span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;Contact position in the world frame: &quot;</span><span class="o">&lt;&lt;</span><span class="n">contact</span><span class="p">.</span><span class="n">getPosition</span><span class="p">().</span><span class="n">e</span><span class="p">().</span><span class="n">transpose</span><span class="p">()</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;It collides with: &quot;</span><span class="o">&lt;&lt;</span><span class="n">world</span><span class="p">.</span><span class="n">getObject</span><span class="p">(</span><span class="n">contact</span><span class="p">.</span><span class="n">getPairObjectIndex</span><span class="p">())</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;It collides with: &quot;</span><span class="o">&lt;&lt;</span><span class="n">world</span><span class="p">.</span><span class="n">getObject</span><span class="p">(</span><span class="n">contact</span><span class="p">.</span><span class="n">getPairObjectIndex</span><span class="p">())</span><span class="o">-&gt;</span><span class="n">getName</span><span class="p">()</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">contact</span><span class="p">.</span><span class="n">getPairObjectBodyType</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">BodyType</span><span class="o">::</span><span class="n">STATIC</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="c1">/// Static objects do not store contacts, so check whether the pair object is static.</span>
 <span class="w">      </span><span class="c1">/// This saves computation in RaiSim.</span>
@@ -213,6 +222,9 @@ Here is a more detailed example:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
+<p><code class="docutils literal notranslate"><span class="pre">getImpulse()</span></code> dereferences an internal pointer that is set only for contacts of awake dynamic
+objects during <code class="docutils literal notranslate"><span class="pre">World::integrate()</span></code>. Check <code class="docutils literal notranslate"><span class="pre">getImpulsePtr()</span></code> for <code class="docutils literal notranslate"><span class="pre">nullptr</span></code> before reading
+impulses on kinematic objects or before the first integration step.</p>
 </section>
 <section id="collision-detection-details">
 <h2>Collision detection details<a class="headerlink" href="#collision-detection-details" title="Link to this heading"></a></h2>
@@ -221,45 +233,83 @@ per-pair contact counts, see the <a class="reference internal" href="CollisionDe
 </section>
 <section id="contact-solver-notes">
 <h2>Contact Solver Notes<a class="headerlink" href="#contact-solver-notes" title="Link to this heading"></a></h2>
-<p>RaiSim uses a bisection-based per-contact solver for rigid contacts, closed-loop
-pin constraints, and hard length constraints. <code class="docutils literal notranslate"><span class="pre">World::setContactSolverParam</span></code>
+<p>RaiSim uses a bisection-based per-contact solver for rigid contacts and tendon
+constraint rows. Closed-loop pin and equality constraints of articulated systems
+are eliminated exactly before the solve (see
+<a class="reference internal" href="articulated_system/ClosedLoopSystems.html"><span class="doc">Closed-Loop Systems</span></a>). <code class="docutils literal notranslate"><span class="pre">World::setContactSolverParam</span></code>
 still accepts the historical alpha arguments, but the current implementation
-keeps the three alpha values fixed internally; only <code class="docutils literal notranslate"><span class="pre">maxIter</span></code> and
-<code class="docutils literal notranslate"><span class="pre">threshold</span></code> affect the solver configuration. <code class="docutils literal notranslate"><span class="pre">World::setERP</span></code> controls the
-position-error reduction terms used by the contact solve.</p>
+keeps the three alpha values fixed internally; only <code class="docutils literal notranslate"><span class="pre">maxIter</span></code> (default 150)
+and <code class="docutils literal notranslate"><span class="pre">threshold</span></code> (default 1e-8 per constraint row) affect the solver
+configuration. <code class="docutils literal notranslate"><span class="pre">World::setERP(erp,</span> <span class="pre">erp2)</span></code> controls the position-error
+reduction terms used by the contact solve.</p>
 <p>The solver warm-starts ordinary rigid contacts from the previous converged
-solve when the object pair and contact position still match. The cached impulse
-is stored in world coordinates and projected into the current contact frame and
-friction cone before it is applied. Warm-start data is intentionally not reused
-after a non-converged or stalled solve.</p>
+solve when the object pair matches and a previous contact lies within 1 cm of
+the new one. Contacts that are approaching quickly (impacts) start from zero.
+The cached impulse is stored in world coordinates and projected into the
+current contact frame and friction cone before it is applied. Warm-start data
+is intentionally not reused after a non-converged or stalled solve.</p>
 <p>Particle-style contacts are handled differently. Deformable and granular
-contacts use particle/vertex ids as solver point ids, and those ids are not
-persistent contact-list indices. The contact solver therefore does not
-warm-start deformable or granular contacts; they use the exact re-solve path
-each step. This avoids treating a particle id as an index into
-<code class="docutils literal notranslate"><span class="pre">Object::getContacts()</span></code> and keeps particle contacts independent of contact
-list layout.</p>
+contact points are particles or mesh vertices, so their positions do not
+identify a persistent contact. The contact solver therefore does not
+warm-start deformable or granular contacts; they are solved from zero
+impulses each step.</p>
 <p><code class="docutils literal notranslate"><span class="pre">World::setContactSolverIterationOrder(order)</span></code> sets the starting sweep
-direction for the next contact solve. The bisection solver then flips the stored
-direction after each solve, so subsequent solves alternate between forward and
-reverse sweeps unless the application sets the starting direction again.</p>
+direction for the next contact solve (<code class="docutils literal notranslate"><span class="pre">true</span></code> is forward). The bisection
+solver then flips the stored direction after each solve, so subsequent solves
+alternate between forward and reverse sweeps unless the application sets the
+starting direction again. Pin rows added directly to the solver make every solve
+sweep forward; articulated-system loop constraints are eliminated before the solve
+and do not.</p>
 </section>
 <section id="api">
 <h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
-<p>You can get a vector of collisions on an object using <code class="docutils literal notranslate"><span class="pre">raisim::Object::getContacts</span></code>.
+<p>You can get a vector of contacts on an object using <code class="docutils literal notranslate"><span class="pre">raisim::Object::getContacts</span></code>.
 Each element in the vector has the following API:</p>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim7ContactE">
 <span id="_CPPv3N6raisim7ContactE"></span><span id="_CPPv2N6raisim7ContactE"></span><span id="raisim::Contact"></span><span class="target" id="classraisim_1_1Contact"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Contact</span></span></span><a class="headerlink" href="#_CPPv4N6raisim7ContactE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
+<dd><p>A contact point between two collision bodies, as stored in <a class="reference internal" href="Object.html#classraisim_1_1Object_1a57bcda6e9ed7b8188f68ae3f4080c559"><span class="std std-ref">Object::getContacts()</span></a>.</p>
+<p>Every contact has two participants, objectA and objectB (assigned by the collision detector). A <a class="reference internal" href="#classraisim_1_1Contact"><span class="std std-ref">Contact</span></a> entry is stored in each participant’s contact list, except on STATIC objects. Both entries share the same position, normal, contact frame, depth, impulse and collision-body handles; use <a class="reference internal" href="#classraisim_1_1Contact_1ac94eb5d7b48c65dd68ca3d96b7d77f79"><span class="std std-ref">isObjectA()</span></a> to tell which side the entry belongs to.</p>
+<p>Conventions:<ul class="simple">
+<li><p><a class="reference internal" href="#classraisim_1_1Contact_1a3b877555a80796023c8b19f3aaef84dc"><span class="std std-ref">getNormal()</span></a> is a unit vector pointing from objectB toward objectA (in both entries).</p></li>
+<li><p><a class="reference internal" href="#classraisim_1_1Contact_1a85d2e8eef2538a9f29b71a75af24b3cc"><span class="std std-ref">getContactFrame()</span></a> is a rotation matrix whose rows are the contact-frame axes expressed in the world frame; its third row equals the normal.</p></li>
+<li><p><a class="reference internal" href="#classraisim_1_1Contact_1a171ad4b1fd95495a131bc0b3b85a84bc"><span class="std std-ref">getImpulse()</span></a> is the impulse acting on objectA, expressed in the contact frame. objectB receives the negated impulse. The world-frame impulse on objectA is <a class="reference internal" href="#classraisim_1_1Contact_1a85d2e8eef2538a9f29b71a75af24b3cc"><span class="std std-ref">getContactFrame()</span></a>.transpose() * <a class="reference internal" href="#classraisim_1_1Contact_1a171ad4b1fd95495a131bc0b3b85a84bc"><span class="std std-ref">getImpulse()</span></a>. </p></li>
+</ul>
+</p>
+<div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim7Contact7ContactERK3VecIXL3EEERK3VecIXL3EEERK3MatIXL3EEXL3EEEb6size_t6size_t6size_t8BodyType6size_t6size_td22CollisionBodyHandlePtr22CollisionBodyHandlePtr">
+<span id="_CPPv3N6raisim7Contact7ContactERK3VecIXL3EEERK3VecIXL3EEERK3MatIXL3EEXL3EEEb6size_t6size_t6size_t8BodyType6size_t6size_td22CollisionBodyHandlePtr22CollisionBodyHandlePtr"></span><span id="_CPPv2N6raisim7Contact7ContactERK3VecIX3EERK3VecIX3EERK3MatIX3EX3EEb6size_t6size_t6size_t8BodyType6size_t6size_td22CollisionBodyHandlePtr22CollisionBodyHandlePtr"></span><span id="raisim::Contact::Contact__Vec:3:CR.Vec:3:CR.Mat:3.3:CR.b.s.s.s.BodyType.s.s.double.CollisionBodyHandlePtr.CollisionBodyHandlePtr"></span><span class="target" id="classraisim_1_1Contact_1ae6702fc0f508c088d7ecd2ac14c81909"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Contact</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">position</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">normal</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Mat</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">frame</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">objectA</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">contactProblemIndex</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">contactIndexInObject</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pairObjectIndex</span></span>, <span class="n"><span class="pre">BodyType</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pairObjectBodyType</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pairContactIndexInPairObject</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">localBodyIndex</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">depth</span></span>, <span class="n"><span class="pre">CollisionBodyHandlePtr</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">colA</span></span>, <span class="n"><span class="pre">CollisionBodyHandlePtr</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">colB</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim7Contact7ContactERK3VecIXL3EEERK3VecIXL3EEERK3MatIXL3EEXL3EEEb6size_t6size_t6size_t8BodyType6size_t6size_td22CollisionBodyHandlePtr22CollisionBodyHandlePtr" title="Link to this definition"></a><br /></dt>
+<dd><p>Created by the <a class="reference internal" href="WorldSystem.html#classraisim_1_1World"><span class="std std-ref">World</span></a> during collision detection; users normally only read contacts. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>position</strong> – <strong>[in]</strong> <a class="reference internal" href="#classraisim_1_1Contact"><span class="std std-ref">Contact</span></a> position in the world frame. </p></li>
+<li><p><strong>normal</strong> – <strong>[in]</strong> Unit normal pointing from objectB to objectA. </p></li>
+<li><p><strong>frame</strong> – <strong>[in]</strong> <a class="reference internal" href="#classraisim_1_1Contact"><span class="std std-ref">Contact</span></a> frame (see <a class="reference internal" href="#classraisim_1_1Contact_1a85d2e8eef2538a9f29b71a75af24b3cc"><span class="std std-ref">getContactFrame()</span></a>). </p></li>
+<li><p><strong>objectA</strong> – <strong>[in]</strong> True if this entry belongs to objectA. </p></li>
+<li><p><strong>contactProblemIndex</strong> – <strong>[in]</strong> Index in <a class="reference internal" href="WorldSystem.html#classraisim_1_1World_1a890576537fc68b49e503c9f35413913b"><span class="std std-ref">World::getContactProblem()</span></a>. </p></li>
+<li><p><strong>contactIndexInObject</strong> – <strong>[in]</strong> Index of this entry in its object’s contact list. </p></li>
+<li><p><strong>pairObjectIndex</strong> – <strong>[in]</strong> <a class="reference internal" href="WorldSystem.html#classraisim_1_1World"><span class="std std-ref">World</span></a> index of the other object. </p></li>
+<li><p><strong>pairObjectBodyType</strong> – <strong>[in]</strong> Body type of the other object. </p></li>
+<li><p><strong>pairContactIndexInPairObject</strong> – <strong>[in]</strong> Index of the paired entry in the other object’s contact list. </p></li>
+<li><p><strong>localBodyIndex</strong> – <strong>[in]</strong> Local index of the body (within this object) that is in contact. </p></li>
+<li><p><strong>depth</strong> – <strong>[in]</strong> Signed separation (negative when penetrating), see <a class="reference internal" href="#classraisim_1_1Contact_1a313a329551ad89db63314c56b2e51619"><span class="std std-ref">getDepth()</span></a>. </p></li>
+<li><p><strong>colA</strong> – <strong>[in]</strong> Collision body of objectA. </p></li>
+<li><p><strong>colB</strong> – <strong>[in]</strong> Collision body of objectB. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim7Contact11getPositionEv">
 <span id="_CPPv3NK6raisim7Contact11getPositionEv"></span><span id="_CPPv2NK6raisim7Contact11getPositionEv"></span><span id="raisim::Contact::getPositionC"></span><span class="target" id="classraisim_1_1Contact_1ae0d8abaddfcf5b081bc3b8d6a96d57b5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getPosition</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim7Contact11getPositionEv" title="Link to this definition"></a><br /></dt>
 <dd><p>the contact position </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the contact position </p>
+<dd class="field-odd"><p>the contact position in the world frame </p>
 </dd>
 </dl>
 </dd></dl>
@@ -268,15 +318,20 @@ Each element in the vector has the following API:</p>
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim7Contact17getSolverPositionEv">
 <span id="_CPPv3NK6raisim7Contact17getSolverPositionEv"></span><span id="_CPPv2NK6raisim7Contact17getSolverPositionEv"></span><span id="raisim::Contact::getSolverPositionC"></span><span class="target" id="classraisim_1_1Contact_1a0ff8cbcdeacf129ce8dd6c3c05675776"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getSolverPosition</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim7Contact17getSolverPositionEv" title="Link to this definition"></a><br /></dt>
 <dd><p>Point used for the contact Jacobian. It can be the body witness while <a class="reference internal" href="#classraisim_1_1Contact_1ae0d8abaddfcf5b081bc3b8d6a96d57b5"><span class="std std-ref">getPosition()</span></a> remains the reported terrain-surface point. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the solver contact position in the world frame (usually equal to <a class="reference internal" href="#classraisim_1_1Contact_1ae0d8abaddfcf5b081bc3b8d6a96d57b5"><span class="std std-ref">getPosition()</span></a>) </p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim7Contact9getNormalEv">
 <span id="_CPPv3NK6raisim7Contact9getNormalEv"></span><span id="_CPPv2NK6raisim7Contact9getNormalEv"></span><span id="raisim::Contact::getNormalC"></span><span class="target" id="classraisim_1_1Contact_1a3b877555a80796023c8b19f3aaef84dc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getNormal</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim7Contact9getNormalEv" title="Link to this definition"></a><br /></dt>
-<dd><p>the contact normal vector pointing to ObjectA </p>
+<dd><p>the contact normal vector, pointing from objectB to objectA. The same vector is stored in the entries of both objects, so check <a class="reference internal" href="#classraisim_1_1Contact_1ac94eb5d7b48c65dd68ca3d96b7d77f79"><span class="std std-ref">isObjectA()</span></a> before using it as “this object’s” normal. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>frame </p>
+<dd class="field-odd"><p>unit normal in the world frame </p>
 </dd>
 </dl>
 </dd></dl>
@@ -284,7 +339,7 @@ Each element in the vector has the following API:</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim7Contact15getContactFrameEv">
 <span id="_CPPv3NK6raisim7Contact15getContactFrameEv"></span><span id="_CPPv2NK6raisim7Contact15getContactFrameEv"></span><span id="raisim::Contact::getContactFrameC"></span><span class="target" id="classraisim_1_1Contact_1a85d2e8eef2538a9f29b71a75af24b3cc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Mat</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getContactFrame</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim7Contact15getContactFrameEv" title="Link to this definition"></a><br /></dt>
-<dd><p>returns a TRANSPOSE of the frame that the impulse is expressed. </p>
+<dd><p>returns a TRANSPOSE of the frame that the impulse is expressed: each row is a contact-frame axis in world coordinates and the third row is the normal. A world-frame vector v is expressed in the contact frame as <a class="reference internal" href="#classraisim_1_1Contact_1a85d2e8eef2538a9f29b71a75af24b3cc"><span class="std std-ref">getContactFrame()</span></a> * v. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>contact frame </p>
@@ -342,7 +397,7 @@ Each element in the vector has the following API:</p>
 <dd><p>returns the impulse pointer. You have to divide this number by the time step to get the force </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>impulse </p>
+<dd class="field-odd"><p>pointer to the impulse on objectA in the contact frame (N*s); see <a class="reference internal" href="#classraisim_1_1Contact_1a171ad4b1fd95495a131bc0b3b85a84bc"><span class="std std-ref">getImpulse()</span></a>. nullptr until the <a class="reference internal" href="WorldSystem.html#classraisim_1_1World"><span class="std std-ref">World</span></a> binds it in <a class="reference internal" href="WorldSystem.html#classraisim_1_1World_1a469054d6525c640a978abfaf3da71a33"><span class="std std-ref">World::integrate()</span></a>, which it does only for contacts of awake DYNAMIC objects (e.g. contacts stored on KINEMATIC objects keep nullptr). </p>
 </dd>
 </dl>
 </dd></dl>
@@ -353,7 +408,7 @@ Each element in the vector has the following API:</p>
 <dd><p>returns the impulse. You have to divide this number by the time step to get the force </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>impulse </p>
+<dd class="field-odd"><p>impulse (N*s) acting on objectA, expressed in the contact frame (z component along the normal). Negate it for objectB. Dereferences <a class="reference internal" href="#classraisim_1_1Contact_1a951f80ac5344cdd74c8880838e28c56b"><span class="std std-ref">getImpulsePtr()</span></a> without a check, so it must only be called when that pointer is non-null. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -364,7 +419,7 @@ Each element in the vector has the following API:</p>
 <dd><p>returns if the object is objectA. When there is a contact, the two paired objects are assigned to be objectA and objectB arbitrarily. The contact frame is defined such that its z-axis is pointing towards the objectA. The contact impulse is defined as an external force that objectA experiences. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>impulse </p>
+<dd class="field-odd"><p>true if this entry belongs to objectA </p>
 </dd>
 </dl>
 </dd></dl>
@@ -383,10 +438,10 @@ Each element in the vector has the following API:</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim7Contact13getInvInertiaEv">
 <span id="_CPPv3N6raisim7Contact13getInvInertiaEv"></span><span id="_CPPv2N6raisim7Contact13getInvInertiaEv"></span><span id="raisim::Contact::getInvInertia"></span><span class="target" id="classraisim_1_1Contact_1a07aed27e9bf98d271673c8b7f4bd46e1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Mat</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getInvInertia</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim7Contact13getInvInertiaEv" title="Link to this definition"></a><br /></dt>
-<dd><p>returns the inverse apparent inertia of the contacting point </p>
+<dd><p>returns the inverse apparent inertia of the contacting point of this object </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>inertia </p>
+<dd class="field-odd"><p>inverse apparent inertia, expressed in the contact frame </p>
 </dd>
 </dl>
 </dd></dl>
@@ -405,10 +460,10 @@ Each element in the vector has the following API:</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim7Contact8getDepthEv">
 <span id="_CPPv3NK6raisim7Contact8getDepthEv"></span><span id="_CPPv2NK6raisim7Contact8getDepthEv"></span><span id="raisim::Contact::getDepthC"></span><span class="target" id="classraisim_1_1Contact_1a313a329551ad89db63314c56b2e51619"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getDepth</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim7Contact8getDepthEv" title="Link to this definition"></a><br /></dt>
-<dd><p>The penetration depth of the contact </p>
+<dd><p>The signed separation of the contact along the normal, in meters </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the depth of the contact </p>
+<dd class="field-odd"><p>the negated penetration depth: negative while the bodies overlap </p>
 </dd>
 </dl>
 </dd></dl>
@@ -416,7 +471,7 @@ Each element in the vector has the following API:</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim7Contact15isSelfCollisionEv">
 <span id="_CPPv3NK6raisim7Contact15isSelfCollisionEv"></span><span id="_CPPv2NK6raisim7Contact15isSelfCollisionEv"></span><span id="raisim::Contact::isSelfCollisionC"></span><span class="target" id="classraisim_1_1Contact_1a41ceba007306b97c0038c6bfff661945"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isSelfCollision</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim7Contact15isSelfCollisionEv" title="Link to this definition"></a><br /></dt>
-<dd><p>returns if the contact is self collision </p>
+<dd><p>returns if the contact is self collision (two bodies of the same articulated system). Only the objectA entry is flagged; the objectB entry has <a class="reference internal" href="#classraisim_1_1Contact_1a3d226ca62f4597baef52625d03c81575"><span class="std std-ref">skip()</span></a> == true instead. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>if this is a self collision </p>
@@ -427,7 +482,7 @@ Each element in the vector has the following API:</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim7Contact4skipEv">
 <span id="_CPPv3NK6raisim7Contact4skipEv"></span><span id="_CPPv2NK6raisim7Contact4skipEv"></span><span id="raisim::Contact::skipC"></span><span class="target" id="classraisim_1_1Contact_1a3d226ca62f4597baef52625d03c81575"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">skip</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim7Contact4skipEv" title="Link to this definition"></a><br /></dt>
-<dd><p>this is set true for one self-collision point so that you don’t count them twice </p>
+<dd><p>this is set true for the objectB entry of a self-collision point so that you don’t count them twice </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>if you can skip this contact point while iterating contact points </p>
@@ -438,7 +493,7 @@ Each element in the vector has the following API:</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim7Contact17getCollisionBodyAEv">
 <span id="_CPPv3N6raisim7Contact17getCollisionBodyAEv"></span><span id="_CPPv2N6raisim7Contact17getCollisionBodyAEv"></span><span id="raisim::Contact::getCollisionBodyA"></span><span class="target" id="classraisim_1_1Contact_1a3a2fc76f163e039c3ae7de075274280a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">CollisionBodyHandlePtr</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getCollisionBodyA</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim7Contact17getCollisionBodyAEv" title="Link to this definition"></a><br /></dt>
-<dd><p>get the collision body handle of this object </p>
+<dd><p>get the collision body handle of objectA (the same in both entries, so it is not necessarily this object’s body; check <a class="reference internal" href="#classraisim_1_1Contact_1ac94eb5d7b48c65dd68ca3d96b7d77f79"><span class="std std-ref">isObjectA()</span></a>) </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>collision body </p>
@@ -449,10 +504,27 @@ Each element in the vector has the following API:</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim7Contact17getCollisionBodyBEv">
 <span id="_CPPv3N6raisim7Contact17getCollisionBodyBEv"></span><span id="_CPPv2N6raisim7Contact17getCollisionBodyBEv"></span><span id="raisim::Contact::getCollisionBodyB"></span><span class="target" id="classraisim_1_1Contact_1a3460462f0bd73cc65dde2a235ae4993e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">CollisionBodyHandlePtr</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getCollisionBodyB</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim7Contact17getCollisionBodyBEv" title="Link to this definition"></a><br /></dt>
-<dd><p>get the collision body handle of the pairing object </p>
+<dd><p>get the collision body handle of objectB (the same in both entries; check <a class="reference internal" href="#classraisim_1_1Contact_1ac94eb5d7b48c65dd68ca3d96b7d77f79"><span class="std std-ref">isObjectA()</span></a>) </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>collision body </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim7Contact12computeFrameERK3VecIXL3EEER3MatIXL3EEXL3EEE">
+<span id="_CPPv3N6raisim7Contact12computeFrameERK3VecIXL3EEER3MatIXL3EEXL3EEE"></span><span id="_CPPv2N6raisim7Contact12computeFrameERK3VecIX3EER3MatIX3EX3EE"></span><span id="raisim::Contact::computeFrame__Vec:3:CR.Mat:3.3:R"></span><span class="target" id="classraisim_1_1Contact_1ac68ee05bc1f2475e01cb52be164b16a1"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">computeFrame</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">zAxis</span></span>, <span class="n"><span class="pre">Mat</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">frame</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim7Contact12computeFrameERK3VecIXL3EEER3MatIXL3EEXL3EEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Build a contact frame from a normal: the third row of <code class="docutils literal notranslate"><span class="pre">frame</span></code> is the normalized zAxis, the first two rows are orthonormal tangent directions (all expressed in the world frame). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>zAxis</strong> – <strong>[in]</strong> <a class="reference internal" href="#classraisim_1_1Contact"><span class="std std-ref">Contact</span></a> normal (need not be normalized; must be non-zero). </p></li>
+<li><p><strong>frame</strong> – <strong>[out]</strong> Rotation matrix whose rows are the contact axes (world-to-contact rotation). </p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -467,7 +539,7 @@ Each element in the vector has the following API:</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="GranularMedia.html" class="btn btn-neutral float-left" title="Granular Media" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="GranularPoolSleep.html" class="btn btn-neutral float-left" title="Granular Pool Sleep" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="CollisionDetection.html" class="btn btn-neutral float-right" title="Collision Detection and Colliders" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

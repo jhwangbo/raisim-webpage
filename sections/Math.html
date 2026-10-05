@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Math Classes &mdash; raisim 2.7.0 documentation</title>
+  <title>Math Classes &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -83,17 +83,17 @@
 <li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -168,16 +168,19 @@ call APIs that take Eigen types (e.g. <code class="docutils literal notranslate"
 Standard containers therefore need over-aligned allocation support. The
 exported RaiSim target requires C++20, which provides the needed language and
 standard-library baseline.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">raisim::MatDyn</span></code>/<code class="docutils literal notranslate"><span class="pre">raisim::VecDyn</span></code> allocate 32-byte aligned storage
-internally. Do not free their memory manually.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">raisim::MatDyn</span></code>/<code class="docutils literal notranslate"><span class="pre">raisim::VecDyn</span></code> own their heap storage, which is
+32-byte aligned on Linux and macOS and allocated with Eigen’s aligned
+allocator on Windows. Do not free their memory manually.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">.e()</span></code> returns a non-owning map. Its lifetime must not exceed the underlying
 RaiSim object.</p></li>
-<li><p>Any call to <code class="docutils literal notranslate"><span class="pre">resize()</span></code> (dynamic types) invalidates raw pointers and Eigen maps.</p></li>
+<li><p>Any call to <code class="docutils literal notranslate"><span class="pre">resize()</span></code> (dynamic types) reallocates the storage, discards
+the previous contents, and invalidates raw pointers and Eigen maps.</p></li>
 </ul>
 </section>
 <section id="initialization-and-indexing">
 <h2>Initialization and indexing<a class="headerlink" href="#initialization-and-indexing" title="Link to this heading"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">raisim::Mat</span></code> and <code class="docutils literal notranslate"><span class="pre">raisim::Vec</span></code> store data in <strong>column-major</strong> order.</p>
+<p><code class="docutils literal notranslate"><span class="pre">raisim::Mat</span></code> and <code class="docutils literal notranslate"><span class="pre">raisim::Vec</span></code> store data in <strong>column-major</strong> order. Their
+default constructor leaves the elements uninitialized, so set them before use.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">Mat</span><span class="o">&lt;</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="n">A</span><span class="p">;</span>
 <span class="n">A</span><span class="p">.</span><span class="n">setZero</span><span class="p">();</span>
 <span class="n">A</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span>
@@ -228,8 +231,18 @@ RaiSim object.</p></li>
 row-major arrays, transpose or fill by columns.</p></li>
 <li><p><strong>Dangling maps/pointers:</strong> <code class="docutils literal notranslate"><span class="pre">.e()</span></code> and <code class="docutils literal notranslate"><span class="pre">ptr()</span></code> become invalid after
 <code class="docutils literal notranslate"><span class="pre">resize()</span></code> (dynamic types) or when the object goes out of scope.</p></li>
-<li><p><strong>Size mismatches:</strong> <code class="docutils literal notranslate"><span class="pre">VecDyn::operator=(Eigen::VectorXd)</span></code> checks dimensions
-at runtime. Resize first or use <code class="docutils literal notranslate"><span class="pre">setZero(size)</span></code> before assignment.</p></li>
+<li><p><strong>Implicit resizing:</strong> assigning an Eigen vector, a <code class="docutils literal notranslate"><span class="pre">Vec&lt;n&gt;</span></code>, or another
+<code class="docutils literal notranslate"><span class="pre">VecDyn</span></code> to a <code class="docutils literal notranslate"><span class="pre">VecDyn</span></code> resizes the destination when the sizes differ.
+Resizing reallocates, so maps and pointers taken before the assignment become
+invalid. Element-wise <code class="docutils literal notranslate"><span class="pre">+=</span></code> and <code class="docutils literal notranslate"><span class="pre">-=</span></code> between <code class="docutils literal notranslate"><span class="pre">VecDyn</span></code> objects do not
+check sizes.</p></li>
+<li><p><strong>Expression templates:</strong> arithmetic on <code class="docutils literal notranslate"><span class="pre">Mat</span></code>/<code class="docutils literal notranslate"><span class="pre">Vec</span></code> (<code class="docutils literal notranslate"><span class="pre">+</span></code>, <code class="docutils literal notranslate"><span class="pre">-</span></code>, <code class="docutils literal notranslate"><span class="pre">*</span></code>,
+<code class="docutils literal notranslate"><span class="pre">/</span></code>) builds lazy expressions that reference their operands. Do not store
+such an expression with <code class="docutils literal notranslate"><span class="pre">auto</span></code> when it refers to temporaries; assign it to
+a <code class="docutils literal notranslate"><span class="pre">Mat</span></code>/<code class="docutils literal notranslate"><span class="pre">Vec</span></code> instead. A product or transpose that reads its own
+destination (<code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">=</span> <span class="pre">a</span> <span class="pre">*</span> <span class="pre">b</span></code>, <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">=</span> <span class="pre">a.transpose()</span></code>) gives wrong results; use a
+separate result variable. Element-wise expressions such as <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">=</span> <span class="pre">a</span> <span class="pre">+</span> <span class="pre">b</span></code> are
+safe.</p></li>
 </ul>
 </section>
 </section>

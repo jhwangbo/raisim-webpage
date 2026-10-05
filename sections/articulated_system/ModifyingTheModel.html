@@ -1,0 +1,222 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Modifying the Model in Code &mdash; raisim 2.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Closed-Loop Systems" href="ClosedLoopSystems.html" />
+    <link rel="prev" title="Sensors" href="../Sensors.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../FeatureMap.html">Feature Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ProjectLayout.html">Project Layout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Performance.html">Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Benchmark.html">Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RsceneFile.html">.rscene File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../OpenUSD.html">OpenUSD Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../ArticulatedSystem.html">Articulated Systems</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Creation.html">Creating an Articulated System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="StateAndKinematics.html">State and Kinematics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DynamicsAndControl.html">Dynamics and Control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JointDampingAndFriction.html">Joint Damping and Friction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Actuators.html">Actuators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Modifying the Model in Code</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#collision">Collision</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ClosedLoopSystems.html">Closed-Loop Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MimicJoints.html">Mimic Joints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="API.html">ArticulatedSystem API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../GranularMedia.html">Granular Media</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Tendons.html">Tendons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimMatlab.html">RaisimMatlab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../ArticulatedSystem.html">Articulated Systems</a></li>
+      <li class="breadcrumb-item active">Modifying the Model in Code</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="modifying-the-model-in-code">
+<h1>Modifying the Model in Code<a class="headerlink" href="#modifying-the-model-in-code" title="Link to this heading"></a></h1>
+<p>RaiSim allows users to modify most of the robot parameters freely in code.
+This allows users to create randomized robot models, which might be useful for AI applications (i.e., <strong>dynamic randomization</strong>).
+Note that a random model might be kinematically and dynamically unrealistic.
+For example, joints can be locked by collision bodies.
+In such cases, simulation cannot be performed reliably and it is advised to carefully check randomly generated robot models.</p>
+<p>Here is a list of modifiable kinematic/dynamic parameters.</p>
+<ul class="simple">
+<li><p><strong>Joint Position (relative to the parent joint) Expressed in the Parent Frame</strong></p></li>
+</ul>
+<p><code class="code docutils literal notranslate"><span class="pre">getJointPos_P</span></code> method returns (a non-const reference to) a <code class="code docutils literal notranslate"><span class="pre">std::vector</span></code> of position vectors from the parent joint to the child joint expressed in the respective parent joint frames.
+This should be changed with care since it can result in unrealistic collision geometry.
+<strong>This method does not change the position of the end-effector with respect to its parent</strong> as the position of the last link is defined by the collision body position, not by the joint position.
+The elements are ordered by the joint indices.</p>
+<ul class="simple">
+<li><p><strong>Joint Axis in the Parent Frame</strong></p></li>
+</ul>
+<p><code class="code docutils literal notranslate"><span class="pre">getJointAxis_P</span></code> method returns (a non-const reference to) a <code class="code docutils literal notranslate"><span class="pre">std::vector</span></code> of joint axes expressed in the respective parent joint frame.
+This method should also be changed with care.
+The elements are ordered by the joint indices.</p>
+<ul class="simple">
+<li><p><strong>Mass of the Links</strong></p></li>
+</ul>
+<p><code class="code docutils literal notranslate"><span class="pre">getMass</span></code> method returns (a non-const reference to) a <code class="code docutils literal notranslate"><span class="pre">std::vector</span></code> of link masses.
+<strong>IMPORTANT!</strong> You must call <code class="code docutils literal notranslate"><span class="pre">updateMassInfo()</span></code> after changing mass values.
+The elements are ordered by the body indices (which is the same as the joint indices in RaiSim).</p>
+<ul class="simple">
+<li><p><strong>Center of Mass Position</strong></p></li>
+</ul>
+<p><code class="code docutils literal notranslate"><span class="pre">getBodyCOM_B</span></code> method returns (a non-const reference to) a <code class="code docutils literal notranslate"><span class="pre">std::vector</span></code> of the COM of the bodies.
+The elements are ordered by the body indices.</p>
+<ul class="simple">
+<li><p><strong>Link Inertia</strong></p></li>
+</ul>
+<p><code class="code docutils literal notranslate"><span class="pre">getInertia</span></code> method returns (a non-const reference to) a <code class="code docutils literal notranslate"><span class="pre">std::vector</span></code> of link inertia.
+The elements are ordered by the body indices.</p>
+<ul class="simple">
+<li><p><strong>Collision Bodies</strong></p></li>
+</ul>
+<p><code class="code docutils literal notranslate"><span class="pre">getCollisionBodies</span></code> method returns (a non-const reference to) a <code class="code docutils literal notranslate"><span class="pre">raisim::CollisionSet</span></code>, a <code class="code docutils literal notranslate"><span class="pre">std::vector</span></code> of <code class="code docutils literal notranslate"><span class="pre">raisim::CollisionDefinition</span></code>.
+This vector contains all collision bodies associated with the articulated system.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">getCollisionBody</span></code> method returns a specific collision body instead.
+All collision bodies are named “LINK_NAME” + “/INDEX”.
+For example, the 2nd collision body of a link named “FOOT” is named “FOOT/1” (1 because the index starts from 0).</p>
+<p>A <code class="code docutils literal notranslate"><span class="pre">CollisionDefinition</span></code> holds the position and orientation offset from the body frame (<code class="code docutils literal notranslate"><span class="pre">posOffset</span></code>, <code class="code docutils literal notranslate"><span class="pre">rotOffset</span></code>), the body index (<code class="code docutils literal notranslate"><span class="pre">localIdx</span></code>), the shape and its parameters, and the collision body handle (<code class="code docutils literal notranslate"><span class="pre">getCollisionBody()</span></code>).
+To change the shape or the offsets of a collision body, use <code class="code docutils literal notranslate"><span class="pre">setCollisionBodyShapeParameters()</span></code> (primitive shapes only), <code class="code docutils literal notranslate"><span class="pre">setCollisionBodyPositionOffset()</span></code> and <code class="code docutils literal notranslate"><span class="pre">setCollisionBodyOrientationOffset()</span></code> of the articulated system with the index of the collision body in <code class="code docutils literal notranslate"><span class="pre">getCollisionBodies()</span></code>.
+Users can also change the material of a collision body with <code class="code docutils literal notranslate"><span class="pre">setMaterial()</span></code>, which affects the contact dynamics, and its collision group and mask with <code class="code docutils literal notranslate"><span class="pre">setCollisionGroup()</span></code> and <code class="code docutils literal notranslate"><span class="pre">setCollisionMask()</span></code>.</p>
+<section id="collision">
+<h2>Collision<a class="headerlink" href="#collision" title="Link to this heading"></a></h2>
+<p>Apart from the collision mask and collision group, users can also disable a collision between a certain pair of bodies with <code class="code docutils literal notranslate"><span class="pre">ignoreCollisionBetween(bodyIdx1,</span> <span class="pre">bodyIdx2)</span></code>.
+If the system is already in a world, call <code class="code docutils literal notranslate"><span class="pre">updateSelfCollisionCache(world)</span></code> afterwards.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../Sensors.html" class="btn btn-neutral float-left" title="Sensors" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ClosedLoopSystems.html" class="btn btn-neutral float-right" title="Closed-Loop Systems" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

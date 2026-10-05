@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OpenUSD Loading &mdash; raisim 2.7.0 documentation</title>
+  <title>OpenUSD Loading &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -85,17 +85,17 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -147,32 +147,38 @@ articulated systems.</span><a class="headerlink" href="#id1" title="Link to this
 </figure>
 <section id="instantiating-a-world-from-usd">
 <h2>Instantiating a World From USD<a class="headerlink" href="#instantiating-a-world-from-usd" title="Link to this heading"></a></h2>
-<p>The <strong>default way to instantiate a ``raisim::World``</strong> is to point the
-constructor at a USD scene file. The constructor inspects the file’s
-extension and, when it is <code class="docutils literal notranslate"><span class="pre">.usd</span></code>, <code class="docutils literal notranslate"><span class="pre">.usda</span></code>, <code class="docutils literal notranslate"><span class="pre">.usdc</span></code>, or <code class="docutils literal notranslate"><span class="pre">.usdz</span></code>,
-dispatches to the USD scene loader to build the world’s bodies, joints, and
-collision shapes in a single call:</p>
+<p>The recommended way to create a <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> from a USD asset is to pass
+the USD file to the constructor. The constructor inspects the file’s extension
+(case-insensitive) and, when it is <code class="docutils literal notranslate"><span class="pre">.usd</span></code>, <code class="docutils literal notranslate"><span class="pre">.usda</span></code>, <code class="docutils literal notranslate"><span class="pre">.usdc</span></code>, or
+<code class="docutils literal notranslate"><span class="pre">.usdz</span></code>, calls <code class="docutils literal notranslate"><span class="pre">World::addUsdArticulatedSystem</span></code> to build the articulation’s
+bodies, joints, and collision shapes in a single call:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;raisim/World.hpp&gt;</span>
 
 <span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">(</span><span class="s">&quot;scene.usd&quot;</span><span class="p">);</span><span class="w">   </span><span class="c1">// &lt;-- recommended default</span>
 
-<span class="c1">// World is now populated with the rigid bodies, articulated systems, and</span>
-<span class="c1">// collision shapes declared in scene.usd. Add a ground, set the time</span>
-<span class="c1">// step, attach controllers, and start stepping as usual.</span>
+<span class="c1">// The world now contains the articulated system defined in scene.usd,</span>
+<span class="c1">// with its collision shapes. Add a ground, set the time step, attach</span>
+<span class="c1">// controllers, and start stepping as usual.</span>
 <span class="n">world</span><span class="p">.</span><span class="n">addGround</span><span class="p">();</span>
 <span class="n">world</span><span class="p">.</span><span class="n">setTimeStep</span><span class="p">(</span><span class="mf">0.0025</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>This unifies physics scene authoring on a single text/binary format that public
-USD tooling such as Isaac Sim, Omniverse, and Blender’s USD exporter can
-produce and consume. Prefer it over hand-written XML when the scene is going
-to be authored by a tool or exchanged with other USD-native ecosystems.</p>
+<p>The constructor imports exactly one articulation: the default prim if it has
+<code class="docutils literal notranslate"><span class="pre">PhysicsArticulationRootAPI</span></code>, otherwise the first such prim in the stage.
+It throws <code class="docutils literal notranslate"><span class="pre">std::runtime_error</span></code> if the file has none. Rigid bodies outside that
+articulation’s subtree are not imported. To place several USD robots in one
+world, create the world first and call <code class="docutils literal notranslate"><span class="pre">World::addUsdArticulatedSystem</span></code> once
+per file, as the <code class="docutils literal notranslate"><span class="pre">nvidia_usd_robots</span></code> example does.</p>
+<p>USD lets you author robots with public tools such as Isaac Sim, Omniverse, and
+Blender’s USD exporter. Prefer it over hand-written XML when the asset is
+authored by such a tool or exchanged with other USD-based pipelines.</p>
 <p>The same constructor still accepts a RaiSim <code class="docutils literal notranslate"><span class="pre">.xml</span></code> <a class="reference internal" href="WorldConfigurationFile.html"><span class="doc">world configuration
-file</span></a> or a MuJoCo <code class="docutils literal notranslate"><span class="pre">.mjcf</span></code>; the file’s extension
-(for USD) and root tag (<code class="docutils literal notranslate"><span class="pre">&lt;raisim&gt;</span></code> / <code class="docutils literal notranslate"><span class="pre">&lt;mujoco&gt;</span></code>) determine the loader.
-USD is the recommended default; XML stays available for hand-edited and
-template-driven worlds.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">usdWorld</span><span class="p">(</span><span class="s">&quot;scene.usd&quot;</span><span class="p">);</span><span class="w">           </span><span class="c1">// USD scene loader</span>
+file</span></a>, a MuJoCo MJCF file, or, from v2.7.1 (not yet
+released), a <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> file (see <a class="reference internal" href="RsceneFile.html"><span class="doc">.rscene File</span></a>). The
+extension selects the USD and <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> loaders; for other files, the
+content (a <code class="docutils literal notranslate"><span class="pre">&lt;raisim&gt;</span></code> or <code class="docutils literal notranslate"><span class="pre">&lt;mujoco&gt;</span></code> element) selects the loader. XML stays
+available for hand-edited and template-driven worlds.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">usdWorld</span><span class="p">(</span><span class="s">&quot;scene.usd&quot;</span><span class="p">);</span><span class="w">           </span><span class="c1">// USD articulation loader</span>
 <span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">xmlWorld</span><span class="p">(</span><span class="s">&quot;scene.xml&quot;</span><span class="p">);</span><span class="w">           </span><span class="c1">// RaiSim XML loader</span>
 <span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">mjcWorld</span><span class="p">(</span><span class="s">&quot;scene.mjcf&quot;</span><span class="p">);</span><span class="w">          </span><span class="c1">// MuJoCo MJCF loader</span>
 <span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">emptyWorld</span><span class="p">;</span><span class="w">                      </span><span class="c1">// empty world, build it</span>
@@ -189,17 +195,37 @@ cube is a native RaiSim rigid body.</span><a class="headerlink" href="#id2" titl
 </figure>
 <section id="what-is-imported-from-a-usd-scene">
 <h3>What is imported from a USD scene<a class="headerlink" href="#what-is-imported-from-a-usd-scene" title="Link to this heading"></a></h3>
-<p>The USD constructor reads:</p>
+<p>The USD constructor (and <code class="docutils literal notranslate"><span class="pre">World::addUsdArticulatedSystem</span></code>) reads:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">UsdPhysicsRigidBodyAPI</span></code> bodies as rigid objects.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">PhysicsFixedJoint</span></code>, <code class="docutils literal notranslate"><span class="pre">PhysicsRevoluteJoint</span></code>, and
-<code class="docutils literal notranslate"><span class="pre">PhysicsPrismaticJoint</span></code> relationships between bodies, assembled into
-articulated systems.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">UsdPhysicsRigidBodyAPI</span></code> bodies inside the articulation as links, with
+their <code class="docutils literal notranslate"><span class="pre">UsdPhysicsMassAPI</span></code> properties and initial velocities. Kinematic
+rigid bodies are rejected.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PhysicsFixedJoint</span></code>, <code class="docutils literal notranslate"><span class="pre">PhysicsRevoluteJoint</span></code>, <code class="docutils literal notranslate"><span class="pre">PhysicsPrismaticJoint</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">PhysicsSphericalJoint</span></code> relationships between bodies, including joint
+limits, assembled into one articulated system.</p></li>
+<li><p>Closed kinematic loops. A joint with <code class="docutils literal notranslate"><span class="pre">physics:excludeFromArticulation</span> <span class="pre">=</span> <span class="pre">true</span></code>
+closes a loop, and so does any additional joint into a body that already has
+its tree joint (the first joint into a body, in stage order, joins the tree).
+Loop joints become constraints at the authored pose (see
+<a class="reference internal" href="articulated_system/ClosedLoopSystems.html"><span class="doc">Closed-Loop Systems</span></a>): a revolute joint becomes two
+pins 10 cm apart on its axis, a spherical joint a pin at its anchor, and a fixed
+joint three pins. The two bodies of a loop joint do not collide with each
+other. Loading fails with <code class="docutils literal notranslate"><span class="pre">std::runtime_error</span></code> for a loop joint that cannot
+be represented this way: a prismatic loop joint, a loop joint with a drive, or
+a loop joint to the world on a floating-base articulation. Angle limits of a
+revolute loop joint are not enforced, and a warning says so.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">UsdPhysicsDriveAPI</span></code> stiffness, damping, and target position as the
+joint’s passive spring, damping, and spring rest position; the drive’s
+maximum force becomes the joint effort limit. PhysX joint friction, damping,
+and armature attributes are also read.</p></li>
 <li><p>Primitive collision shapes — cube, sphere, capsule, cylinder — and
 triangle-mesh collision shapes via <code class="docutils literal notranslate"><span class="pre">UsdGeomMesh</span></code>.</p></li>
-<li><p>Per-body and per-link transforms.</p></li>
+<li><p>Per-body and per-link transforms, converted to meters and a z-up frame from
+the stage’s <code class="docutils literal notranslate"><span class="pre">metersPerUnit</span></code> and up axis.</p></li>
+<li><p>Physics material friction and restitution (as material pair properties),
+filtered collision pairs, and the gravity of the stage’s physics scene.</p></li>
 </ul>
-<p>The constructor does <strong>not</strong> import PhysX tendons, drives, variants,
+<p>The constructor does <strong>not</strong> import PhysX tendons, variant switching,
 skeletons, lights, or full material graphs. For high-fidelity rendering
 materials, pair USD physics import with the <a class="reference internal" href="Rayrai.html"><span class="doc">Rayrai</span></a> visual
 pipeline, or keep a separate render-quality USD/glTF alongside the physics
@@ -227,8 +253,8 @@ deterministic triangulated OBJ cache that can be reused by later runs.</p>
 <h2>Runtime requirements<a class="headerlink" href="#runtime-requirements" title="Link to this heading"></a></h2>
 <p>Installed packages include the OpenUSD runtime next to RaiSim:</p>
 <ul class="simple">
-<li><p>On Linux, the runtime is installed under <code class="docutils literal notranslate"><span class="pre">raisim/lib/openusd</span></code> and the
-package environment script adds the required library path.</p></li>
+<li><p>On Linux and macOS, the runtime is installed under <code class="docutils literal notranslate"><span class="pre">raisim/lib/openusd</span></code>
+and the package environment script adds the required library path.</p></li>
 <li><p>On Windows, the USD DLLs are installed next to the RaiSim binaries and the
 plugin resources are under <code class="docutils literal notranslate"><span class="pre">raisim/bin/openusd</span></code>.</p></li>
 </ul>
@@ -257,23 +283,23 @@ when appropriate.</p>
 <p><code class="docutils literal notranslate"><span class="pre">shadow_hand_usd_cube</span></code> loads
 <code class="docutils literal notranslate"><span class="pre">rsc/isaac/Robots/ShadowRobot/ShadowHand/shadow_hand.usd</span></code> through
 <code class="docutils literal notranslate"><span class="pre">World(shadow_hand.usd)</span></code> and publishes the scene through <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code>.
-The example target is generated only when CMake finds a RaiSim package with USD
-scene loading. RaiSim is expected to include OpenUSD on every supported
-architecture. Start the TCP viewer, then run:</p>
+Start the TCP viewer, then run the example in another terminal:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build-examples/examples/rayrai_tcp_viewer
 ./build-examples/examples/shadow_hand_usd_cube
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">nvidia_usd_robots</span></code> provides additional vetted Isaac Sim robot scenes:
-<code class="docutils literal notranslate"><span class="pre">create3</span></code>, <code class="docutils literal notranslate"><span class="pre">jetbot</span></code>, and <code class="docutils literal notranslate"><span class="pre">ant</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">nvidia_usd_robots</span></code> adds three Isaac Sim robots (iRobot Create 3, AWS
+RoboMaker JetBot, and the Isaac Sim Ant) to one world with
+<code class="docutils literal notranslate"><span class="pre">World::addUsdArticulatedSystem</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build-examples/examples/nvidia_usd_robots
 </pre></div>
 </div>
-<p>On Windows, use the corresponding <code class="docutils literal notranslate"><span class="pre">.exe</span></code> binaries.</p>
+<p>On Windows, the executables are under <code class="docutils literal notranslate"><span class="pre">build-examples\bin</span></code> (for example,
+<code class="docutils literal notranslate"><span class="pre">build-examples\bin\shadow_hand_usd_cube.exe</span></code>).</p>
 <p>rayrai can also load USD files as visual-only meshes through
 <code class="docutils literal notranslate"><span class="pre">RayraiWindow::addVisualMesh</span></code>. This is useful for inspection, but the same
-scope applies: geometry, transforms, basic display colour/opacity, not full USD
-scene semantics.</p>
+scope applies: geometry, transforms, and basic display color/opacity, not full
+USD scene semantics.</p>
 </section>
 <section id="troubleshooting">
 <h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading"></a></h2>

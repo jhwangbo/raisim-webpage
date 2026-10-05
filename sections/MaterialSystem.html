@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Material System &mdash; raisim 2.7.0 documentation</title>
+  <title>Material System &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -75,6 +75,10 @@
 <li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Material System</a><ul>
@@ -114,12 +118,8 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -162,17 +162,17 @@
 <ul class="simple">
 <li><p><strong>Coefficient of friction</strong> (<span class="math notranslate nohighlight">\(\mu\ge 0\)</span>): Defines the frictional force applied between two contacting materials.</p></li>
 <li><p><strong>Coefficient of restitution</strong> (<span class="math notranslate nohighlight">\(c_r\ge 0\)</span>): Determines the elasticity of the material pair.</p></li>
-<li><p><strong>Restitution threshold</strong> (<span class="math notranslate nohighlight">\(r_{th}\ge 0\)</span>): Objects will not rebound if the impact velocity falls below this threshold.</p></li>
+<li><p><strong>Restitution threshold</strong> (<span class="math notranslate nohighlight">\(r_{th}\ge 0\)</span>, m/s): Objects will not rebound if the impact velocity falls below this threshold.</p></li>
 <li><p><strong>Coefficient of static friction</strong> (<span class="math notranslate nohighlight">\(\mu_{s}\ge \mu\)</span>): When specified, this defines the frictional force applied during near-zero relative velocity between contact points. By default, it equals the coefficient of friction.</p></li>
-<li><p><strong>Velocity threshold for static friction</strong> (<span class="math notranslate nohighlight">\(v_s \ge 0\)</span>): Required when the coefficient of static friction is defined. If the relative velocity exceeds this value, static friction is disregarded. Otherwise, the effective coefficient of friction is interpolated between the static and dynamic coefficients.</p></li>
-<li><p><strong>Coefficient of rolling friction</strong> (<span class="math notranslate nohighlight">\(\mu_r \ge 0\)</span>): Resists rotation that rolls a finite-radius body over a contact patch. It is disabled by default.</p></li>
-<li><p><strong>Coefficient of spinning friction</strong> (<span class="math notranslate nohighlight">\(\mu_s^{spin} \ge 0\)</span>): Resists torsional rotation about the contact normal. It is disabled by default.</p></li>
+<li><p><strong>Velocity threshold for static friction</strong> (<span class="math notranslate nohighlight">\(v_s \ge 0\)</span>, m/s): Required when the coefficient of static friction is defined. If the relative velocity exceeds this value, static friction is disregarded. Otherwise, the effective coefficient of friction is interpolated between the static and dynamic coefficients.</p></li>
+<li><p><strong>Coefficient of rolling friction</strong> (<span class="math notranslate nohighlight">\(\mu_r \ge 0\)</span>): Resists rotation that rolls a finite-radius body over a contact patch. It is disabled (zero) by default.</p></li>
+<li><p><strong>Coefficient of spinning friction</strong> (<span class="math notranslate nohighlight">\(\mu_{spin} \ge 0\)</span>): Resists torsional rotation about the contact normal. It is disabled (zero) by default.</p></li>
 </ul>
-<p>The bounce velocity is computed as <span class="math notranslate nohighlight">\(c_{th}(v_i-c_{th})\)</span>, where <span class="math notranslate nohighlight">\(v_i\)</span> represents the impact velocity.
+<p>For an impact velocity <span class="math notranslate nohighlight">\(v_i\)</span>, the target bounce velocity is <span class="math notranslate nohighlight">\(c_r\max(0, v_i-r_{th})\)</span>.
 The following graphs illustrate the effects of these material properties.</p>
 <img alt="../_images/materials.png" src="../_images/materials.png" />
-<p>Current runnable examples are listed in the examples index. The material API
-below is unchanged and can be applied to any world object material name.</p>
+<p>Runnable examples are listed in <a class="reference internal" href="Examples.html"><span class="doc">Examples</span></a>. The material API below applies
+to any material name used by objects in the world.</p>
 <p>A material name is assigned upon creation.
 For instance:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">ball</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;steel&quot;</span><span class="p">);</span>
@@ -180,14 +180,17 @@ For instance:</p>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">World</span></code> instance maintains a <code class="docutils literal notranslate"><span class="pre">MaterialManager</span></code> that stores all material pair properties.
 Undefined material pairs utilize <strong>default material properties</strong>, which can be configured via <code class="code docutils literal notranslate"><span class="pre">raisim::World::setDefaultMaterial</span></code>.
-If default properties are not explicitly set, they default to {<span class="math notranslate nohighlight">\(\mu=0.8\)</span>, <span class="math notranslate nohighlight">\(c_r=0\)</span>, <span class="math notranslate nohighlight">\(c_{th}=0\)</span>}.</p>
+If default properties are not explicitly set, they default to {<span class="math notranslate nohighlight">\(\mu=0.8\)</span>, <span class="math notranslate nohighlight">\(c_r=0\)</span>, <span class="math notranslate nohighlight">\(r_{th}=0.01\)</span>}
+with <span class="math notranslate nohighlight">\(\mu_s=\mu\)</span> and no rolling or spinning friction.</p>
 <p>Material properties for a specific pair can be defined as follows:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">world</span><span class="p">.</span><span class="n">setMaterialPairProp</span><span class="p">(</span><span class="s">&quot;steel&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;glass&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">0.7</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.15</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>The first two arguments specify the material names, followed by the coefficient of friction, coefficient of restitution, and restitution threshold.
-The order of the material names is interchangeable.</p>
-<p>For static friction, rolling friction, and spinning friction, use the extended overload:</p>
+The order of the material names is interchangeable.
+This overload sets the static friction coefficient equal to the dynamic one, with a static-friction velocity threshold of 1e-3 m/s.</p>
+<p>A seven-argument overload adds the static friction coefficient and its velocity threshold.
+The nine-argument overload below also sets rolling and spinning friction:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">world</span><span class="p">.</span><span class="n">setMaterialPairProp</span><span class="p">(</span>
 <span class="w">    </span><span class="s">&quot;rubber&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;floor&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="mf">0.9</span><span class="p">,</span><span class="w">    </span><span class="c1">// dynamic friction mu</span>
@@ -246,16 +249,22 @@ from the dynamic object’s contact point to center-of-mass distance. For a sphe
 on a plane this is the sphere radius. For a cylinder lying on its side it is the
 cylinder radius at the side contact. For two dynamic bodies, RaiSim averages the
 two available contact radii.</p>
+<p>Only dynamic single-body objects (spheres, boxes, capsules, cylinders, meshes,
+and compounds) currently take part in angular friction. Articulated-system
+links, deformable objects, and granular particles contribute nothing, so a
+contact between, for example, a robot foot and the ground receives no rolling
+or spinning friction even if the material pair defines it.</p>
 <p>The solver forms the relative angular velocity in the contact frame,
 <span class="math notranslate nohighlight">\(\boldsymbol{\omega}_{rel}\)</span>, and an angular apparent inverse inertia:</p>
 <div class="math notranslate nohighlight">
-\[\mathbf{K}_\omega = \mathbf{R}_{c}^{T} \mathbf{I}_{A}^{-1} \mathbf{R}_{c}
-   + \mathbf{R}_{c}^{T} \mathbf{I}_{B}^{-1} \mathbf{R}_{c}\]</div>
-<p>where <span class="math notranslate nohighlight">\(\mathbf{R}_c\)</span> maps contact-frame impulses to world-frame angular
-impulses, and missing/static bodies contribute zero inverse inertia. The
+\[\boldsymbol{K}_\omega = \boldsymbol{R}_{c}^{T} \boldsymbol{I}_{A}^{-1} \boldsymbol{R}_{c}
+   + \boldsymbol{R}_{c}^{T} \boldsymbol{I}_{B}^{-1} \boldsymbol{R}_{c}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\boldsymbol{R}_c\)</span> maps contact-frame impulses to world-frame angular
+impulses, and static bodies and bodies without angular-friction support
+contribute zero inverse inertia. The
 unconstrained angular impulse is then</p>
 <div class="math notranslate nohighlight">
-\[\boldsymbol{\tau}^{*} = -\mathbf{K}_\omega^{-1}
+\[\boldsymbol{\tau}^{*} = -\boldsymbol{K}_\omega^{-1}
    \boldsymbol{\omega}_{rel}\]</div>
 <p>and is projected onto the rolling/spinning friction bounds above. The impulse
 increment is applied to generalized velocity inside the contact solver iteration.
@@ -293,12 +302,14 @@ speed is more important than this detail.</p></li>
 rolling decay very aggressive and can increase solver coupling.</p></li>
 </ul>
 <p>The spinning-friction case can be tested independently by setting Coulomb/static
-friction to zero and setting only <code class="docutils literal notranslate"><span class="pre">spinningFriction</span></code>. The object should spin
-down without relying on lateral slip friction.</p>
+friction to zero and setting only the spinning coefficient. The object should
+spin down without relying on lateral slip friction.</p>
 </section>
 <section id="c-examples">
 <h3>C++ examples<a class="headerlink" href="#c-examples" title="Link to this heading"></a></h3>
-<p>Sphere rolling on a z-up ground plane:</p>
+<p>Sphere rolling on a z-up ground plane. <code class="docutils literal notranslate"><span class="pre">setVelocity</span></code> takes the linear and
+angular velocity in the world frame; the values below roll the ball along +x
+without slip (<span class="math notranslate nohighlight">\(v_x = \omega_y r\)</span>):</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
 <span class="n">world</span><span class="p">.</span><span class="n">setGravity</span><span class="p">({</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">-9.81</span><span class="p">});</span>
 <span class="n">world</span><span class="p">.</span><span class="n">addGround</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ground&quot;</span><span class="p">);</span>
@@ -310,15 +321,22 @@ down without relying on lateral slip friction.</p>
 
 <span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">ball</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addSphere</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ball&quot;</span><span class="p">);</span>
 <span class="n">ball</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">);</span>
-<span class="n">ball</span><span class="o">-&gt;</span><span class="n">setVelocity</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">-4.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+<span class="n">ball</span><span class="o">-&gt;</span><span class="n">setVelocity</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Cylinder rolling on a z-up ground plane. The cylinder local z axis is first
-rotated to world x, so angular velocity about world x rolls it along world y:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">cylinder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addCylinder</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;body&quot;</span><span class="p">);</span>
-<span class="n">cylinder</span><span class="o">-&gt;</span><span class="n">setOrientation</span><span class="p">(</span><span class="mf">0.7071067812</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.7071067812</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+<p>Cylinder rolling on the same ground plane. The cylinder local z axis is first
+rotated to world x, so angular velocity about world x rolls it along world y
+(<span class="math notranslate nohighlight">\(v_y = -\omega_x r\)</span> without slip):</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">world</span><span class="p">.</span><span class="n">setMaterialPairProp</span><span class="p">(</span>
+<span class="w">    </span><span class="s">&quot;ground&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;body&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">    </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1e-3</span><span class="p">,</span>
+<span class="w">    </span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span><span class="w">       </span><span class="c1">// rolling friction only</span>
+
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">cylinder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addCylinder</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;body&quot;</span><span class="p">);</span>
+<span class="n">cylinder</span><span class="o">-&gt;</span><span class="n">setOrientation</span><span class="p">(</span><span class="mf">0.7071067812</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.7071067812</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span><span class="w"> </span><span class="c1">// local z -&gt; world x</span>
 <span class="n">cylinder</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.3</span><span class="p">);</span>
-<span class="n">cylinder</span><span class="o">-&gt;</span><span class="n">setVelocity</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.4</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">14.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+<span class="n">cylinder</span><span class="o">-&gt;</span><span class="n">setVelocity</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.4</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">-8.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>Spinning friction without Coulomb sliding friction:</p>
@@ -392,7 +410,6 @@ for visual inspection.</p>
 <span class="w">        </span><span class="nt">&lt;pair_prop</span><span class="w"> </span><span class="na">name1=</span><span class="s">&quot;steel&quot;</span><span class="w"> </span><span class="na">name2=</span><span class="s">&quot;rubber&quot;</span><span class="w"> </span><span class="na">friction=</span><span class="s">&quot;0.8&quot;</span><span class="w"> </span><span class="na">restitution=</span><span class="s">&quot;0.15&quot;</span><span class="w"> </span><span class="na">restitution_threshold=</span><span class="s">&quot;0.001&quot;</span><span class="nt">/&gt;</span>
 <span class="w">        </span><span class="nt">&lt;pair_prop</span><span class="w"> </span><span class="na">name1=</span><span class="s">&quot;steel&quot;</span><span class="w"> </span><span class="na">name2=</span><span class="s">&quot;copper&quot;</span><span class="w"> </span><span class="na">friction=</span><span class="s">&quot;0.8&quot;</span><span class="w"> </span><span class="na">restitution=</span><span class="s">&quot;0.65&quot;</span><span class="w"> </span><span class="na">restitution_threshold=</span><span class="s">&quot;0.001&quot;</span><span class="nt">/&gt;</span>
 <span class="w">    </span><span class="nt">&lt;/material&gt;</span>
-<span class="w">    </span><span class="nt">&lt;camera</span><span class="w"> </span><span class="na">follow=</span><span class="s">&quot;anymal&quot;</span><span class="w"> </span><span class="na">x=</span><span class="s">&quot;1&quot;</span><span class="w"> </span><span class="na">y=</span><span class="s">&quot;1&quot;</span><span class="w"> </span><span class="na">z=</span><span class="s">&quot;1&quot;</span><span class="nt">/&gt;</span>
 <span class="nt">&lt;/raisim&gt;</span>
 </pre></div>
 </div>
@@ -403,8 +420,9 @@ for visual inspection.</p>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;raisim/World.hpp&quot;</span>
 
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">binaryPath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">Path</span><span class="o">::</span><span class="n">setFromArgv</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
-<span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">::</span><span class="n">setActivationKey</span><span class="p">(</span><span class="n">binaryPath</span><span class="p">.</span><span class="n">getDirectory</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;</span><span class="se">\\</span><span class="s">rsc</span><span class="se">\\</span><span class="s">activation.raisim&quot;</span><span class="p">);</span>
+<span class="w">  </span><span class="c1">/// The activation key is read from $HOME/.raisim/activation.raisim by default.</span>
+<span class="w">  </span><span class="c1">/// To use another file, call this before creating the first World:</span>
+<span class="w">  </span><span class="c1">/// raisim::World::setActivationKey(&quot;/absolute/path/to/activation.raisim&quot;);</span>
 
 <span class="w">  </span><span class="c1">/// Create RaiSim world</span>
 <span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
@@ -465,14 +483,17 @@ for visual inspection.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getCollisionBody</span><span class="p">(</span><span class="s">&quot;LF_FOOT/0&quot;</span><span class="p">).</span><span class="n">setMaterial</span><span class="p">(</span><span class="s">&quot;ice&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Here, “LF_FOOT/0” refers to the first collision body of the “LF_FOOT” link.</p>
+<p>Here, “LF_FOOT/0” refers to the first collision body of the “LF_FOOT” link
+(collision bodies are named <code class="docutils literal notranslate"><span class="pre">&lt;link</span> <span class="pre">name&gt;/&lt;collision</span> <span class="pre">index&gt;</span></code>).</p>
 <p>To retrieve the name of an assigned material:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">ANYmal</span><span class="o">-&gt;</span><span class="n">getCollisionBody</span><span class="p">(</span><span class="s">&quot;LF_FOOT/0&quot;</span><span class="p">).</span><span class="n">getMaterial</span><span class="p">();</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getCollisionBody</span><span class="p">(</span><span class="s">&quot;LF_FOOT/0&quot;</span><span class="p">).</span><span class="n">getMaterial</span><span class="p">();</span>
 </pre></div>
 </div>
-<p>To obtain contact properties for a collision between two materials:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">world</span><span class="p">.</span><span class="n">getMaterialPairProp</span><span class="p">(</span><span class="n">ANYmal</span><span class="o">-&gt;</span><span class="n">getCollisionBody</span><span class="p">(</span><span class="s">&quot;LF_FOOT/0&quot;</span><span class="p">).</span><span class="n">getMaterial</span><span class="p">(),</span>
-<span class="w">                          </span><span class="n">ground</span><span class="o">-&gt;</span><span class="n">getCollisionObject</span><span class="p">().</span><span class="n">getMaterial</span><span class="p">());</span>
+<p>To obtain contact properties for a collision between two materials (here, the
+foot and a ground created with <code class="docutils literal notranslate"><span class="pre">world.addGround</span></code>):</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">MaterialPairProperties</span><span class="o">&amp;</span><span class="w"> </span><span class="n">props</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="n">world</span><span class="p">.</span><span class="n">getMaterialPairProperties</span><span class="p">(</span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getCollisionBody</span><span class="p">(</span><span class="s">&quot;LF_FOOT/0&quot;</span><span class="p">).</span><span class="n">getMaterial</span><span class="p">(),</span>
+<span class="w">                                    </span><span class="n">ground</span><span class="o">-&gt;</span><span class="n">getCollisionBody</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">material</span><span class="p">);</span>
 </pre></div>
 </div>
 </section>
@@ -484,12 +505,67 @@ for visual inspection.</p>
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim22MaterialPairPropertiesE">
 <span id="_CPPv3N6raisim22MaterialPairPropertiesE"></span><span id="_CPPv2N6raisim22MaterialPairPropertiesE"></span><span id="raisim::MaterialPairProperties"></span><span class="target" id="structraisim_1_1MaterialPairProperties"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaterialPairProperties</span></span></span><a class="headerlink" href="#_CPPv4N6raisim22MaterialPairPropertiesE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
+<dd><p><a class="reference internal" href="Contact.html#classraisim_1_1Contact"><span class="std std-ref">Contact</span></a> properties of a pair of materials. </p>
+<div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim22MaterialPairProperties22MaterialPairPropertiesEddd">
+<span id="_CPPv3N6raisim22MaterialPairProperties22MaterialPairPropertiesEddd"></span><span id="_CPPv2N6raisim22MaterialPairProperties22MaterialPairPropertiesEddd"></span><span id="raisim::MaterialPairProperties::MaterialPairProperties__double.double.double"></span><span class="target" id="structraisim_1_1MaterialPairProperties_1ac973876ea2cf6616c16bdbf7f6734473"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaterialPairProperties</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c_f_</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c_r_</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">r_th_</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim22MaterialPairProperties22MaterialPairPropertiesEddd" title="Link to this definition"></a><br /></dt>
+<dd><p>The static friction coefficient equals c_f_ and its transition speed is 1 m/s. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>c_f_</strong> – <strong>[in]</strong> friction coefficient </p></li>
+<li><p><strong>c_r_</strong> – <strong>[in]</strong> restitution coefficient </p></li>
+<li><p><strong>r_th_</strong> – <strong>[in]</strong> restitution threshold velocity (m/s) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim22MaterialPairProperties22MaterialPairPropertiesEddddd">
+<span id="_CPPv3N6raisim22MaterialPairProperties22MaterialPairPropertiesEddddd"></span><span id="_CPPv2N6raisim22MaterialPairProperties22MaterialPairPropertiesEddddd"></span><span id="raisim::MaterialPairProperties::MaterialPairProperties__double.double.double.double.double"></span><span class="target" id="structraisim_1_1MaterialPairProperties_1acd53ca0e4b61b53f807b503fa5531075"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaterialPairProperties</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c_f_</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c_r_</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">r_th_</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c_sf_</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">v_sf_</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim22MaterialPairProperties22MaterialPairPropertiesEddddd" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>c_f_</strong> – <strong>[in]</strong> dynamic friction coefficient </p></li>
+<li><p><strong>c_r_</strong> – <strong>[in]</strong> restitution coefficient </p></li>
+<li><p><strong>r_th_</strong> – <strong>[in]</strong> restitution threshold velocity (m/s) </p></li>
+<li><p><strong>c_sf_</strong> – <strong>[in]</strong> static friction coefficient </p></li>
+<li><p><strong>v_sf_</strong> – <strong>[in]</strong> static friction transition speed (m/s), see <a class="reference internal" href="#structraisim_1_1MaterialPairProperties_1a1261adb41686b18d196ab0c6dbf8fb47"><span class="std std-ref">setStaticFrictionVelocityThreshold()</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim22MaterialPairProperties22MaterialPairPropertiesEddddddd">
+<span id="_CPPv3N6raisim22MaterialPairProperties22MaterialPairPropertiesEddddddd"></span><span id="_CPPv2N6raisim22MaterialPairProperties22MaterialPairPropertiesEddddddd"></span><span id="raisim::MaterialPairProperties::MaterialPairProperties__double.double.double.double.double.double.double"></span><span class="target" id="structraisim_1_1MaterialPairProperties_1ac0714b397b2b5d7a3def2ca948d2c86e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaterialPairProperties</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c_f_</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c_r_</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">r_th_</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c_sf_</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">v_sf_</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c_rf_</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c_spf_</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim22MaterialPairProperties22MaterialPairPropertiesEddddddd" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>c_f_</strong> – <strong>[in]</strong> dynamic friction coefficient </p></li>
+<li><p><strong>c_r_</strong> – <strong>[in]</strong> restitution coefficient </p></li>
+<li><p><strong>r_th_</strong> – <strong>[in]</strong> restitution threshold velocity (m/s) </p></li>
+<li><p><strong>c_sf_</strong> – <strong>[in]</strong> static friction coefficient </p></li>
+<li><p><strong>v_sf_</strong> – <strong>[in]</strong> static friction transition speed (m/s) </p></li>
+<li><p><strong>c_rf_</strong> – <strong>[in]</strong> rolling friction coefficient </p></li>
+<li><p><strong>c_spf_</strong> – <strong>[in]</strong> spinning friction coefficient </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim22MaterialPairProperties34setStaticFrictionVelocityThresholdEd">
 <span id="_CPPv3N6raisim22MaterialPairProperties34setStaticFrictionVelocityThresholdEd"></span><span id="_CPPv2N6raisim22MaterialPairProperties34setStaticFrictionVelocityThresholdEd"></span><span id="raisim::MaterialPairProperties::setStaticFrictionVelocityThreshold__double"></span><span class="target" id="structraisim_1_1MaterialPairProperties_1a1261adb41686b18d196ab0c6dbf8fb47"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setStaticFrictionVelocityThreshold</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">threshold</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim22MaterialPairProperties34setStaticFrictionVelocityThresholdEd" title="Link to this definition"></a><br /></dt>
 <dd><p>Sets the transition speed and its reciprocal together. A non-positive or non-finite threshold disables the static-friction blend rather than storing 1/0 = inf in the material table, where it would propagate through copies, checkpoints and XML export. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>threshold</strong> – <strong>[in]</strong> transition speed (m/s) </p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -510,7 +586,7 @@ for visual inspection.</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim22MaterialPairProperties4r_thE">
 <span id="_CPPv3N6raisim22MaterialPairProperties4r_thE"></span><span id="_CPPv2N6raisim22MaterialPairProperties4r_thE"></span><span id="raisim::MaterialPairProperties::r_th__double"></span><span class="target" id="structraisim_1_1MaterialPairProperties_1aa4a2fa1342eaea798d6f5b5abdfd3d49"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">r_th</span></span></span><a class="headerlink" href="#_CPPv4N6raisim22MaterialPairProperties4r_thE" title="Link to this definition"></a><br /></dt>
-<dd><p>Restitution threshold velocity. </p>
+<dd><p>Restitution threshold velocity (m/s). </p>
 </dd></dl>
 
 <dl class="cpp var">
@@ -522,7 +598,7 @@ for visual inspection.</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim22MaterialPairProperties14v_static_speedE">
 <span id="_CPPv3N6raisim22MaterialPairProperties14v_static_speedE"></span><span id="_CPPv2N6raisim22MaterialPairProperties14v_static_speedE"></span><span id="raisim::MaterialPairProperties::v_static_speed__double"></span><span class="target" id="structraisim_1_1MaterialPairProperties_1ae820bf9c7d6aab2c8b2c141ae2f0281b"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">v_static_speed</span></span></span><a class="headerlink" href="#_CPPv4N6raisim22MaterialPairProperties14v_static_speedE" title="Link to this definition"></a><br /></dt>
-<dd><p>Static friction transition speed. </p>
+<dd><p>Static friction transition speed (m/s). Set it with <a class="reference internal" href="#structraisim_1_1MaterialPairProperties_1a1261adb41686b18d196ab0c6dbf8fb47"><span class="std std-ref">setStaticFrictionVelocityThreshold()</span></a>. </p>
 </dd></dl>
 
 <dl class="cpp var">
@@ -552,12 +628,155 @@ for visual inspection.</p>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim15MaterialManagerE">
 <span id="_CPPv3N6raisim15MaterialManagerE"></span><span id="_CPPv2N6raisim15MaterialManagerE"></span><span id="raisim::MaterialManager"></span><span class="target" id="classraisim_1_1MaterialManager"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaterialManager</span></span></span><a class="headerlink" href="#_CPPv4N6raisim15MaterialManagerE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
+<dd><p>Table of contact properties per material pair. Materials are identified by name; a pair without its own properties uses the default material properties. The <a class="reference internal" href="WorldSystem.html#classraisim_1_1World"><span class="std std-ref">World</span></a> owns one (see <a class="reference internal" href="WorldSystem.html#classraisim_1_1World_1a460e211f19c960fcfdf9c81dbaa0538f"><span class="std std-ref">World::setMaterialPairProp()</span></a> and <a class="reference internal" href="WorldSystem.html#classraisim_1_1World_1af29193c10d50be6c7220ad34975633df"><span class="std std-ref">World::updateMaterialProp()</span></a>). </p>
+<div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim15MaterialManager15MaterialManagerEv">
+<span id="_CPPv3N6raisim15MaterialManager15MaterialManagerEv"></span><span id="_CPPv2N6raisim15MaterialManager15MaterialManagerEv"></span><span id="raisim::MaterialManager::MaterialManager"></span><span class="target" id="classraisim_1_1MaterialManager_1a2c0bb60aa8a61b9f75c0e1ca6d6c117d"></span><span class="sig-name descname"><span class="n"><span class="pre">MaterialManager</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim15MaterialManager15MaterialManagerEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Creates a table that contains only the “default” material. </p>
+</dd></dl>
+
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim15MaterialManager15MaterialManagerERKNSt6stringE">
 <span id="_CPPv3N6raisim15MaterialManager15MaterialManagerERKNSt6stringE"></span><span id="_CPPv2N6raisim15MaterialManager15MaterialManagerERKNSt6stringE"></span><span id="raisim::MaterialManager::MaterialManager__ssCR"></span><span class="target" id="classraisim_1_1MaterialManager_1a0c8aff71c80a556204872664d8b9e383"></span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaterialManager</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">xmlFile</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim15MaterialManager15MaterialManagerERKNSt6stringE" title="Link to this definition"></a><br /></dt>
 <dd><p>upload material data from file </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>xmlFile</strong> – <strong>[in]</strong> RaiSim XML file whose &lt;raisim&gt; root contains a &lt;material&gt; element with an optional &lt;default&gt; child and &lt;pair_prop&gt; children </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim15MaterialManager19setMaterialPairPropERKNSt6stringERKNSt6stringEddddd">
+<span id="_CPPv3N6raisim15MaterialManager19setMaterialPairPropERKNSt6stringERKNSt6stringEddddd"></span><span id="_CPPv2N6raisim15MaterialManager19setMaterialPairPropERKNSt6stringERKNSt6stringEddddd"></span><span id="raisim::MaterialManager::setMaterialPairProp__ssCR.ssCR.double.double.double.double.double"></span><span class="target" id="classraisim_1_1MaterialManager_1a807d28c4c5aa379022254ad6b57099fc"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setMaterialPairProp</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">mat1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">mat2</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">friction</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">restitution</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">resThreshold</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">staticFriction</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">staticFrictionVelocityThreshold</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim15MaterialManager19setMaterialPairPropERKNSt6stringERKNSt6stringEddddd" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the properties of a material pair (rolling and spinning friction are set to 0). Unknown material names are registered. The order of mat1 and mat2 does not matter. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mat1</strong> – <strong>[in]</strong> first material name </p></li>
+<li><p><strong>mat2</strong> – <strong>[in]</strong> second material name </p></li>
+<li><p><strong>friction</strong> – <strong>[in]</strong> dynamic friction coefficient </p></li>
+<li><p><strong>restitution</strong> – <strong>[in]</strong> restitution coefficient </p></li>
+<li><p><strong>resThreshold</strong> – <strong>[in]</strong> restitution threshold velocity (m/s) </p></li>
+<li><p><strong>staticFriction</strong> – <strong>[in]</strong> static friction coefficient </p></li>
+<li><p><strong>staticFrictionVelocityThreshold</strong> – <strong>[in]</strong> static friction transition speed (m/s) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim15MaterialManager19setMaterialPairPropERKNSt6stringERKNSt6stringEddddddd">
+<span id="_CPPv3N6raisim15MaterialManager19setMaterialPairPropERKNSt6stringERKNSt6stringEddddddd"></span><span id="_CPPv2N6raisim15MaterialManager19setMaterialPairPropERKNSt6stringERKNSt6stringEddddddd"></span><span id="raisim::MaterialManager::setMaterialPairProp__ssCR.ssCR.double.double.double.double.double.double.double"></span><span class="target" id="classraisim_1_1MaterialManager_1abcf0ec3a2a4f7c54d836fdfd1c2ba70b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setMaterialPairProp</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">mat1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">mat2</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">friction</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">restitution</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">resThreshold</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">staticFriction</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">staticFrictionVelocityThreshold</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">rollingFriction</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">spinningFriction</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim15MaterialManager19setMaterialPairPropERKNSt6stringERKNSt6stringEddddddd" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the properties of a material pair, including rolling and spinning friction. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mat1</strong> – <strong>[in]</strong> first material name </p></li>
+<li><p><strong>mat2</strong> – <strong>[in]</strong> second material name </p></li>
+<li><p><strong>friction</strong> – <strong>[in]</strong> dynamic friction coefficient </p></li>
+<li><p><strong>restitution</strong> – <strong>[in]</strong> restitution coefficient </p></li>
+<li><p><strong>resThreshold</strong> – <strong>[in]</strong> restitution threshold velocity (m/s) </p></li>
+<li><p><strong>staticFriction</strong> – <strong>[in]</strong> static friction coefficient </p></li>
+<li><p><strong>staticFrictionVelocityThreshold</strong> – <strong>[in]</strong> static friction transition speed (m/s) </p></li>
+<li><p><strong>rollingFriction</strong> – <strong>[in]</strong> rolling friction coefficient </p></li>
+<li><p><strong>spinningFriction</strong> – <strong>[in]</strong> spinning friction coefficient </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim15MaterialManager19setMaterialPairPropERKNSt6stringERKNSt6stringEddd">
+<span id="_CPPv3N6raisim15MaterialManager19setMaterialPairPropERKNSt6stringERKNSt6stringEddd"></span><span id="_CPPv2N6raisim15MaterialManager19setMaterialPairPropERKNSt6stringERKNSt6stringEddd"></span><span id="raisim::MaterialManager::setMaterialPairProp__ssCR.ssCR.double.double.double"></span><span class="target" id="classraisim_1_1MaterialManager_1a7916288c839accd066217e743d99b11c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setMaterialPairProp</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">mat1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">mat2</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">friction</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">restitution</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">resThreshold</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim15MaterialManager19setMaterialPairPropERKNSt6stringERKNSt6stringEddd" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the properties of a material pair. The static friction coefficient equals friction and its transition speed is 1e-3 m/s. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mat1</strong> – <strong>[in]</strong> first material name </p></li>
+<li><p><strong>mat2</strong> – <strong>[in]</strong> second material name </p></li>
+<li><p><strong>friction</strong> – <strong>[in]</strong> friction coefficient </p></li>
+<li><p><strong>restitution</strong> – <strong>[in]</strong> restitution coefficient </p></li>
+<li><p><strong>resThreshold</strong> – <strong>[in]</strong> restitution threshold velocity (m/s) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim15MaterialManager19getMaterialPairPropERKNSt6stringERKNSt6stringE">
+<span id="_CPPv3NK6raisim15MaterialManager19getMaterialPairPropERKNSt6stringERKNSt6stringE"></span><span id="_CPPv2NK6raisim15MaterialManager19getMaterialPairPropERKNSt6stringERKNSt6stringE"></span><span id="raisim::MaterialManager::getMaterialPairProp__ssCR.ssCRC"></span><span class="target" id="classraisim_1_1MaterialManager_1a37326a49ea0472542955659217d795b1"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim22MaterialPairPropertiesE" title="raisim::MaterialPairProperties"><span class="n"><span class="pre">MaterialPairProperties</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getMaterialPairProp</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">mat1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">mat2</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim15MaterialManager19getMaterialPairPropERKNSt6stringERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mat1</strong> – <strong>[in]</strong> first material name; unknown names are treated as “default” </p></li>
+<li><p><strong>mat2</strong> – <strong>[in]</strong> second material name; unknown names are treated as “default” </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>properties of the pair (order-independent), or the default properties if the pair has none </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim15MaterialManager19getMaterialPairPropEjj">
+<span id="_CPPv3NK6raisim15MaterialManager19getMaterialPairPropEjj"></span><span id="_CPPv2NK6raisim15MaterialManager19getMaterialPairPropEjj"></span><span id="raisim::MaterialManager::getMaterialPairProp__unsigned-i.unsigned-iC"></span><span class="target" id="classraisim_1_1MaterialManager_1a64f52a71e7a1a163c8f1caf9466ffcef"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim22MaterialPairPropertiesE" title="raisim::MaterialPairProperties"><span class="n"><span class="pre">MaterialPairProperties</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getMaterialPairProp</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">mat1</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">mat2</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim15MaterialManager19getMaterialPairPropEjj" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mat1</strong> – <strong>[in]</strong> first material id </p></li>
+<li><p><strong>mat2</strong> – <strong>[in]</strong> second material id </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>properties of the pair, or the default properties if the pair has none or an id is out of range </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim15MaterialManager22getMaterialIdOrDefaultERKNSt6stringE">
+<span id="_CPPv3NK6raisim15MaterialManager22getMaterialIdOrDefaultERKNSt6stringE"></span><span id="_CPPv2NK6raisim15MaterialManager22getMaterialIdOrDefaultERKNSt6stringE"></span><span id="raisim::MaterialManager::getMaterialIdOrDefault__ssCRC"></span><span class="target" id="classraisim_1_1MaterialManager_1ad69403551b141b8c1646f13701730982"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getMaterialIdOrDefault</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">matName</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim15MaterialManager22getMaterialIdOrDefaultERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>matName</strong> – <strong>[in]</strong> material name </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the id of the material, or the “default” material id if the name is unknown </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim15MaterialManager20getDefaultMaterialIdEv">
+<span id="_CPPv3NK6raisim15MaterialManager20getDefaultMaterialIdEv"></span><span id="_CPPv2NK6raisim15MaterialManager20getDefaultMaterialIdEv"></span><span id="raisim::MaterialManager::getDefaultMaterialIdC"></span><span class="target" id="classraisim_1_1MaterialManager_1afad51538f052385415a48b7bfb1e3abb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getDefaultMaterialId</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim15MaterialManager20getDefaultMaterialIdEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the id of the “default” material </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim15MaterialManager28setDefaultMaterialPropertiesEddddddd">
+<span id="_CPPv3N6raisim15MaterialManager28setDefaultMaterialPropertiesEddddddd"></span><span id="_CPPv2N6raisim15MaterialManager28setDefaultMaterialPropertiesEddddddd"></span><span id="raisim::MaterialManager::setDefaultMaterialProperties__double.double.double.double.double.double.double"></span><span class="target" id="classraisim_1_1MaterialManager_1a93f9c003166578c69d12203b2d8223b3"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setDefaultMaterialProperties</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">friction</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">restitution</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">resThreshold</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">staticFriction</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">staticFrictionVelocityThreshold</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">rollingFriction</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.0</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">spinningFriction</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim15MaterialManager28setDefaultMaterialPropertiesEddddddd" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the properties used by pairs without their own properties. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>friction</strong> – <strong>[in]</strong> dynamic friction coefficient </p></li>
+<li><p><strong>restitution</strong> – <strong>[in]</strong> restitution coefficient </p></li>
+<li><p><strong>resThreshold</strong> – <strong>[in]</strong> restitution threshold velocity (m/s) </p></li>
+<li><p><strong>staticFriction</strong> – <strong>[in]</strong> static friction coefficient </p></li>
+<li><p><strong>staticFrictionVelocityThreshold</strong> – <strong>[in]</strong> static friction transition speed (m/s) </p></li>
+<li><p><strong>rollingFriction</strong> – <strong>[in]</strong> rolling friction coefficient </p></li>
+<li><p><strong>spinningFriction</strong> – <strong>[in]</strong> spinning friction coefficient </p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -566,7 +785,7 @@ for visual inspection.</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim15MaterialManager10materials_E">
 <span id="_CPPv3N6raisim15MaterialManager10materials_E"></span><span id="_CPPv2N6raisim15MaterialManager10materials_E"></span><span id="raisim::MaterialManager::materials___std::unordered_map:unsigned-i.MaterialPairProperties:"></span><span class="target" id="classraisim_1_1MaterialManager_1afaa2e7e1e8f6911fe0a9b0c5435fd019"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unordered_map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim22MaterialPairPropertiesE" title="raisim::MaterialPairProperties"><span class="n"><span class="pre">MaterialPairProperties</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">materials_</span></span></span><a class="headerlink" href="#_CPPv4N6raisim15MaterialManager10materials_E" title="Link to this definition"></a><br /></dt>
-<dd><p>Map from material id to properties for the default material pairing. </p>
+<dd><p>Pair properties set by <a class="reference internal" href="#classraisim_1_1MaterialManager_1a807d28c4c5aa379022254ad6b57099fc"><span class="std std-ref">setMaterialPairProp()</span></a>, keyed by larger id * 10000 + smaller id. </p>
 </dd></dl>
 
 <dl class="cpp var">

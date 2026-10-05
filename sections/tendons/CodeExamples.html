@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tendon code examples &mdash; raisim 2.7.0 documentation</title>
+  <title>Tendon code examples &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -74,14 +74,15 @@
 <li class="toctree-l1"><a class="reference internal" href="../OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../Tendons.html">Tendons</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Tendon code examples</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#build-and-run-the-recipes">Build and run the recipes</a></li>
@@ -110,7 +111,6 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -149,8 +149,8 @@
              
   <section id="tendon-code-examples">
 <h1>Tendon code examples<a class="headerlink" href="#tendon-code-examples" title="Link to this heading"></a></h1>
-<p>These examples show the C++ needed for individual tendon behaviors. Every block
-below is included directly from the runnable <code class="docutils literal notranslate"><span class="pre">tendon_recipes.cpp</span></code> source.
+<p>These examples show the C++ needed for individual tendon behaviors. Every C++
+block below is included directly from the runnable <code class="docutils literal notranslate"><span class="pre">tendon_recipes.cpp</span></code> source.
 The program also checks the resulting motion, forces, and exported state, so
 these are executable examples with physical acceptance checks.</p>
 <p>Download <a class="reference download internal" download="" href="../../_downloads/3658286789b70ebd71b45ed90eb15d76/tendon_recipes.cpp"><code class="xref download docutils literal notranslate"><span class="pre">tendon_recipes.cpp</span></code></a>
@@ -612,13 +612,14 @@ A pull-only spring is slack below its rest length. The implicit update with
 <p>For a compression-only spring, set <code class="docutils literal notranslate"><span class="pre">springLower</span> <span class="pre">=</span> <span class="pre">L</span></code> and
 <code class="docutils literal notranslate"><span class="pre">springUpper</span> <span class="pre">=</span> <span class="pre">std::numeric_limits&lt;double&gt;::infinity()</span></code>. For a bilateral
 spring, set both endpoints to L. See <a class="reference internal" href="../Constraints.html"><span class="doc">Constraints</span></a> for the complete
-migration table from the former wire API.</p>
+mapping from the legacy wire API.</p>
 </section>
 <section id="python-uses-the-same-model">
 <h2>Python uses the same model<a class="headerlink" href="#python-uses-the-same-model" title="Link to this heading"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">raisimpy.Tendon</span></code> exposes the same properties, routes, drives, and inspection
-methods. Properties and drive getters return copies; apply edits with the
-corresponding setter so validation and wake-up happen. The world owns tendons
+<p><code class="docutils literal notranslate"><span class="pre">raisimpy.Tendon</span></code> exposes the same properties, routes, drives, and scalar
+inspection methods; point and joint gradients are available only in C++.
+Properties and drive getters return copies; apply edits with the corresponding
+setter so validation and wake-up happen. The world owns tendons
 and couplings; do not use their Python handles after explicit removal or after
 removing an attached object.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">raisimpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">raisim</span>

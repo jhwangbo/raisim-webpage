@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PBR materials &mdash; raisim 2.7.0 documentation</title>
+  <title>PBR materials &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -74,17 +74,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul class="current">
@@ -99,6 +99,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#foliage-materials">Foliage materials</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#material-import-details">Material import details</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#visual-assets-and-collision-assets">Visual assets and collision assets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#subsurface-scattering-and-backlight">Subsurface scattering and backlight</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bloom-hdr-and-pbr">Bloom, HDR, and PBR</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#gpu-capability-tiers">GPU capability tiers</a></li>
 </ul>
 </li>
@@ -165,8 +167,8 @@ factories described below and applies them via
 <code class="docutils literal notranslate"><span class="pre">Visuals::setMaterialOverride</span></code>. Glass and foliage have their own sections
 below, and <a class="reference internal" href="#gpu-capability-tiers">GPU capability tiers</a> lists which features a given GPU renders.</p>
 <p>Visual-level material controls (override, remap, overlay, visibility range,
-shadow casting modes) are on the <a class="reference internal" href="Visuals.html"><span class="doc">Custom visuals, instancing, and scene helpers</span></a> page. Tone mapping and
-post-process are on <a class="reference internal" href="PostProcess.html"><span class="doc">Post-process effects</span></a>.</p>
+shadow casting modes) are on the <a class="reference internal" href="Visuals.html"><span class="doc">Custom visuals, instancing, and scene helpers</span></a> page. Tone mapping is on
+<a class="reference internal" href="RenderQuality.html"><span class="doc">Render quality, tone mapping, color grading</span></a>, and post-process effects are on <a class="reference internal" href="PostProcess.html"><span class="doc">Post-process effects</span></a>.</p>
 <section id="supported-pbr-inputs">
 <h2>Supported PBR inputs<a class="headerlink" href="#supported-pbr-inputs" title="Link to this heading"></a></h2>
 <p>rayrai supports a lightweight glTF-style metallic-roughness PBR path in addition to
@@ -198,9 +200,9 @@ a configurable <code class="docutils literal notranslate"><span class="pre">Text
 <code class="docutils literal notranslate"><span class="pre">roughnessTextureChannel</span></code>, <code class="docutils literal notranslate"><span class="pre">aoTextureChannel</span></code>, <code class="docutils literal notranslate"><span class="pre">refractionTextureChannel</span></code>).</p>
 <p>Material behavior is controlled by several enums on <code class="docutils literal notranslate"><span class="pre">raisin::Material</span></code>:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">Type</span></code>: <code class="docutils literal notranslate"><span class="pre">SIMPLE_COLOR</span></code>, <code class="docutils literal notranslate"><span class="pre">TEXTURED</span></code>, <code class="docutils literal notranslate"><span class="pre">PBR</span></code> — user-facing type hint.
-<code class="docutils literal notranslate"><span class="pre">PBR</span></code> materials, and any material that sets a PBR feature or map, use the
-PBR shaders; <code class="docutils literal notranslate"><span class="pre">forceSimpleShading</span></code> forces the simple shader.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Type</span></code>: <code class="docutils literal notranslate"><span class="pre">SIMPLE_COLOR</span></code>, <code class="docutils literal notranslate"><span class="pre">TEXTURED</span></code>, <code class="docutils literal notranslate"><span class="pre">PBR</span></code> (the default) — user-facing
+type hint. <code class="docutils literal notranslate"><span class="pre">PBR</span></code> materials, and any material that sets a PBR feature or
+map, use the PBR shaders; <code class="docutils literal notranslate"><span class="pre">forceSimpleShading</span></code> forces the simple shader.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">ShadingModel</span></code>: <code class="docutils literal notranslate"><span class="pre">Standard</span></code>, <code class="docutils literal notranslate"><span class="pre">Lambert</span></code>, <code class="docutils literal notranslate"><span class="pre">Toon</span></code>, <code class="docutils literal notranslate"><span class="pre">Unlit</span></code> —
 <code class="docutils literal notranslate"><span class="pre">setShadingModel()</span></code> writes the matching diffuse, specular, and unlit fields.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">AlphaMode</span></code>: <code class="docutils literal notranslate"><span class="pre">Opaque</span></code>, <code class="docutils literal notranslate"><span class="pre">Mask</span></code>, <code class="docutils literal notranslate"><span class="pre">Hash</span></code>, <code class="docutils literal notranslate"><span class="pre">Blend</span></code> — glTF-style alpha
@@ -223,20 +225,23 @@ depth-state override for decals, overlays, and inspection surfaces.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">StencilCompare</span></code> / <code class="docutils literal notranslate"><span class="pre">StencilEffectMode</span></code> (<code class="docutils literal notranslate"><span class="pre">Disabled</span></code> / <code class="docutils literal notranslate"><span class="pre">Outline</span></code> /
 <code class="docutils literal notranslate"><span class="pre">Xray</span></code> / <code class="docutils literal notranslate"><span class="pre">Custom</span></code>) — stencil-driven selection overlays.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">TextureRepeatMode</span></code> and <code class="docutils literal notranslate"><span class="pre">TextureFilter</span></code> — per-material sampler overrides
-(<code class="docutils literal notranslate"><span class="pre">Repeat</span></code> / <code class="docutils literal notranslate"><span class="pre">Mirror</span></code> / <code class="docutils literal notranslate"><span class="pre">Disabled</span></code> and <code class="docutils literal notranslate"><span class="pre">Nearest</span></code> / <code class="docutils literal notranslate"><span class="pre">Linear</span></code> with
-optional mipmaps and anisotropy).</p></li>
+(<code class="docutils literal notranslate"><span class="pre">Inherit</span></code> by default, or <code class="docutils literal notranslate"><span class="pre">Repeat</span></code> / <code class="docutils literal notranslate"><span class="pre">Mirror</span></code> / <code class="docutils literal notranslate"><span class="pre">Disabled</span></code> and
+<code class="docutils literal notranslate"><span class="pre">Nearest</span></code> / <code class="docutils literal notranslate"><span class="pre">Linear</span></code> with optional mipmaps and anisotropy).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">BillboardMode</span></code>: <code class="docutils literal notranslate"><span class="pre">Disabled</span></code>, <code class="docutils literal notranslate"><span class="pre">Enabled</span></code>, <code class="docutils literal notranslate"><span class="pre">FixedZ</span></code>, <code class="docutils literal notranslate"><span class="pre">Particles</span></code> —
 camera-facing rendering for foliage and sprites.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">UvLayer</span></code>: <code class="docutils literal notranslate"><span class="pre">Uv1</span></code> / <code class="docutils literal notranslate"><span class="pre">Uv2</span></code> — secondary UV channel for detail and
-lightmap textures.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">UvLayer</span></code>: <code class="docutils literal notranslate"><span class="pre">Uv1</span></code> / <code class="docutils literal notranslate"><span class="pre">Uv2</span></code> — UV channel of the detail textures
+(<code class="docutils literal notranslate"><span class="pre">detailUvLayer</span></code>). Lightmap, AO, and emissive maps choose the second UV
+channel with the <code class="docutils literal notranslate"><span class="pre">lightmapUsesUv2</span></code>, <code class="docutils literal notranslate"><span class="pre">aoUsesUv2</span></code>, and <code class="docutils literal notranslate"><span class="pre">emissiveUsesUv2</span></code>
+flags instead.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">FoliageType</span></code>: <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">Grass</span></code>, <code class="docutils literal notranslate"><span class="pre">LeafCard</span></code>, <code class="docutils literal notranslate"><span class="pre">Bush</span></code>, <code class="docutils literal notranslate"><span class="pre">Branch</span></code>,
 <code class="docutils literal notranslate"><span class="pre">TreeTrunk</span></code>, <code class="docutils literal notranslate"><span class="pre">Crop</span></code>, <code class="docutils literal notranslate"><span class="pre">Vine</span></code> — foliage classification. Any value other
 than <code class="docutils literal notranslate"><span class="pre">None</span></code> enables the fields in <a class="reference internal" href="#foliage-materials">Foliage materials</a>; the specific value
 does not change shading or wind.</p></li>
 </ul>
-<p>Most of these knobs are populated automatically by the Assimp/glTF importer.
-Authored materials can be constructed directly when in-process code needs a
-specific shading mode; the next section covers the importer’s fallback rules.</p>
+<p>Most of these knobs are populated automatically by the Assimp/glTF importer
+(<a class="reference internal" href="#material-import-details">Material import details</a> covers its fallback rules). Authored materials can
+be constructed directly when in-process code needs a specific shading mode, as
+the next section shows.</p>
 </section>
 <section id="material-factories">
 <h2>Material factories<a class="headerlink" href="#material-factories" title="Link to this heading"></a></h2>
@@ -296,19 +301,19 @@ through glass.</p>
 <p>Heightmap terrain uses a dedicated rough PBR material in both in-process and TCP
 viewer paths. Heightmap color maps are treated as terrain albedo, but the material
 keeps metallic at zero, roughness high, and planar reflection disabled even when
-<code class="docutils literal notranslate"><span class="pre">RenderQualitySettings.reflectiveGround</span></code> is enabled. This keeps outdoor terrain
+<code class="docutils literal notranslate"><span class="pre">RenderQualitySettings::reflectiveGround</span></code> is enabled. This keeps outdoor terrain
 from looking like a mirror while retaining sky/IBL fill and normal PBR lighting.</p>
 <p>The shipped PBR examples and tools are:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_pbr_material_grid</span></code>: PBR material coverage across a primitive grid
-under matching HDR/IBL lighting.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_pbr_material_grid</span></code>: the Khronos MetalRoughSpheres glTF sample, a
+grid of spheres spanning metallic and roughness values, under the High preset.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">rayrai_pbr_texture_maps</span></code>: texture-slot coverage for base color, normal,
-metallic-roughness, occlusion, and emissive maps.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_visual_asset_support</span></code>: authored glTF/GLB scene import with PBR
-materials, embedded lights, reflection-probe sidecars, and screenshot output
-while keeping visual and collision geometry separate.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_quality_lighting</span></code>: additional-light and quality preset coverage for
-inspecting PBR materials.</p></li>
+metallic-roughness, occlusion, and emissive maps on glTF sample assets, lit
+by an HDR environment.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_visual_asset_support</span></code>: textured URDF visual assets (ANYmal C and
+YCB objects) whose visual and collision geometry stay separate.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_quality_lighting</span></code>: point, spot, and area additional lights on the
+Ultra preset for inspecting PBR materials.</p></li>
 </ul>
 <p>Authored light sources are imported through:</p>
 <ul class="simple">
@@ -344,7 +349,7 @@ scales the optical path; both honor per-slot UV transforms.
 <code class="docutils literal notranslate"><span class="pre">refractionFactor</span></code> / <code class="docutils literal notranslate"><span class="pre">refractionMap</span></code> also make a surface transmissive and
 add an artistic offset scaled by <code class="docutils literal notranslate"><span class="pre">screenSpaceRefractionStrength</span></code> ×
 <code class="docutils literal notranslate"><span class="pre">screenSpaceRefractionMaxPixels</span></code>.</p></li>
-<li><p>A nonzero <code class="docutils literal notranslate"><span class="pre">metallicFactor</span></code> suppresses transmission.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metallicFactor</span></code> scales transmission and refraction by <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">-</span> <span class="pre">metallic</span></code>.</p></li>
 </ul>
 <p>A material pass with <code class="docutils literal notranslate"><span class="pre">transmissionFactor</span></code>, <code class="docutils literal notranslate"><span class="pre">refractionFactor</span></code>,
 <code class="docutils literal notranslate"><span class="pre">transmissionMap</span></code>, or <code class="docutils literal notranslate"><span class="pre">refractionMap</span></code> set is drawn in the sorted transparent
@@ -354,12 +359,12 @@ the same on every GPU tier. To show the scene behind the glass, enable
 <code class="docutils literal notranslate"><span class="pre">Ultra</span></code> presets, see <a class="reference internal" href="RenderQuality.html"><span class="doc">Render quality, tone mapping, color grading</span></a>); otherwise glass transmits only the
 environment. The <code class="docutils literal notranslate"><span class="pre">Fast</span></code> preset forces simple shading, which draws glass as an
 ordinary surface.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">glass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Material</span><span class="o">::</span><span class="n">glass</span><span class="p">(</span><span class="s">&quot;green_block&quot;</span><span class="p">,</span><span class="w"> </span><span class="cm">/*thickness=*/</span><span class="mf">1.2f</span><span class="p">,</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">glass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Material</span><span class="o">::</span><span class="n">glass</span><span class="p">(</span><span class="s">&quot;green_block&quot;</span><span class="p">,</span><span class="w"> </span><span class="cm">/*thickness=*/</span><span class="mf">0.12f</span><span class="p">,</span>
 <span class="w">                                     </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.30f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.82f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.60f</span><span class="p">),</span>
 <span class="w">                                     </span><span class="cm">/*attenuationDistance=*/</span><span class="mf">0.9f</span><span class="p">);</span>
-<span class="n">block</span><span class="o">-&gt;</span><span class="n">setMaterialOverride</span><span class="p">(</span><span class="n">glass</span><span class="p">);</span>
-<span class="n">block</span><span class="o">-&gt;</span><span class="n">setPbrEnvironment</span><span class="p">(</span><span class="n">environmentCubemap</span><span class="p">);</span><span class="w">  </span><span class="c1">// reflections and fallback</span>
-<span class="n">block</span><span class="o">-&gt;</span><span class="n">setCastsShadows</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span><span class="w">  </span><span class="c1">// otherwise glass casts an opaque shadow</span>
+<span class="n">blockVisual</span><span class="o">-&gt;</span><span class="n">setMaterialOverride</span><span class="p">(</span><span class="n">glass</span><span class="p">);</span>
+<span class="n">blockVisual</span><span class="o">-&gt;</span><span class="n">setPbrEnvironment</span><span class="p">(</span><span class="n">environmentCubemap</span><span class="p">);</span><span class="w">  </span><span class="c1">// reflections and fallback</span>
+<span class="n">blockVisual</span><span class="o">-&gt;</span><span class="n">setCastsShadows</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span><span class="w">  </span><span class="c1">// otherwise glass casts an opaque shadow</span>
 
 <span class="k">auto</span><span class="w"> </span><span class="n">quality</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">();</span>
 <span class="n">quality</span><span class="p">.</span><span class="n">highFidelityPbr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
@@ -377,8 +382,10 @@ so screen-space glass does not show glass behind glass, nested liquids,
 internal reflections, dispersion, caustics, or colored shadows. The glass
 shader applies base and vertex color, the albedo, normal, roughness, emissive,
 transmission, thickness, and refraction maps, environment reflections, the main
-and additional lights, and the main-light shadow. It ignores clearcoat, sheen,
-subsurface, parallax, and additional-light shadows. Views that contain glass
+and additional lights, and the main-light shadow. It ignores metallic,
+metallic-roughness/ORM, and AO maps (so a roughness packed into a glTF
+metallic-roughness texture has no effect; use <code class="docutils literal notranslate"><span class="pre">roughnessMap</span></code>), clearcoat,
+sheen, subsurface, parallax, and additional-light shadows. Views that contain glass
 use sorted blending instead of weighted OIT or the transparent depth prepass.
 <code class="docutils literal notranslate"><span class="pre">InstancedVisuals</span></code> ignore transmission; use regular visuals or world meshes
 for glass.</p>
@@ -512,17 +519,19 @@ camera, or a <code class="docutils literal notranslate"><span class="pre">Vulkan
 <p><code class="docutils literal notranslate"><span class="pre">geometryRefractionDiagnostics()</span></code> reports whether tracing ran, the backend
 actually used and why (<code class="docutils literal notranslate"><span class="pre">backend</span></code>, <code class="docutils literal notranslate"><span class="pre">backendStatus</span></code>), triangle, volume, and
 BVH node counts, scene rebuilds, and the scheduled samples per pixel.
-<code class="docutils literal notranslate"><span class="pre">geometryRefractionSamplingStatistics()</span></code> reads per-pixel sample counts back
-from the GPU and can stall.</p>
-<p>The Vulkan backend exists only in Linux and Windows builds made with the Vulkan
-headers and <code class="docutils literal notranslate"><span class="pre">glslc</span></code> shader compiler. Installing <code class="docutils literal notranslate"><span class="pre">glslc</span></code> later does not add
+With adaptive sampling, <code class="docutils literal notranslate"><span class="pre">geometryRefractionSamplingStatistics()</span></code> reads
+per-pixel sample counts back from the GPU and can stall; without it every pixel
+holds the scheduled budget and no readback happens.</p>
+<p>The Vulkan backend is available in Linux and Windows builds. Vulkan headers
+and SPIR-V shaders are checked in, and CMake verifies their source manifest
+without Python. A Vulkan SDK and shader compiler are unnecessary for normal
+builds. Installing development files later does not add
 the backend to an already-built rayrai package; use a package built with it or
 rebuild from source. See <a class="reference internal" href="../Troubleshooting.html#rayrai-vulkan-ray-query-troubleshooting"><span class="std std-ref">Vulkan Ray Queries Unavailable</span></a> for
 setup and verification. At run time it needs a Vulkan 1.2 GPU that matches
 the OpenGL device and supports ray queries, acceleration structures, and
-OpenGL memory and semaphore sharing (<code class="docutils literal notranslate"><span class="pre">GL_EXT_memory_object</span></code>, <code class="docutils literal notranslate"><span class="pre">GL_EXT_semaphore</span></code>). Set
-<code class="docutils literal notranslate"><span class="pre">RAYRAI_DISABLE_VULKAN_RAY_QUERY=1</span></code> to force the portable tracer. Changing
-the backend restarts accumulation. While <code class="docutils literal notranslate"><span class="pre">geometryRefraction</span></code> is enabled the
+OpenGL memory and semaphore sharing (<code class="docutils literal notranslate"><span class="pre">GL_EXT_memory_object</span></code>, <code class="docutils literal notranslate"><span class="pre">GL_EXT_semaphore</span></code>);
+without them the portable tracer runs. Changing the backend restarts accumulation. While <code class="docutils literal notranslate"><span class="pre">geometryRefraction</span></code> is enabled the
 renderer’s frame caches are bypassed even when no glass is visible, so leave it
 off otherwise.</p>
 </section>
@@ -663,29 +672,34 @@ physics:</p>
 of the physics model. The current textured glTF and imported scene examples keep
 renderer assets separate from collision geometry; the physics model still comes
 from the URDF or explicit collision objects.</p>
+</section>
 <section id="subsurface-scattering-and-backlight">
-<h3>Subsurface scattering and backlight<a class="headerlink" href="#subsurface-scattering-and-backlight" title="Link to this heading"></a></h3>
+<h2>Subsurface scattering and backlight<a class="headerlink" href="#subsurface-scattering-and-backlight" title="Link to this heading"></a></h2>
 <p>rayrai approximates subsurface scattering with three controls that combine
 cheaply for plausible skin, leaves, wax, and thin plastic.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">viewerSubsurfaceWrap</span></code> / <code class="docutils literal notranslate"><span class="pre">viewerSubsurfaceTint</span></code> wrap the diffuse falloff
-past 90 degrees and tint the wrap region (warm flesh tones by default).
-This is a global, cheap post-shading approximation.</p></li>
-<li><p>The <code class="docutils literal notranslate"><span class="pre">Subsurface</span></code> and <code class="docutils literal notranslate"><span class="pre">SubsurfaceTransmittance</span></code> <code class="docutils literal notranslate"><span class="pre">Material</span></code> texture
-slots feed a per-material thickness/transmission term. <code class="docutils literal notranslate"><span class="pre">Material::DiffuseMode</span></code>
-<code class="docutils literal notranslate"><span class="pre">Toon</span></code> and <code class="docutils literal notranslate"><span class="pre">LambertWrap</span></code> make the wrap response artist-controllable.</p></li>
-<li><p>The <code class="docutils literal notranslate"><span class="pre">Backlight</span></code> slot drives a separate light contribution that comes from
-<em>behind</em> the surface — useful for translucent leaves, candle wax, and thin
-fabric in rim lighting.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">viewerSubsurfaceWrap</span></code> / <code class="docutils literal notranslate"><span class="pre">viewerSubsurfaceTint</span></code> (<code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code>)
+wrap the diffuse falloff past 90 degrees and tint the wrapped light (warm
+flesh tones by default). This is a global, cheap wrap term in the PBR
+lighting of every material; a nonzero value selects the high-fidelity PBR
+shader.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Material::subsurfaceScatteringStrength</span></code> (default 0) enables a
+per-material subsurface term; the <code class="docutils literal notranslate"><span class="pre">Subsurface</span></code> texture slot scales that
+strength, and the <code class="docutils literal notranslate"><span class="pre">SubsurfaceTransmittance</span></code> slot tints the transmitted
+light. <code class="docutils literal notranslate"><span class="pre">Material::DiffuseMode::LambertWrap</span></code> forces a fixed, untinted wrap of
+at least 0.5, while <code class="docutils literal notranslate"><span class="pre">Toon</span></code> replaces the diffuse falloff with a hard
+terminator.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">Backlight</span></code> slot (added to <code class="docutils literal notranslate"><span class="pre">backlightColor</span></code>) drives a separate light
+contribution that comes from <em>behind</em> the surface — useful for translucent
+leaves, candle wax, and thin fabric in rim lighting.</p></li>
 </ul>
 <p><code class="docutils literal notranslate"><span class="pre">DiffuseMode</span></code> values other than <code class="docutils literal notranslate"><span class="pre">Lambert</span></code> render only on the full GPU tier,
 and the subsurface and backlight maps are not sampled on the limited tier; see
 <a class="reference internal" href="#gpu-capability-tiers">GPU capability tiers</a>.</p>
 <p>The two showcase images contrast a wrap-only subsurface response (cheap,
 shader-side) against an authored skin material that uses the dedicated SSS
-texture slots and tuned wrap. The backlight image shows leaves lit from behind
-the camera receiving energy through the leaf rather than just on the camera
-side.</p>
+texture slots and tuned wrap. The backlight image shows leaves lit from behind,
+so light passes through the leaf toward the camera.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Global wrap-light approximation — cheapest path.</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">quality</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">();</span>
 <span class="n">quality</span><span class="p">.</span><span class="n">viewerSubsurfaceWrap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.45f</span><span class="p">;</span>
@@ -697,6 +711,7 @@ side.</p>
 <span class="w">  </span><span class="s">&quot;skin&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.96f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.78f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.68f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">),</span>
 <span class="w">  </span><span class="cm">/*metallic=*/</span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*roughness=*/</span><span class="mf">0.55f</span><span class="p">);</span>
 <span class="n">skin</span><span class="p">.</span><span class="n">diffuseMode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Material</span><span class="o">::</span><span class="n">DiffuseMode</span><span class="o">::</span><span class="n">LambertWrap</span><span class="p">;</span>
+<span class="n">skin</span><span class="p">.</span><span class="n">subsurfaceScatteringStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">;</span><span class="w">  </span><span class="c1">// the map below scales this</span>
 <span class="n">skin</span><span class="p">.</span><span class="n">subsurfaceMap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">subsurfaceMapId</span><span class="p">;</span>
 <span class="n">skin</span><span class="p">.</span><span class="n">subsurfaceTransmittanceMap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">transmittanceMapId</span><span class="p">;</span>
 
@@ -735,12 +750,15 @@ side.</p>
 </table>
 </section>
 <section id="bloom-hdr-and-pbr">
-<h3>Bloom, HDR, and PBR<a class="headerlink" href="#bloom-hdr-and-pbr" title="Link to this heading"></a></h3>
-<p>Bloom (<code class="docutils literal notranslate"><span class="pre">bloomEnabled</span></code>) uses a Gaussian-pyramid down/upsample with knee
-threshold (<code class="docutils literal notranslate"><span class="pre">bloomThreshold</span></code>, <code class="docutils literal notranslate"><span class="pre">bloomKnee</span></code>), strength, source clamp, and
-optional anamorphic squeeze. The <code class="docutils literal notranslate"><span class="pre">bloomDirtTexture</span></code> slot multiplies bloom
-by a lens-dirt mask for a stylized lens look. Emissive surfaces with
-intensities above the threshold bloom naturally.</p>
+<h2>Bloom, HDR, and PBR<a class="headerlink" href="#bloom-hdr-and-pbr" title="Link to this heading"></a></h2>
+<p>Bloom (<code class="docutils literal notranslate"><span class="pre">bloomEnabled</span></code>) blurs a soft-thresholded bright-pass
+(<code class="docutils literal notranslate"><span class="pre">bloomThreshold</span></code>, <code class="docutils literal notranslate"><span class="pre">bloomKnee</span></code>) with strength, source clamp, and optional
+anamorphic stretch. <code class="docutils literal notranslate"><span class="pre">bloomQuality</span></code> picks the blur: 1 or less is a 12-tap
+gather, 2 a 24-tap gather, and 3 or more a 4-level downsample/upsample chain
+(the Ultra preset uses 3). <code class="docutils literal notranslate"><span class="pre">bloomDirtStrength</span></code> multiplies bloom by a
+lens-dirt mask for a stylized lens look, read from <code class="docutils literal notranslate"><span class="pre">bloomDirtTexture</span></code> or, when
+that is 0, generated procedurally. Emissive surfaces with intensities above the
+threshold bloom naturally.</p>
 <p>HDR / IBL setup loads a single equirectangular HDR file and integrates the
 diffuse irradiance + GGX-prefiltered specular cubemaps plus the split-sum
 BRDF lookup. Reflective surfaces sample these instead of a constant ambient
@@ -756,7 +774,7 @@ included for context.</p>
 <span class="n">quality</span><span class="p">.</span><span class="n">bloomStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.28f</span><span class="p">;</span>
 <span class="n">quality</span><span class="p">.</span><span class="n">bloomRadius</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">4.0f</span><span class="p">;</span>
 <span class="n">quality</span><span class="p">.</span><span class="n">bloomKnee</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.22f</span><span class="p">;</span>
-<span class="n">quality</span><span class="p">.</span><span class="n">bloomQuality</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">              </span><span class="c1">// 0=fast, 1=high</span>
+<span class="n">quality</span><span class="p">.</span><span class="n">bloomQuality</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w">              </span><span class="c1">// 1=12-tap, 2=24-tap, 3=down/upsample chain</span>
 <span class="n">quality</span><span class="p">.</span><span class="n">bloomDirtTexture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lensDirtTextureId</span><span class="p">;</span><span class="w">  </span><span class="c1">// optional</span>
 <span class="n">quality</span><span class="p">.</span><span class="n">bloomDirtStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.35f</span><span class="p">;</span>
 <span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">quality</span><span class="p">);</span>
@@ -812,7 +830,6 @@ included for context.</p>
 </tbody>
 </table>
 </section>
-</section>
 <section id="gpu-capability-tiers">
 <h2>GPU capability tiers<a class="headerlink" href="#gpu-capability-tiers" title="Link to this heading"></a></h2>
 <p>Which material features render depends on how many fragment texture units the
@@ -848,7 +865,7 @@ splatting, wet/snow weather response, additional-light shadows, or
 light projectors.</p></td>
 </tr>
 <tr class="row-even"><td><p>Limited</p></td>
-<td><p>16 or fewer units, and every macOS build</p></td>
+<td><p>16 units (the minimum rayrai accepts), and every macOS build</p></td>
 <td><p>As compact, minus planar reflection, height-map parallax, and the
 subsurface, subsurface-transmittance, and backlight maps. Simple and
 instanced meshes also lose additional-light shadows and light
@@ -861,19 +878,20 @@ projectors.</p></td>
 also runs everywhere.</p>
 <p>Maps that do not fit the reported unit count are moved to the unit of a slot
 the material leaves empty (bent-normal, refraction, subsurface, subsurface
-transmittance, backlight, detail, rim, height, and texture-blend maps). If no
-unit is free, that map is ignored for the draw. On 16-unit GPUs the lightmap,
+transmittance, backlight, detail mask/albedo/normal, rim, height, lightmap, and
+texture-blend maps). If no unit is free, that map is ignored for the draw. On 16-unit GPUs the lightmap,
 sheen, transmission, thickness, anisotropy, weather-mask, and clearcoat-normal
 maps are always ignored; glass binds its own transmission, thickness, and
 refraction maps and is unaffected.</p>
 <p>On the limited tier post-processing uses a reduced program that keeps depth of
-field, FXAA, bloom, SSAO, and temporal AA, but not effects such as SSR,
-projected decals, color grading, saturation, or white balance (see
+field, FXAA, bloom, SSAO, temporal AA, white balance, and saturation, but not
+effects such as SSR, projected decals, or color grading (see
 <a class="reference internal" href="PostProcess.html"><span class="doc">Post-process effects</span></a>). On macOS, material textures are also sampled without
 mipmaps (<code class="docutils literal notranslate"><span class="pre">TextureFilter</span></code> modes with mipmaps behave like <code class="docutils literal notranslate"><span class="pre">Linear</span></code>), and
 geometry refraction always uses the portable tracer.</p>
-<p>To check the tier, set <code class="docutils literal notranslate"><span class="pre">RAYRAI_LOG_SHADER_COMPILE=1</span></code>, which prints the
-fallback in use. <code class="docutils literal notranslate"><span class="pre">RAYRAI_FORCE_COMPACT_PBR_SAMPLER_FALLBACK=1</span></code> or
+<p>rayrai does not print the tier it picked; compare the
+<code class="docutils literal notranslate"><span class="pre">GL_MAX_TEXTURE_IMAGE_UNITS</span></code> value your driver reports with the table above.
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_FORCE_COMPACT_PBR_SAMPLER_FALLBACK=1</span></code> or
 <code class="docutils literal notranslate"><span class="pre">RAYRAI_FORCE_LIMITED_PBR_SAMPLER_FALLBACK=1</span></code>, set before the application
 starts, previews a lower tier on a capable GPU.
 <code class="docutils literal notranslate"><span class="pre">RAYRAI_LOG_MATERIAL_BINDINGS=1</span></code> prints the texture unit each map is bound

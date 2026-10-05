@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quick Start &mdash; raisim 2.7.0 documentation</title>
+  <title>Quick Start &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,14 +14,14 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Installation" href="Installation.html" />
-    <link rel="prev" title="RaiSim v2.7.0" href="../index.html" /> 
+    <link rel="prev" title="RaiSim v2.8.0" href="../index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -82,17 +82,17 @@
 <li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -130,30 +130,34 @@
              
   <section id="quick-start">
 <h1>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h1>
-<p>This page gets an unpacked RaiSim binary package to a running example. For
-package layout, environment variables, and activation details, see
+<p>This page takes a <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> checkout to a running example. For package
+layout, dependencies, environment variables, and activation details, see
 <a class="reference internal" href="Installation.html"><span class="doc">Installation</span></a>.</p>
 <section id="install-and-activate-raisim">
 <h2>1. Install and activate RaiSim<a class="headerlink" href="#install-and-activate-raisim" title="Link to this heading"></a></h2>
-<p>Install the binary package for your platform and place the activation file at
-the default location:</p>
+<p>Clone <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> and place the activation file at the default location:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Linux/macOS: $HOME/.raisim/activation.raisim
 Windows:     C:\Users\&lt;YOUR-USERNAME&gt;\.raisim\activation.raisim
 </pre></div>
 </div>
-<p>Source the environment and build the examples from the release workspace:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/path/to/raisim2Lib
-<span class="nb">source</span><span class="w"> </span>./raisim_env.sh
+<p>Build the examples. The first configure downloads the RaiSim and rayrai binary
+packages that match the checkout into <code class="docutils literal notranslate"><span class="pre">raisim/</span></code> and <code class="docutils literal notranslate"><span class="pre">rayrai/</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/raisimTech/raisim2Lib.git
+<span class="nb">cd</span><span class="w"> </span>raisim2Lib
 cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build-examples<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-DRAISIM_EXAMPLE<span class="o">=</span>ON
 cmake<span class="w"> </span>--build<span class="w"> </span>build-examples<span class="w"> </span>--parallel<span class="w"> </span><span class="m">12</span>
+<span class="nb">source</span><span class="w"> </span>./raisim_env.sh
 </pre></div>
 </div>
+<p><code class="docutils literal notranslate"><span class="pre">raisim_env.sh</span></code> adds the RaiSim and rayrai library directories to the library
+search path. It only adds directories that exist, so source it after the first
+configure has downloaded the packages.</p>
 <p>On Linux and macOS, example executables are then under
 <code class="docutils literal notranslate"><span class="pre">build-examples/examples</span></code>. On Windows, configure without
 <code class="docutils literal notranslate"><span class="pre">CMAKE_BUILD_TYPE</span></code> and build with <code class="docutils literal notranslate"><span class="pre">--config</span> <span class="pre">Release</span></code>; executables are under
-<code class="docutils literal notranslate"><span class="pre">build-examples\\bin</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">build-examples\bin</span></code>, next to copies of the runtime DLLs.</p>
 </section>
 <section id="run-a-server-based-example">
 <h2>2. Run a server-based example<a class="headerlink" href="#run-a-server-based-example" title="Link to this heading"></a></h2>
@@ -165,9 +169,11 @@ cmake<span class="w"> </span>--build<span class="w"> </span>build-examples<span 
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build-examples/examples/primitive_grid
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">primitive_grid</span></code> and the other server examples create a <code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code>
-scene. The viewer connects to the default port <code class="docutils literal notranslate"><span class="pre">8080</span></code> unless the application
-changes it.</p>
+<p><code class="docutils literal notranslate"><span class="pre">primitive_grid</span></code> and the other server examples publish their world through a
+<code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code>, which listens on port <code class="docutils literal notranslate"><span class="pre">8080</span></code> by default. On first
+launch the viewer connects to <code class="docutils literal notranslate"><span class="pre">127.0.0.1:8080</span></code>; if an application uses another
+host or port, pass <code class="docutils literal notranslate"><span class="pre">--connect</span> <span class="pre">host:port</span></code> to the viewer or edit the endpoint in
+its <strong>Connection</strong> tab (see <a class="reference internal" href="RayraiTcpViewer.html"><span class="doc">Rayrai TCP Viewer</span></a>).</p>
 </section>
 <section id="run-an-in-process-rayrai-example">
 <h2>3. Run an in-process rayrai example<a class="headerlink" href="#run-an-in-process-rayrai-example" title="Link to this heading"></a></h2>
@@ -186,7 +192,8 @@ need the TCP viewer:</p>
 </section>
 <section id="run-an-openusd-mesh-loading-example">
 <h2>5. Run an OpenUSD mesh-loading example<a class="headerlink" href="#run-an-openusd-mesh-loading-example" title="Link to this heading"></a></h2>
-<p>Start the TCP viewer, then run the ShadowHand USD example:</p>
+<p>As in step 2, start the TCP viewer in one terminal and the ShadowHand USD
+example in another:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build-examples/examples/rayrai_tcp_viewer
 ./build-examples/examples/shadow_hand_usd_cube
 </pre></div>
@@ -211,7 +218,7 @@ viewer.</p></li>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../index.html" class="btn btn-neutral float-left" title="RaiSim v2.7.0" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../index.html" class="btn btn-neutral float-left" title="RaiSim v2.8.0" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="Installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

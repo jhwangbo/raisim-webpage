@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sensors and depth/LiDAR &mdash; raisim 2.7.0 documentation</title>
+  <title>Sensors and depth/LiDAR &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -74,17 +74,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul class="current">
@@ -161,13 +161,17 @@ the general camera control and picking APIs (free-fly, orbit, picking from the
 viewer) see <a class="reference internal" href="Capture.html"><span class="doc">Capture, diagnostics, and headless rendering</span></a>.</p>
 <section id="sensor-alignment">
 <h2>Sensor alignment<a class="headerlink" href="#sensor-alignment" title="Link to this heading"></a></h2>
-<p>rayrai can align rendering to RaiSim camera sensors. Use
-<code class="docutils literal notranslate"><span class="pre">syncRaisimCameraPose</span></code> and <code class="docutils literal notranslate"><span class="pre">renderWithExternalCamera</span></code> to ensure the
-render camera matches the sensor pose and intrinsics. RaiSim sensor rendering is
-world-object-only: custom visuals, instanced visuals, point clouds, coordinate
-frames, and other viewer-only helpers are excluded from RGB, depth, and LiDAR
-data-generation passes. Use generic external-camera rendering only when you
-intentionally want a viewer render that includes visualization objects.
+<p>rayrai can align rendering to RaiSim camera sensors. Constructing a
+<code class="docutils literal notranslate"><span class="pre">raisin::Camera</span></code> from a RaiSim <code class="docutils literal notranslate"><span class="pre">RGBCamera</span></code> or <code class="docutils literal notranslate"><span class="pre">DepthCamera</span></code> copies the
+sensor’s resolution, clip planes, horizontal field of view, and lens model (a GL
+context must be current). The sensor overloads of <code class="docutils literal notranslate"><span class="pre">renderWithExternalCamera</span></code>
+and <code class="docutils literal notranslate"><span class="pre">renderDepthPlaneDistance</span></code> then copy the sensor’s world pose into that
+camera on every call; <code class="docutils literal notranslate"><span class="pre">syncRaisimCameraPose</span></code> does the same for other render
+paths. RaiSim sensor rendering is world-object-only: custom visuals, instanced
+visuals, point clouds, coordinate frames, and other viewer-only helpers are
+excluded from RGB, depth, and LiDAR data-generation passes. Use generic
+external-camera rendering only when you intentionally want a viewer render that
+includes visualization objects.
 Note: <code class="docutils literal notranslate"><span class="pre">syncRaisimCameraPose</span></code> updates <code class="docutils literal notranslate"><span class="pre">Camera::position/front/up</span></code> directly;
 avoid calling <code class="docutils literal notranslate"><span class="pre">Camera::update()</span></code> immediately afterward unless you also update
 <code class="docutils literal notranslate"><span class="pre">yaw</span></code>/<code class="docutils literal notranslate"><span class="pre">pitch</span></code>.</p>
@@ -191,25 +195,31 @@ longer RGB/depth readback example.</p>
 <span class="n">raisin</span><span class="o">::</span><span class="n">Camera</span><span class="w"> </span><span class="nf">rgbCamera</span><span class="p">(</span><span class="o">*</span><span class="n">rgbCam</span><span class="p">);</span>
 <span class="n">raisin</span><span class="o">::</span><span class="n">Camera</span><span class="w"> </span><span class="nf">depthCamera</span><span class="p">(</span><span class="o">*</span><span class="n">depthCam</span><span class="p">);</span>
 
-<span class="n">viewer</span><span class="p">.</span><span class="n">renderWithExternalCamera</span><span class="p">(</span><span class="o">*</span><span class="n">rgbCam</span><span class="p">,</span><span class="w"> </span><span class="n">rgbCamera</span><span class="p">,</span><span class="w"> </span><span class="p">{});</span>
-<span class="n">viewer</span><span class="p">.</span><span class="n">renderWithExternalCamera</span><span class="p">(</span><span class="o">*</span><span class="n">depthCam</span><span class="p">,</span><span class="w"> </span><span class="n">depthCamera</span><span class="p">,</span><span class="w"> </span><span class="p">{});</span>
-<span class="n">viewer</span><span class="p">.</span><span class="n">renderDepthPlaneDistance</span><span class="p">(</span><span class="o">*</span><span class="n">depthCam</span><span class="p">,</span><span class="w"> </span><span class="n">depthCamera</span><span class="p">);</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">renderWithExternalCamera</span><span class="p">(</span><span class="o">*</span><span class="n">rgbCam</span><span class="p">,</span><span class="w"> </span><span class="n">rgbCamera</span><span class="p">,</span><span class="w"> </span><span class="p">{});</span><span class="w">   </span><span class="c1">// color image</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">renderWithExternalCamera</span><span class="p">(</span><span class="o">*</span><span class="n">depthCam</span><span class="p">,</span><span class="w"> </span><span class="n">depthCamera</span><span class="p">,</span><span class="w"> </span><span class="p">{});</span><span class="w"> </span><span class="c1">// optional color view of the depth sensor</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">renderDepthPlaneDistance</span><span class="p">(</span><span class="o">*</span><span class="n">depthCam</span><span class="p">,</span><span class="w"> </span><span class="n">depthCamera</span><span class="p">);</span><span class="w">    </span><span class="c1">// linear depth</span>
 </pre></div>
 </div>
-<p>You can read back the camera buffers on CPU:</p>
+<p><code class="docutils literal notranslate"><span class="pre">renderDepthPlaneDistance</span></code> does not need the color render before it; render
+the depth camera’s color image only when you want to show it.</p>
+<p>You can read back the camera buffers on CPU. <code class="docutils literal notranslate"><span class="pre">getRawImage</span></code> reads the scene
+color target as 8-bit BGRA (<code class="docutils literal notranslate"><span class="pre">width</span> <span class="pre">*</span> <span class="pre">height</span> <span class="pre">*</span> <span class="pre">4</span></code> bytes); the sensor resolution
+must match the camera’s render target. <code class="docutils literal notranslate"><span class="pre">SensorStorageMode::SENSOR_SETTER</span></code>
+(the default) writes into the RaiSim sensor instead of a caller buffer:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">prop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rgbCam</span><span class="o">-&gt;</span><span class="n">getProperties</span><span class="p">();</span>
 <span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">width</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">prop</span><span class="p">.</span><span class="n">width</span><span class="p">);</span>
 <span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">height</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">prop</span><span class="p">.</span><span class="n">height</span><span class="p">);</span>
-<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span><span class="w"> </span><span class="n">rgba</span><span class="p">(</span><span class="kt">size_t</span><span class="p">(</span><span class="n">width</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kt">size_t</span><span class="p">(</span><span class="n">height</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span><span class="w"> </span><span class="n">bgra</span><span class="p">(</span><span class="kt">size_t</span><span class="p">(</span><span class="n">width</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kt">size_t</span><span class="p">(</span><span class="n">height</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
 <span class="n">rgbCamera</span><span class="p">.</span><span class="n">getRawImage</span><span class="p">(</span><span class="o">*</span><span class="n">rgbCam</span><span class="p">,</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Camera</span><span class="o">::</span><span class="n">SensorStorageMode</span><span class="o">::</span><span class="n">CUSTOM_BUFFER</span><span class="p">,</span>
-<span class="w">  </span><span class="n">rgba</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">rgba</span><span class="p">.</span><span class="n">size</span><span class="p">(),</span><span class="w"> </span><span class="cm">/*flipVertical=*/</span><span class="nb">false</span><span class="p">);</span>
+<span class="w">  </span><span class="n">bgra</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">bgra</span><span class="p">.</span><span class="n">size</span><span class="p">(),</span><span class="w"> </span><span class="cm">/*flipVertical=*/</span><span class="nb">false</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Depth uses a <code class="docutils literal notranslate"><span class="pre">float</span></code> buffer with <code class="docutils literal notranslate"><span class="pre">width</span> <span class="pre">*</span> <span class="pre">height</span></code> entries. In 2.5.8,
-constructing <code class="docutils literal notranslate"><span class="pre">Camera</span></code> from a <code class="docutils literal notranslate"><span class="pre">DepthCamera</span></code> allocates depth targets without
-also eagerly allocating the RGB/post-processing targets. Keep the camera alive
-across frames to reuse its buffers, and destroy it while its owning GL context
-is current. <code class="docutils literal notranslate"><span class="pre">Camera</span></code> cannot be copied or moved because it owns GL handles.</p>
+<p>Depth uses a <code class="docutils literal notranslate"><span class="pre">float</span></code> buffer with <code class="docutils literal notranslate"><span class="pre">width</span> <span class="pre">*</span> <span class="pre">height</span></code> entries. Constructing a
+<code class="docutils literal notranslate"><span class="pre">Camera</span></code> from a <code class="docutils literal notranslate"><span class="pre">DepthCamera</span></code> allocates only the linear-depth target; the
+color and post-processing targets are allocated if the camera is later used
+for a color render. Keep the camera alive across frames to reuse its buffers,
+and destroy it while its owning GL context is current. <code class="docutils literal notranslate"><span class="pre">Camera</span></code> cannot be
+copied or moved because it owns GL handles.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">RGBCamera</span></code>/<code class="docutils literal notranslate"><span class="pre">DepthCamera</span></code> overloads of <code class="docutils literal notranslate"><span class="pre">renderWithExternalCamera</span></code>
 always render without MSAA, temporal AA, or viewer upscaling, whatever the
 quality preset. They do run the built-in postprocessing unless
@@ -220,12 +230,13 @@ sensor images; pass <code class="docutils literal notranslate"><span class="pre"
 <section id="asynchronous-readback">
 <h2>Asynchronous readback<a class="headerlink" href="#asynchronous-readback" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">getRawImage</span></code> is synchronous. For high-rate capture,
-<code class="docutils literal notranslate"><span class="pre">Camera::setAsyncReadbackEnabled(true,</span> <span class="pre">ringSize)</span></code> (ring size at least 2,
-default 3) enables a ring of pixel-buffer objects:
-<code class="docutils literal notranslate"><span class="pre">readSceneColorRgbaAsync(rgba)</span></code> and <code class="docutils literal notranslate"><span class="pre">readLinearDepthAsync(depth)</span></code> start a
-readback of the current frame and return <code class="docutils literal notranslate"><span class="pre">true</span></code> once they have copied an
-earlier one. The first calls return <code class="docutils literal notranslate"><span class="pre">false</span></code> until the ring is full, and the
-copied frame then lags the latest render by <code class="docutils literal notranslate"><span class="pre">ringSize</span></code> calls.</p>
+<code class="docutils literal notranslate"><span class="pre">Camera::setAsyncReadbackEnabled(true,</span> <span class="pre">ringSize)</span></code> (default 3; values below 2
+are raised to 2) enables a ring of pixel-buffer objects:
+<code class="docutils literal notranslate"><span class="pre">readSceneColorRgbaAsync(rgba)</span></code> (RGBA8, unlike the BGRA of <code class="docutils literal notranslate"><span class="pre">getRawImage</span></code>)
+and <code class="docutils literal notranslate"><span class="pre">readLinearDepthAsync(depth)</span></code> start a readback of the current frame and
+return <code class="docutils literal notranslate"><span class="pre">true</span></code> once they have copied an earlier one. The first <code class="docutils literal notranslate"><span class="pre">ringSize</span></code>
+calls return <code class="docutils literal notranslate"><span class="pre">false</span></code> while the ring fills, and the copied frame then lags the
+latest render by <code class="docutils literal notranslate"><span class="pre">ringSize</span></code> calls.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rgbCamera</span><span class="p">.</span><span class="n">setAsyncReadbackEnabled</span><span class="p">(</span><span class="nb">true</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span>
 <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="o">&gt;</span><span class="w"> </span><span class="n">rgba</span><span class="p">;</span>
 <span class="n">viewer</span><span class="p">.</span><span class="n">renderWithExternalCamera</span><span class="p">(</span><span class="o">*</span><span class="n">rgbCam</span><span class="p">,</span><span class="w"> </span><span class="n">rgbCamera</span><span class="p">,</span><span class="w"> </span><span class="p">{});</span>
@@ -239,11 +250,11 @@ copied frame then lags the latest render by <code class="docutils literal notran
 <h2>Fisheye lenses<a class="headerlink" href="#fisheye-lenses" title="Link to this heading"></a></h2>
 <p>A RaiSim camera whose <code class="docutils literal notranslate"><span class="pre">lens</span></code> property is an equidistant fisheye model
 (<code class="docutils literal notranslate"><span class="pre">raisim::CameraLensModel::setOpenCvFisheye(fx,</span> <span class="pre">fy,</span> <span class="pre">cx,</span> <span class="pre">cy,</span> <span class="pre">k1,</span> <span class="pre">k2,</span> <span class="pre">k3,</span> <span class="pre">k4)</span></code>)
-is honoured by <code class="docutils literal notranslate"><span class="pre">raisin::Camera</span></code>. The <code class="docutils literal notranslate"><span class="pre">RGBCamera</span></code> and <code class="docutils literal notranslate"><span class="pre">DepthCamera</span></code>
+is honored by <code class="docutils literal notranslate"><span class="pre">raisin::Camera</span></code>. The <code class="docutils literal notranslate"><span class="pre">RGBCamera</span></code> and <code class="docutils literal notranslate"><span class="pre">DepthCamera</span></code>
 constructors copy the lens, <code class="docutils literal notranslate"><span class="pre">isFisheyeLens()</span></code> reports it, and
-<code class="docutils literal notranslate"><span class="pre">renderWithExternalCamera</span></code> resamples the rendered colour image through the
+<code class="docutils literal notranslate"><span class="pre">renderWithExternalCamera</span></code> resamples the rendered color image through the
 OpenCV/ROS equidistant model with <code class="docutils literal notranslate"><span class="pre">k1</span></code>–<code class="docutils literal notranslate"><span class="pre">k4</span></code> distortion. The source view is
-rasterized with a horizontal field of view of at most 179°. Only the colour
+rasterized with a horizontal field of view of at most 179°. Only the color
 image is remapped; depth from <code class="docutils literal notranslate"><span class="pre">renderDepthPlaneDistance</span></code> stays rectilinear.
 For a camera that is not built from a RaiSim sensor, call
 <code class="docutils literal notranslate"><span class="pre">Camera::setLensModel(lens,</span> <span class="pre">hFovRad)</span></code> and set <code class="docutils literal notranslate"><span class="pre">zoom</span></code> (the vertical field of
@@ -256,21 +267,24 @@ protocol header with feature bits before each request, and the server replies wi
 negotiated feature set. A viewer rejects newer unsupported protocol versions with a clear
 error instead of attempting to parse an incompatible stream.</p>
 <p>Current feature bits cover the explicit header, deformable delta streaming, sim
-control, and contact ownership tags. Deformable objects send mesh topology during initialization or topology
-changes; ordinary update frames send vertex positions only. This keeps dynamic
-cloth/cube streaming cheaper while avoiding binary compression until network bandwidth
-is measured as a bottleneck. Sim-control messages share the same feature-negotiated
-request path.</p>
-<p>The protocol constants live in <code class="docutils literal notranslate"><span class="pre">rayrai/RaisimTcpCommon.hpp</span></code> (namespace
-<code class="docutils literal notranslate"><span class="pre">raisin::tcp_viewer</span></code>):</p>
+control, contact ownership tags, and actuator state. Deformable objects send
+mesh topology during initialization or topology changes; ordinary update
+frames send vertex positions only. This keeps dynamic cloth/cube streaming
+cheaper while avoiding binary compression until network bandwidth is measured
+as a bottleneck. Sim-control messages share the same feature-negotiated request
+path.</p>
+<p>The protocol constants are defined in <code class="docutils literal notranslate"><span class="pre">rayrai/TcpProtocolReader.hpp</span></code>, which
+<code class="docutils literal notranslate"><span class="pre">rayrai/RaisimTcpCommon.hpp</span></code> includes (namespace <code class="docutils literal notranslate"><span class="pre">raisin::tcp_viewer</span></code>):</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">kDefaultPort</span></code> — default <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> port the viewer connects to.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kDefaultPort</span></code> — default <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> port the viewer connects to
+(8080).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">kProtocolVersion</span></code> — the current wire version. Mismatched versions cause
 the viewer to disconnect with a versioned-protocol error.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">kProtocolFeatureExplicitHeader</span></code>, <code class="docutils literal notranslate"><span class="pre">kProtocolFeatureDeformableDelta</span></code>,
-<code class="docutils literal notranslate"><span class="pre">kProtocolFeatureSimControl</span></code>, and <code class="docutils literal notranslate"><span class="pre">kProtocolFeatureContactObjectTags</span></code> —
-the currently-negotiated feature bits;
-<code class="docutils literal notranslate"><span class="pre">kProtocolSupportedFeatures</span></code> is the OR of all bits this build understands.</p></li>
+<code class="docutils literal notranslate"><span class="pre">kProtocolFeatureSimControl</span></code>, <code class="docutils literal notranslate"><span class="pre">kProtocolFeatureContactObjectTags</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">kProtocolFeatureActuatorState</span></code> — the currently negotiated feature bits;
+<code class="docutils literal notranslate"><span class="pre">kProtocolSupportedFeatures</span></code> is the OR of all bits this build understands.
+The viewer rejects a server update that sets any other bit.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">kMaxMessageBytes</span></code> — maximum accepted message size (default 64 MiB),
 overridable at build time via the
 <code class="docutils literal notranslate"><span class="pre">RAISIM_TCP_VIEWER_MAX_MESSAGE_BYTES</span></code> preprocessor define when very large
@@ -278,24 +292,28 @@ scenes need a larger frame budget.</p></li>
 </ul>
 <p>The wire format is a native-endian binary stream. Each TCP frame begins with
 an <code class="docutils literal notranslate"><span class="pre">int32_t</span></code> total-frame-size header (including the 4-byte header itself).
-Scene strings use <code class="docutils literal notranslate"><span class="pre">int32_t</span></code> lengths; sensor-response names use <code class="docutils literal notranslate"><span class="pre">uint64_t</span></code>
-lengths to remain ABI-compatible with the legacy <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> protocol.</p>
+Strings in both directions, including sensor names in sensor-update messages,
+carry <code class="docutils literal notranslate"><span class="pre">int32_t</span></code> byte-length prefixes.</p>
 <p>Custom TCP clients should use <code class="docutils literal notranslate"><span class="pre">raisin::tcp_viewer::BufferReader</span></code> to decode
-frames. It is a non-owning view over the received byte buffer with bounds-
-checked accessors:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisin</span><span class="o">::</span><span class="n">tcp_viewer</span><span class="o">::</span><span class="n">BufferReader</span><span class="w"> </span><span class="nf">reader</span><span class="p">(</span><span class="n">buffer</span><span class="p">);</span>
+frames. It is a non-owning view over the received byte buffer (the buffer must
+outlive the reader) with bounds-checked accessors:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisin</span><span class="o">::</span><span class="n">tcp_viewer</span><span class="o">::</span><span class="n">BufferReader</span><span class="w"> </span><span class="nf">reader</span><span class="p">(</span><span class="n">buffer</span><span class="p">);</span><span class="w">  </span><span class="c1">// const std::vector&lt;char&gt;&amp;</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reader</span><span class="p">.</span><span class="n">read</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">();</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">features</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reader</span><span class="p">.</span><span class="n">read</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span><span class="o">&gt;</span><span class="p">();</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reader</span><span class="p">.</span><span class="n">readString</span><span class="p">();</span>
-<span class="k">auto</span><span class="w"> </span><span class="n">positions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reader</span><span class="p">.</span><span class="n">readVector</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">positions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reader</span><span class="p">.</span><span class="n">readFloatVector</span><span class="p">();</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">reader</span><span class="p">.</span><span class="n">ok</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="c1">// malformed frame; drop the connection</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Each read advances <code class="docutils literal notranslate"><span class="pre">reader.offset()</span></code> and sets <code class="docutils literal notranslate"><span class="pre">reader.ok</span> <span class="pre">=</span> <span class="pre">false</span></code> if there
-is not enough data left, so callers can decode an entire frame and check
-<code class="docutils literal notranslate"><span class="pre">ok</span></code> at the end rather than after every field.</p>
+<p>Each read advances the cursor (<code class="docutils literal notranslate"><span class="pre">reader.offset()</span></code>) and clears <code class="docutils literal notranslate"><span class="pre">reader.ok</span></code> if
+there is not enough data left or a length prefix is invalid. The flag is
+sticky, so callers can decode an entire frame and check <code class="docutils literal notranslate"><span class="pre">ok</span></code> at the end
+rather than after every field. Besides <code class="docutils literal notranslate"><span class="pre">read&lt;T&gt;()</span></code> and <code class="docutils literal notranslate"><span class="pre">readString()</span></code>, the
+reader provides <code class="docutils literal notranslate"><span class="pre">readBool</span></code>, <code class="docutils literal notranslate"><span class="pre">readVec3f</span></code>, <code class="docutils literal notranslate"><span class="pre">readVec4f</span></code>, <code class="docutils literal notranslate"><span class="pre">readQuatWxyz</span></code>,
+<code class="docutils literal notranslate"><span class="pre">readFloatVector</span></code>, <code class="docutils literal notranslate"><span class="pre">readIntVector</span></code>, <code class="docutils literal notranslate"><span class="pre">readByteVector</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">readColorMap</span></code>.</p>
 <p>The current viewer also services <code class="docutils literal notranslate"><span class="pre">MeasurementSource::MANUAL</span></code> RGB/depth
 requests received in the scene stream. It renders from the streamed camera
 pose and lens, returns BGRA or metric-depth buffers in a sensor-update message,
@@ -309,15 +327,20 @@ full request/response sequence and troubleshooting guidance.</p>
 passes render RaiSim world objects only; visualization-only objects are intentionally
 ignored so they cannot leak into training observations.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">renderDepthPlaneDistance</span></code> renders a linear depth texture. Its optional
-<code class="docutils literal notranslate"><span class="pre">drawVisualizationObjects</span></code> argument (default <code class="docutils literal notranslate"><span class="pre">false</span></code>) adds custom and
-instanced visuals; only detectable ones are included unless
+<li><p><code class="docutils literal notranslate"><span class="pre">renderDepthPlaneDistance</span></code> renders camera-plane distance into the camera’s
+<code class="docutils literal notranslate"><span class="pre">R32F</span></code> linear-depth texture; pixels without geometry are <code class="docutils literal notranslate"><span class="pre">0</span></code>. Its
+optional <code class="docutils literal notranslate"><span class="pre">drawVisualizationObjects</span></code> argument (default <code class="docutils literal notranslate"><span class="pre">false</span></code>) adds custom
+and instanced visuals; only detectable ones are included unless
 <code class="docutils literal notranslate"><span class="pre">visualizationObjectsMustBeDetectable</span></code> is <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">measureSpinningLidarSingleDrawGPU</span></code> renders a LiDAR slice using a
-spherical chunk shader. Pass <code class="docutils literal notranslate"><span class="pre">objectToExclude</span></code> (for example the robot
+<li><p><code class="docutils literal notranslate"><span class="pre">measureSpinningLidarSingleDrawGPU</span></code> renders, using a spherical chunk
+shader, the yaw span the LiDAR swept since the previous call (from the world
+time and the spin rate) and stores the hits, in the sensor frame, with
+<code class="docutils literal notranslate"><span class="pre">SpinningLidar::setScan</span></code>. Pass <code class="docutils literal notranslate"><span class="pre">objectToExclude</span></code> (for example the robot
 carrying the sensor) to leave one object out of the scan.</p></li>
 </ul>
-<p>You can retrieve the depth texture via <code class="docutils literal notranslate"><span class="pre">getDepthPlaneTexture()</span></code>.</p>
+<p>Read the depth texture of an external camera with
+<code class="docutils literal notranslate"><span class="pre">Camera::getLinearDepthTexture()</span></code>; <code class="docutils literal notranslate"><span class="pre">getDepthPlaneTexture()</span></code> returns the one
+of the viewer’s internal camera.</p>
 <p>LiDAR usage has two paths. Prefer the rayrai GPU path when rayrai is available:</p>
 <ol class="arabic simple">
 <li><p>GPU slice rendering via <code class="docutils literal notranslate"><span class="pre">measureSpinningLidarSingleDrawGPU</span></code> for fast

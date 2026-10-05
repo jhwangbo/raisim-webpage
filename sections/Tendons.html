@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tendons &mdash; raisim 2.7.0 documentation</title>
+  <title>Tendons &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -75,14 +75,15 @@
 <li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Tendons</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="tendons/CodeExamples.html">Tendon code examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tendons/Physics.html">Tendon physics</a></li>
@@ -100,7 +101,6 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -149,9 +149,12 @@ with the contact solver. Spatial tendons are drawn automatically by Rayrai and
 by the TCP viewer connected to <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code>.</p>
 <a class="reference internal image-reference" href="../_images/tendons.png"><img alt="Elastic suspensions, cylinder and sphere wrapping, and coupled joints in Rayrai" src="../_images/tendons.png" style="width: 100%;" />
 </a>
-<p>Straight length constraints use this same tendon API with two sites. The former
-wire classes have been removed; see <a class="reference internal" href="Constraints.html"><span class="doc">Constraints</span></a> for migration mappings
-and legacy XML import behavior.</p>
+<p>Straight length constraints use this same tendon API with two sites. The legacy
+C++ wire functions (<code class="docutils literal notranslate"><span class="pre">addStiffWire</span></code>, <code class="docutils literal notranslate"><span class="pre">addCompliantWire</span></code>, <code class="docutils literal notranslate"><span class="pre">addCustomWire</span></code>)
+remain as source-compatible adapters: each wire is a view of a two-site spatial
+tendon, returned by <code class="docutils literal notranslate"><span class="pre">LengthConstraint::getTendon()</span></code>. See <a class="reference internal" href="Constraints.html"><span class="doc">Constraints</span></a>
+for the mapping from wire behavior to tendon properties and for legacy XML
+import.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tendons/CodeExamples.html">Tendon code examples</a><ul>
@@ -325,8 +328,8 @@ optional first argument supplies an activation-key path.</p>
 </div>
 </div>
 <p>Download <a class="reference download internal" download="" href="../_downloads/14d365005521491202b544a3363e618c/tendon_quickstart.cpp"><code class="xref download docutils literal notranslate"><span class="pre">the</span> <span class="pre">complete</span> <span class="pre">source</span></code></a>.
-For focused, tested C++ recipes, including current-length locks and wire API
-comparisons, see <a class="reference internal" href="tendons/CodeExamples.html"><span class="doc">Tendon code examples</span></a>.
+For focused, tested C++ recipes, including current-length locks and straight
+two-site connections, see <a class="reference internal" href="tendons/CodeExamples.html"><span class="doc">Tendon code examples</span></a>.
 Build and run the larger <code class="docutils literal notranslate"><span class="pre">tendon_elastic</span></code>, <code class="docutils literal notranslate"><span class="pre">tendon_pulleys</span></code>,
 <code class="docutils literal notranslate"><span class="pre">tendon_coupling</span></code>, and <code class="docutils literal notranslate"><span class="pre">rayrai_tendons</span></code> programs using
 <a class="reference internal" href="tendons/Examples.html"><span class="doc">Tendon examples and Rayrai</span></a>.</p>
@@ -421,18 +424,28 @@ tendons that reference it, including references through wrapping guides or side
 sites, and removes their dependent couplings. Discard borrowed pointers after
 such removals. A path and its joint-term list are immutable through the public
 API: remove and recreate a tendon to change its topology.</p>
-<p>For particle sites, <code class="docutils literal notranslate"><span class="pre">localIndex</span></code> identifies one particle. Keep particle indices
-stable while attached. Remove/recreate the tendon before deleting or reordering
-particles. World ownership does not turn particle indices into stable handles.</p>
+<p>For particle sites, <code class="docutils literal notranslate"><span class="pre">localIndex</span></code> identifies one particle, not a stable
+handle. <code class="docutils literal notranslate"><span class="pre">GranularSystem::removeParticle()</span></code> (also used by the bulk removal
+functions) moves the last particle into the removed index. The world then
+removes tendons attached to the removed particle, together with their couplings,
+and remaps sites on the moved particle to its new index. Other operations that
+replace or reorder particles, such as <code class="docutils literal notranslate"><span class="pre">GranularSystem::loadGranularState()</span></code>,
+are not tracked: remove the affected tendons first and recreate them afterward.</p>
 <p><code class="docutils literal notranslate"><span class="pre">setEnabled(false)</span></code> disables the tendon’s solver contributions and, after
 scene synchronization, its drawing. Couplings involving that tendon also stop
 contributing. Geometry remains inspectable. The next simulated step clears its
 reported force components; disabling does not retroactively change previous
 step results. The force-activation state is retained and is not advanced while
 disabled. Re-enabling resumes from that state.</p>
-<p>Enabled attachments are kept awake. Participating articulated systems use
-semi-implicit position integration for the constrained step so their positions
-advance consistently with the solved end-step velocities.</p>
+<p>With sleeping enabled (the default), bodies connected by an enabled tendon or
+coupling belong to one sleeping island and sleep and wake together. A tendon
+wakes its attachments while its length is changing, while its drive is active
+(nonzero feedforward force, activation state, or gain), or while a length lock
+has not converged. A tendon that only holds a steady load lets its bodies sleep,
+as a resting contact does. Changing a tendon’s properties, drive, or enable state
+wakes its attached objects. Participating articulated systems use semi-implicit
+position integration for the constrained step so their positions advance
+consistently with the solved end-step velocities.</p>
 <p>Make tendon topology changes between complete steps. Adding/removing tendons or
 couplings between <code class="docutils literal notranslate"><span class="pre">integrate1()</span></code> and <code class="docutils literal notranslate"><span class="pre">integrate2()</span></code> is rejected. Apply
 configuration/control changes before a complete step as well. In a server

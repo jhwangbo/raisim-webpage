@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Benchmark &mdash; raisim 2.7.0 documentation</title>
+  <title>Benchmark &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -81,17 +81,17 @@
 <li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -129,14 +129,15 @@
              
   <section id="benchmark">
 <h1>Benchmark<a class="headerlink" href="#benchmark" title="Link to this heading"></a></h1>
-<p>This page reports representative timing comparisons between RaiSim and another
-widely used multi-body physics engine (MuJoCo) on articulated-dynamics
-workloads. These are historical measurements from the private release-validation
-suite, with the machine and workload settings recorded below. For general tuning guidance, see <a class="reference internal" href="Performance.html"><span class="doc">Performance</span></a>.</p>
+<p>This page reports timing comparisons between RaiSim and another widely used multi-body physics
+engine (MuJoCo) on seven workloads: articulated chains, the ANYmal quadruped standing, falling and
+standing on rough terrain, a pile of rigid primitives, and Theo Jansen’s Strandbeest, whose 42
+closed kinematic loops make it a test of loop constraints. The measurements come from the private
+release-validation suite, with the machine and workload settings recorded below. For general
+tuning guidance, see <a class="reference internal" href="Performance.html"><span class="doc">Performance</span></a>.</p>
 <section id="environment">
 <h2>Environment<a class="headerlink" href="#environment" title="Link to this heading"></a></h2>
-<p>All numbers on this page were collected on a single machine with the following
-configuration.</p>
+<p>All numbers on this page were collected on a single machine with the following configuration.</p>
 <div class="benchmark-table-block benchmark-table-environment docutils container">
 <table class="docutils align-default">
 <colgroup>
@@ -150,45 +151,41 @@ configuration.</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Machine</p></td>
-<td><p>Apple MacBook Air (<code class="docutils literal notranslate"><span class="pre">MacBookAir10,1</span></code>), Apple M1 SoC, 8 CPU cores
-(4 performance + 4 efficiency), 8 GB unified memory.</p></td>
+<td><p>Desktop with an AMD Ryzen 9 3950X (16 cores, 32 threads, Zen 2), 64 GB of memory.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Operating system</p></td>
-<td><p>macOS 26.5.1 (build <code class="docutils literal notranslate"><span class="pre">25F80</span></code>), arm64.</p></td>
+<td><p>Ubuntu 26.04.1 LTS, Linux 7.0, x86-64.</p></td>
 </tr>
 <tr class="row-even"><td><p>Compiler</p></td>
-<td><p>Apple Clang 21.0.0 (Xcode toolchain), C++20, target <code class="docutils literal notranslate"><span class="pre">arm64-apple-darwin</span></code>.</p></td>
+<td><p>Clang 20.1.8, C++20.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Benchmark run</p></td>
-<td><p>August 7, 2026, from clean RaiSim revision
-<code class="docutils literal notranslate"><span class="pre">84f7ad114f890aa31ca5255e5481393d61830895</span></code>
-(<code class="docutils literal notranslate"><span class="pre">v0.4.1-1136-g84f7ad11</span></code>).</p></td>
+<td><p>October 5, 2026, from the RaiSim 2.7 development tree (revision <code class="docutils literal notranslate"><span class="pre">b31a6ae6c</span></code> with the
+changes of this release cycle).</p></td>
 </tr>
 <tr class="row-even"><td><p>RaiSim build</p></td>
-<td><p>Current optimized RaiSim build, <code class="docutils literal notranslate"><span class="pre">CMAKE_BUILD_TYPE=Release</span></code>
-(<code class="docutils literal notranslate"><span class="pre">-O3</span> <span class="pre">-DNDEBUG</span></code>) with <code class="docutils literal notranslate"><span class="pre">-mcpu=apple-m1</span></code>.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CMAKE_BUILD_TYPE=Release</span></code> (<code class="docutils literal notranslate"><span class="pre">-O3</span> <span class="pre">-DNDEBUG</span> <span class="pre">-march=native</span></code>).</p></td>
 </tr>
 <tr class="row-odd"><td><p>MuJoCo build</p></td>
-<td><p>MuJoCo 3.4.1, compiled from source as part of the benchmark suite
-(same compiler and <code class="docutils literal notranslate"><span class="pre">Release</span></code> flags).</p></td>
+<td><p>MuJoCo 3.13.0, compiled from source as part of the benchmark suite with the same compiler
+and its own <code class="docutils literal notranslate"><span class="pre">Release</span></code> flags (<code class="docutils literal notranslate"><span class="pre">-O3</span> <span class="pre">-DNDEBUG</span> <span class="pre">-mavx</span></code>).</p></td>
 </tr>
 <tr class="row-even"><td><p>Threading</p></td>
-<td><p>Single threaded. Both engines run the simulation loop on one core; no
-multi-threading or SIMD batching across bodies is used.
-<code class="docutils literal notranslate"><span class="pre">OMP_NUM_THREADS</span></code>, <code class="docutils literal notranslate"><span class="pre">OPENBLAS_NUM_THREADS</span></code>, <code class="docutils literal notranslate"><span class="pre">MKL_NUM_THREADS</span></code>,
-and <code class="docutils literal notranslate"><span class="pre">VECLIB_MAXIMUM_THREADS</span></code> were all set to 1.</p></td>
+<td><p>Single threaded, pinned to one core with <code class="docutils literal notranslate"><span class="pre">taskset</span></code>. Neither engine uses
+multi-threading or SIMD batching across bodies. <code class="docutils literal notranslate"><span class="pre">OMP_NUM_THREADS</span></code>,
+<code class="docutils literal notranslate"><span class="pre">OPENBLAS_NUM_THREADS</span></code> and <code class="docutils literal notranslate"><span class="pre">MKL_NUM_THREADS</span></code> were set to 1.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Metric</p></td>
-<td><p>Wall-clock seconds for the timed simulation loop of each scene (scene
-construction is excluded). Lower is better; <code class="docutils literal notranslate"><span class="pre">Speedup</span> <span class="pre">(R/M)</span></code> is the
-MuJoCo time divided by the RaiSim time.</p></td>
+<td><p>Wall-clock seconds of each benchmark run, measured by the benchmark launcher. This includes
+building the scene, which takes a few milliseconds except for the Strandbeest (see
+<a class="reference internal" href="#results">Results</a>). Lower is better. <code class="docutils literal notranslate"><span class="pre">Speedup</span></code> is the median MuJoCo time divided by the median
+RaiSim time, so values above 1 mean RaiSim was faster.</p></td>
 </tr>
 <tr class="row-even"><td><p>Settings</p></td>
-<td><p>Each benchmark/backend pair was run three times with its default
-arguments (the per-benchmark step counts listed below). The table and
-charts report the median; the table also shows the minimum and maximum.
-The RaiSim and MuJoCo variants use matching scene parameters and the
-same integration timestep, so the two engines simulate equivalent scenes.</p></td>
+<td><p>Each benchmark and backend was run three times with its default arguments (the step
+counts listed below). The table and the charts report the median; the table also shows the
+minimum and maximum. The RaiSim and MuJoCo variants use matching scene parameters and the
+same time step, so the two engines simulate equivalent scenes.</p></td>
 </tr>
 </tbody>
 </table>
@@ -196,10 +193,9 @@ same integration timestep, so the two engines simulate equivalent scenes.</p></t
 </section>
 <section id="measure-the-distributed-package">
 <h2>Measure the distributed package<a class="headerlink" href="#measure-the-distributed-package" title="Link to this heading"></a></h2>
-<p>The comparison runner and its MuJoCo backend are maintained in the private
-engine repository. They are not build targets in <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code>. The results
-below describe that recorded run, rather than a benchmark of the installed
-2.7.0 package.</p>
+<p>The comparison runner and its MuJoCo backend are maintained in the private engine repository. They
+are not build targets in <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code>. The results below describe that recorded run, rather than
+a benchmark of the installed 2.8.0 package.</p>
 <p>To measure the binary package on your machine, build the public timing examples:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build-examples<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span>-DRAISIM_EXAMPLE<span class="o">=</span>ON
 cmake<span class="w"> </span>--build<span class="w"> </span>build-examples<span class="w"> </span>--target<span class="w"> </span>anymal_standing_benchmark<span class="w"> </span><span class="se">\</span>
@@ -209,19 +205,18 @@ cmake<span class="w"> </span>--build<span class="w"> </span>build-examples<span 
 </pre></div>
 </div>
 <p>On Windows, build with <code class="docutils literal notranslate"><span class="pre">--config</span> <span class="pre">Release</span></code> and run
-<code class="docutils literal notranslate"><span class="pre">build-examples\\bin\\anymal_standing_benchmark.exe</span></code>. Repeat the same command
-at least three times, keeping the package version, scene, timestep, step count,
-and machine fixed. These examples measure RaiSim only and do not reproduce the
-private comparison scenes or the published ratios. See <a class="reference internal" href="BuildAndTest.html"><span class="doc">Build, Test, and Benchmark</span></a>
-for other available timing examples.</p>
+<code class="docutils literal notranslate"><span class="pre">build-examples\bin\anymal_standing_benchmark.exe</span></code>. Repeat the same command at least three times,
+keeping the package version, scene, timestep, step count, and machine fixed. These examples measure
+RaiSim only and do not reproduce the private comparison scenes or the published ratios. See
+<a class="reference internal" href="BuildAndTest.html"><span class="doc">Build, Test, and Benchmark</span></a> for other available timing examples.</p>
 </section>
 <section id="what-the-benchmarks-simulate">
 <h2>What the benchmarks simulate<a class="headerlink" href="#what-the-benchmarks-simulate" title="Link to this heading"></a></h2>
-<p>Each scene is described below with its articulation (joint types and degrees of
-freedom), its collision/contact content, the integration timestep, and the
-number of simulation steps timed. “DOF” is the number of generalized velocity
-coordinates the dynamics solves for. A floating base contributes 6 DOF
-(3 translation + 3 rotation).</p>
+<p>Each scene is described below with its articulation (joint types and degrees of freedom), its
+collision and contact content, the integration time step, and the number of simulation steps. “DOF”
+is the number of generalized velocity coordinates the dynamics solves for. A floating base
+contributes 6 DOF (3 translation + 3 rotation). Scenes without a ground are shown above a floor
+for reference.</p>
 <div class="benchmark-table-block benchmark-table-scenes docutils container">
 <table class="docutils align-default">
 <colgroup>
@@ -238,44 +233,75 @@ coordinates the dynamics solves for. A floating base contributes 6 DOF
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">chain10_speed</span></code></p></td>
 <td><p>100,000</p></td>
-<td><p>One articulated chain with a <strong>fixed base</strong> and 10 links joined by
-<strong>10 spherical joints</strong> (3 DOF each) → <strong>30 DOF</strong>. Each joint has a
-spring-damper. <strong>No collision geometry</strong> (the link spheres are visual
-only), so there is <strong>no contact</strong> — this is pure articulated forward
-dynamics. Timestep 0.001 s.</p></td>
+<td><a class="reference internal image-reference" href="../_images/benchmark_chain10.png"><img alt="A chain of ten spheres hanging from a fixed point, curling up." src="../_images/benchmark_chain10.png" style="width: 100%;" />
+</a>
+<p>One articulated chain with a <strong>fixed base</strong> and 10 links joined by <strong>10 spherical
+joints</strong> (3 DOF each) → <strong>30 DOF</strong>. Each joint has a spring-damper whose rest angle bends
+it by 90°, so the hanging chain curls up and keeps moving. <strong>No collision geometry</strong>
+(the spheres are visual only), so there is <strong>no contact</strong>: this is pure articulated
+forward dynamics. Time step 0.001 s.</p>
+</td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">chain20_speed</span></code></p></td>
 <td><p>100,000</p></td>
-<td><p>Same as <code class="docutils literal notranslate"><span class="pre">chain10_speed</span></code> but 20 links and <strong>20 spherical joints</strong> →
-<strong>60 DOF</strong>. No collision, no contact. Timestep 0.001 s.</p></td>
+<td><a class="reference internal image-reference" href="../_images/benchmark_chain20.png"><img alt="A chain of twenty spheres hanging from a fixed point, curling up." src="../_images/benchmark_chain20.png" style="width: 100%;" />
+</a>
+<p>Same as <code class="docutils literal notranslate"><span class="pre">chain10_speed</span></code> but 20 links and <strong>20 spherical joints</strong> → <strong>60 DOF</strong>. No
+collision, no contact. Time step 0.001 s.</p>
+</td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">anymal_standing</span></code></p></td>
 <td><p>1,000,000</p></td>
-<td><p>One ANYmal quadruped: <strong>floating base + 12 revolute joints = 18 DOF</strong>,
-under PD position control. It stands on a flat ground plane. ANYmal’s
-collision geometry is primitive shapes (a trunk box plus cylinders and
-spheres on the legs); the four feet rest on the ground, giving about
-four persistent contacts. Friction coefficient 0.8, timestep 0.002 s.</p></td>
+<td><a class="reference internal image-reference" href="../_images/benchmark_anymal_standing.png"><img alt="ANYmal standing on a flat ground." src="../_images/benchmark_anymal_standing.png" style="width: 100%;" />
+</a>
+<p>One ANYmal quadruped: <strong>floating base + 12 revolute joints = 18 DOF</strong>, under PD position
+control. It stands on a flat ground plane. ANYmal’s collision geometry is primitive
+shapes (a trunk box plus cylinders and spheres on the legs); the four feet rest on the
+ground, giving about four persistent contacts. Friction coefficient 0.8, time step
+0.002 s.</p>
+</td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">anymal_falling</span></code></p></td>
 <td><p>100,000</p></td>
-<td><p>The same ANYmal (<strong>18 DOF</strong>), but <strong>no ground is added</strong> — the robot
-falls freely under gravity. There is <strong>no contact</strong>, so this isolates
-floating-base articulated dynamics. Timestep 0.002 s.</p></td>
+<td><a class="reference internal image-reference" href="../_images/benchmark_anymal_falling.png"><img alt="ANYmal in the air, falling." src="../_images/benchmark_anymal_falling.png" style="width: 100%;" />
+</a>
+<p>The same ANYmal (<strong>18 DOF</strong>), but <strong>no ground is added</strong>: the robot falls freely under
+gravity. There is <strong>no contact</strong>, so this isolates floating-base articulated dynamics.
+Time step 0.002 s.</p>
+</td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">heightmap_anymal_speed</span></code></p></td>
 <td><p>200,000</p></td>
-<td><p>One ANYmal (<strong>18 DOF</strong>) on a procedurally generated <strong>fractal
-height-map terrain</strong> (20 m × 20 m, 100 × 100 samples, 3 fractal
-octaves). Contacts form between the feet and the terrain cells.
-Timestep 0.002 s.</p></td>
+<td><a class="reference internal image-reference" href="../_images/benchmark_heightmap_anymal.png"><img alt="ANYmal standing on rolling fractal terrain." src="../_images/benchmark_heightmap_anymal.png" style="width: 100%;" />
+</a>
+<p>One ANYmal (<strong>18 DOF</strong>) on a procedurally generated <strong>fractal height-map terrain</strong>
+(20 m × 20 m, 100 × 100 samples, 3 fractal octaves). Contacts form between the feet and
+the terrain cells. Time step 0.002 s.</p>
+</td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">primitive_speed</span></code></p></td>
 <td><p>100,000</p></td>
-<td><p><strong>No articulated system.</strong> 32 rigid bodies — 16 boxes (0.4 m cubes) and
-16 spheres (radius 0.15 m) — arranged in a 4 × 4 grid, each sphere
-stacked above a box, dropped onto a flat ground plane. Contacts are
-box–ground, sphere–box, and box–box primitive pairs. Timestep 0.002 s.</p></td>
+<td><a class="reference internal image-reference" href="../_images/benchmark_primitive_speed.png"><img alt="Sixteen boxes on a ground plane, each with a sphere resting on top." src="../_images/benchmark_primitive_speed.png" style="width: 100%;" />
+</a>
+<p><strong>No articulated system.</strong> 32 rigid bodies, 16 boxes (0.4 m cubes) and 16 spheres
+(radius 0.15 m), arranged in a 4 × 4 grid with 0.6 m spacing, each sphere dropped onto a
+box, on a flat ground plane. Contacts are box–ground and sphere–box primitive pairs
+(neighboring boxes are 0.2 m apart). Time step 0.002 s.</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">strandbeest</span></code></p></td>
+<td><p>3,000</p></td>
+<td><a class="reference internal image-reference" href="../_images/constraints_strandbeest.png"><img alt="The Strandbeest walking on its twelve legs." src="../_images/constraints_strandbeest.png" style="width: 100%;" />
+</a>
+<p>Theo Jansen’s Strandbeest, a 12-legged walking linkage driven by one crank, imported from
+OpenUSD: <strong>floating base + 73 revolute joints = 79 DOF</strong>. Its <strong>42 closed loops</strong> are
+hinge closures, each two pins on the hinge axis: <strong>84 pin constraints</strong>, all coupled
+through the crank. A velocity-controlled crank turns once per second, and the machine
+walks about 3.8 m on its 12 feet in the 3 s. Time step 0.001 s. The MuJoCo variant is the
+same model converted to MJCF, its loops as connect equalities, stiffened until they stay
+as tightly closed as RaiSim’s: the worst loop gap over the run is 25 µm in RaiSim and
+28 µm in MuJoCo.</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -283,7 +309,7 @@ box–ground, sphere–box, and box–box primitive pairs. Timestep 0.002 s.</p>
 </section>
 <section id="results">
 <h2>Results<a class="headerlink" href="#results" title="Link to this heading"></a></h2>
-<p>In the recorded run, RaiSim was 2.59× to 6.23× faster than MuJoCo across these six workloads. The
+<p>In the recorded run, RaiSim was 1.91× to 6.21× faster than MuJoCo across these seven workloads. The
 charts below show both the median timings and the relative speedup.</p>
 <div class="benchmark-graph-block docutils container">
 <figure class="align-default">
@@ -310,53 +336,60 @@ charts below show both the median timings and the relative speedup.</p>
 <tr class="row-odd"><th class="head"><p>Benchmark</p></th>
 <th class="head"><p>RaiSim median (min–max)</p></th>
 <th class="head"><p>MuJoCo median (min–max)</p></th>
-<th class="head"><p>Speedup (R/M)</p></th>
+<th class="head"><p>Speedup</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Chain20 speed</p></td>
-<td><p>0.433 (0.433–0.434)</p></td>
-<td><p>2.697 (2.694–2.700)</p></td>
-<td><p>6.23×</p></td>
+<td><p>0.569 (0.566–0.570)</p></td>
+<td><p>3.535 (3.533–3.551)</p></td>
+<td><p>6.21×</p></td>
 </tr>
 <tr class="row-odd"><td><p>Heightmap ANYmal speed</p></td>
-<td><p>0.914 (0.913–0.916)</p></td>
-<td><p>4.346 (4.339–4.375)</p></td>
-<td><p>4.75×</p></td>
+<td><p>1.152 (1.151–1.160)</p></td>
+<td><p>5.519 (5.498–5.567)</p></td>
+<td><p>4.79×</p></td>
 </tr>
-<tr class="row-even"><td><p>Primitive speed</p></td>
-<td><p>2.729 (2.664–2.744)</p></td>
-<td><p>10.904 (10.793–11.076)</p></td>
-<td><p>4.00×</p></td>
+<tr class="row-even"><td><p>Chain10 speed</p></td>
+<td><p>0.283 (0.283–0.286)</p></td>
+<td><p>1.093 (1.092–1.096)</p></td>
+<td><p>3.86×</p></td>
 </tr>
-<tr class="row-odd"><td><p>Chain10 speed</p></td>
-<td><p>0.214 (0.214–0.215)</p></td>
-<td><p>0.739 (0.739–0.742)</p></td>
-<td><p>3.46×</p></td>
+<tr class="row-odd"><td><p>Primitive speed</p></td>
+<td><p>3.376 (3.357–3.395)</p></td>
+<td><p>8.804 (8.754–8.822)</p></td>
+<td><p>2.61×</p></td>
 </tr>
-<tr class="row-even"><td><p>ANYmal standing</p></td>
-<td><p>3.528 (3.515–3.560)</p></td>
-<td><p>10.969 (10.968–11.359)</p></td>
-<td><p>3.11×</p></td>
-</tr>
-<tr class="row-odd"><td><p>ANYmal falling</p></td>
-<td><p>0.171 (0.171–0.174)</p></td>
-<td><p>0.444 (0.444–0.449)</p></td>
+<tr class="row-even"><td><p>ANYmal falling</p></td>
+<td><p>0.283 (0.283–0.287)</p></td>
+<td><p>0.732 (0.731–0.733)</p></td>
 <td><p>2.59×</p></td>
+</tr>
+<tr class="row-odd"><td><p>ANYmal standing</p></td>
+<td><p>5.519 (5.466–5.740)</p></td>
+<td><p>13.819 (13.805–13.861)</p></td>
+<td><p>2.50×</p></td>
+</tr>
+<tr class="row-even"><td><p>Strandbeest</p></td>
+<td><p>0.258 (0.254–0.287)</p></td>
+<td><p>0.492 (0.487–0.493)</p></td>
+<td><p>1.91×</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>Absolute times depend on hardware, compiler, and scene configuration, so treat
-them as relative magnitudes rather than fixed specifications.</p>
+<p>The Strandbeest’s times include loading the scene: RaiSim imports the OpenUSD file (about 0.05 s),
+while MuJoCo loads the prepared MJCF. The simulation loop alone takes 78 µs per step in RaiSim and
+162 µs in MuJoCo, a ratio of 2.08.</p>
+<p>Absolute times depend on hardware, compiler, and scene configuration, so treat them as relative
+magnitudes rather than fixed specifications.</p>
 </section>
 <section id="interpreting-the-comparison">
 <h2>Interpreting the comparison<a class="headerlink" href="#interpreting-the-comparison" title="Link to this heading"></a></h2>
-<p>These measurements describe the six scenes and configurations above. They do
-not isolate the contribution of the dynamics algorithm, contact solver, or
-implementation details, and do not establish a speedup for other scenes or
-package versions. Use the public timing examples and your application workload
-when evaluating the current binary package.</p>
+<p>These measurements describe the seven scenes and configurations above. They do not isolate the
+contribution of the dynamics algorithm, contact solver, or implementation details, and do not
+establish a speedup for other scenes or package versions. Use the public timing examples and your
+application workload when evaluating the current binary package.</p>
 </section>
 </section>
 

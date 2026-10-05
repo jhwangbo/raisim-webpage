@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Visualization &mdash; raisim 2.7.0 documentation</title>
+  <title>Visualization &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -79,17 +79,17 @@
 <li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -127,8 +127,8 @@
              
   <section id="visualization">
 <h1>Visualization<a class="headerlink" href="#visualization" title="Link to this heading"></a></h1>
-<p>RaiSim has two current visualization workflows. Choose the workflow based on
-where rendering should happen.</p>
+<p>RaiSim has two visualization workflows. Choose one based on where rendering
+should happen.</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 28.0%" />
@@ -145,7 +145,8 @@ where rendering should happen.</p>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> + TCP viewer</p></td>
 <td><p>Your simulation should publish world state and a separate viewer should
 display it.</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code> and source-built <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code> and <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> (built with the
+examples)</p></td>
 </tr>
 <tr class="row-odd"><td><p>In-process rayrai</p></td>
 <td><p>Your application needs direct access to OpenGL textures, RGB/depth
@@ -159,7 +160,7 @@ images, screenshots, PBR assets, or custom UI embedding.</p></td>
 <h2>RaisimServer + TCP Viewer<a class="headerlink" href="#raisimserver-tcp-viewer" title="Link to this heading"></a></h2>
 <p>This is the simplest way to inspect a simulation while keeping the renderer out
 of the simulation process. Your application owns the world and starts a
-<code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code>:</p>
+<code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code>, which listens on <code class="docutils literal notranslate"><span class="pre">127.0.0.1:8080</span></code> by default:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
 <span class="n">raisim</span><span class="o">::</span><span class="n">RaisimServer</span><span class="w"> </span><span class="nf">server</span><span class="p">(</span><span class="o">&amp;</span><span class="n">world</span><span class="p">);</span>
 <span class="n">server</span><span class="p">.</span><span class="n">launchServer</span><span class="p">(</span><span class="mi">8080</span><span class="p">);</span>
@@ -169,25 +170,28 @@ of the simulation process. Your application owns the world and starts a
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Start the source-built viewer in one sourced terminal:</p>
+<p>Start the viewer, which is built with the examples, in a terminal where
+<code class="docutils literal notranslate"><span class="pre">raisim_env.sh</span></code> is sourced:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>./raisim_env.sh
 ./build-examples/examples/rayrai_tcp_viewer
 </pre></div>
 </div>
-<p>Then run a server-based example in another sourced terminal:</p>
+<p>Then run a server-based example in a second terminal, also sourced:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>./raisim_env.sh
 ./build-examples/examples/primitive_grid
 </pre></div>
 </div>
-<p>The viewer connects to port <code class="docutils literal notranslate"><span class="pre">8080</span></code> by default. Use this workflow for normal
-debug visualization, object inspection, interactive camera control, and
-viewer-rendered manual RGB/depth cameras. Camera requests and completed BGRA or
-metric-depth buffers share the same TCP session as scene updates.</p>
+<p>The viewer connects to <code class="docutils literal notranslate"><span class="pre">127.0.0.1:8080</span></code> by default. Use this workflow for
+everyday debug visualization, object inspection, interactive camera control,
+simulation control (pause, step, push and reposition bodies), and
+viewer-rendered manual RGB/depth cameras. Camera requests and the returned BGRA
+or metric-depth images share the TCP connection with the scene updates. See
+<a class="reference internal" href="RayraiTcpViewer.html"><span class="doc">Rayrai TCP Viewer</span></a> for the viewer itself.</p>
 <p>Use in-process rayrai when the application must own the OpenGL context, access
 textures without a network round trip, include custom render-only objects, or
-continue producing camera frames without a viewer process. Use RaiSim-side CPU
-depth when rayrai is unavailable or a deterministic headless ray-query fallback
-is explicitly required.</p>
+keep producing camera frames without a viewer process. Use RaiSim’s CPU depth
+computation when rayrai is unavailable, or when a deterministic headless ray
+query is explicitly required.</p>
 </section>
 <section id="in-process-rayrai">
 <h2>In-Process rayrai<a class="headerlink" href="#in-process-rayrai" title="Link to this heading"></a></h2>
@@ -217,8 +221,11 @@ and direct RGB/depth readback.</p>
 <section id="which-page-next">
 <h2>Which Page Next?<a class="headerlink" href="#which-page-next" title="Link to this heading"></a></h2>
 <ul class="simple">
+<li><p><a class="reference internal" href="RayraiTcpViewer.html"><span class="doc">Rayrai TCP Viewer</span></a> documents the TCP viewer: panels, controls,
+command-line options and the wire format for custom clients.</p></li>
 <li><p><a class="reference internal" href="RaisimServer.html"><span class="doc">Raisim Server</span></a> documents the server lifecycle, thread-safety boundary,
-synchronous request loop, and server-side visual helper API.</p></li>
+simulation control, synchronous request loop, and server-side visual helper
+API.</p></li>
 <li><p><a class="reference internal" href="Rayrai.html"><span class="doc">rayrai Visualizer</span></a> documents <code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code>, render-quality controls, custom
 visuals, glTF/Blender import, offscreen contexts, sensors, and rayrai API
 reference.</p></li>

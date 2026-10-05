@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Build, Test, and Benchmark &mdash; raisim 2.7.0 documentation</title>
+  <title>Build, Test, and Benchmark &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -56,6 +56,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#build-examples">Build examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#debug-and-release-package-variants">Debug and Release package variants</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#timing-examples">Timing examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tests">Tests</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#build-the-documentation">Build the documentation</a></li>
 </ul>
 </li>
@@ -81,17 +82,17 @@
 <li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -151,22 +152,33 @@ repository layout and build output paths, see <a class="reference internal" href
 <td><p>Build C++ examples. Enabled by default.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RAISIM_PY</span></code></p></td>
-<td><p>Build the Python wrapper.</p></td>
+<td><p>Build the Python wrapper (<code class="docutils literal notranslate"><span class="pre">raisimPy</span></code>). Disabled by default.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RAISIM_DOC</span></code></p></td>
+<td><p>Build documentation through CMake. Disabled by default.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RAISIM_ALL</span></code></p></td>
+<td><p>Shortcut that enables <code class="docutils literal notranslate"><span class="pre">RAISIM_EXAMPLE</span></code>, <code class="docutils literal notranslate"><span class="pre">RAISIM_PY</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">RAISIM_DOC</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RAISIM_MATLAB</span></code></p></td>
 <td><p>Reserved compatibility option. The current public workspace does not
 add a MATLAB wrapper subdirectory or build target.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RAISIM_DOC</span></code></p></td>
-<td><p>Build documentation through CMake.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RAISIM_EXAMPLE_DESKTOP_LAUNCHER</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RAISIM_EXAMPLE_DESKTOP_LAUNCHER</span></code></p></td>
 <td><p>Linux only. After each Release build of <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code>, install a
 desktop launcher for it and pin it to the GNOME / Ubuntu dock. Disabled
 by default; see <a class="reference internal" href="RayraiTcpViewer.html"><span class="doc">Rayrai TCP Viewer</span></a>.</p></td>
 </tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RAISIM_FOREST_COLLISION_BENCHMARK</span></code></p></td>
+<td><p>Also build the <code class="docutils literal notranslate"><span class="pre">forest_collision_benchmark</span></code> example tool. Disabled by
+default.</p></td>
+</tr>
 </tbody>
 </table>
+<p>The RaiSim version is pinned by the checkout (<code class="docutils literal notranslate"><span class="pre">RAISIM_VERSION</span></code> in the
+top-level <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code>). Configuring with a different
+<code class="docutils literal notranslate"><span class="pre">-DRAISIM_VERSION</span></code> is an error; update the checkout instead.</p>
 </section>
 <section id="build-examples">
 <h2>Build examples<a class="headerlink" href="#build-examples" title="Link to this heading"></a></h2>
@@ -175,7 +187,7 @@ by default; see <a class="reference internal" href="RayraiTcpViewer.html"><span 
 cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build-examples<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-DRAISIM_EXAMPLE<span class="o">=</span>ON
-cmake<span class="w"> </span>--build<span class="w"> </span>build-examples<span class="w"> </span>-j12
+cmake<span class="w"> </span>--build<span class="w"> </span>build-examples<span class="w"> </span>--parallel<span class="w"> </span><span class="m">12</span>
 </pre></div>
 </div>
 <p>You can also build only the example CMake project against an installed RaiSim
@@ -184,11 +196,13 @@ and rayrai package:</p>
 <span class="w">  </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-DRAISIM_PREFIX<span class="o">=</span>/path/to/raisim<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-DRAYRAI_PREFIX<span class="o">=</span>/path/to/rayrai
-cmake<span class="w"> </span>--build<span class="w"> </span>/tmp/raisim2lib-examples<span class="w"> </span>-j12
+cmake<span class="w"> </span>--build<span class="w"> </span>/tmp/raisim2lib-examples<span class="w"> </span>--parallel<span class="w"> </span><span class="m">12</span>
 </pre></div>
 </div>
 <p>Run source-built examples from the build directory. They are not installed by
-the <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> install target:</p>
+the <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> install target. A top-level build places them under
+<code class="docutils literal notranslate"><span class="pre">&lt;build-dir&gt;/examples</span></code>; a standalone build of <code class="docutils literal notranslate"><span class="pre">examples</span></code> places them
+directly in its build directory:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build-examples/examples/rayrai_tcp_viewer
 ./build-examples/examples/primitive_grid
 /tmp/raisim2lib-examples/rayrai_tcp_viewer
@@ -217,7 +231,7 @@ shipped in this public binary-package workspace. Run package timing examples on
 one thread and repeat the same command several times when comparing package or
 scene changes:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>--build<span class="w"> </span>build-examples<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--target<span class="w"> </span>anymal_standing_benchmark<span class="w"> </span>articulated_system_benchmark<span class="w"> </span>-j12
+<span class="w">  </span>--target<span class="w"> </span>anymal_standing_benchmark<span class="w"> </span>articulated_system_benchmark<span class="w"> </span>--parallel<span class="w"> </span><span class="m">12</span>
 <span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>./build-examples/examples/anymal_standing_benchmark<span class="w"> </span>--fast
 <span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
@@ -227,6 +241,18 @@ scene changes:</p>
 <p>Use <a class="reference internal" href="Performance.html"><span class="doc">Performance</span></a> for scene-level tuning guidance and for choosing a
 representative package example before changing solver settings or sensor
 workloads in a downstream application.</p>
+</section>
+<section id="tests">
+<h2>Tests<a class="headerlink" href="#tests" title="Link to this heading"></a></h2>
+<p>The public workspace has no CTest suite; the engine’s own test suite is not
+shipped. The examples double as smoke tests, and <code class="docutils literal notranslate"><span class="pre">raisimPy</span></code> includes a
+<code class="docutils literal notranslate"><span class="pre">unittest</span></code> module for its tendon bindings. Run it after building with
+<code class="docutils literal notranslate"><span class="pre">-DRAISIM_PY=ON</span></code>, with <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code> pointing to the directory that contains
+the built <code class="docutils literal notranslate"><span class="pre">raisimpy</span></code> module:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">PYTHONPATH</span><span class="o">=</span>build/raisimPy<span class="w"> </span><span class="nv">RAISIM_ACTIVATION_KEY</span><span class="o">=</span><span class="nv">$HOME</span>/.raisim/activation.raisim<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>python3<span class="w"> </span>-m<span class="w"> </span>unittest<span class="w"> </span>raisimPy/tests/test_tendons.py
+</pre></div>
+</div>
 </section>
 <section id="build-the-documentation">
 <h2>Build the documentation<a class="headerlink" href="#build-the-documentation" title="Link to this heading"></a></h2>
@@ -238,14 +264,17 @@ Sphinx:</p>
 <span class="w">  </span>-DRAISIM_DOCS_BUILD_RAYRAI_IMAGES<span class="o">=</span>OFF<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-DRAISIM_DOCS_RAISIM_INCLUDE_DIR<span class="o">=</span>/path/to/raisim2Lib/raisim/include/raisim<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-DRAISIM_DOCS_RAYRAI_INCLUDE_DIR<span class="o">=</span>/path/to/raisim2Lib/rayrai/include/rayrai
-cmake<span class="w"> </span>--build<span class="w"> </span>/tmp/raisim2lib-docs<span class="w"> </span>-j12
+cmake<span class="w"> </span>--build<span class="w"> </span>/tmp/raisim2lib-docs<span class="w"> </span>--parallel<span class="w"> </span><span class="m">12</span>
 </pre></div>
 </div>
 <p>This generates API references from the distributed headers and reuses the
 checked-in documentation images. Enable <code class="docutils literal notranslate"><span class="pre">RAISIM_DOCS_BUILD_RAYRAI_IMAGES</span></code>
 when you have a working OpenGL context and want to regenerate those images.</p>
 <p>For prose and link checks, the documentation can also be built directly with
-Sphinx:</p>
+Sphinx. When it cannot find Sphinx, the CMake docs configure creates
+<code class="docutils literal notranslate"><span class="pre">docs/.venv</span></code> with the packages from <code class="docutils literal notranslate"><span class="pre">docs/requirements.txt</span></code>
+(<code class="docutils literal notranslate"><span class="pre">RAISIM_DOCS_BOOTSTRAP_VENV</span></code>, on by default); any Python environment with
+those packages works as well:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>/path/to/raisim2Lib/docs/.venv/bin/sphinx-build<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-b<span class="w"> </span>html<span class="w"> </span>/path/to/raisim2Lib/docs<span class="w"> </span>/tmp/raisim2lib-docs-html
 </pre></div>

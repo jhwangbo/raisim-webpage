@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Legacy Integrations &mdash; raisim 2.7.0 documentation</title>
+  <title>Legacy Integrations &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -73,17 +73,17 @@
 <li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul class="current">
@@ -146,13 +146,17 @@ the rayrai TCP viewer and in-process rendering.</p>
 <code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code> application.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Record visualized policy rollouts</p></td>
-<td><p>Use rayrai screenshot, offscreen, or application-side recording tools.</p></td>
+<td><p>Call <code class="docutils literal notranslate"><span class="pre">RaisimServer::startRecordingVideo</span></code> and <code class="docutils literal notranslate"><span class="pre">stopRecordingVideo</span></code>;
+<code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> encodes the video with <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> or writes a PNG
+sequence when <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> is not available. For in-process rendering, use
+rayrai screenshot or offscreen capture.</p></td>
 </tr>
 <tr class="row-even"><td><p>Render RGB/depth images for sensors</p></td>
-<td><p>Use in-process rayrai sensor rendering with <code class="docutils literal notranslate"><span class="pre">raisin::RayraiWindow</span></code>
-and <code class="docutils literal notranslate"><span class="pre">Sensor::MeasurementSource::MANUAL</span></code>. Use RaiSim CPU depth only
-when rayrai is unavailable or a deterministic headless ray-query fallback
-is explicitly required.</p></td>
+<td><p>Use in-process rayrai sensor rendering with <code class="docutils literal notranslate"><span class="pre">raisin::RayraiWindow</span></code>,
+or set the sensors to <code class="docutils literal notranslate"><span class="pre">Sensor::MeasurementSource::MANUAL</span></code> so
+<code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> renders them for a <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> application.
+Use RaiSim CPU depth only when rayrai is unavailable or a deterministic
+headless ray-query fallback is explicitly required.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Inspect glTF, PBR, HDR, or OpenUSD assets</p></td>
 <td><p>Use the rayrai asset-inspection examples listed in <a class="reference internal" href="Examples.html"><span class="doc">Examples</span></a>.</p></td>
@@ -165,7 +169,7 @@ is explicitly required.</p></td>
 <p>The old page names are kept only as short redirects for users following stale
 links:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="RaisimUnity.html"><span class="doc">RaiSimUnity</span></a></p></li>
+<li><p><a class="reference internal" href="RaisimUnity.html"><span class="doc">RaisimUnity</span></a></p></li>
 <li><p><a class="reference internal" href="RaisimUnreal.html"><span class="doc">RaisimUnreal</span></a></p></li>
 </ul>
 </section>

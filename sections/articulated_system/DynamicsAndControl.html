@@ -1,0 +1,772 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dynamics and Control &mdash; raisim 2.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Joint Damping and Friction" href="JointDampingAndFriction.html" />
+    <link rel="prev" title="State and Kinematics" href="StateAndKinematics.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../FeatureMap.html">Feature Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ProjectLayout.html">Project Layout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Performance.html">Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Benchmark.html">Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RsceneFile.html">.rscene File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../OpenUSD.html">OpenUSD Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../ArticulatedSystem.html">Articulated Systems</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Creation.html">Creating an Articulated System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="StateAndKinematics.html">State and Kinematics</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Dynamics and Control</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dynamics">Dynamics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#inverse-dynamics">Inverse Dynamics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pd-controller">PD Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#actuators">Actuators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#apply-external-forces-torques">Apply External Forces/Torques</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#joint-torque-of-a-simulation-step">Joint torque of a simulation step</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#kinematic-loops">Kinematic loops</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#notation">Notation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-constraint-and-its-rate">The constraint and its rate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#equations-of-motion-of-a-step">Equations of motion of a step</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#eliminating-the-constraints">Eliminating the constraints</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#why-these-are-the-reduced-dynamics">Why these are the reduced dynamics</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#integration-steps">Integration Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="JointDampingAndFriction.html">Joint Damping and Friction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Actuators.html">Actuators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ModifyingTheModel.html">Modifying the Model in Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ClosedLoopSystems.html">Closed-Loop Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MimicJoints.html">Mimic Joints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="API.html">ArticulatedSystem API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../GranularMedia.html">Granular Media</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Tendons.html">Tendons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimMatlab.html">RaisimMatlab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../ArticulatedSystem.html">Articulated Systems</a></li>
+      <li class="breadcrumb-item active">Dynamics and Control</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dynamics-and-control">
+<h1>Dynamics and Control<a class="headerlink" href="#dynamics-and-control" title="Link to this heading"></a></h1>
+<section id="dynamics">
+<h2>Dynamics<a class="headerlink" href="#dynamics" title="Link to this heading"></a></h2>
+<p>All force and torque acting on the system can be represented as a single vector in the generalized velocity space.
+This representation is called <strong>generalized force</strong> <span class="math notranslate nohighlight">\(\boldsymbol{\tau}\)</span>.
+Just like in a Cartesian coordinate (i.e., x, y, z axes), the power exerted by an articulated system is computed as a dot product of generalized force and generalized velocity (i.e., <span class="math notranslate nohighlight">\(\boldsymbol{u}\cdot\boldsymbol{\tau}\)</span>).</p>
+<p>We can also combine the mass and inertia of the whole articulated system and represent them in a single matrix.
+This matrix is called <strong>mass matrix</strong> or <strong>inertia matrix</strong> and denoted by <span class="math notranslate nohighlight">\(\boldsymbol{M}\)</span>.
+A mass matrix represents how much the articulated system resists change in generalized velocities.
+Naively speaking, a large mass matrix means that the articulated system experiences a low velocity change for a given generalized force.</p>
+<p>The total kinetic energy of the system is computed as <span class="math notranslate nohighlight">\(\frac{1}{2}\boldsymbol{u}^T\boldsymbol{M}\boldsymbol{u}\)</span>.
+This quantity can be obtained by <code class="code docutils literal notranslate"><span class="pre">getKineticEnergy()</span></code>.</p>
+<p>The total potential energy due to the gravity is a sum of <span class="math notranslate nohighlight">\(m\,g\,z\)</span> (mass, gravitational acceleration and height) for all bodies.
+This quantity can be obtained by <code class="code docutils literal notranslate"><span class="pre">getPotentialEnergy(gravity)</span></code>.
+The gravity vector must be passed because only the world stores it (e.g., <code class="docutils literal notranslate"><span class="pre">world.getGravity()</span></code>).</p>
+<p>The equation of motion of an articulated system is shown below:</p>
+<div class="math notranslate nohighlight">
+\[\begin{equation}
+   \boldsymbol{\tau} = \boldsymbol{M}(\boldsymbol{q})\dot{\boldsymbol{u}} + \boldsymbol{h}(\boldsymbol{q}, \boldsymbol{u}).
+\end{equation}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(\boldsymbol{h}\)</span> is called a <strong>non-linear term</strong>.
+There are three sources of force that contribute to the non-linear term: gravity, Coriolis, and centrifugal force.
+It is rarely useful to compute the gravity contribution to the nonlinear term alone.
+If it is needed, evaluate the nonlinear term at zero generalized velocity, e.g., on a copy of the robot in another world: then the Coriolis and centrifugal contributions are zero.</p>
+<p>The following methods are used to obtain dynamic quantities</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">getMassMatrix()</span></code> (it includes the rotor inertia on its diagonal)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">getNonlinearities(gravity)</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">getInverseMassMatrix()</span></code> (call <code class="code docutils literal notranslate"><span class="pre">getMassMatrix()</span></code> first)</p></li>
+</ul>
+</section>
+<section id="inverse-dynamics">
+<h2>Inverse Dynamics<a class="headerlink" href="#inverse-dynamics" title="Link to this heading"></a></h2>
+<p>RaiSim can compute inverse dynamics using the recursive Newton-Euler algorithm.
+It is the only option for computing the force and torque acting at joints.
+Joint force/torque are the sum of the constraint joint force/torque and actuation force/torque.
+For example, a revolute joint constrains motions in 5 degrees of freedom, which means that there are 5-dimensional constraint forces/torque and 1-dimensional joint actuation torque acting at a revolute joint.</p>
+<p>In minimal coordinate simulation (such as RaiSim), these constraint forces/torques are not computed in the simulation loop.
+These forces/torques can be computed after a simulation loop using the inverse dynamics pipeline.</p>
+<p>To enable inverse dynamics, call <code class="docutils literal notranslate"><span class="pre">raisim::ArticulatedSystem::setComputeInverseDynamics(true)</span></code>.
+<strong>This flag is set automatically if the robot has an IMU sensor</strong>.
+Note that the inverse dynamics pipeline will slow down the simulation by about 10%.</p>
+<p>After a simulation loop, you can call <code class="docutils literal notranslate"><span class="pre">raisim::ArticulatedSystem::getForceAtJointInWorldFrame()</span></code> and <code class="docutils literal notranslate"><span class="pre">raisim::ArticulatedSystem::getTorqueAtJointInWorldFrame()</span></code> to get forces and torques acting at the specified joint.</p>
+<p>Assuming that there are no joint position/velocity limit forces acting at the joint, you can compute the joint actuation as a dot product of the joint axis and the joint torque.
+The <code class="docutils literal notranslate"><span class="pre">inverse_dynamics</span></code> example (<a class="reference internal" href="../examples/server/inverse_dynamics.html"><span class="doc">Server Example: Inverse Dynamics</span></a>) does this for ANYmal and compares the result with the applied generalized force.</p>
+</section>
+<section id="pd-controller">
+<h2>PD Controller<a class="headerlink" href="#pd-controller" title="Link to this heading"></a></h2>
+<p>When naively implemented, a PD controller can often make a robot unstable.
+However, this is often less problematic for robotics since this instability is also present in real systems (discrete-time control systems).</p>
+<p>For other applications like animation and graphics, it is often desirable to have a PD controller that stays stable with a large time step.
+Therefore, the built-in PD controller is integrated implicitly and stays stable with much larger time steps and gains than a naive implementation.</p>
+<p>The built-in PD torque and the feedforward generalized force are clamped together to the joint
+actuation limits (URDF <code class="docutils literal notranslate"><span class="pre">effort</span></code> or <code class="docutils literal notranslate"><span class="pre">setActuationLimits()</span></code>). Joint damping and actuator torques
+are added after this clamp and are not clipped by it.
+Because PD is integrated implicitly, the clamp bounds only its explicit part, and
+<code class="docutils literal notranslate"><span class="pre">getGeneralizedForce()</span></code> reports the applied PD torque only approximately (see
+<a class="reference internal" href="#joint-torque-of-a-simulation-step">Joint torque of a simulation step</a>). The built-in PD torque is not an actuator torque, so the
+motor operating regions of actuators do not clip it (see <a class="reference internal" href="#actuators">Actuators</a> below).</p>
+<p>To use this PD controller, set the desired control gains first:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="nf">pGain</span><span class="p">(</span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getDOF</span><span class="p">()),</span><span class="w"> </span><span class="n">dGain</span><span class="p">(</span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getDOF</span><span class="p">());</span>
+<span class="n">pGain</span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">...;</span><span class="w"> </span><span class="c1">// set your proportional gain values here</span>
+<span class="n">dGain</span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">...;</span><span class="w"> </span><span class="c1">// set your differential gain values here</span>
+<span class="n">robot</span><span class="o">-&gt;</span><span class="n">setPdGains</span><span class="p">(</span><span class="n">pGain</span><span class="p">,</span><span class="w"> </span><span class="n">dGain</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Note that <strong>the dimension of the pGain vector is the same as that of the generalized velocity NOT that of the coordinate</strong>.
+For a floating base, the first six gains are forced to zero.
+<code class="docutils literal notranslate"><span class="pre">setPdGains()</span></code> also switches the control mode to <code class="docutils literal notranslate"><span class="pre">ControlMode::PD_PLUS_FEEDFORWARD_TORQUE</span></code>.</p>
+<p>Finally, the target position and the velocity can be set as follows:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="nf">pTarget</span><span class="p">(</span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getGeneralizedCoordinateDim</span><span class="p">()),</span><span class="w"> </span><span class="n">vTarget</span><span class="p">(</span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getDOF</span><span class="p">());</span>
+<span class="n">pTarget</span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">...;</span><span class="w"> </span><span class="c1">// set your position target</span>
+<span class="n">vTarget</span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">...;</span><span class="w"> </span><span class="c1">// set your velocity target</span>
+<span class="n">robot</span><span class="o">-&gt;</span><span class="n">setPdTarget</span><span class="p">(</span><span class="n">pTarget</span><span class="p">,</span><span class="w"> </span><span class="n">vTarget</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Here, <strong>the dimension of the pTarget vector is the same as that of the generalized coordinate NOT that of the velocity</strong>.
+This can be confusing and may seem inconsistent.
+However, this is a valid convention.
+The only reason the two dimensions differ is the quaternion representation.
+The quaternion target is represented by a quaternion whereas the virtual spring stiffness between the two orientations can be represented by a 3D vector, which is composed of motions in each angular velocity components.</p>
+<p>A feedforward force term can be added by <code class="code docutils literal notranslate"><span class="pre">setGeneralizedForce()</span></code> if desired.
+This term is set to zero by default.
+Note that this value is stored in the class instance and does not change unless the user specifies it so.
+If this feedforward force should be applied for a single time step, set it to zero in the subsequent control loop (after the <code class="code docutils literal notranslate"><span class="pre">integrate()</span></code> call of the world).</p>
+<p>The theory of the implemented PD controller can be found in chapter 1.2 of this <a class="reference external" href="https://www.overleaf.com/read/dbqbgcnhzykq">article</a>.
+This document is intended for advanced users and is not required to use RaiSim.</p>
+</section>
+<section id="actuators">
+<h2>Actuators<a class="headerlink" href="#actuators" title="Link to this heading"></a></h2>
+<p>The URDF <code class="docutils literal notranslate"><span class="pre">effort</span></code> limit is a constant bound per joint on the feedforward generalized force plus
+the built-in PD torque; joint damping is passive and is not clipped. Actuator torques set with
+<code class="docutils literal notranslate"><span class="pre">setActuatorTorque()</span></code> or <code class="docutils literal notranslate"><span class="pre">setActuatorTorques()</span></code> are clipped separately, to the motor operating
+regions (MOR) of their motors, mapped to the joints (with their couplings), and added after the
+effort clamp. Effort limits do not clip actuator torques, and MOR does not clip
+<code class="docutils literal notranslate"><span class="pre">setGeneralizedForce()</span></code> or the built-in PD controller. The combined generalized force is not
+clamped again. To keep a PD controller inside the motor operating regions, compute its torques
+explicitly and send them with <code class="docutils literal notranslate"><span class="pre">setActuatorTorques()</span></code>. See <a class="reference internal" href="../Actuators.html"><span class="doc">Actuators</span></a>.</p>
+</section>
+<section id="apply-external-forces-torques">
+<h2>Apply External Forces/Torques<a class="headerlink" href="#apply-external-forces-torques" title="Link to this heading"></a></h2>
+<p>The following two methods are used to apply external force and torque respectively</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">setExternalForce</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">setExternalTorque</span></code></p></li>
+</ul>
+<p>You will find the above methods in the <a class="reference internal" href="API.html"><span class="doc">ArticulatedSystem API</span></a>.</p>
+</section>
+<section id="joint-torque-of-a-simulation-step">
+<span id="joint-torque-of-a-step"></span><h2>Joint torque of a simulation step<a class="headerlink" href="#joint-torque-of-a-simulation-step" title="Link to this heading"></a></h2>
+<p>This section gives exactly what a simulation step of length <span class="math notranslate nohighlight">\(\Delta t\)</span> computes for an
+articulated system. Bold symbols are vectors with one entry per generalized velocity (one per
+revolute or prismatic joint, three per spherical joint and six for a floating base), and a product
+of two such vectors is taken entry by entry. <span class="math notranslate nohighlight">\(\boldsymbol{q}_t\)</span> and <span class="math notranslate nohighlight">\(\boldsymbol{u}_t\)</span>
+are the generalized coordinate and velocity at the beginning of the step, and
+<span class="math notranslate nohighlight">\(\boldsymbol{u}_{t+1}\)</span> is the velocity at its end. For a spherical joint,
+<span class="math notranslate nohighlight">\(\boldsymbol{q}_{ref} - \boldsymbol{q}_t\)</span> stands for the rotation vector of
+<span class="math notranslate nohighlight">\(\boldsymbol{q}_t^{-1} \boldsymbol{q}_{ref}\)</span>.</p>
+<p><strong>1. The command, clamped to the actuation limits.</strong></p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\boldsymbol{\tau}_{PD}  &amp;= \boldsymbol{k}_p\,(\boldsymbol{q}_{ref} - \boldsymbol{q}_t)
+                           + \boldsymbol{k}_d\,(\boldsymbol{u}_{ref} - \boldsymbol{u}_t) \\
+\boldsymbol{\tau}_{cmd} &amp;= \mathrm{clamp}\bigl(\boldsymbol{\tau}_{ff} + \boldsymbol{\tau}_{PD},\;
+                           \boldsymbol{\tau}_{lower},\; \boldsymbol{\tau}_{upper}\bigr)\end{split}\]</div>
+<p><span class="math notranslate nohighlight">\(\boldsymbol{\tau}_{ff}\)</span> is the force set with <code class="docutils literal notranslate"><span class="pre">setGeneralizedForce()</span></code>,
+<span class="math notranslate nohighlight">\(\boldsymbol{k}_p\)</span> and <span class="math notranslate nohighlight">\(\boldsymbol{k}_d\)</span> are the gains of <code class="docutils literal notranslate"><span class="pre">setPdGains()</span></code>, and
+<span class="math notranslate nohighlight">\(\boldsymbol{q}_{ref}\)</span> and <span class="math notranslate nohighlight">\(\boldsymbol{u}_{ref}\)</span> are the targets of <code class="docutils literal notranslate"><span class="pre">setPdTarget()</span></code>.
+In the <code class="docutils literal notranslate"><span class="pre">FORCE_AND_TORQUE</span></code> control mode, <span class="math notranslate nohighlight">\(\boldsymbol{k}_p = \boldsymbol{k}_d = 0\)</span> here and
+in step 4. The bounds are <span class="math notranslate nohighlight">\(\mp\)</span> the URDF <code class="docutils literal notranslate"><span class="pre">effort</span></code> or those of <code class="docutils literal notranslate"><span class="pre">setActuationLimits()</span></code>; a
+joint without them is not clamped.</p>
+<p><strong>2. The actuator torques.</strong> Take an actuator with the gear ratio <span class="math notranslate nohighlight">\(G\)</span>, the driven joint
+<span class="math notranslate nohighlight">\(j\)</span>, the couplings <span class="math notranslate nohighlight">\((c, r_c)\)</span> and the torque <span class="math notranslate nohighlight">\(\tau_a\)</span> set with
+<code class="docutils literal notranslate"><span class="pre">setActuatorTorques()</span></code> (see <a class="reference internal" href="../Actuators.html"><span class="doc">Actuators</span></a>). Its motor has the stall torque
+<span class="math notranslate nohighlight">\(\tau_{stall} = K_t V_{bus} / R\)</span>, the back-EMF damping <span class="math notranslate nohighlight">\(b = K_t / (R K_v)\)</span> and the
+peak torque <span class="math notranslate nohighlight">\(\tau_{peak}\)</span>. With <span class="math notranslate nohighlight">\(u_{t,j}\)</span> the entry of <span class="math notranslate nohighlight">\(\boldsymbol{u}_t\)</span> for
+joint <span class="math notranslate nohighlight">\(j\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\omega_m     &amp;= G\,u_{t,j} + \textstyle\sum_c r_c\,u_{t,c} \\
+\tau_{m,min} &amp;= \mathrm{clamp}\bigl(-\tau_{stall} - b\,\omega_m,\; -\tau_{peak},\; \tau_{peak}\bigr) \\
+\tau_{m,max} &amp;= \mathrm{clamp}\bigl(\phantom{-}\tau_{stall} - b\,\omega_m,\; -\tau_{peak},\; \tau_{peak}\bigr) \\
+\tau_m       &amp;= \mathrm{clamp}\bigl(\tau_a / G,\; \tau_{m,min},\; \tau_{m,max}\bigr)\end{split}\]</div>
+<p>The actuator adds <span class="math notranslate nohighlight">\(G\,\tau_m\)</span> to joint <span class="math notranslate nohighlight">\(j\)</span> and <span class="math notranslate nohighlight">\(r_c\,\tau_m\)</span> to each coupled
+joint <span class="math notranslate nohighlight">\(c\)</span>, and <span class="math notranslate nohighlight">\(\boldsymbol{\tau}_{act}\)</span> is the sum over all actuators. With
+<code class="docutils literal notranslate"><span class="pre">setMotorOperatingRegionEnforced(false)</span></code>, <span class="math notranslate nohighlight">\(\tau_m = \tau_a / G\)</span>. The actuation limits do
+not clip actuator torques.</p>
+<p><strong>3. The explicit torque.</strong> Everything evaluated at the beginning of the step is summed, and the
+sum is not clamped:</p>
+<div class="math notranslate nohighlight">
+\[\boldsymbol{\tau}_{exp} = \boldsymbol{\tau}_{cmd} - (\boldsymbol{b}_{joint} + \boldsymbol{b}_{out})\,\boldsymbol{u}_t
+                          + \boldsymbol{\tau}_{act} + \boldsymbol{k}_s\,(\boldsymbol{q}_s - \boldsymbol{q}_t)
+                          + \boldsymbol{J}^T \boldsymbol{F}_{ext}\]</div>
+<p><span class="math notranslate nohighlight">\(\boldsymbol{b}_{joint}\)</span> is the joint damping (URDF <code class="docutils literal notranslate"><span class="pre">damping</span></code> or <code class="docutils literal notranslate"><span class="pre">setJointDamping()</span></code>, see
+<a class="reference internal" href="JointDampingAndFriction.html"><span class="doc">Joint Damping and Friction</span></a>) and <span class="math notranslate nohighlight">\(\boldsymbol{b}_{out}\)</span> the output damping of the joint’s
+actuator. <span class="math notranslate nohighlight">\(\boldsymbol{k}_s\)</span> and <span class="math notranslate nohighlight">\(\boldsymbol{q}_s\)</span> are the stiffness and the rest
+position of the joint springs (URDF <code class="docutils literal notranslate"><span class="pre">&lt;dynamics</span> <span class="pre">stiffness</span> <span class="pre">spring_mount&gt;</span></code> or <code class="docutils literal notranslate"><span class="pre">addSpring()</span></code>, see
+<code class="docutils literal notranslate"><span class="pre">getSprings()</span></code>). <span class="math notranslate nohighlight">\(\boldsymbol{J}^T \boldsymbol{F}_{ext}\)</span> are the forces and torques of
+<code class="docutils literal notranslate"><span class="pre">setExternalForce()</span></code>, <code class="docutils literal notranslate"><span class="pre">setExternalTorque()</span></code> and <code class="docutils literal notranslate"><span class="pre">setConstraintForce()</span></code>, mapped through their
+Jacobians.</p>
+<p><strong>4. The velocity.</strong> The PD gains, the damping and the springs are integrated implicitly: the
+diagonal <span class="math notranslate nohighlight">\(\boldsymbol{w}\)</span> is added to the mass matrix <span class="math notranslate nohighlight">\(\boldsymbol{M}\)</span>
+(<code class="docutils literal notranslate"><span class="pre">getMassMatrix()</span></code>, which includes the rotor inertia). With the nonlinear term
+<span class="math notranslate nohighlight">\(\boldsymbol{h}\)</span> (gravity, Coriolis and centrifugal forces, <code class="docutils literal notranslate"><span class="pre">getNonlinearities()</span></code>), the
+articulated-body algorithm computes the velocity without contacts, <span class="math notranslate nohighlight">\(\boldsymbol{u}^*\)</span>, and the
+contact solver adds the impulses <span class="math notranslate nohighlight">\(\boldsymbol{\lambda}_c\)</span> of the contacts, the joint limits
+and the joint friction through their Jacobian <span class="math notranslate nohighlight">\(\boldsymbol{J}_c\)</span> and the same matrix:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\boldsymbol{w}         &amp;= \frac{\Delta t}{2}\,(\boldsymbol{b}_{joint} + \boldsymbol{b}_{out} + \boldsymbol{k}_d)
+                          + \frac{\Delta t^2}{4}\,(\boldsymbol{k}_p + \boldsymbol{k}_s) \\
+\tilde{\boldsymbol{M}} &amp;= \boldsymbol{M} + \mathrm{diag}(\boldsymbol{w}) \\
+\boldsymbol{u}^*       &amp;= \boldsymbol{u}_t + \Delta t\;\tilde{\boldsymbol{M}}^{-1}\,(\boldsymbol{\tau}_{exp} - \boldsymbol{h}) \\
+\boldsymbol{u}_{t+1}   &amp;= \boldsymbol{u}^* + \tilde{\boldsymbol{M}}^{-1} \boldsymbol{J}_c^T \boldsymbol{\lambda}_c\end{split}\]</div>
+<p>A position-limit impulse acts on a joint outside its range. A velocity-limit impulse acts on a
+joint whose entry of <span class="math notranslate nohighlight">\(\boldsymbol{u}^*\)</span> exceeds its velocity limit, unless a position-limit
+impulse acts on that joint. A joint-friction impulse acts on every revolute or prismatic joint with
+friction (see <a class="reference internal" href="JointDampingAndFriction.html"><span class="doc">Joint Damping and Friction</span></a>).</p>
+<p><strong>5. The applied joint torque.</strong> With <span class="math notranslate nohighlight">\(\Delta\boldsymbol{u} = \boldsymbol{u}_{t+1} - \boldsymbol{u}_t\)</span>,
+moving the implicit part to the right-hand side gives the equation of motion of the step:</p>
+<div class="math notranslate nohighlight">
+\[\boldsymbol{M}\,\frac{\Delta\boldsymbol{u}}{\Delta t} + \boldsymbol{h}
+  = \boldsymbol{\tau}_{exp} - \boldsymbol{w}\,\frac{\Delta\boldsymbol{u}}{\Delta t}
+    + \frac{\boldsymbol{J}_c^T \boldsymbol{\lambda}_c}{\Delta t}\]</div>
+<p>The torque on the joints over the step is therefore, term by term:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Source</p></th>
+<th class="head"><p>Torque over the step</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>feedforward and PD</p></td>
+<td><p><span class="math notranslate nohighlight">\(\boldsymbol{\tau}_{cmd} - \bigl(\tfrac{1}{2} \boldsymbol{k}_d + \tfrac{\Delta t}{4} \boldsymbol{k}_p\bigr)\,\Delta\boldsymbol{u}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>damping</p></td>
+<td><p><span class="math notranslate nohighlight">\(-\tfrac{1}{2}\,(\boldsymbol{b}_{joint} + \boldsymbol{b}_{out})\,(\boldsymbol{u}_t + \boldsymbol{u}_{t+1})\)</span> (trapezoidal rule)</p></td>
+</tr>
+<tr class="row-even"><td><p>actuators</p></td>
+<td><p><span class="math notranslate nohighlight">\(\boldsymbol{\tau}_{act}\)</span>, constant over the step</p></td>
+</tr>
+<tr class="row-odd"><td><p>springs</p></td>
+<td><p><span class="math notranslate nohighlight">\(\boldsymbol{k}_s\,(\boldsymbol{q}_s - \boldsymbol{q}_t) - \tfrac{\Delta t}{4}\,\boldsymbol{k}_s\,\Delta\boldsymbol{u}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>external forces</p></td>
+<td><p><span class="math notranslate nohighlight">\(\boldsymbol{J}^T \boldsymbol{F}_{ext}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>joint friction</p></td>
+<td><p><span class="math notranslate nohighlight">\(\boldsymbol{\lambda}_f / \Delta t\)</span>, with <span class="math notranslate nohighlight">\(|\boldsymbol{\lambda}_f| \le (\boldsymbol{\tau}_{c,joint} + \boldsymbol{\tau}_{c,out})\,\Delta t\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>contacts and joint limits</p></td>
+<td><p>the rest of <span class="math notranslate nohighlight">\(\boldsymbol{J}_c^T \boldsymbol{\lambda}_c / \Delta t\)</span></p></td>
+</tr>
+</tbody>
+</table>
+<p>The friction impulse <span class="math notranslate nohighlight">\(\boldsymbol{\lambda}_f\)</span>, the joints’ share of
+<span class="math notranslate nohighlight">\(\boldsymbol{J}_c^T \boldsymbol{\lambda}_c\)</span>, stops a joint if the bound allows it, and
+otherwise opposes the motion with the bound. <span class="math notranslate nohighlight">\(\boldsymbol{\tau}_{c,joint}\)</span> is the joint
+friction (see <a class="reference internal" href="JointDampingAndFriction.html"><span class="doc">Joint Damping and Friction</span></a>) and <span class="math notranslate nohighlight">\(\boldsymbol{\tau}_{c,out}\)</span> the output
+friction of the joint’s actuator.</p>
+<p>Only the explicit part of the feedforward and PD torque is clamped. The implicit part is not, so
+the applied PD torque can exceed the actuation limits by
+<span class="math notranslate nohighlight">\(\bigl(\tfrac{1}{2} \boldsymbol{k}_d + \tfrac{\Delta t}{4} \boldsymbol{k}_p\bigr)\,|\Delta\boldsymbol{u}|\)</span>,
+e.g., when an impact changes the velocity within one step. Without the clamp, the feedforward and
+PD torque is</p>
+<div class="math notranslate nohighlight">
+\[\boldsymbol{\tau}_{ff} + \boldsymbol{k}_p \left(\boldsymbol{q}_{ref} - \boldsymbol{q}_t - \frac{\Delta t}{4}\,\Delta\boldsymbol{u}\right)
+          + \boldsymbol{k}_d \left(\boldsymbol{u}_{ref} - \frac{1}{2}\,(\boldsymbol{u}_t + \boldsymbol{u}_{t+1})\right)\]</div>
+<p><strong>6. The position.</strong> The position is integrated with the average velocity <span class="math notranslate nohighlight">\(\bar{\boldsymbol{u}}\)</span>
+of the scheme set with <code class="docutils literal notranslate"><span class="pre">setIntegrationScheme()</span></code> (a quaternion with the same angular velocity):</p>
+<div class="math notranslate nohighlight">
+\[\boldsymbol{q}_{t+1} = \boldsymbol{q}_t + \Delta t\,\bar{\boldsymbol{u}}\]</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 40.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Integration scheme</p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(\bar{\boldsymbol{u}}\)</span></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TRAPEZOID</span></code> (default)</p></td>
+<td><p><span class="math notranslate nohighlight">\(\tfrac{1}{2}(\boldsymbol{u}_t + \boldsymbol{u}_{t+1})\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">SEMI_IMPLICIT</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(\boldsymbol{u}_{t+1}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">EULER</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(\boldsymbol{u}_t\)</span></p></td>
+</tr>
+</tbody>
+</table>
+<p>The torque is the same for the three. <code class="docutils literal notranslate"><span class="pre">RUNGE_KUTTA_4</span></code> applies the velocity change of the contact
+solver at the beginning of the step and then evaluates steps 1-4 without contacts at each of its
+four stages, at the state of the stage; the actuator bounds use the motor speeds of the stage, and
+<code class="docutils literal notranslate"><span class="pre">getActuatorStates()</span></code> describes the last stage. In the PD control mode, <code class="docutils literal notranslate"><span class="pre">TRAPEZOID</span></code> replaces the
+scheme once the robot has been in contact (from the step after its first contact), until its state
+is set again with <code class="docutils literal notranslate"><span class="pre">setState()</span></code>, <code class="docutils literal notranslate"><span class="pre">setGeneralizedCoordinate()</span></code> or an applied <code class="docutils literal notranslate"><span class="pre">solveIK()</span></code>
+solution. <code class="docutils literal notranslate"><span class="pre">TRAPEZOID</span></code> also replaces <code class="docutils literal notranslate"><span class="pre">RUNGE_KUTTA_4</span></code> while the robot has loop or mimic
+constraints, which are eliminated from the velocity of one step (see <a class="reference internal" href="ClosedLoopSystems.html"><span class="doc">Closed-Loop Systems</span></a>).</p>
+<p><code class="docutils literal notranslate"><span class="pre">getGeneralizedForce()</span></code> returns <span class="math notranslate nohighlight">\(\boldsymbol{\tau}_{cmd} + \boldsymbol{\tau}_{act}\)</span> at the
+current state: the PD term with the position error of the last step and the current velocity, and
+the actuator bounds at the current motor speeds. It does not include the damping, the springs, the
+external forces, the implicit terms or the solver impulses.</p>
+</section>
+<section id="kinematic-loops">
+<span id="id1"></span><h2>Kinematic loops<a class="headerlink" href="#kinematic-loops" title="Link to this heading"></a></h2>
+<p>An articulated system is simulated in the generalized coordinates of a kinematic tree. A <em>loop
+constraint</em> closes a loop of the tree again: it ties an anchor point on <code class="docutils literal notranslate"><span class="pre">body1</span></code> to the
+coincident point on <code class="docutils literal notranslate"><span class="pre">body2</span></code>. A <strong>pin</strong> holds the two points together in all three directions.
+An <strong>equality constraint</strong> holds them together only along one or two axes fixed in <code class="docutils literal notranslate"><span class="pre">body1</span></code>;
+along the remaining directions the points slide freely. A <strong>mimic constraint</strong> couples two joint
+coordinates linearly. The three are handled in the same way. This section derives the dynamics
+with the equality constraint as the main case; <a class="reference internal" href="ClosedLoopSystems.html"><span class="doc">Closed-Loop Systems</span></a> describes how to model
+loops and how they behave, and <a class="reference internal" href="MimicJoints.html"><span class="doc">Mimic Joints</span></a> the mimic constraints. The symbols are those of
+<a class="reference internal" href="#joint-torque-of-a-simulation-step">Joint torque of a simulation step</a> above.</p>
+<p>The constraints are not iterated by the contact solver. In every step, each articulated system
+eliminates them exactly, before the contacts are solved:</p>
+<ol class="arabic simple">
+<li><p>it takes the velocity <span class="math notranslate nohighlight">\(\boldsymbol{u}^*\)</span> that the system would reach without them (step 4
+above),</p></li>
+<li><p>applies the one impulse that makes that velocity satisfy them, and</p></li>
+<li><p>replaces the response of everything else that acts on the system (contacts, joint limits,
+joint friction, tendons) by its response on the constrained mechanism.</p></li>
+</ol>
+<p>The contact solver then works on a smaller problem whose every solution already satisfies the
+constraints.</p>
+<section id="notation">
+<h3>Notation<a class="headerlink" href="#notation" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Symbol</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\boldsymbol{q},\ \boldsymbol{u}\)</span></p></td>
+<td><p>generalized coordinate and velocity of the tree (<span class="math notranslate nohighlight">\(|\boldsymbol{u}|\)</span> entries; see
+<a class="reference internal" href="StateAndKinematics.html"><span class="doc">State and Kinematics</span></a>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\boldsymbol{M},\ \tilde{\boldsymbol{M}}\)</span></p></td>
+<td><p>the mass matrix, and the mass matrix with the implicit diagonal of step 4</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\boldsymbol{p}_1,\ \boldsymbol{p}_2\)</span></p></td>
+<td><p>world positions of the anchor on <code class="docutils literal notranslate"><span class="pre">body1</span></code> and on <code class="docutils literal notranslate"><span class="pre">body2</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\boldsymbol{a}_i\)</span></p></td>
+<td><p>constrained unit axes of an equality constraint in the world frame. They are fixed in
+<code class="docutils literal notranslate"><span class="pre">body1</span></code>’s frame <span class="math notranslate nohighlight">\(B_1\)</span>, where they are <span class="math notranslate nohighlight">\({}^{B_1}\boldsymbol{a}_i\)</span>.</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\boldsymbol{v}_b(\boldsymbol{x}),\ \boldsymbol{\omega}_b\)</span></p></td>
+<td><p>velocity of the material point of body <span class="math notranslate nohighlight">\(b\)</span> at the world point <span class="math notranslate nohighlight">\(\boldsymbol{x}\)</span>,
+and the angular velocity of body <span class="math notranslate nohighlight">\(b\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\boldsymbol{J}_b(\boldsymbol{x})\)</span></p></td>
+<td><p>Jacobian of that point, <span class="math notranslate nohighlight">\(\boldsymbol{J}_b(\boldsymbol{x})\,\boldsymbol{u} = \boldsymbol{v}_b(\boldsymbol{x})\)</span>
+(see <a class="reference internal" href="StateAndKinematics.html"><span class="doc">State and Kinematics</span></a>)</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\boldsymbol{J},\ \boldsymbol{\lambda}\)</span></p></td>
+<td><p>all constraint rows stacked (<span class="math notranslate nohighlight">\(|\boldsymbol{\lambda}| \times |\boldsymbol{u}|\)</span>), and
+their impulses</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\boldsymbol{J}_c,\ \boldsymbol{\lambda}_c\)</span></p></td>
+<td><p>the rows and impulses of the contacts, the joint limits and the joint friction (step 4)</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\boldsymbol{e}\)</span></p></td>
+<td><p>the position errors of the rows</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\boldsymbol{D} = \boldsymbol{J} \tilde{\boldsymbol{M}}^{-1} \boldsymbol{J}^T\)</span></p></td>
+<td><p>the coupling of the rows (their inverse effective mass, the Delassus matrix of the
+constraints), <span class="math notranslate nohighlight">\(|\boldsymbol{\lambda}| \times |\boldsymbol{\lambda}|\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\Delta t,\ \beta\)</span></p></td>
+<td><p>the time step and the error-correction rate,
+<span class="math notranslate nohighlight">\(\beta = \mathrm{clamp}(0.2\,\mathrm{erp}, 0, 0.3)/\Delta t\)</span> (see <a class="reference internal" href="ClosedLoopSystems.html"><span class="doc">Closed-Loop Systems</span></a>)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="the-constraint-and-its-rate">
+<h3>The constraint and its rate<a class="headerlink" href="#the-constraint-and-its-rate" title="Link to this heading"></a></h3>
+<p>For each of its axes, the equality constraint requires</p>
+<div class="math notranslate nohighlight">
+\[e_i(\boldsymbol{q}) = \boldsymbol{a}_i \cdot (\boldsymbol{p}_1 - \boldsymbol{p}_2) = 0 .\]</div>
+<p>A pin uses three fixed world directions as its axes <span class="math notranslate nohighlight">\(\boldsymbol{a}_i\)</span>. A mimic constraint
+uses <span class="math notranslate nohighlight">\(e = q_\mathrm{follower} - m\, q_\mathrm{leader} - c\)</span> for the multiplier <span class="math notranslate nohighlight">\(m\)</span> and
+the offset <span class="math notranslate nohighlight">\(c\)</span> (see <a class="reference internal" href="MimicJoints.html"><span class="doc">Mimic Joints</span></a>).</p>
+<p><strong>The exact rate of an equality row.</strong> The step is solved for velocities, so each row needs the
+time derivative of its error, linear in the generalized velocity <span class="math notranslate nohighlight">\(\boldsymbol{u}\)</span>. Take one
+axis <span class="math notranslate nohighlight">\(\boldsymbol{a}\)</span>, with <span class="math notranslate nohighlight">\(e = \boldsymbol{a}\cdot(\boldsymbol{p}_1 - \boldsymbol{p}_2)\)</span>.
+Three things move:</p>
+<ul class="simple">
+<li><p>the axis: it is fixed in <code class="docutils literal notranslate"><span class="pre">body1</span></code>, so it turns with <code class="docutils literal notranslate"><span class="pre">body1</span></code>’s angular velocity,
+<span class="math notranslate nohighlight">\(\dot{\boldsymbol{a}} = \boldsymbol{\omega}_1\times \boldsymbol{a}\)</span>;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">body1</span></code>’s anchor: <span class="math notranslate nohighlight">\(\boldsymbol{p}_1\)</span> is a material point of <code class="docutils literal notranslate"><span class="pre">body1</span></code>, so
+<span class="math notranslate nohighlight">\(\dot{\boldsymbol{p}}_1 = \boldsymbol{v}_1(\boldsymbol{p}_1)\)</span>;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">body2</span></code>’s anchor: <span class="math notranslate nohighlight">\(\boldsymbol{p}_2\)</span> is a material point of <code class="docutils literal notranslate"><span class="pre">body2</span></code>, so
+<span class="math notranslate nohighlight">\(\dot{\boldsymbol{p}}_2 = \boldsymbol{v}_2(\boldsymbol{p}_2)\)</span>.</p></li>
+</ul>
+<p>One more fact is needed, the velocity field of a rigid body. The material point of <code class="docutils literal notranslate"><span class="pre">body1</span></code> that
+currently sits at a world point <span class="math notranslate nohighlight">\(\boldsymbol{x}\)</span> moves with
+<span class="math notranslate nohighlight">\(\boldsymbol{v}_1(\boldsymbol{x}) = \boldsymbol{v}_1(\boldsymbol{y}) + \boldsymbol{\omega}_1\times(\boldsymbol{x} - \boldsymbol{y})\)</span>
+for any other point <span class="math notranslate nohighlight">\(\boldsymbol{y}\)</span>: two points of the same body differ in velocity only by
+the rotation.</p>
+<ol class="arabic">
+<li><p>The product rule gives
+<span class="math notranslate nohighlight">\(\dot e = \dot{\boldsymbol{a}}\cdot(\boldsymbol{p}_1 - \boldsymbol{p}_2) + \boldsymbol{a}\cdot(\dot{\boldsymbol{p}}_1 - \dot{\boldsymbol{p}}_2)\)</span>.</p></li>
+<li><p>Inserting the three rates, the first term is the axis turning and the second the anchors
+moving:</p>
+<div class="math notranslate nohighlight">
+\[\dot e = \underbrace{(\boldsymbol{\omega}_1\times \boldsymbol{a})\cdot(\boldsymbol{p}_1 - \boldsymbol{p}_2)}_{\text{A: the axis turns}}
+       + \underbrace{\boldsymbol{a}\cdot\big(\boldsymbol{v}_1(\boldsymbol{p}_1) - \boldsymbol{v}_2(\boldsymbol{p}_2)\big)}_{\text{B: the anchors move}} .\]</div>
+</li>
+<li><p>Move <code class="docutils literal notranslate"><span class="pre">body1</span></code>’s velocity from <span class="math notranslate nohighlight">\(\boldsymbol{p}_1\)</span> to <span class="math notranslate nohighlight">\(\boldsymbol{p}_2\)</span>. By the
+velocity field,
+<span class="math notranslate nohighlight">\(\boldsymbol{v}_1(\boldsymbol{p}_1) = \boldsymbol{v}_1(\boldsymbol{p}_2) + \boldsymbol{\omega}_1\times(\boldsymbol{p}_1 - \boldsymbol{p}_2)\)</span>,
+so term B splits into</p>
+<div class="math notranslate nohighlight">
+\[\text{B} = \boldsymbol{a}\cdot\big(\boldsymbol{v}_1(\boldsymbol{p}_2) - \boldsymbol{v}_2(\boldsymbol{p}_2)\big)
+         + \boldsymbol{a}\cdot\big(\boldsymbol{\omega}_1\times(\boldsymbol{p}_1 - \boldsymbol{p}_2)\big) .\]</div>
+</li>
+<li><p>The scalar triple product is invariant under a cyclic permutation and changes sign when two
+factors are swapped, so the last term is
+<span class="math notranslate nohighlight">\(-(\boldsymbol{\omega}_1\times \boldsymbol{a})\cdot(\boldsymbol{p}_1 - \boldsymbol{p}_2)\)</span>:
+term A with the opposite sign.</p></li>
+<li><p>Term A and the rest of term B cancel:</p>
+<div class="math notranslate nohighlight">
+\[\dot e = \boldsymbol{a}\cdot\big(\boldsymbol{v}_1(\boldsymbol{p}_2) - \boldsymbol{v}_2(\boldsymbol{p}_2)\big)
+       = \underbrace{\boldsymbol{a}^T\big(\boldsymbol{J}_1(\boldsymbol{p}_2) - \boldsymbol{J}_2(\boldsymbol{p}_2)\big)}_{\text{a row of } \boldsymbol{J}}\,\boldsymbol{u} .\]</div>
+</li>
+</ol>
+<p>Nothing was approximated: the rate holds at every instant, however far the anchors have slid
+apart. An equality constraint with two axes has one such row per axis.</p>
+<p><strong>The same result, seen from body1.</strong> In <code class="docutils literal notranslate"><span class="pre">body1</span></code>’s frame, <span class="math notranslate nohighlight">\({}^{B_1}\boldsymbol{a}\)</span> and
+<span class="math notranslate nohighlight">\({}^{B_1}\boldsymbol{p}_1\)</span> are constant, so <span class="math notranslate nohighlight">\(e\)</span> changes only through the motion of
+<code class="docutils literal notranslate"><span class="pre">body2</span></code>’s anchor relative to <code class="docutils literal notranslate"><span class="pre">body1</span></code>. That relative velocity is <code class="docutils literal notranslate"><span class="pre">body2</span></code>’s velocity at the
+anchor minus the velocity of the point of <code class="docutils literal notranslate"><span class="pre">body1</span></code> that coincides with it,
+<span class="math notranslate nohighlight">\(\boldsymbol{v}_2(\boldsymbol{p}_2) - \boldsymbol{v}_1(\boldsymbol{p}_2)\)</span>, which gives
+<span class="math notranslate nohighlight">\(\dot e = \boldsymbol{a}\cdot\big(\boldsymbol{v}_1(\boldsymbol{p}_2) - \boldsymbol{v}_2(\boldsymbol{p}_2)\big)\)</span>
+again. An equality constraint says that <code class="docutils literal notranslate"><span class="pre">body2</span></code>’s anchor stays on a plane (one axis) or a line
+(two axes) fixed in <code class="docutils literal notranslate"><span class="pre">body1</span></code>; what matters is how that anchor moves relative to <code class="docutils literal notranslate"><span class="pre">body1</span></code>,
+measured where the anchor is.</p>
+<p><strong>Body1’s own anchor would give a wrong row.</strong> Evaluating <code class="docutils literal notranslate"><span class="pre">body1</span></code> at its own anchor keeps only
+term B,
+<span class="math notranslate nohighlight">\(\boldsymbol{a}^T\big(\boldsymbol{J}_1(\boldsymbol{p}_1) - \boldsymbol{J}_2(\boldsymbol{p}_2)\big)\boldsymbol{u} = \dot e - (\boldsymbol{\omega}_1\times \boldsymbol{a})\cdot(\boldsymbol{p}_1 - \boldsymbol{p}_2)\)</span>.
+That row misses the turning of the axis, an error that vanishes only when the anchors coincide or
+when <span class="math notranslate nohighlight">\(\boldsymbol{\omega}_1\times \boldsymbol{a}\)</span> happens to be perpendicular to
+<span class="math notranslate nohighlight">\(\boldsymbol{p}_1 - \boldsymbol{p}_2\)</span>. An equality constraint lets the anchors slide apart
+along its free directions by design, so the error would grow with the slide and with <code class="docutils literal notranslate"><span class="pre">body1</span></code>’s
+rotation: a 5 cm slide at 2 rad/s gives 0.1 m/s along the constrained axis. RaiSim uses the exact
+row above.</p>
+<p><strong>A pin.</strong> Its axes are fixed in the world, so <span class="math notranslate nohighlight">\(\dot{\boldsymbol{a}} = 0\)</span> and there is no
+term A, and it holds the anchors together in every direction, so
+<span class="math notranslate nohighlight">\(\boldsymbol{p}_1 - \boldsymbol{p}_2\)</span> stays at zero. Its rows
+<span class="math notranslate nohighlight">\(\boldsymbol{a}_i^T\big(\boldsymbol{J}_1(\boldsymbol{p}_1) - \boldsymbol{J}_2(\boldsymbol{p}_2)\big)\)</span>
+are exact as they are.</p>
+<p><strong>Where the force acts.</strong> By virtual work, a row
+<span class="math notranslate nohighlight">\(\boldsymbol{a}^T\big(\boldsymbol{J}_1(\boldsymbol{p}_2) - \boldsymbol{J}_2(\boldsymbol{p}_2)\big)\)</span>
+with the impulse <span class="math notranslate nohighlight">\(\lambda\)</span> applies the generalized impulse</p>
+<div class="math notranslate nohighlight">
+\[\big(\boldsymbol{J}_1(\boldsymbol{p}_2) - \boldsymbol{J}_2(\boldsymbol{p}_2)\big)^T \boldsymbol{a}\,\lambda
+  = \boldsymbol{J}_1(\boldsymbol{p}_2)^T(\lambda \boldsymbol{a}) - \boldsymbol{J}_2(\boldsymbol{p}_2)^T(\lambda \boldsymbol{a}) :\]</div>
+<p>the point impulse <span class="math notranslate nohighlight">\(\lambda \boldsymbol{a}\)</span> on <code class="docutils literal notranslate"><span class="pre">body1</span></code> at <span class="math notranslate nohighlight">\(\boldsymbol{p}_2\)</span>, and
+<span class="math notranslate nohighlight">\(-\lambda \boldsymbol{a}\)</span> on <code class="docutils literal notranslate"><span class="pre">body2</span></code> at the same point. The two are equal, opposite and
+collinear, so they apply no net force or torque to the system. They have no component along the
+free directions, and their power <span class="math notranslate nohighlight">\(\lambda\,\dot e\)</span> is zero while the constraint holds: the
+constraint does no work while the points slide.</p>
+</section>
+<section id="equations-of-motion-of-a-step">
+<h3>Equations of motion of a step<a class="headerlink" href="#equations-of-motion-of-a-step" title="Link to this heading"></a></h3>
+<p>With the constraint impulses <span class="math notranslate nohighlight">\(\boldsymbol{\lambda}\)</span> added to step 4, one step of the
+velocity-level integration reads</p>
+<div class="math notranslate nohighlight">
+\[\tilde{\boldsymbol{M}}\,(\boldsymbol{u}_{t+1} - \boldsymbol{u}_t)
+  = \Delta t\,(\boldsymbol{\tau}_{exp} - \boldsymbol{h}) + \boldsymbol{J}_c^T \boldsymbol{\lambda}_c
+    + \boldsymbol{J}^T \boldsymbol{\lambda} .\]</div>
+<p>The constraints are imposed on the velocity at the end of the step, with the position error fed
+back:</p>
+<div class="math notranslate nohighlight" id="equation-loop-target">
+<span class="eqno">(1)<a class="headerlink" href="#equation-loop-target" title="Link to this equation"></a></span>\[\boldsymbol{J}\,\boldsymbol{u}_{t+1} = -\beta\, \boldsymbol{e} .\]</div>
+<p>As one linear system in <span class="math notranslate nohighlight">\(\boldsymbol{u}_{t+1}\)</span> and <span class="math notranslate nohighlight">\(\boldsymbol{\lambda}\)</span> (for given
+<span class="math notranslate nohighlight">\(\boldsymbol{\lambda}_c\)</span>), this is the saddle-point (KKT) problem</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{bmatrix} \tilde{\boldsymbol{M}} &amp; -\boldsymbol{J}^T \\ \boldsymbol{J} &amp; \boldsymbol{0} \end{bmatrix}
+\begin{bmatrix} \boldsymbol{u}_{t+1} \\ \boldsymbol{\lambda} \end{bmatrix}
+=
+\begin{bmatrix} \tilde{\boldsymbol{M}} \boldsymbol{u}_t + \Delta t(\boldsymbol{\tau}_{exp} - \boldsymbol{h})
+                + \boldsymbol{J}_c^T \boldsymbol{\lambda}_c \\ -\beta \boldsymbol{e} \end{bmatrix} .\end{split}\]</div>
+<p>The impulses <span class="math notranslate nohighlight">\(\boldsymbol{\lambda}_c\)</span> are unknown as well, and subject to the Coulomb friction
+cones and to one-sided limits; that is what the contact solver iterates on. The elimination below
+removes <span class="math notranslate nohighlight">\(\boldsymbol{\lambda}\)</span> from this problem exactly, so the solver iterates only on
+<span class="math notranslate nohighlight">\(\boldsymbol{\lambda}_c\)</span>.</p>
+</section>
+<section id="eliminating-the-constraints">
+<h3>Eliminating the constraints<a class="headerlink" href="#eliminating-the-constraints" title="Link to this heading"></a></h3>
+<p><strong>1. The free velocity.</strong> Without any impulse, the velocity at the end of the step is
+<span class="math notranslate nohighlight">\(\boldsymbol{u}^* = \boldsymbol{u}_t + \Delta t\, \tilde{\boldsymbol{M}}^{-1}(\boldsymbol{\tau}_{exp} - \boldsymbol{h})\)</span>
+(step 4).</p>
+<p><strong>2. Solve the first block row for</strong> <span class="math notranslate nohighlight">\(\boldsymbol{u}_{t+1}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\boldsymbol{u}_{t+1} = \boldsymbol{u}^* + \tilde{\boldsymbol{M}}^{-1}\boldsymbol{J}_c^T\boldsymbol{\lambda}_c
+                       + \tilde{\boldsymbol{M}}^{-1}\boldsymbol{J}^T\boldsymbol{\lambda} .\]</div>
+<p><strong>3. Substitute it into the constraints</strong> <a class="reference internal" href="#equation-loop-target">(1)</a>. This leaves a system for
+<span class="math notranslate nohighlight">\(\boldsymbol{\lambda}\)</span> alone, whose matrix <span class="math notranslate nohighlight">\(\boldsymbol{D}\)</span> is the Schur complement of
+<span class="math notranslate nohighlight">\(\tilde{\boldsymbol{M}}\)</span> in the KKT matrix:</p>
+<div class="math notranslate nohighlight">
+\[\boldsymbol{D}\,\boldsymbol{\lambda} = -\beta \boldsymbol{e} - \boldsymbol{J} \boldsymbol{u}^*
+  - \boldsymbol{J} \tilde{\boldsymbol{M}}^{-1} \boldsymbol{J}_c^T \boldsymbol{\lambda}_c .\]</div>
+<p>Its solution splits into a part that depends only on the free motion and a part induced by the
+other impulses:</p>
+<div class="math notranslate nohighlight" id="equation-loop-lambda">
+<span class="eqno">(2)<a class="headerlink" href="#equation-loop-lambda" title="Link to this equation"></a></span>\[\boldsymbol{\lambda} = \underbrace{\boldsymbol{D}^{-1}\big(-\beta \boldsymbol{e} - \boldsymbol{J} \boldsymbol{u}^*\big)}_{\boldsymbol{\lambda}_0}
+          - \boldsymbol{D}^{-1} \boldsymbol{J} \tilde{\boldsymbol{M}}^{-1} \boldsymbol{J}_c^T \boldsymbol{\lambda}_c .\]</div>
+<p><strong>4. Substitute</strong> <span class="math notranslate nohighlight">\(\boldsymbol{\lambda}\)</span> <strong>back:</strong></p>
+<div class="math notranslate nohighlight">
+\[\boldsymbol{u}_{t+1} = \underbrace{\boldsymbol{u}^* + \tilde{\boldsymbol{M}}^{-1}\boldsymbol{J}^T\boldsymbol{\lambda}_0}_{\boldsymbol{u}_0}
+        + \underbrace{\Big(\tilde{\boldsymbol{M}}^{-1} - \tilde{\boldsymbol{M}}^{-1}\boldsymbol{J}^T \boldsymbol{D}^{-1} \boldsymbol{J} \tilde{\boldsymbol{M}}^{-1}\Big)}_{\boldsymbol{M}_c^{-1}}\,
+          \boldsymbol{J}_c^T \boldsymbol{\lambda}_c .\]</div>
+<p>These are the reduced dynamics, in two parts:</p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(\boldsymbol{u}_0\)</span> is the free velocity moved onto the constraints; by construction,
+<span class="math notranslate nohighlight">\(\boldsymbol{J} \boldsymbol{u}_0 = -\beta \boldsymbol{e}\)</span>. Each step applies the impulse
+<span class="math notranslate nohighlight">\(\boldsymbol{J}^T\boldsymbol{\lambda}_0\)</span> before the contacts are solved.</p></li>
+<li><p>Every other impulse acts through the inverse mass of the constrained mechanism,</p>
+<div class="math notranslate nohighlight">
+\[\boldsymbol{M}_c^{-1} = \tilde{\boldsymbol{M}}^{-1}
+  - \tilde{\boldsymbol{M}}^{-1} \boldsymbol{J}^T \boldsymbol{D}^{-1} \boldsymbol{J} \tilde{\boldsymbol{M}}^{-1} ,\]</div>
+<p>whose response to an impulse is the unconstrained response minus its constrained part:
+<span class="math notranslate nohighlight">\(\boldsymbol{M}_c^{-1}\boldsymbol{J}_c^T = \tilde{\boldsymbol{M}}^{-1}\boldsymbol{J}_c^T
+- \tilde{\boldsymbol{M}}^{-1}\boldsymbol{J}^T\,\boldsymbol{D}^{-1}\big(\boldsymbol{J} \tilde{\boldsymbol{M}}^{-1}\boldsymbol{J}_c^T\big)\)</span>.</p>
+</li>
+</ul>
+<p>Three properties make this exact:</p>
+<ul class="simple">
+<li><p><strong>No impulse can open a constraint.</strong>
+<span class="math notranslate nohighlight">\(\boldsymbol{J} \boldsymbol{M}_c^{-1} = \boldsymbol{J} \tilde{\boldsymbol{M}}^{-1} - \boldsymbol{D}\,\boldsymbol{D}^{-1}\boldsymbol{J} \tilde{\boldsymbol{M}}^{-1} = \boldsymbol{0}\)</span>,
+so <span class="math notranslate nohighlight">\(\boldsymbol{J} \boldsymbol{u}_{t+1} = \boldsymbol{J} \boldsymbol{u}_0 = -\beta \boldsymbol{e}\)</span>
+for any <span class="math notranslate nohighlight">\(\boldsymbol{\lambda}_c\)</span>. The constraints hold whatever the contact solver does and
+however many iterations it runs.</p></li>
+<li><p><strong>The contact problem keeps its form.</strong> <span class="math notranslate nohighlight">\(\boldsymbol{M}_c^{-1}\)</span> is symmetric and positive
+semidefinite. The contacts’ apparent inverse inertia becomes
+<span class="math notranslate nohighlight">\(\boldsymbol{J}_c \boldsymbol{M}_c^{-1} \boldsymbol{J}_c^T\)</span>: the same kind of quantity as
+without constraints, only smaller, because the closed mechanism is stiffer.</p></li>
+<li><p><strong>The constraint impulse is still known.</strong> Equation <a class="reference internal" href="#equation-loop-lambda">(2)</a> gives
+<span class="math notranslate nohighlight">\(\boldsymbol{\lambda}\)</span> once the solver has found <span class="math notranslate nohighlight">\(\boldsymbol{\lambda}_c\)</span>; this is the
+impulse reported for each constraint (see
+<a class="reference internal" href="ClosedLoopSystems.html#closed-loop-reading-forces"><span class="std std-ref">Reading constraint forces</span></a>).</p></li>
+</ul>
+<p>In short, RaiSim solves the KKT system by block elimination: it eliminates
+<span class="math notranslate nohighlight">\(\boldsymbol{\lambda}\)</span> through <span class="math notranslate nohighlight">\(\boldsymbol{D}\)</span>, solves the contacts on the constrained
+mechanism with the inverse mass <span class="math notranslate nohighlight">\(\boldsymbol{M}_c^{-1}\)</span>, and recovers
+<span class="math notranslate nohighlight">\(\boldsymbol{\lambda}\)</span> from the solved <span class="math notranslate nohighlight">\(\boldsymbol{\lambda}_c\)</span>.</p>
+<p>If the rows of <span class="math notranslate nohighlight">\(\boldsymbol{J}\)</span> are dependent (redundant constraints, or a loop at a singular
+pose), <span class="math notranslate nohighlight">\(\boldsymbol{D}\)</span> is singular. RaiSim then keeps an independent subset of the rows; the
+motion is the same, and the load goes to the rows that are kept (see
+<a class="reference internal" href="ClosedLoopSystems.html#closed-loop-redundant"><span class="std std-ref">Redundant constraints and singular poses</span></a>).</p>
+</section>
+<section id="why-these-are-the-reduced-dynamics">
+<h3>Why these are the reduced dynamics<a class="headerlink" href="#why-these-are-the-reduced-dynamics" title="Link to this heading"></a></h3>
+<p>Constrained dynamics can equivalently be written in coordinates of the allowed motion. Let the
+columns of <span class="math notranslate nohighlight">\(\boldsymbol{N}\)</span> span the null space of <span class="math notranslate nohighlight">\(\boldsymbol{J}\)</span>, the velocities that
+keep the constraints. Restricting the equations of motion to that space (d’Alembert’s principle: the
+constraint forces do no work on the allowed motions) gives the reduced mass
+<span class="math notranslate nohighlight">\(\boldsymbol{N}^T \tilde{\boldsymbol{M}} \boldsymbol{N}\)</span>, and the constrained mechanism
+responds to a generalized impulse through
+<span class="math notranslate nohighlight">\(\boldsymbol{N} (\boldsymbol{N}^T \tilde{\boldsymbol{M}} \boldsymbol{N})^{-1} \boldsymbol{N}^T\)</span>.
+For <span class="math notranslate nohighlight">\(\boldsymbol{J}\)</span> of full row rank, this is the same matrix:</p>
+<div class="math notranslate nohighlight">
+\[\boldsymbol{N} (\boldsymbol{N}^T \tilde{\boldsymbol{M}} \boldsymbol{N})^{-1} \boldsymbol{N}^T
+  = \tilde{\boldsymbol{M}}^{-1} - \tilde{\boldsymbol{M}}^{-1} \boldsymbol{J}^T
+    (\boldsymbol{J} \tilde{\boldsymbol{M}}^{-1} \boldsymbol{J}^T)^{-1} \boldsymbol{J} \tilde{\boldsymbol{M}}^{-1}
+  = \boldsymbol{M}_c^{-1} .\]</div>
+<p>Both sides map a generalized impulse along the constraints, <span class="math notranslate nohighlight">\(\boldsymbol{J}^T \boldsymbol{y}\)</span>,
+to zero, and both map <span class="math notranslate nohighlight">\(\tilde{\boldsymbol{M}} \boldsymbol{N} \boldsymbol{z}\)</span> to
+<span class="math notranslate nohighlight">\(\boldsymbol{N} \boldsymbol{z}\)</span>. The two subspaces <span class="math notranslate nohighlight">\(\{\boldsymbol{J}^T \boldsymbol{y}\}\)</span>
+and <span class="math notranslate nohighlight">\(\{\tilde{\boldsymbol{M}} \boldsymbol{N} \boldsymbol{z}\}\)</span> together span the whole space:
+<span class="math notranslate nohighlight">\(\tilde{\boldsymbol{M}} \boldsymbol{N} \boldsymbol{z} = \boldsymbol{J}^T \boldsymbol{y}\)</span>
+implies <span class="math notranslate nohighlight">\(\boldsymbol{N}^T \tilde{\boldsymbol{M}} \boldsymbol{N} \boldsymbol{z} = \boldsymbol{0}\)</span>,
+so <span class="math notranslate nohighlight">\(\boldsymbol{z} = \boldsymbol{0}\)</span>.</p>
+<p>The right-hand form needs only <span class="math notranslate nohighlight">\(\boldsymbol{J}\)</span>,
+<span class="math notranslate nohighlight">\(\tilde{\boldsymbol{M}}^{-1}\boldsymbol{J}^T\)</span> and a system with one equation per constraint
+row. No basis of the null space is built, the generalized coordinates stay those of the tree, and
+the number of constraint rows <span class="math notranslate nohighlight">\(|\boldsymbol{\lambda}|\)</span> is small compared with
+<span class="math notranslate nohighlight">\(|\boldsymbol{u}|\)</span>.</p>
+<p><span class="math notranslate nohighlight">\(\boldsymbol{P} = \boldsymbol{I} - \tilde{\boldsymbol{M}}^{-1}\boldsymbol{J}^T \boldsymbol{D}^{-1} \boldsymbol{J}\)</span>
+projects onto the allowed velocities, orthogonally in the kinetic-energy metric
+<span class="math notranslate nohighlight">\(\tilde{\boldsymbol{M}}\)</span>: <span class="math notranslate nohighlight">\(\boldsymbol{P} \boldsymbol{u}\)</span> is the allowed velocity
+closest to <span class="math notranslate nohighlight">\(\boldsymbol{u}\)</span> in <span class="math notranslate nohighlight">\(\|\cdot\|_{\tilde{\boldsymbol{M}}}\)</span>. Moving
+<span class="math notranslate nohighlight">\(\boldsymbol{u}^*\)</span> to <span class="math notranslate nohighlight">\(\boldsymbol{u}_0\)</span> in step 4 is this projection, shifted so that
+<span class="math notranslate nohighlight">\(\boldsymbol{J} \boldsymbol{u}_0 = -\beta \boldsymbol{e}\)</span> instead of zero. Physically, it is
+the impulse that a perfectly rigid and lossless constraint applies: of all velocities that satisfy
+the constraints, <span class="math notranslate nohighlight">\(\boldsymbol{u}_0\)</span> is the one closest to <span class="math notranslate nohighlight">\(\boldsymbol{u}^*\)</span> in kinetic
+energy (Gauss’s principle of least constraint).</p>
+</section>
+</section>
+<section id="integration-steps">
+<h2>Integration Steps<a class="headerlink" href="#integration-steps" title="Link to this heading"></a></h2>
+<p>Integration of an articulated system is performed in two stages: <code class="code docutils literal notranslate"><span class="pre">integrate1</span></code> and <code class="code docutils literal notranslate"><span class="pre">integrate2</span></code>.</p>
+<p>The following steps are performed in <code class="code docutils literal notranslate"><span class="pre">integrate1</span></code></p>
+<ol class="arabic simple">
+<li><p>If the time step, the PD gains, the damping or the springs changed, update the diagonal <span class="math notranslate nohighlight">\(\boldsymbol{w}\)</span> added to the mass matrix (the effective inertia of the implicit springs, dampers and PD gains)</p></li>
+<li><p>Update positions of the collision bodies</p></li>
+<li><p>Detect collisions (called by the world instance)</p></li>
+<li><p>The world assigns contacts on each object and computes the contact normal</p></li>
+<li><p>Compute the mass matrix, nonlinear term, and inverse inertia matrix</p></li>
+<li><p>Compute (Sparse) Jacobians of contacts</p></li>
+</ol>
+<p>After this step, all kinematic/dynamic properties are computed.
+Users can access them if they are necessary for the controller.
+Next, <code class="code docutils literal notranslate"><span class="pre">integrate2</span></code> computes the rest of the simulation.</p>
+<ol class="arabic simple" start="7">
+<li><p>Compute contact properties</p></li>
+<li><p>Compute the PD torque (if used), add the feedforward generalized force, clamp this sum to the joint effort limits, and add the joint damping (never clipped, see <a class="reference internal" href="JointDampingAndFriction.html"><span class="doc">Joint Damping and Friction</span></a>)</p></li>
+<li><p>Clip the actuator torques to the motor operating regions, map them to the joints and add them; then add the springs and the external forces/torques, and compute the velocity without contacts</p></li>
+<li><p>Contact solver (called by the world instance). It also solves the joint limits and the joint friction</p></li>
+<li><p>Integrate the velocity</p></li>
+<li><p>Integrate the position with the integration scheme</p></li>
+</ol>
+<p>Steps 8-12 are written out exactly in <a class="reference internal" href="#joint-torque-of-a-simulation-step">Joint torque of a simulation step</a>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="StateAndKinematics.html" class="btn btn-neutral float-left" title="State and Kinematics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="JointDampingAndFriction.html" class="btn btn-neutral float-right" title="Joint Damping and Friction" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RaisimGymTorch &mdash; raisim 2.7.0 documentation</title>
+  <title>RaisimGymTorch &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -74,17 +74,17 @@
 <li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul class="current">
@@ -135,11 +135,12 @@
 <h1>RaisimGymTorch<a class="headerlink" href="#raisimgymtorch" title="Link to this heading"></a></h1>
 <section id="what-is-raisimgymtorch">
 <h2>What is RaisimGymTorch?<a class="headerlink" href="#what-is-raisimgymtorch" title="Link to this heading"></a></h2>
-<a class="reference internal image-reference" href="../_images/raisimGymTorch.png"><img alt="RaiSimPy demo (robots.py)" src="../_images/raisimGymTorch.png" style="width: 600px;" />
+<a class="reference internal image-reference" href="../_images/raisimGymTorch.png"><img alt="RaisimGymTorch overview" src="../_images/raisimGymTorch.png" style="width: 600px;" />
 </a>
-<p>RaisimGymTorch is a gym environment example for RaiSim.
-A lightweight PyTorch-based RL framework is provided, but it should work with other RL frameworks.
-Instead of using RaisimPy, nanobind wraps a vectorized environment in C++ so that the parallelization happens in C++.
+<p>RaisimGymTorch is a gym environment example for RaiSim. It comes with a
+lightweight PyTorch-based RL framework, but the environments also work with
+other RL frameworks. Instead of going through RaisimPy, nanobind wraps a
+vectorized environment written in C++, so the parallelization happens in C++.
 This improves performance significantly.</p>
 </section>
 <section id="why-raisimgymtorch">
@@ -149,29 +150,34 @@ Such a number of state transitions can be necessary for challenging tasks. An ex
 <img alt="trained policy 1" src="../_images/raisimGymTorch_trainedPolicy1.gif" />
 <img alt="trained policy 2" src="../_images/raisimGymTorch_trainedPolicy2.gif" />
 <p>Approximately <strong>160 billion time steps</strong> were used to train the above controller.
-RaisimGymTorch can process about 500k time steps per second in the above environment (with 3950x) with an actuator network whose cost matches the physics simulation.</p>
+RaisimGymTorch can process about 500k time steps per second in the above environment (on a Ryzen 9 3950X) with an actuator network whose cost matches that of the physics simulation.</p>
 </section>
 <section id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading"></a></h2>
-<p>Assuming that you have installed RaiSim:</p>
+<p>RaiSim, rayrai, Eigen, and nanobind come with <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code>. In addition, you need:</p>
 <ul class="simple">
-<li><p>Anaconda</p></li>
-<li><p>PyTorch (<a class="reference external" href="https://pytorch.org/">https://pytorch.org/</a>)</p></li>
-<li><p>To use the GPU, install CUDA as well. Use the version recommended by PyTorch.</p></li>
-<li><p>OpenMP on Linux/Windows. On macOS, OpenMP is used when available; otherwise
-RaisimGymTorch builds with a serial fallback.</p></li>
-<li><p>Other dependencies are installed when you build a RaisimGymTorch environment for the first time.</p></li>
+<li><p>Python 3.9 or newer in a conda or venv environment, CMake 3.10 or newer, and
+a C++20 compiler.</p></li>
+<li><p>PyTorch (<a class="reference external" href="https://pytorch.org/">https://pytorch.org/</a>). To use the GPU, also install the CUDA version
+recommended by PyTorch.</p></li>
+<li><p>OpenMP on Linux and Windows. On macOS, OpenMP is used when available;
+otherwise RaisimGymTorch builds without it and runs the environments
+serially.</p></li>
+<li><p>The Python packages in <code class="docutils literal notranslate"><span class="pre">raisimGymTorch/requirements.txt</span></code>.</p></li>
 </ul>
 </section>
 <section id="how-to-run-the-example">
 <h2>How to run the example<a class="headerlink" href="#how-to-run-the-example" title="Link to this heading"></a></h2>
 <p>We provide an ANYmal locomotion example.
 From the <code class="docutils literal notranslate"><span class="pre">raisimGymTorch</span></code> directory:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>numpy<span class="w"> </span>tensorboard<span class="w"> </span>ruamel.yaml
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
 python<span class="w"> </span>setup.py<span class="w"> </span>develop
 python<span class="w"> </span>raisimGymTorch/env/envs/rsg_anymal/runner.py
 </pre></div>
 </div>
+<p><code class="docutils literal notranslate"><span class="pre">runner.py</span></code> trains by default. Resume from a checkpoint with
+<code class="docutils literal notranslate"><span class="pre">--mode</span> <span class="pre">retrain</span> <span class="pre">--weight</span> <span class="pre">/path/to/full_N.pt</span></code>, and replay a checkpoint with
+<code class="docutils literal notranslate"><span class="pre">raisimGymTorch/env/envs/rsg_anymal/tester.py</span> <span class="pre">--weight</span> <span class="pre">/path/to/full_N.pt</span></code>.</p>
 <p>On macOS, source the package environment before building so Python can load the
 RaiSim and rayrai dynamic libraries:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>..
@@ -181,35 +187,39 @@ python<span class="w"> </span>setup.py<span class="w"> </span>develop
 </pre></div>
 </div>
 <p>If <code class="docutils literal notranslate"><span class="pre">../raisim</span></code> or <code class="docutils literal notranslate"><span class="pre">../rayrai</span></code> is missing, CMake downloads the matching
-macOS package automatically: <code class="docutils literal notranslate"><span class="pre">macos-arm64</span></code> on Apple Silicon, including
-Rosetta shells, and <code class="docutils literal notranslate"><span class="pre">macos-x86_64</span></code> on Intel when that asset is available.
-Install <code class="docutils literal notranslate"><span class="pre">libomp</span></code> if you want OpenMP parallelism on macOS; without it, the C++
-vectorized environment compiles with a serial fallback.</p>
-<p>To visualize the policy, use <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> as described in
-<a class="reference internal" href="Visualization.html"><span class="doc">Visualization</span></a>. The training script records policy performance every 200
-iterations. Older RaisimUnity/Unreal visualization workflows have been replaced;
-see <a class="reference internal" href="LegacyIntegrations.html"><span class="doc">Legacy Integrations</span></a> for migration notes.</p>
+release package automatically, for example <code class="docutils literal notranslate"><span class="pre">macos-arm64</span></code> on Apple Silicon
+(including Rosetta shells) and <code class="docutils literal notranslate"><span class="pre">macos-x86_64</span></code> on Intel when that asset is
+available. Install <code class="docutils literal notranslate"><span class="pre">libomp</span></code> if you want OpenMP parallelism on macOS.</p>
+<p>With <code class="docutils literal notranslate"><span class="pre">render:</span> <span class="pre">True</span></code> in <code class="docutils literal notranslate"><span class="pre">cfg.yaml</span></code>, the first environment runs a
+<code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code>; connect <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> as described in
+<a class="reference internal" href="Visualization.html"><span class="doc">Visualization</span></a> to watch it. Every <code class="docutils literal notranslate"><span class="pre">eval_every_n</span></code> updates (200 in the
+shipped <code class="docutils literal notranslate"><span class="pre">cfg.yaml</span></code>), the runner saves a checkpoint, runs one visualized
+evaluation rollout, and asks the connected viewer to record it as a video.
+Older RaisimUnity/Unreal visualization workflows have been replaced; see
+<a class="reference internal" href="LegacyIntegrations.html"><span class="doc">Legacy Integrations</span></a> for migration notes.</p>
 </section>
 <section id="how-to-debug">
 <h2>How to debug<a class="headerlink" href="#how-to-debug" title="Link to this heading"></a></h2>
-<p>A nanobind package (e.g., your environment) can be difficult to debug because it is written in C++ but not run as a normal executable.
-We provide a debug app that wraps your environment and creates an executable.
-To build the debug app, build your environment with</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>setup.py<span class="w"> </span>develop<span class="w"> </span>--Debug
+<p>A nanobind package, such as your environment, can be difficult to debug
+because it is written in C++ but does not run as a normal executable. We
+provide a debug app that wraps your environment in an executable. To build the
+debug app, build your environment in the Debug configuration:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>setup.py<span class="w"> </span>build_ext<span class="w"> </span>--inplace<span class="w"> </span>--Debug
 </pre></div>
 </div>
-<p>Then, the debug executable is created next to your nanobind package
+<p>The debug executable is created next to your nanobind package
 (<code class="docutils literal notranslate"><span class="pre">raisimGymTorch/raisimGymTorch/env/bin</span></code>).
 If you use CLion (recommended), open the raisimGymTorch directory in CLion.
-It will automatically add the debug app executable.
-It provides a convenient GUI for debugging.</p>
+CLion adds the debug app executable automatically and provides a convenient
+GUI for debugging.</p>
 <p>You can run the debug app as:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./&lt;environment<span class="w"> </span>name&gt;_debug_app<span class="w"> </span>&lt;full<span class="w"> </span>path<span class="w"> </span>to<span class="w"> </span>rsc<span class="w"> </span>directory&gt;<span class="w"> </span>&lt;full<span class="w"> </span>path<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>cfg<span class="w"> </span>file&gt;
 </pre></div>
 </div>
 <p>or add the arguments to the CLion run configuration.</p>
-<p><strong>On Windows</strong>, make sure that you are linking against the debug-build raisim.
-Visual Studio compiled executables will not work if it links against a library built with different compile flags.</p>
+<p><strong>On Windows</strong>, make sure that you link against the Debug build of RaiSim.
+Executables built with Visual Studio do not work when they link against a
+library built with different runtime flags.</p>
 </section>
 <section id="how-does-it-work">
 <h2>How does it work?<a class="headerlink" href="#how-does-it-work" title="Link to this heading"></a></h2>
@@ -232,18 +242,27 @@ those sibling prefixes directly. After adding or copying an environment under
 python<span class="w"> </span>setup.py<span class="w"> </span>develop
 </pre></div>
 </div>
-<p>Delete generated <code class="docutils literal notranslate"><span class="pre">build</span></code> and <code class="docutils literal notranslate"><span class="pre">raisim_gym_torch.egg-info</span></code> directories before
-a clean rebuild when changing Python interpreters or build configurations.
-However, if you want to keep multiple environments, you may want to rename a few items.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>Package name: You can find it in <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> (<code class="docutils literal notranslate"><span class="pre">name='raisim_gym_torch'</span></code>). This is the name you will find in <code class="docutils literal notranslate"><span class="pre">site_packages</span></code> directory of your anaconda environment.</p></li>
-<li><p>Directory name: This is the directory name that you will find in the top <code class="docutils literal notranslate"><span class="pre">raisimGymTorch</span></code> directory. The default name is <code class="docutils literal notranslate"><span class="pre">raisimGymTorch</span></code>. Modify it if necessary, and update the directories in the header of <code class="docutils literal notranslate"><span class="pre">runner.py</span></code> and the <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code>.</p></li>
-<li><p>Binary name: This is the name of the directory of your environment. The default name is <code class="docutils literal notranslate"><span class="pre">rsg_anymal</span></code>. If you change the directory name, update <code class="docutils literal notranslate"><span class="pre">rsg_anymal</span></code> in <code class="docutils literal notranslate"><span class="pre">runner.py</span></code>.</p></li>
-<li><p>Environment name: This is the name of the binary that will be built from your <code class="docutils literal notranslate"><span class="pre">Environment.hpp</span></code> file. The default name is <code class="docutils literal notranslate"><span class="pre">RaisimGymVecEnv</span></code>. You can find it in <code class="docutils literal notranslate"><span class="pre">raisim_gym.cpp</span></code>. If you change it, update the name in <code class="docutils literal notranslate"><span class="pre">runner.py</span></code>.</p></li>
+<p>Delete the generated <code class="docutils literal notranslate"><span class="pre">build</span></code> and <code class="docutils literal notranslate"><span class="pre">raisim_gym_torch.egg-info</span></code> directories
+before a clean rebuild when you change Python interpreters or build
+configurations. If you want to keep several environments side by side, you may
+want to rename a few items:</p>
+<ul class="simple">
+<li><p>Package name: set in <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> (<code class="docutils literal notranslate"><span class="pre">name='raisim_gym_torch'</span></code>). This is the
+name you will find in the <code class="docutils literal notranslate"><span class="pre">site-packages</span></code> directory of your Python
+environment.</p></li>
+<li><p>Directory name: the name of the Python package directory inside the
+top-level <code class="docutils literal notranslate"><span class="pre">raisimGymTorch</span></code> directory. The default name is
+<code class="docutils literal notranslate"><span class="pre">raisimGymTorch</span></code>. If you change it, update the paths in the header of
+<code class="docutils literal notranslate"><span class="pre">runner.py</span></code> and in <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code>.</p></li>
+<li><p>Module name: each directory under <code class="docutils literal notranslate"><span class="pre">raisimGymTorch/env/envs</span></code> is built into a
+nanobind module with the same name. The default is <code class="docutils literal notranslate"><span class="pre">rsg_anymal</span></code>. If you
+rename the directory, update <code class="docutils literal notranslate"><span class="pre">rsg_anymal</span></code> in <code class="docutils literal notranslate"><span class="pre">runner.py</span></code>.</p></li>
+<li><p>Environment class name: the Python class that the module exports for your
+<code class="docutils literal notranslate"><span class="pre">Environment.hpp</span></code>. It is set by the <code class="docutils literal notranslate"><span class="pre">ENVIRONMENT_NAME</span></code> macro in
+<code class="docutils literal notranslate"><span class="pre">raisim_gym.cpp</span></code> and defaults to <code class="docutils literal notranslate"><span class="pre">RaisimGymEnv</span></code>. If you change it, update
+the name in <code class="docutils literal notranslate"><span class="pre">runner.py</span></code>.</p></li>
 </ul>
-<p>You can also create another conda environment to avoid name conflicts.</p>
-</div></blockquote>
+<p>You can also create another conda or venv environment to avoid name conflicts.</p>
 </section>
 <section id="code-structure-if-you-are-curious">
 <h2>Code structure (if you are curious)<a class="headerlink" href="#code-structure-if-you-are-curious" title="Link to this heading"></a></h2>
@@ -259,7 +278,10 @@ It defines the interface functions.</p>
 <section id="common-issues-and-solutions">
 <h2>Common issues and solutions<a class="headerlink" href="#common-issues-and-solutions" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>If Python scripts complain about missing “libcudnn.so”: conda install -c nvidia cudnn</p></li>
+<li><p>If Python scripts complain about a missing <code class="docutils literal notranslate"><span class="pre">libcudnn.so</span></code>, install cuDNN,
+for example with <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">-c</span> <span class="pre">nvidia</span> <span class="pre">cudnn</span></code>.</p></li>
+<li><p>Video recording in <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> uses <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> from <code class="docutils literal notranslate"><span class="pre">PATH</span></code>
+(or <code class="docutils literal notranslate"><span class="pre">$RAYRAI_FFMPEG</span></code>); without it, the viewer writes a PNG sequence.</p></li>
 </ul>
 </section>
 </section>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Project Layout &mdash; raisim 2.7.0 documentation</title>
+  <title>Project Layout &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -80,17 +80,17 @@
 <li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -149,11 +149,12 @@ package and building examples.</p>
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">raisim</span></code></p></td>
 <td><p>Platform-specific binary RaiSim package with headers, libraries, and
-CMake config files.</p></td>
+CMake config files. Downloaded by the first CMake configure (or
+<code class="docutils literal notranslate"><span class="pre">raisim_upgrade</span></code>); not tracked in Git.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">rayrai</span></code></p></td>
 <td><p>Platform-specific binary rayrai package with the renderer library,
-headers, and CMake config files.</p></td>
+headers, and CMake config files. Downloaded together with <code class="docutils literal notranslate"><span class="pre">raisim</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">examples</span></code></p></td>
 <td><p>C++ example sources and their CMake project. CMake target names include
@@ -173,10 +174,23 @@ assets, and example data.</p></td>
 <td><p>Sphinx documentation sources and generated example pages.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">thirdParty</span></code></p></td>
-<td><p>Third-party code used by optional wrappers and docs tooling.</p></td>
+<td><p>Bundled third-party sources: Eigen3 (used by Windows builds) and
+nanobind (used by <code class="docutils literal notranslate"><span class="pre">raisimPy</span></code>).</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">cmake</span></code></p></td>
-<td><p>CMake helpers for package discovery and local installation.</p></td>
+<td><p>CMake find modules for the build (<code class="docutils literal notranslate"><span class="pre">FindSphinx.cmake</span></code> for the
+documentation build).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">scripts</span></code></p></td>
+<td><p>Helper scripts: the Blender scene exporter
+(<code class="docutils literal notranslate"><span class="pre">export_blender_scene.py</span></code>) and the Linux desktop-launcher installer
+for <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">raisim_env.*</span></code>, <code class="docutils literal notranslate"><span class="pre">raisim_upgrade.*</span></code></p></td>
+<td><p>Environment scripts that add the package library directories to the
+library search path (<code class="docutils literal notranslate"><span class="pre">.sh</span></code>, <code class="docutils literal notranslate"><span class="pre">.bat</span></code>, <code class="docutils literal notranslate"><span class="pre">.ps1</span></code>) and scripts that
+download a release package into <code class="docutils literal notranslate"><span class="pre">raisim</span></code> and <code class="docutils literal notranslate"><span class="pre">rayrai</span></code>
+(<code class="docutils literal notranslate"><span class="pre">.sh</span></code>, <code class="docutils literal notranslate"><span class="pre">.ps1</span></code>).</p></td>
 </tr>
 </tbody>
 </table>
@@ -200,7 +214,8 @@ clarity:</p>
 <td><p>Default local build for examples and optional wrappers.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">build-examples</span></code></p></td>
-<td><p>Common local build directory for the example CMake project.</p></td>
+<td><p>Top-level build with examples enabled; the example commands in these
+docs use it.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">build-debug</span></code></p></td>
 <td><p>Debug build for local debugging.</p></td>
@@ -210,18 +225,19 @@ clarity:</p>
 </tr>
 </tbody>
 </table>
-<p>On Linux and macOS, a top-level build places example executables under the
-<code class="docutils literal notranslate"><span class="pre">examples</span></code> subdirectory of the build tree. The install target does not copy
-these source-built examples, and the release package does not ship a separate
-prebuilt TCP viewer. For example:</p>
+<p>On Linux and macOS, a top-level build places example executables, together
+with a copy of <code class="docutils literal notranslate"><span class="pre">rsc</span></code>, under the <code class="docutils literal notranslate"><span class="pre">examples</span></code> subdirectory of the build tree.
+The install target does not copy these source-built examples, and the release
+package does not ship a separate prebuilt TCP viewer. For example:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build-examples/examples/primitive_grid
 ./build-examples/examples/rayrai_tcp_viewer
 </pre></div>
 </div>
-<p>On Windows, CMake places runtime executables under <code class="docutils literal notranslate"><span class="pre">&lt;build-dir&gt;/bin</span></code>.</p>
+<p>On Windows, CMake places the example executables under <code class="docutils literal notranslate"><span class="pre">&lt;build-dir&gt;/bin</span></code>,
+together with a copy of <code class="docutils literal notranslate"><span class="pre">rsc</span></code> and the runtime DLLs.</p>
 <p>The package example tree documented under <a class="reference internal" href="Examples.html"><span class="doc">Examples</span></a> contains grouped
-source directories such as <code class="docutils literal notranslate"><span class="pre">src/server</span></code>, <code class="docutils literal notranslate"><span class="pre">src/rayrai</span></code>, <code class="docutils literal notranslate"><span class="pre">src/worlds</span></code>, and
-<code class="docutils literal notranslate"><span class="pre">src/xml</span></code>. Target names, not source directory names, are the stable
+source directories such as <code class="docutils literal notranslate"><span class="pre">src/server</span></code>, <code class="docutils literal notranslate"><span class="pre">src/rayrai</span></code>, <code class="docutils literal notranslate"><span class="pre">src/worlds</span></code>,
+<code class="docutils literal notranslate"><span class="pre">src/xml</span></code>, and <code class="docutils literal notranslate"><span class="pre">src/benchmark</span></code>. Target names, not source directory names, are the stable
 user-facing interface.</p>
 </section>
 <section id="installed-package-layout">

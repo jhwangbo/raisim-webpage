@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Post-process effects &mdash; raisim 2.7.0 documentation</title>
+  <title>Post-process effects &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -74,17 +74,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul class="current">
@@ -162,22 +162,23 @@ macOS; see <a class="reference internal" href="#platform-notes">Platform notes</
 <section id="cinematic-post-process-effects">
 <h2>Cinematic post-process effects<a class="headerlink" href="#cinematic-post-process-effects" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code> exposes a large set of optional screen-space effects.
-Each one is gated by an <code class="docutils literal notranslate"><span class="pre">*Enabled</span></code> flag so the fast frame path stays cheap;
-turn them on per-shot for screenshots, asset inspection, or demo captures.</p>
+Each one is off by default, behind an <code class="docutils literal notranslate"><span class="pre">*Enabled</span></code> flag or a zero strength, so
+the fast frame path stays cheap; turn them on per shot for screenshots, asset
+inspection, or demo captures.</p>
 <p>Cinematic lens and image effects:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">viewerVignetteStrength</span></code> — radial darkening.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">viewerChromaticAberrationStrength</span></code> — RGB channel offset.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">viewerFilmGrainStrength</span></code> — luma-noise overlay.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">lensFlareGhostStrength</span></code>, <code class="docutils literal notranslate"><span class="pre">lensFlareStreakStrength</span></code>, <code class="docutils literal notranslate"><span class="pre">lensFlareTint</span></code> —
-cinematic lens flares around bright lights.</p></li>
+lens-flare ghosts and a horizontal streak from bright pixels.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">lensDistortionEnabled</span></code> / <code class="docutils literal notranslate"><span class="pre">lensDistortionStrength</span></code> /
 <code class="docutils literal notranslate"><span class="pre">lensDistortionCenter</span></code> — signed barrel or pincushion distortion.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">letterboxEnabled</span></code> / <code class="docutils literal notranslate"><span class="pre">letterboxAspect</span></code> / <code class="docutils literal notranslate"><span class="pre">letterboxColor</span></code> —
 cinematic letterboxing.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">starburstEnabled</span></code> / <code class="docutils literal notranslate"><span class="pre">starburstStrength</span></code> / <code class="docutils literal notranslate"><span class="pre">starburstSpikes</span></code> /
 <code class="docutils literal notranslate"><span class="pre">starburstAngleOffset</span></code> / <code class="docutils literal notranslate"><span class="pre">starburstRadius</span></code> / <code class="docutils literal notranslate"><span class="pre">starburstTint</span></code> —
-aperture-shaped highlights.</p></li>
+diffraction spikes around the sun’s screen position.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">zoomBlurEnabled</span></code> / <code class="docutils literal notranslate"><span class="pre">zoomBlurStrength</span></code> / <code class="docutils literal notranslate"><span class="pre">zoomBlurCenter</span></code> /
 <code class="docutils literal notranslate"><span class="pre">zoomBlurInnerRadius</span></code> — radial focus blur for sprint and dash effects.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">motionBlurEnabled</span></code> / <code class="docutils literal notranslate"><span class="pre">motionBlurDirection</span></code> / <code class="docutils literal notranslate"><span class="pre">motionBlurStrength</span></code> —
@@ -319,17 +320,18 @@ corners, and tight contacts using <code class="docutils literal notranslate"><sp
 pass on top of SSAO for surfaces that touch.</p>
 <p>With the denoiser on and temporal AA off (as in the High preset), AO is
 computed once per pixel in a prepass and the denoiser reuses it; results can
-differ from per-tap evaluation by a few 8-bit levels. With temporal AA on
-(Ultra) each denoise tap evaluates AO again, which costs noticeably more. Set
-<code class="docutils literal notranslate"><span class="pre">RAYRAI_DISABLE_CACHED_AO=1</span></code> to force the per-tap path. AO is stable from
-frame to frame at sky silhouettes, including on Apple GPUs.</p>
+differ from per-tap evaluation by a few 8-bit levels. With legacy temporal AA
+on (Ultra) each denoise tap evaluates AO again, which costs noticeably more. AO
+is stable from frame to frame at sky silhouettes, including on Apple GPUs.</p>
 <p>Screen-space indirect lighting (<code class="docutils literal notranslate"><span class="pre">screenSpaceIndirectLightingEnabled</span></code>)
-bounces one indirect ray per pixel against the colour buffer to add coloured
-fill light from nearby diffuse surfaces; <code class="docutils literal notranslate"><span class="pre">Radius</span></code>, <code class="docutils literal notranslate"><span class="pre">Strength</span></code>, <code class="docutils literal notranslate"><span class="pre">Samples</span></code>,
-<code class="docutils literal notranslate"><span class="pre">Falloff</span></code>, <code class="docutils literal notranslate"><span class="pre">NormalRejection</span></code>, and <code class="docutils literal notranslate"><span class="pre">Saturation</span></code> control quality and bias.</p>
-<p>Contact shadows (<code class="docutils literal notranslate"><span class="pre">contactShadowsEnabled</span></code>) ray-march short shadow rays in
-screen space to recover fine occlusion near grazing geometry that a shadow
-map misses; <code class="docutils literal notranslate"><span class="pre">Length</span></code>, <code class="docutils literal notranslate"><span class="pre">Strength</span></code>, and <code class="docutils literal notranslate"><span class="pre">Thickness</span></code> are in metres.</p>
+gathers one bounce of light from the colour buffer around each pixel to add
+coloured fill light from nearby diffuse surfaces; <code class="docutils literal notranslate"><span class="pre">Radius</span></code>, <code class="docutils literal notranslate"><span class="pre">Strength</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Samples</span></code>, <code class="docutils literal notranslate"><span class="pre">Falloff</span></code>, <code class="docutils literal notranslate"><span class="pre">NormalRejection</span></code>, and <code class="docutils literal notranslate"><span class="pre">Saturation</span></code> control
+quality and bias.</p>
+<p>Contact shadows (<code class="docutils literal notranslate"><span class="pre">contactShadowsEnabled</span></code>) ray-march short shadow rays toward
+the main light in screen space to recover fine occlusion near grazing geometry
+that a shadow map misses. <code class="docutils literal notranslate"><span class="pre">Length</span></code> (at most 0.5) and <code class="docutils literal notranslate"><span class="pre">Thickness</span></code> are in
+metres; <code class="docutils literal notranslate"><span class="pre">Strength</span></code> is the darkening, 0–1.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">quality</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">defaultRenderQualitySettings</span><span class="p">(</span>
 <span class="w">  </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">RenderQualityPreset</span><span class="o">::</span><span class="n">High</span><span class="p">);</span>
 
@@ -401,12 +403,14 @@ map misses; <code class="docutils literal notranslate"><span class="pre">Length<
 <p>Depth of field (<code class="docutils literal notranslate"><span class="pre">depthOfFieldEnabled</span></code>, <code class="docutils literal notranslate"><span class="pre">depthOfFieldFocusDistance</span></code>,
 <code class="docutils literal notranslate"><span class="pre">depthOfFieldFocusRange</span></code>, <code class="docutils literal notranslate"><span class="pre">depthOfFieldMaxRadius</span></code>) uses a hex-bokeh disk
 and a depth-driven circle-of-confusion sample. The hex shape is intentionally
-cinematic; <code class="docutils literal notranslate"><span class="pre">starburstEnabled</span></code> adds an aperture-shaped highlight starburst
-for in-focus bright sources.</p>
+cinematic. Pixels inside <code class="docutils literal notranslate"><span class="pre">depthOfFieldFocusRange</span></code> around the focus distance
+stay sharp; the blur grows with distance from that band up to
+<code class="docutils literal notranslate"><span class="pre">depthOfFieldMaxRadius</span></code> pixels. <code class="docutils literal notranslate"><span class="pre">starburstEnabled</span></code> adds aperture-style
+diffraction spikes around the sun’s screen position.</p>
 <p>Lens flare uses two layers: ghost reflections projected toward the screen
-centre (<code class="docutils literal notranslate"><span class="pre">lensFlareGhostStrength</span></code>) and an axial streak from very bright
-sources (<code class="docutils literal notranslate"><span class="pre">lensFlareStreakStrength</span></code>). Both share <code class="docutils literal notranslate"><span class="pre">lensFlareTint</span></code> (a cool
-cinematic blue by default).</p>
+centre (<code class="docutils literal notranslate"><span class="pre">lensFlareGhostStrength</span></code>) and a horizontal (anamorphic) streak through
+very bright pixels (<code class="docutils literal notranslate"><span class="pre">lensFlareStreakStrength</span></code>). Both share <code class="docutils literal notranslate"><span class="pre">lensFlareTint</span></code>
+(a cool cinematic blue by default).</p>
 <p><code class="docutils literal notranslate"><span class="pre">viewerVignetteStrength</span></code>, <code class="docutils literal notranslate"><span class="pre">viewerChromaticAberrationStrength</span></code>, and
 <code class="docutils literal notranslate"><span class="pre">viewerFilmGrainStrength</span></code> add the rest of the standard photographic camera
 character. <code class="docutils literal notranslate"><span class="pre">lensDistortionEnabled</span></code> applies signed barrel / pincushion
@@ -419,7 +423,7 @@ distortion centred at <code class="docutils literal notranslate"><span class="pr
 <span class="n">quality</span><span class="p">.</span><span class="n">depthOfFieldFocusRange</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.8f</span><span class="p">;</span><span class="w">      </span><span class="c1">// metres of in-focus band</span>
 <span class="n">quality</span><span class="p">.</span><span class="n">depthOfFieldMaxRadius</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.6f</span><span class="p">;</span><span class="w">       </span><span class="c1">// pixels at far blur</span>
 
-<span class="c1">// Aperture-shaped highlight starburst.</span>
+<span class="c1">// Diffraction spikes around the sun.</span>
 <span class="n">quality</span><span class="p">.</span><span class="n">starburstEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
 <span class="n">quality</span><span class="p">.</span><span class="n">starburstStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.6f</span><span class="p">;</span>
 <span class="n">quality</span><span class="p">.</span><span class="n">starburstSpikes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
@@ -472,9 +476,13 @@ distortion centred at <code class="docutils literal notranslate"><span class="pr
 <h3>Motion blur and atmospheric effects<a class="headerlink" href="#motion-blur-and-atmospheric-effects" title="Link to this heading"></a></h3>
 <p>Directional motion blur (<code class="docutils literal notranslate"><span class="pre">motionBlurEnabled</span></code>, <code class="docutils literal notranslate"><span class="pre">motionBlurDirection</span></code>,
 <code class="docutils literal notranslate"><span class="pre">motionBlurStrength</span></code>) smears the colour buffer along a constant screen-space
-vector. Useful for shutter-style captures and stylized motion frames.</p>
-<p>Heat haze (<code class="docutils literal notranslate"><span class="pre">heatHazeEnabled</span></code>) perturbs UVs with a noise field above
-<code class="docutils literal notranslate"><span class="pre">heatHazeMaxY</span></code> in screen space, simulating hot air shimmer. Underwater
+vector: <code class="docutils literal notranslate"><span class="pre">motionBlurDirection</span></code> is the blur vector in screen-UV units, scaled by
+<code class="docutils literal notranslate"><span class="pre">motionBlurStrength</span></code> (0–1). It models camera motion only; there is no
+per-object velocity buffer. Useful for shutter-style captures and stylized
+motion frames.</p>
+<p>Heat haze (<code class="docutils literal notranslate"><span class="pre">heatHazeEnabled</span></code>) perturbs UVs with a sinusoidal ripple below
+<code class="docutils literal notranslate"><span class="pre">heatHazeMaxY</span></code> (a screen-UV height, 0 = bottom), fading out toward that line
+so the sky above stays sharp, simulating hot-air shimmer. Underwater
 (<code class="docutils literal notranslate"><span class="pre">underwaterEnabled</span></code>, <code class="docutils literal notranslate"><span class="pre">underwaterTint</span></code>, <code class="docutils literal notranslate"><span class="pre">underwaterCausticStrength</span></code>,
 <code class="docutils literal notranslate"><span class="pre">underwaterCausticScale</span></code>, <code class="docutils literal notranslate"><span class="pre">underwaterDepthExtinction</span></code>) tints the image,
 adds animated caustic patterns, and attenuates by depth.</p>
@@ -482,10 +490,10 @@ adds animated caustic patterns, and attenuates by depth.</p>
 
 <span class="c1">// Directional motion blur — typical &quot;running camera&quot; look.</span>
 <span class="n">q</span><span class="p">.</span><span class="n">motionBlurEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
-<span class="n">q</span><span class="p">.</span><span class="n">motionBlurDirection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec2</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">);</span><span class="w">  </span><span class="c1">// horizontal sweep</span>
-<span class="n">q</span><span class="p">.</span><span class="n">motionBlurStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.45f</span><span class="p">;</span>
+<span class="n">q</span><span class="p">.</span><span class="n">motionBlurDirection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec2</span><span class="p">(</span><span class="mf">0.18f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">);</span><span class="w">  </span><span class="c1">// horizontal pan, screen UV</span>
+<span class="n">q</span><span class="p">.</span><span class="n">motionBlurStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">;</span>
 
-<span class="c1">// Hot tarmac shimmer above the horizon line.</span>
+<span class="c1">// Hot tarmac shimmer in the lower 60 % of the frame.</span>
 <span class="n">q</span><span class="p">.</span><span class="n">heatHazeEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
 <span class="n">q</span><span class="p">.</span><span class="n">heatHazeStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.30f</span><span class="p">;</span>
 <span class="n">q</span><span class="p">.</span><span class="n">heatHazeFrequency</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">5.0f</span><span class="p">;</span>
@@ -623,33 +631,53 @@ exposure and goes through the same tone curve. Bloom thresholds tuned for the
 default pipeline need to be raised. Frames rendered with a
 <code class="docutils literal notranslate"><span class="pre">RAYRAI_PBR_DEBUG_OUTPUT</span></code> view keep the previous output, and
 <a class="reference internal" href="Capture.html"><span class="doc">Capture, diagnostics, and headless rendering</span></a> describes how the mode affects captures and RGB sensor images.
-Changing the exposure, tone curve, or gamma resets temporal-AA history, which
-also happens while auto exposure adapts.</p>
+Changing the exposure, tone curve, or gamma resets the legacy temporal-AA
+history, which also happens while auto exposure adapts; the reprojected method
+keeps its scene-linear history.</p>
 </section>
 <section id="temporal-anti-aliasing">
 <h3>Temporal anti-aliasing<a class="headerlink" href="#temporal-anti-aliasing" title="Link to this heading"></a></h3>
-<p><code class="docutils literal notranslate"><span class="pre">temporalAaEnabled</span></code> blends each frame with the previous result, sampled at
-the same screen position and clamped to the current pixel neighbourhood;
-<code class="docutils literal notranslate"><span class="pre">temporalAaBlend</span></code> (default 0.08, at most 0.95) is the history weight. There
-are no motion vectors, so moving content relies on that clamp. Ultra enables
-temporal AA with <code class="docutils literal notranslate"><span class="pre">temporalAaJitterScale</span> <span class="pre">=</span> <span class="pre">0</span></code>. Keep the jitter at zero: the
-resolve does not compensate for it, so a non-zero jitter shifts static images
-every frame. <code class="docutils literal notranslate"><span class="pre">RenderOverrides::allowTemporalAa</span></code> turns it off for an
-individual external render.</p>
+<p><code class="docutils literal notranslate"><span class="pre">temporalAaEnabled</span></code> turns temporal AA on, and <code class="docutils literal notranslate"><span class="pre">temporalAaMethod</span></code> selects
+the algorithm:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">TemporalAaMethod::Legacy</span></code> (the default) blends each frame with the
+previous display-encoded result, sampled at the same screen position and
+clamped to the current pixel neighbourhood; <code class="docutils literal notranslate"><span class="pre">temporalAaBlend</span></code> (default
+0.08, at most 0.95) is the history weight. There are no motion vectors, so
+moving content relies on that clamp. Ultra uses this method with
+<code class="docutils literal notranslate"><span class="pre">temporalAaJitterScale</span> <span class="pre">=</span> <span class="pre">0</span></code>. Keep the jitter at zero here: the legacy
+resolve does not compensate for it, so a non-zero jitter (the struct default
+is 1) shifts static images every frame.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TemporalAaMethod::Reprojected</span></code> accumulates jittered scene-linear colour
+and reprojects it with the camera motion and foliage wind, with depth
+rejection and variance clipping. <code class="docutils literal notranslate"><span class="pre">temporalAaCurrentWeight</span></code> (0.02–1, default
+0.1) is the weight of the new frame, and <code class="docutils literal notranslate"><span class="pre">temporalAaSharpness</span></code> (0–1, default
+0.3) sharpens the output only. <code class="docutils literal notranslate"><span class="pre">setRenderQualitySettings</span></code> throws
+<code class="docutils literal notranslate"><span class="pre">std::invalid_argument</span></code> for values outside these ranges, and forces
+<code class="docutils literal notranslate"><span class="pre">viewerMsaaSamples</span></code> to 1 while this method is on. It always uses the
+<a class="reference internal" href="#linear-hdr-rendering">Linear HDR rendering</a> output path, and an external render with a custom
+<code class="docutils literal notranslate"><span class="pre">post</span></code> shader throws <code class="docutils literal notranslate"><span class="pre">std::invalid_argument</span></code> unless its
+<code class="docutils literal notranslate"><span class="pre">RenderOverrides::allowTemporalAa</span></code> is false.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">RenderOverrides::allowTemporalAa</span></code> turns temporal AA off for an individual
+external render.</p>
 </section>
 <section id="platform-notes">
 <h3>Platform notes<a class="headerlink" href="#platform-notes" title="Link to this heading"></a></h3>
 <p>On macOS, and on other GPUs that expose 16 or fewer fragment texture units,
 rayrai uses a reduced post-process program (see the GPU capability tiers in
 <a class="reference internal" href="Materials.html"><span class="doc">PBR materials</span></a>). FXAA, additive bloom, SSAO and contact AO with denoising,
-temporal AA, depth of field, and linear HDR output work. The rest of this page
-is not rendered there: white balance, saturation, colour grading, vignette,
+temporal AA, depth of field, white balance, saturation, and linear HDR output
+work. The rest of this page is not rendered there: colour grading, vignette,
 chromatic aberration, film grain, lens flare, starburst, lens distortion,
 letterbox, motion and zoom blur, SSR, SSIL, contact shadows, aerial
 perspective, volumetric fog and lighting, light shafts, local fog volumes,
 projected decals, heat haze, underwater, the stylized looks, non-<code class="docutils literal notranslate"><span class="pre">Additive</span></code>
 bloom blend modes, and every <code class="docutils literal notranslate"><span class="pre">postProcessDebugMode</span></code> except <code class="docutils literal notranslate"><span class="pre">Final</span></code>. Lens
 droplets and precipitation are separate passes and still render.</p>
+<p>Every other GPU runs the full program. With 32 fragment texture units, which
+the NVIDIA, AMD and Intel OpenGL drivers report, a frame can use 25
+projected-decal maps instead of 32 (see <a class="reference internal" href="Lighting.html"><span class="doc">Lighting, shadows, and HDR/IBL</span></a>).</p>
 </section>
 </section>
 </section>

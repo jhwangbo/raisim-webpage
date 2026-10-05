@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Render quality, tone mapping, color grading &mdash; raisim 2.7.0 documentation</title>
+  <title>Render quality, tone mapping, color grading &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -74,17 +74,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul class="current">
@@ -173,7 +173,12 @@ linear colours before passing them in. The convention:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">Camera::setBackgroundColorRgb255</span></code> and <code class="docutils literal notranslate"><span class="pre">RayraiWindow::setBackgroundColorRgb255</span></code>
 use legacy <code class="docutils literal notranslate"><span class="pre">0..255</span></code> RGBA. <code class="docutils literal notranslate"><span class="pre">setBackgroundColor</span></code> is kept as a compatibility wrapper
 for the same <code class="docutils literal notranslate"><span class="pre">0..255</span></code> range.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">setBackgroundColorLinear</span></code> accepts linear <code class="docutils literal notranslate"><span class="pre">0..1</span></code> RGBA and converts it internally.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setBackgroundColorLinear</span></code> takes <code class="docutils literal notranslate"><span class="pre">0..1</span></code> RGBA and multiplies it by 255, so the
+two background calls below set the same colour; neither converts between sRGB and
+linear. The background colour shows only where no sky or environment map is
+drawn, so it is hidden by the procedural sky unless
+<code class="docutils literal notranslate"><span class="pre">proceduralSkyBackgroundEnabled</span></code> is false. <code class="docutils literal notranslate"><span class="pre">setRenderQualitySettings</span></code> and
+<code class="docutils literal notranslate"><span class="pre">setRenderQualityPreset</span></code> replace it with <code class="docutils literal notranslate"><span class="pre">backgroundColorRgb255</span></code>.</p></li>
 <li><p>Texture uploads distinguish color maps and data maps. Use <code class="docutils literal notranslate"><span class="pre">loadColorTextureWithTiling</span></code>
 for sRGB albedo/emissive maps, and <code class="docutils literal notranslate"><span class="pre">loadDataTextureWithTiling</span></code> for normal,
 metallic-roughness, AO, depth, mask, or other linear data textures.</p></li>
@@ -182,15 +187,15 @@ metallic-roughness, AO, depth, mask, or other linear data textures.</p></li>
 <span class="n">sphere</span><span class="o">-&gt;</span><span class="n">setColor</span><span class="p">(</span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.95f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.43f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.12f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">));</span>
 
 <span class="c1">// Background: pick the API that matches your colour range.</span>
-<span class="n">viewer</span><span class="p">.</span><span class="n">setBackgroundColorRgb255</span><span class="p">({</span><span class="mi">40</span><span class="p">,</span><span class="w"> </span><span class="mi">45</span><span class="p">,</span><span class="w"> </span><span class="mi">55</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">});</span><span class="w">           </span><span class="c1">// 0..255 sRGB</span>
-<span class="n">viewer</span><span class="p">.</span><span class="n">setBackgroundColorLinear</span><span class="p">({</span><span class="mf">0.157f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.176f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.216f</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">});</span><span class="w">  </span><span class="c1">// 0..1 linear</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setBackgroundColorRgb255</span><span class="p">({</span><span class="mi">40</span><span class="p">,</span><span class="w"> </span><span class="mi">45</span><span class="p">,</span><span class="w"> </span><span class="mi">55</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">});</span><span class="w">           </span><span class="c1">// 0..255 per channel</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">setBackgroundColorLinear</span><span class="p">({</span><span class="mf">0.157f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.176f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.216f</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">});</span><span class="w">  </span><span class="c1">// same colour, 0..1</span>
 
 <span class="c1">// Texture uploads distinguish colour maps from data maps:</span>
 <span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">albedo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">loadColorTextureWithTiling</span><span class="p">(</span>
 <span class="w">    </span><span class="s">&quot;/path/wood_albedo.png&quot;</span><span class="p">);</span><span class="w">      </span><span class="c1">// treated as sRGB</span>
 <span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">normal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">loadDataTextureWithTiling</span><span class="p">(</span>
 <span class="w">    </span><span class="s">&quot;/path/wood_normal.png&quot;</span><span class="p">);</span><span class="w">      </span><span class="c1">// treated as linear data</span>
-<span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">roughness</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">loadDataTextureWithTiling</span><span class="p">(</span>
+<span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">orm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">loadDataTextureWithTiling</span><span class="p">(</span>
 <span class="w">    </span><span class="s">&quot;/path/wood_orm.png&quot;</span><span class="p">);</span><span class="w">         </span><span class="c1">// treated as linear data</span>
 </pre></div>
 </div>
@@ -451,14 +456,17 @@ materials; see <a class="reference internal" href="Materials.html"><span class="
 </section>
 <section id="tone-mapping-exposure-and-color-grading">
 <h2>Tone mapping, exposure, and color grading<a class="headerlink" href="#tone-mapping-exposure-and-color-grading" title="Link to this heading"></a></h2>
-<p>The viewer color pipeline is driven by <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code>. Tone mapping is
-selected by <code class="docutils literal notranslate"><span class="pre">colorMode</span></code> (<code class="docutils literal notranslate"><span class="pre">ViewerColorMode</span></code>): <code class="docutils literal notranslate"><span class="pre">FastLinear</span></code> (no tone curve),
-<code class="docutils literal notranslate"><span class="pre">AcesApprox</span></code> (ACES-fitted), <code class="docutils literal notranslate"><span class="pre">UnrealPreviewApprox</span></code>, <code class="docutils literal notranslate"><span class="pre">FilmicApprox</span></code>, and
-<code class="docutils literal notranslate"><span class="pre">AgXApprox</span></code>. Exposure is controlled by <code class="docutils literal notranslate"><span class="pre">pbrExposure</span></code> plus an optional
-auto-exposure loop (<code class="docutils literal notranslate"><span class="pre">autoExposureEnabled</span></code>, <code class="docutils literal notranslate"><span class="pre">autoExposureKey</span></code>,
-<code class="docutils literal notranslate"><span class="pre">autoExposureSpeed</span></code>, <code class="docutils literal notranslate"><span class="pre">autoExposureMinFactor</span></code>, <code class="docutils literal notranslate"><span class="pre">autoExposureMaxFactor</span></code>)
-that drives exposure toward a target post-tonemap luma. White balance and
-saturation use <code class="docutils literal notranslate"><span class="pre">viewerWhiteBalance</span></code> and <code class="docutils literal notranslate"><span class="pre">viewerSaturation</span></code>.</p>
+<p>The viewer color pipeline is driven by <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings</span></code>. The tone curve
+is applied only when <code class="docutils literal notranslate"><span class="pre">pbrToneMapping</span></code> is true, and <code class="docutils literal notranslate"><span class="pre">colorMode</span></code>
+(<code class="docutils literal notranslate"><span class="pre">ViewerColorMode</span></code>) selects it: <code class="docutils literal notranslate"><span class="pre">FastLinear</span></code> (the default; it currently uses the
+same fitted ACES curve as <code class="docutils literal notranslate"><span class="pre">AcesApprox</span></code>), <code class="docutils literal notranslate"><span class="pre">AcesApprox</span></code> (fitted ACES),
+<code class="docutils literal notranslate"><span class="pre">UnrealPreviewApprox</span></code>, <code class="docutils literal notranslate"><span class="pre">FilmicApprox</span></code>, and <code class="docutils literal notranslate"><span class="pre">AgXApprox</span></code>. To render without a
+tone curve, set <code class="docutils literal notranslate"><span class="pre">pbrToneMapping</span> <span class="pre">=</span> <span class="pre">false</span></code>. Exposure is controlled by
+<code class="docutils literal notranslate"><span class="pre">pbrExposure</span></code> plus an optional auto-exposure loop (<code class="docutils literal notranslate"><span class="pre">autoExposureEnabled</span></code>,
+<code class="docutils literal notranslate"><span class="pre">autoExposureKey</span></code>, <code class="docutils literal notranslate"><span class="pre">autoExposureSpeed</span></code>, <code class="docutils literal notranslate"><span class="pre">autoExposureMinFactor</span></code>,
+<code class="docutils literal notranslate"><span class="pre">autoExposureMaxFactor</span></code>) that adapts exposure toward a target average luminance
+of the displayed frame. White balance and saturation use <code class="docutils literal notranslate"><span class="pre">viewerWhiteBalance</span></code>
+and <code class="docutils literal notranslate"><span class="pre">viewerSaturation</span></code>.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">quality</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">getRenderQualitySettings</span><span class="p">();</span>
 
 <span class="c1">// Pick the tone curve.</span>
@@ -484,10 +492,12 @@ saturation use <code class="docutils literal notranslate"><span class="pre">view
 <span class="n">viewer</span><span class="p">.</span><span class="n">setRenderQualitySettings</span><span class="p">(</span><span class="n">quality</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>The five tone-mapping curves render the same scene very differently — flat
-linear preserves source intensity but rolls off bright surfaces; ACES and
-Filmic compress highlights cinematically; AgX trades a slightly desaturated
-look for cleaner skin tones; UnrealPreview matches the engine reference:</p>
+<p>The curves compress highlights differently. <code class="docutils literal notranslate"><span class="pre">AcesApprox</span></code> is a fitted ACES
+filmic curve, and <code class="docutils literal notranslate"><span class="pre">FastLinear</span></code> currently renders identically to it.
+<code class="docutils literal notranslate"><span class="pre">UnrealPreviewApprox</span></code> is ACES with a slight shadow lift and highlight
+desaturation, <code class="docutils literal notranslate"><span class="pre">FilmicApprox</span></code> is a Hejl/Burgess-Dawson-style filmic curve, and
+<code class="docutils literal notranslate"><span class="pre">AgXApprox</span></code> is an AgX-style log curve that stays neutral and preserves hue (the
+Ultra preset uses it):</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 50.0%" />
@@ -563,8 +573,8 @@ grid by <code class="docutils literal notranslate"><span class="pre">doc_image_c
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>On macOS and on GPUs with 16 or fewer fragment texture units, the post pass
-supports only depth of field, FXAA, bloom, SSAO and temporal AA, so white
-balance, saturation and color grading have no effect there. Tone curves and
+supports only depth of field, FXAA, bloom, SSAO, temporal AA, white balance
+and saturation, so color grading has no effect there. Tone curves and
 exposure still apply. See <a class="reference internal" href="../Rayrai.html#rayrai-platform-support"><span class="std std-ref">Platform support</span></a> and
 <a class="reference internal" href="Materials.html#gpu-capability-tiers"><span class="std std-ref">GPU capability tiers</span></a>.</p>
 </div>
@@ -579,7 +589,9 @@ without touching renderer state directly.</p>
 resolve, fog, bloom and depth of field, then applies exposure (including
 auto-exposure), the <code class="docutils literal notranslate"><span class="pre">colorMode</span></code> curve (when <code class="docutils literal notranslate"><span class="pre">pbrToneMapping</span></code> is on) and
 gamma once in the final post pass. It is off by default. Because it is a window
-setting, presets and <code class="docutils literal notranslate"><span class="pre">setRenderQualitySettings</span></code> leave it unchanged.</p>
+setting, presets and <code class="docutils literal notranslate"><span class="pre">setRenderQualitySettings</span></code> leave it unchanged. Temporal AA
+with <code class="docutils literal notranslate"><span class="pre">TemporalAaMethod::Reprojected</span></code> uses this path even when the toggle is off
+(see <a class="reference internal" href="PostProcess.html"><span class="doc">Post-process effects</span></a>).</p>
 <p>In this mode bloom thresholds are compared with scene-linear radiance, and a
 post pass runs even when no other post effect is enabled. External renders with
 <code class="docutils literal notranslate"><span class="pre">RenderOverrides::postProcess</span> <span class="pre">=</span> <span class="pre">false</span></code> or a custom <code class="docutils literal notranslate"><span class="pre">post</span></code> shader, and frames

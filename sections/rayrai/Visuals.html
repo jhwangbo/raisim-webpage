@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Custom visuals, instancing, and scene helpers &mdash; raisim 2.7.0 documentation</title>
+  <title>Custom visuals, instancing, and scene helpers &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -74,17 +74,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul class="current">
@@ -101,6 +101,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#detectability-and-capture-render-passes">Detectability and capture render passes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#visual-shadow-casting-visibility-range-and-material-overrides">Visual shadow casting, visibility range, and material overrides</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#point-clouds-and-coordinate-frames">Point clouds and coordinate frames</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#per-visual-and-per-light-gallery">Per-visual and per-light gallery</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="Foliage.html">Foliage and forest rendering</a></li>
@@ -164,36 +165,29 @@ the per-visual controls for visibility range, material override/overlay, and
 shadow casting modes. CoACD mesh approximation is also covered here.</p>
 <section id="coacd-mesh-approximation-visualization">
 <h2>CoACD mesh approximation visualization<a class="headerlink" href="#coacd-mesh-approximation-visualization" title="Link to this heading"></a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">rayrai_coacd_mesh_approximation</span></code> example visualizes CoACD collision
-mesh approximation. It shows the source mesh and generated convex parts side by
-side. The decomposition side uses per-part colors so individual convex bodies
-can be inspected. The example is registered as the
-<code class="docutils literal notranslate"><span class="pre">rayrai_coacd_mesh_approximation</span></code> target. Package examples keep its source
-under <code class="docutils literal notranslate"><span class="pre">rsc/rayrai/flaticon</span></code>.</p>
-<p>This example uses real meshes from <code class="docutils literal notranslate"><span class="pre">rsc</span></code> such as YCB and Minitaur assets. Some robot
-visual meshes are intentionally not used because they are non-manifold visual shells and
-are rejected by the minimal CoACD integration.</p>
-<p>The typical pattern is to load the source mesh as a viewer-only <code class="docutils literal notranslate"><span class="pre">Visual</span></code>
-and the CoACD decomposition output as a second <code class="docutils literal notranslate"><span class="pre">Visual</span></code> rendered with a
-per-part palette:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Source mesh (left-side view).</span>
-<span class="k">auto</span><span class="w"> </span><span class="n">sourceMesh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addVisualMesh</span><span class="p">(</span><span class="s">&quot;coacd_source&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/path/asset.obj&quot;</span><span class="p">,</span>
-<span class="w">                                       </span><span class="n">glm</span><span class="o">::</span><span class="n">dvec3</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span>
-<span class="w">                                       </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">0.85f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.85f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.85f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">));</span>
-<span class="n">sourceMesh</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">-0.6</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+<p>The <code class="docutils literal notranslate"><span class="pre">rayrai_coacd_mesh_approximation</span></code> example
+(<a class="reference internal" href="../examples/rayrai/rayrai_coacd_mesh_approximation.html"><span class="doc">Rayrai Example: CoACD Mesh Approximation</span></a>) visualizes CoACD
+collision-mesh approximation for five YCB meshes. Each row shows the original
+triangle mesh next to its CoACD convex parts. Both are RaiSim mesh objects
+created with <code class="docutils literal notranslate"><span class="pre">World::addMesh</span></code>, not rayrai visuals: the parts form one object
+drawn in a single translucent colour, and rayrai renders them like any other
+world object.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">CoacdOptions</span><span class="w"> </span><span class="n">options</span><span class="p">;</span>
+<span class="n">options</span><span class="p">.</span><span class="n">threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.04</span><span class="p">;</span>
+<span class="n">options</span><span class="p">.</span><span class="n">maxConvexHull</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">12</span><span class="p">;</span>
 
-<span class="c1">// CoACD decomposition output (right-side view), one Visual per part with</span>
-<span class="c1">// distinct colours from a small palette.</span>
-<span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="o">&gt;</span><span class="w"> </span><span class="n">palette</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="p">{</span><span class="mf">0.95f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.30f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.30f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mf">0.30f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.85f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.55f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">},</span>
-<span class="w">  </span><span class="p">{</span><span class="mf">0.30f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.60f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.95f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mf">0.95f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.85f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.30f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">},</span>
-<span class="p">};</span>
-<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">parts</span><span class="p">.</span><span class="n">size</span><span class="p">();</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addVisualCustomMesh</span><span class="p">(</span><span class="s">&quot;coacd_part_&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">to_string</span><span class="p">(</span><span class="n">i</span><span class="p">),</span>
-<span class="w">                                      </span><span class="n">parts</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">meshes</span><span class="p">,</span>
-<span class="w">                                      </span><span class="n">palette</span><span class="p">[</span><span class="n">i</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">palette</span><span class="p">.</span><span class="n">size</span><span class="p">()]);</span>
-<span class="w">  </span><span class="n">p</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.6</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
-<span class="p">}</span>
+<span class="c1">// Original mesh (left).</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">original</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">addMesh</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="cm">/*mass=*/</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="cm">/*scale=*/</span><span class="mf">3.0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span>
+<span class="w">                                </span><span class="n">raisim</span><span class="o">::</span><span class="n">MeshCollisionMode</span><span class="o">::</span><span class="n">ORIGINAL_MESH</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="n">original</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">-0.45</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">);</span>
+<span class="n">original</span><span class="o">-&gt;</span><span class="n">setBodyType</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">BodyType</span><span class="o">::</span><span class="n">STATIC</span><span class="p">);</span>
+
+<span class="c1">// CoACD convex parts (right), drawn translucent.</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">coacd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">addMesh</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span>
+<span class="w">                             </span><span class="n">raisim</span><span class="o">::</span><span class="n">MeshCollisionMode</span><span class="o">::</span><span class="n">CONVEXIFY</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">options</span><span class="p">);</span>
+<span class="n">coacd</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.45</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">);</span>
+<span class="n">coacd</span><span class="o">-&gt;</span><span class="n">setBodyType</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">BodyType</span><span class="o">::</span><span class="n">STATIC</span><span class="p">);</span>
+<span class="n">coacd</span><span class="o">-&gt;</span><span class="n">setAppearance</span><span class="p">(</span><span class="s">&quot;0.95,0.52,0.24,0.78&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 </section>
@@ -201,12 +195,12 @@ per-part palette:</p>
 <h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
 <p>Rayrai examples are documented in <a class="reference internal" href="Examples.html"><span class="doc">Examples</span></a>. Each example
 page includes a short explanation, CMake target, and build-tree usage.</p>
-<p>Quick map to the current rayrai-related targets:</p>
+<p>Quick map to selected rayrai targets:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code>: source-built viewer for <code class="docutils literal notranslate"><span class="pre">raisim::RaisimServer</span></code>
 scenes.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_basic_scene</span></code>: minimal ImGui + SDL2 app showing the standard update
-loop, custom visuals, and the offscreen render texture.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_basic_scene</span></code>: minimal ImGui + SDL2 app with a robot on a ground
+plane, showing the standard update loop and the offscreen render texture.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">rayrai_complete_showcase</span></code>: broad in-process scene that combines RGB/depth
 cameras, raw buffer readback, LiDAR visualization, camera frustums, and
 custom visuals.</p></li>
@@ -219,18 +213,21 @@ point-cloud streaming.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">rayrai_pbr_material_grid</span></code> / <code class="docutils literal notranslate"><span class="pre">rayrai_pbr_texture_maps</span></code> /
 <code class="docutils literal notranslate"><span class="pre">rayrai_quality_lighting</span></code>: PBR materials, bundled glTF PBR sample assets,
 texture slots, quality presets, and additional-light configurations.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_visual_asset_support</span></code>: authored glTF/GLB scene import with PBR
-materials, imported lights, HDR IBL, optional reflection-probe sidecars, and
-screenshots.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_visual_asset_support</span></code>: textured URDF visual assets (ANYmal C and
+YCB objects with OBJ/DAE meshes) whose visual and collision geometry stay
+separate.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">rayrai_coacd_mesh_approximation</span></code>: in-process comparison of source meshes
 and CoACD convex approximation parts generated through <code class="docutils literal notranslate"><span class="pre">World::addMesh</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_runtime_scene_editing</span></code>: runtime add/remove of RaiSim objects and
-rayrai visuals with stable ids, snapshots, collision filters, and cloning.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai_runtime_scene_editing</span></code>: runtime add/remove of RaiSim objects with
+stable ids, snapshots, collision filters, and cloning.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">rayrai_rolling_spinning_friction</span></code> / <code class="docutils literal notranslate"><span class="pre">rayrai_swept_ccd</span></code>: physics-focused
 scenes that visualize rolling/spinning friction and swept CCD.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">rayrai_forest</span></code>: a physics heightmap covered with instanced plants and
 rocks, loaded asynchronously behind a progress overlay; see
-<a class="reference internal" href="../examples/rayrai/rayrai_forest.html"><span class="doc">Rayrai Example: Forest</span></a> and <a class="reference internal" href="#dense-foliage">Dense foliage</a> below.</p></li>
+<a class="reference internal" href="../examples/rayrai/rayrai_forest.html"><span class="doc">Rayrai Example: Forest</span></a> and <a class="reference internal" href="#dense-foliage">Dense foliage</a> below.
+<a class="reference internal" href="../examples/rayrai/rayrai_forest_from_rscene.html"><span class="doc">Rayrai Example: Forest From .rscene</span></a> loads the same world
+from its <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> file with <code class="docutils literal notranslate"><span class="pre">raisin::applyRscene</span></code> (new in v2.7.1, not
+yet released; see <a class="reference internal" href="../RsceneFile.html"><span class="doc">.rscene File</span></a>).</p></li>
 <li><p>OpenUSD visual meshes can be loaded through <code class="docutils literal notranslate"><span class="pre">RayraiWindow::addVisualMesh</span></code>;
 see <a class="reference internal" href="../OpenUSD.html"><span class="doc">OpenUSD Loading</span></a> for importer scope and runtime layout.</p></li>
 </ul>
@@ -299,9 +296,9 @@ Prefer <code class="docutils literal notranslate"><span class="pre">MeshList</sp
 <p><code class="docutils literal notranslate"><span class="pre">Visuals::approximateBounds(center,</span> <span class="pre">radius)</span></code> and
 <code class="docutils literal notranslate"><span class="pre">InstancedVisuals::approximateBounds(center,</span> <span class="pre">radius)</span></code> expose the conservative
 world-space bounds that the renderer uses for culling, picking, shadow planning,
-and camera framing. Unlike <code class="docutils literal notranslate"><span class="pre">approximateRadius()</span></code>, the center can differ from
-<code class="docutils literal notranslate"><span class="pre">getPosition()</span></code> for offset meshes, generated heightmaps, articulated links,
-and deformables. Use <code class="docutils literal notranslate"><span class="pre">setCustomBounds(localCenter,</span> <span class="pre">localRadius)</span></code> when a
+and camera framing. <code class="docutils literal notranslate"><span class="pre">approximateRadius()</span></code> returns only the radius; the center
+can differ from <code class="docutils literal notranslate"><span class="pre">getPosition()</span></code> for offset meshes, generated heightmaps,
+articulated links, and deformables. Use <code class="docutils literal notranslate"><span class="pre">setCustomBounds(localCenter,</span> <span class="pre">localRadius)</span></code> when a
 programmatically deformed visual needs a tighter or more stable bound than its
 source mesh provides.</p>
 <section id="bulk-instances-and-instanced-lod">
@@ -340,8 +337,8 @@ default) draws all of them.</p></li>
 radius. It is off by default, and the explicit stride stays a lower bound.</p></li>
 <li><p>Automatic mesh LOD (<code class="docutils literal notranslate"><span class="pre">setAutomaticMeshLodEnabled</span></code>, on by default, or the
 <code class="docutils literal notranslate"><span class="pre">automaticMeshLodEnabled</span></code> argument of <code class="docutils literal notranslate"><span class="pre">addInstancedVisuals</span></code>) generates
-simplified meshes for file-backed batches and picks a level from the
-projected size when drawing.</p></li>
+simplified meshes for triangle-mesh batches (cached for file-backed ones)
+and picks a level from the projected size when drawing.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">setDoubleBufferedInstanceUploads(true)</span></code> helps when full instance-buffer
 rebuilds are frequent, and <code class="docutils literal notranslate"><span class="pre">setSortTransparentInstances(true)</span></code> sorts
 transparent instances back to front. Both are off by default.</p></li>
@@ -361,22 +358,27 @@ builds a mesh without any OpenGL call and computes missing tangents, so it can
 run on a worker thread. Call <code class="docutils literal notranslate"><span class="pre">uploadPreparedGeometry()</span></code> later on the thread
 that owns the GL context, then add the mesh to a <code class="docutils literal notranslate"><span class="pre">MeshList</span></code> for
 <code class="docutils literal notranslate"><span class="pre">addVisualCustomMesh</span></code> or <code class="docutils literal notranslate"><span class="pre">addInstancedVisuals</span></code>.</p>
-<p>Prepared uploads, <code class="docutils literal notranslate"><span class="pre">OpenGLMesh::createWithCompactIndices</span></code>, and generated
-foliage LODs store 16-bit indices when every index fits. Code that draws an
-<code class="docutils literal notranslate"><span class="pre">OpenGLMesh</span></code> VAO directly must use <code class="docutils literal notranslate"><span class="pre">indexElementBytes()</span></code> (2 or 4) to choose
-<code class="docutils literal notranslate"><span class="pre">GL_UNSIGNED_SHORT</span></code> or <code class="docutils literal notranslate"><span class="pre">GL_UNSIGNED_INT</span></code>. Set
-<code class="docutils literal notranslate"><span class="pre">RAYRAI_DISABLE_16BIT_MESH_INDICES=1</span></code> to keep 32-bit indices.</p>
+<p><code class="docutils literal notranslate"><span class="pre">uploadPreparedGeometry()</span></code> (with its default <code class="docutils literal notranslate"><span class="pre">compactIndices</span> <span class="pre">=</span> <span class="pre">true</span></code>),
+<code class="docutils literal notranslate"><span class="pre">OpenGLMesh::createWithCompactIndices</span></code>, and generated foliage LODs store
+16-bit indices for triangle meshes whose largest index is below 65535 (0xFFFF
+is reserved for primitive restart). Asynchronous file imports keep 32-bit
+indices. Code that draws an <code class="docutils literal notranslate"><span class="pre">OpenGLMesh</span></code> VAO directly must use
+<code class="docutils literal notranslate"><span class="pre">indexElementBytes()</span></code> (2 or 4) to choose <code class="docutils literal notranslate"><span class="pre">GL_UNSIGNED_SHORT</span></code> or
+<code class="docutils literal notranslate"><span class="pre">GL_UNSIGNED_INT</span></code>.</p>
 </section>
 </section>
 <section id="dense-foliage">
 <h2>Dense foliage<a class="headerlink" href="#dense-foliage" title="Link to this heading"></a></h2>
 <p>An instanced mesh visual is treated as foliage when one of its materials is
-alpha-masked, blended, or has a <code class="docutils literal notranslate"><span class="pre">FoliageType</span></code>, or when its mesh path contains
-one of the words <code class="docutils literal notranslate"><span class="pre">foliage</span></code>, <code class="docutils literal notranslate"><span class="pre">grass</span></code>, <code class="docutils literal notranslate"><span class="pre">leaf</span></code>, <code class="docutils literal notranslate"><span class="pre">leaves</span></code>, <code class="docutils literal notranslate"><span class="pre">bush</span></code>,
-<code class="docutils literal notranslate"><span class="pre">shrub</span></code>, <code class="docutils literal notranslate"><span class="pre">plant</span></code>, <code class="docutils literal notranslate"><span class="pre">flower</span></code>, <code class="docutils literal notranslate"><span class="pre">fern</span></code>, <code class="docutils literal notranslate"><span class="pre">pine</span></code>, <code class="docutils literal notranslate"><span class="pre">sapling</span></code>, <code class="docutils literal notranslate"><span class="pre">twig</span></code>, or
-<code class="docutils literal notranslate"><span class="pre">vegetation</span></code>. The path test is a plain substring match on the full path, and
-with asynchronous loading only the path is known when the batch is created, so
-set the policies below explicitly when the path does not identify the asset.</p>
+not opaque (masked, hashed, or blended) or has a <code class="docutils literal notranslate"><span class="pre">FoliageType</span></code>, or when its
+mesh path contains one of the words <code class="docutils literal notranslate"><span class="pre">foliage</span></code>, <code class="docutils literal notranslate"><span class="pre">grass</span></code>, <code class="docutils literal notranslate"><span class="pre">leaf</span></code>,
+<code class="docutils literal notranslate"><span class="pre">leaves</span></code>, <code class="docutils literal notranslate"><span class="pre">bush</span></code>, <code class="docutils literal notranslate"><span class="pre">shrub</span></code>, <code class="docutils literal notranslate"><span class="pre">plant</span></code>, <code class="docutils literal notranslate"><span class="pre">flower</span></code>, <code class="docutils literal notranslate"><span class="pre">fern</span></code>, <code class="docutils literal notranslate"><span class="pre">pine</span></code>,
+<code class="docutils literal notranslate"><span class="pre">sapling</span></code>, <code class="docutils literal notranslate"><span class="pre">twig</span></code>, or <code class="docutils literal notranslate"><span class="pre">vegetation</span></code>. The path test is a case-insensitive
+substring match on the full path; batches created from a <code class="docutils literal notranslate"><span class="pre">MeshList</span></code> are
+classified by their materials only. With asynchronous loading only the path is
+known when the batch is created, so set the policies below explicitly when the
+path does not identify the asset. <a class="reference internal" href="Foliage.html"><span class="doc">Foliage and forest rendering</span></a> covers dense vegetation in
+more depth.</p>
 <p>For foliage batches rayrai:</p>
 <ul class="simple">
 <li><p>enables shadow-only instance LOD, hierarchical cluster culling, and distant
@@ -416,15 +418,16 @@ LOD, and clusters. Instances are still authored with <code class="docutils liter
 <p><code class="docutils literal notranslate"><span class="pre">RAYRAI_FOLIAGE_LOD_PIXEL_ERROR</span></code> (default <code class="docutils literal notranslate"><span class="pre">2.25</span></code>, valid range <code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">8]</span></code>)
 sets the projected error budget in pixels for camera LODs, and
 <code class="docutils literal notranslate"><span class="pre">RAYRAI_FOLIAGE_SHADOW_LOD_PIXEL_ERROR</span></code> (default <code class="docutils literal notranslate"><span class="pre">2.5</span></code>; it follows the
-camera value when only that one is set) the budget for shadow maps. Both are
-read once per process.</p>
-<p>GPU instance culling, GPU cluster culling, and indirect multi-draws need
-OpenGL 4.3. On older contexts, such as OpenGL 4.1 on macOS, rayrai uses its
-CPU paths and prints a one-time fallback warning.</p>
-<p>Per-batch diagnostics (<code class="docutils literal notranslate"><span class="pre">shadowFoliageLodDiagnostics()</span></code>,
-<code class="docutils literal notranslate"><span class="pre">foliageImpostorDiagnostics()</span></code>, <code class="docutils literal notranslate"><span class="pre">hierarchicalFoliageClusterDiagnostics()</span></code>,
-<code class="docutils literal notranslate"><span class="pre">grassPatchDiagnostics()</span></code>) and <code class="docutils literal notranslate"><span class="pre">RayraiWindow::foliageRenderDiagnostics()</span></code>
-describe the last rendered frame; see <a class="reference internal" href="Capture.html"><span class="doc">Capture, diagnostics, and headless rendering</span></a>. The wind clock can follow
+camera value when only that one is set) the budget for shadow maps. Invalid
+values fall back to <code class="docutils literal notranslate"><span class="pre">2.25</span></code>. Both are read once per process.</p>
+<p>GPU instance culling and indirect multi-draws need OpenGL 4.3. On older
+contexts, such as OpenGL 4.1 on macOS, rayrai uses its CPU paths and prints a
+one-time fallback warning. Hierarchical cluster culling always runs on the CPU.</p>
+<p>The per-batch diagnostics <code class="docutils literal notranslate"><span class="pre">shadowFoliageLodDiagnostics()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">foliageImpostorDiagnostics()</span></code>, and <code class="docutils literal notranslate"><span class="pre">hierarchicalFoliageClusterDiagnostics()</span></code>
+and <code class="docutils literal notranslate"><span class="pre">RayraiWindow::foliageRenderDiagnostics()</span></code> describe the last rendered
+frame; <code class="docutils literal notranslate"><span class="pre">grassPatchDiagnostics()</span></code> reports the settings passed to
+<code class="docutils literal notranslate"><span class="pre">configureGrassPatch</span></code>. See <a class="reference internal" href="Capture.html"><span class="doc">Capture, diagnostics, and headless rendering</span></a>. The wind clock can follow
 simulation time with <code class="docutils literal notranslate"><span class="pre">viewer.setFoliageWindTimeSeconds(t)</span></code>; the global wind
 field is described in <a class="reference internal" href="Weather.html"><span class="doc">Weather and atmospherics</span></a>.</p>
 </section>
@@ -448,8 +451,8 @@ and supersampled documentation captures use the same external-camera machinery,
 so custom helper geometry that should appear there must also be marked
 detectable.</p>
 <p>The RaiSim <code class="docutils literal notranslate"><span class="pre">RGBCamera</span></code> and <code class="docutils literal notranslate"><span class="pre">DepthCamera</span></code> overloads intentionally disable
-rayrai custom visualization objects and point clouds, regardless of
-detectability. Use detectability for external-camera/capture paths where
+rayrai custom visualization objects, point clouds, and coordinate frames,
+regardless of detectability. Use detectability for external-camera/capture paths where
 <code class="docutils literal notranslate"><span class="pre">RenderOverrides::drawVisualizationObjects</span></code> or
 <code class="docutils literal notranslate"><span class="pre">RenderOverrides::drawPointClouds</span></code> is enabled.</p>
 <p>Detectability does not create a RaiSim object, collision shape, dynamics body,
@@ -469,7 +472,7 @@ external render, but remember that those toggles still respect detectability
 filtering for custom visuals and point clouds.</p></li>
 </ul>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addVisualSphere</span><span class="p">(</span><span class="s">&quot;camera_target&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">0.08</span><span class="p">,</span>
-<span class="w">                                     </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.2f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">);</span>
+<span class="w">                                     </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.2f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">));</span>
 <span class="n">target</span><span class="o">-&gt;</span><span class="n">setDetectable</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span><span class="w">   </span><span class="c1">// Included in external-camera captures.</span>
 
 <span class="k">auto</span><span class="w"> </span><span class="n">axisHelper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addVisualBox</span><span class="p">(</span><span class="s">&quot;debug_axis&quot;</span><span class="p">,</span>
@@ -511,9 +514,11 @@ makes a textured mesh translucent.</p></li>
 detectable-only external-camera, reflection-probe, documentation-capture, and
 point-cloud render filters. It is render metadata only, not physics or
 collision state.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">setPbrEnvironment(envMap,</span> <span class="pre">brdfLut)</span></code> / <code class="docutils literal notranslate"><span class="pre">setPbrEnvironment(envMap,</span>
-<span class="pre">irradianceMap,</span> <span class="pre">prefilteredMap,</span> <span class="pre">brdfLut,</span> <span class="pre">intensity)</span></code> — attach an HDR
-environment to a single visual when global IBL is not appropriate.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setPbrEnvironment(pbrEnvironment)</span></code> / <code class="docutils literal notranslate"><span class="pre">setPbrEnvironment(envMap,</span>
+<span class="pre">brdfLut,</span> <span class="pre">strength)</span></code> / <code class="docutils literal notranslate"><span class="pre">setPbrEnvironment(envMap,</span> <span class="pre">irradianceMap,</span>
+<span class="pre">prefilteredMap,</span> <span class="pre">brdfLut,</span> <span class="pre">strength,</span> <span class="pre">boxProjection,</span> <span class="pre">probePosition,</span> <span class="pre">boxMin,</span>
+<span class="pre">boxMax)</span></code> — attach an HDR environment to a single visual when global IBL is
+not appropriate; see <a class="reference internal" href="Lighting.html"><span class="doc">Lighting, shadows, and HDR/IBL</span></a>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">setTransparency</span></code>, <code class="docutils literal notranslate"><span class="pre">setTransparentSortOffset</span></code>,
 <code class="docutils literal notranslate"><span class="pre">setTransparentSortUsesBoundsCenter</span></code> — fine control of transparent draw
 order without enabling full OIT.</p></li>
@@ -584,12 +589,13 @@ Call <code class="docutils literal notranslate"><span class="pre">updatePointBuf
 <span class="n">cloud</span><span class="o">-&gt;</span><span class="n">updatePointBuffer</span><span class="p">();</span>
 </pre></div>
 </div>
+</section>
 <section id="per-visual-and-per-light-gallery">
-<h3>Per-visual and per-light gallery<a class="headerlink" href="#per-visual-and-per-light-gallery" title="Link to this heading"></a></h3>
+<h2>Per-visual and per-light gallery<a class="headerlink" href="#per-visual-and-per-light-gallery" title="Link to this heading"></a></h2>
 <p>Each additional light exposes optional projector cookies, colour temperature,
 distance fade for both lighting and shadows, and a per-light shadow toggle.
 The renderer also supports <em>negative</em> lights that subtract instead of add —
-useful for cooling shadowed regions or carving artistic dark spots — and
+useful for darkening or tinting a region, or carving artistic dark spots — and
 arbitrary projector textures (gobos) that mask a spotlight’s contribution.
 See <a class="reference internal" href="Lighting.html"><span class="doc">Lighting, shadows, and HDR/IBL</span></a> for the full <code class="docutils literal notranslate"><span class="pre">AdditionalLight</span></code> API; this gallery
 focuses on the per-visual treatment side.</p>
@@ -611,19 +617,21 @@ geometry without rendering colour.</p>
 <span class="n">gobo</span><span class="p">.</span><span class="n">projectorMap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">goboTextureId</span><span class="p">;</span><span class="w">       </span><span class="c1">// RGBA8 cookie</span>
 <span class="n">gobo</span><span class="p">.</span><span class="n">projectorStrength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">;</span>
 <span class="n">gobo</span><span class="p">.</span><span class="n">distanceFadeEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
-<span class="n">gobo</span><span class="p">.</span><span class="n">distanceFadeBegin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">12.0f</span><span class="p">;</span>
+<span class="n">gobo</span><span class="p">.</span><span class="n">distanceFadeBegin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">12.0f</span><span class="p">;</span><span class="w">   </span><span class="c1">// camera 12-16 m away: light fades out</span>
 <span class="n">gobo</span><span class="p">.</span><span class="n">distanceFadeLength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">4.0f</span><span class="p">;</span>
+<span class="n">gobo</span><span class="p">.</span><span class="n">distanceFadeShadow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">10.0f</span><span class="p">;</span><span class="w">  </span><span class="c1">// camera 10-14 m away: shadow fades out</span>
 <span class="n">gobo</span><span class="p">.</span><span class="n">castsShadows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
 <span class="n">viewer</span><span class="p">.</span><span class="n">addAdditionalLight</span><span class="p">(</span><span class="n">gobo</span><span class="p">);</span>
 
-<span class="c1">// A subtractive (negative) fill light to cool down a shadowed region.</span>
-<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">AdditionalLight</span><span class="w"> </span><span class="n">cool</span><span class="p">;</span>
-<span class="n">cool</span><span class="p">.</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">LightType</span><span class="o">::</span><span class="n">POINT</span><span class="p">;</span>
-<span class="n">cool</span><span class="p">.</span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">-2.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.8f</span><span class="p">);</span>
-<span class="n">cool</span><span class="p">.</span><span class="n">diffuse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.10f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.16f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.32f</span><span class="p">);</span>
-<span class="n">cool</span><span class="p">.</span><span class="n">negative</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
-<span class="n">cool</span><span class="p">.</span><span class="n">constant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">;</span><span class="w"> </span><span class="n">cool</span><span class="p">.</span><span class="n">linear</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5f</span><span class="p">;</span><span class="w"> </span><span class="n">cool</span><span class="p">.</span><span class="n">quadratic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.20f</span><span class="p">;</span>
-<span class="n">viewer</span><span class="p">.</span><span class="n">addAdditionalLight</span><span class="p">(</span><span class="n">cool</span><span class="p">);</span>
+<span class="c1">// A subtractive (negative) light that darkens a region; it removes more</span>
+<span class="c1">// blue than red, so the region also turns warmer.</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">AdditionalLight</span><span class="w"> </span><span class="n">dark</span><span class="p">;</span>
+<span class="n">dark</span><span class="p">.</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">LightType</span><span class="o">::</span><span class="n">POINT</span><span class="p">;</span>
+<span class="n">dark</span><span class="p">.</span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">-2.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.8f</span><span class="p">);</span>
+<span class="n">dark</span><span class="p">.</span><span class="n">diffuse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="mf">0.10f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.16f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.32f</span><span class="p">);</span>
+<span class="n">dark</span><span class="p">.</span><span class="n">negative</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="n">dark</span><span class="p">.</span><span class="n">constant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">;</span><span class="w"> </span><span class="n">dark</span><span class="p">.</span><span class="n">linear</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5f</span><span class="p">;</span><span class="w"> </span><span class="n">dark</span><span class="p">.</span><span class="n">quadratic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.20f</span><span class="p">;</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">addAdditionalLight</span><span class="p">(</span><span class="n">dark</span><span class="p">);</span>
 </pre></div>
 </div>
 <table class="docutils align-default">
@@ -660,7 +668,6 @@ geometry without rendering colour.</p>
 </tr>
 </tbody>
 </table>
-</section>
 </section>
 </section>
 

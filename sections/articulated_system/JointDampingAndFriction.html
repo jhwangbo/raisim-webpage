@@ -1,0 +1,259 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Joint Damping and Friction &mdash; raisim 2.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Actuators" href="../Actuators.html" />
+    <link rel="prev" title="Dynamics and Control" href="DynamicsAndControl.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../FeatureMap.html">Feature Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ProjectLayout.html">Project Layout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Performance.html">Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Benchmark.html">Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RsceneFile.html">.rscene File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../OpenUSD.html">OpenUSD Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../ArticulatedSystem.html">Articulated Systems</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Creation.html">Creating an Articulated System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="StateAndKinematics.html">State and Kinematics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DynamicsAndControl.html">Dynamics and Control</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Joint Damping and Friction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#damping">Damping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#friction">Friction</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../Actuators.html">Actuators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ModifyingTheModel.html">Modifying the Model in Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ClosedLoopSystems.html">Closed-Loop Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MimicJoints.html">Mimic Joints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="API.html">ArticulatedSystem API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../GranularMedia.html">Granular Media</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Tendons.html">Tendons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimMatlab.html">RaisimMatlab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../ArticulatedSystem.html">Articulated Systems</a></li>
+      <li class="breadcrumb-item active">Joint Damping and Friction</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="joint-damping-and-friction">
+<h1>Joint Damping and Friction<a class="headerlink" href="#joint-damping-and-friction" title="Link to this heading"></a></h1>
+<p>Every revolute and prismatic joint can have viscous damping and Coulomb friction, and a spherical
+joint can have viscous damping. They model bearings, seals and gears. They are passive: they only
+remove energy, they are not part of the generalized force you set, and they act whether or not the
+joint is controlled.</p>
+<p>Set them with the standard URDF <code class="docutils literal notranslate"><span class="pre">&lt;dynamics&gt;</span></code> attributes. Both default to zero:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;joint</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;knee&quot;</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;revolute&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;parent</span><span class="w"> </span><span class="na">link=</span><span class="s">&quot;thigh&quot;</span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;child</span><span class="w"> </span><span class="na">link=</span><span class="s">&quot;shank&quot;</span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;axis</span><span class="w"> </span><span class="na">xyz=</span><span class="s">&quot;0 1 0&quot;</span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;dynamics</span><span class="w"> </span><span class="na">damping=</span><span class="s">&quot;0.5&quot;</span><span class="w"> </span><span class="na">friction=</span><span class="s">&quot;2.0&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/joint&gt;</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 40.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Joint type</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">damping</span></code> <span class="math notranslate nohighlight">\(b\)</span></p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">friction</span></code> <span class="math notranslate nohighlight">\(\tau_c\)</span></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>revolute</p></td>
+<td><p><span class="math notranslate nohighlight">\(Nm\,s/rad\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(Nm\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>prismatic</p></td>
+<td><p><span class="math notranslate nohighlight">\(N\,s/m\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(N\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>spherical</p></td>
+<td><p><span class="math notranslate nohighlight">\(Nm\,s/rad\)</span>, on each of the three angular velocity components</p></td>
+<td><p>not supported (ignored)</p></td>
+</tr>
+</tbody>
+</table>
+<p>The MJCF loader reads the joint <code class="docutils literal notranslate"><span class="pre">damping</span></code> attribute but not <code class="docutils literal notranslate"><span class="pre">frictionloss</span></code>.</p>
+<p>Both are measured at the joint, i.e., after any gear. If the joint is driven by an actuator, the
+actuator’s <code class="docutils literal notranslate"><span class="pre">output_damping</span></code> and <code class="docutils literal notranslate"><span class="pre">output_friction</span></code> add to them (see <a class="reference internal" href="../Actuators.html"><span class="doc">Actuators</span></a>).</p>
+<section id="damping">
+<h2>Damping<a class="headerlink" href="#damping" title="Link to this heading"></a></h2>
+<p>Damping is the torque <span class="math notranslate nohighlight">\(\tau_d = -b\,u\)</span> on the joint velocity <span class="math notranslate nohighlight">\(u\)</span> (relative to the
+parent body, see <a class="reference internal" href="StateAndKinematics.html#articulated-systems"><span class="std std-ref">Joints</span></a>). RaiSim integrates it implicitly with the
+trapezoidal rule, i.e., at the average velocity of the time step <span class="math notranslate nohighlight">\(\Delta t\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\tau_d = -b\,\frac{u_t + u_{t+1}}{2}.\]</div>
+<p>For example, a free joint with inertia <span class="math notranslate nohighlight">\(I\)</span> under a constant torque <span class="math notranslate nohighlight">\(\tau\)</span> and no gravity
+accelerates as</p>
+<div class="math notranslate nohighlight">
+\[I\,\frac{u_{t+1} - u_t}{\Delta t} = \tau - b\,\frac{u_t + u_{t+1}}{2}\]</div>
+<p>and converges to the velocity <span class="math notranslate nohighlight">\(\tau / b\)</span>. The implicit integration keeps a joint with a large
+damping stable at any time step. The d gain of the PD controller is integrated the same way. The
+difference is that damping pulls the velocity to zero, while the d gain pulls it to the velocity
+target.</p>
+<p>To change the damping at runtime, call <code class="docutils literal notranslate"><span class="pre">setJointDamping()</span></code> with one coefficient per degree of
+freedom (<code class="docutils literal notranslate"><span class="pre">getDOF()</span></code> entries). The new values act from the next step. Leave the six entries of a
+floating base at zero: they are not joints, and their damping would not be integrated implicitly.</p>
+<p>The URDF <code class="docutils literal notranslate"><span class="pre">effort</span></code> limit bounds only the commanded torque (PD plus feedforward). The damping torque
+is passive and is never clipped. Actuator torques (see <a class="reference internal" href="../Actuators.html"><span class="doc">Actuators</span></a>) are not bounded by the
+effort limit either: they are limited by the operating regions of their motors and are added after
+the effort clamp.</p>
+</section>
+<section id="friction">
+<h2>Friction<a class="headerlink" href="#friction" title="Link to this heading"></a></h2>
+<p>Friction is Coulomb friction with stiction. It opposes the motion with the constant torque
+<span class="math notranslate nohighlight">\(\tau_c\)</span>, and it holds a joint at rest as long as the other torques on it (actuation,
+gravity, contacts and the motion of the other bodies) stay below <span class="math notranslate nohighlight">\(\tau_c\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\tau_f = -\tau_c\,\mathrm{sgn}(u_{t+1}) \ \text{if} \ u_{t+1} \neq 0,
+\qquad |\tau_f| \le \tau_c \ \text{if} \ u_{t+1} = 0.\]</div>
+<p>Once the other torques exceed <span class="math notranslate nohighlight">\(\tau_c\)</span>, the joint accelerates with their sum minus
+<span class="math notranslate nohighlight">\(\tau_c\)</span>. For the free joint above, that is
+<span class="math notranslate nohighlight">\(I\,(u_{t+1} - u_t)/\Delta t = \tau - \tau_c\,\mathrm{sgn}(u_{t+1})\)</span>.</p>
+<p>RaiSim solves friction as a joint impulse bounded by <span class="math notranslate nohighlight">\(\tau_c\,\Delta t\)</span> in the contact
+solver, together with the contacts and the joint limits. A joint therefore stops exactly instead
+of chattering around zero velocity, and the friction torque is consistent with the contact forces
+on the robot. A robot with friction adds one row to the contact
+solver; robots without friction do not pay for it.</p>
+<p>The joint’s own friction is set in the model file; there is no C++ setter for it. The
+<code class="docutils literal notranslate"><span class="pre">output_friction</span></code> of an actuator can be changed at runtime by editing the definitions from
+<code class="docutils literal notranslate"><span class="pre">getActuators()</span></code> and passing them to <code class="docutils literal notranslate"><span class="pre">setActuators()</span></code>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="DynamicsAndControl.html" class="btn btn-neutral float-left" title="Dynamics and Control" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../Actuators.html" class="btn btn-neutral float-right" title="Actuators" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

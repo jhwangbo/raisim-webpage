@@ -1,0 +1,332 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creating an Articulated System &mdash; raisim 2.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="State and Kinematics" href="StateAndKinematics.html" />
+    <link rel="prev" title="Articulated Systems" href="../ArticulatedSystem.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../FeatureMap.html">Feature Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ProjectLayout.html">Project Layout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Performance.html">Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Benchmark.html">Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RsceneFile.html">.rscene File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../OpenUSD.html">OpenUSD Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../ArticulatedSystem.html">Articulated Systems</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Creating an Articulated System</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#creating-an-instance">Creating an instance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#urdf-convention">URDF convention</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#mesh-collision-mode-for-urdf">Mesh collision mode for URDF</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#templated-urdf">Templated URDF</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#urdf-modules-optional-attachments">URDF modules (optional attachments)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#urdf-loader-details">URDF loader details</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="StateAndKinematics.html">State and Kinematics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DynamicsAndControl.html">Dynamics and Control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JointDampingAndFriction.html">Joint Damping and Friction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Actuators.html">Actuators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ModifyingTheModel.html">Modifying the Model in Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ClosedLoopSystems.html">Closed-Loop Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MimicJoints.html">Mimic Joints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="API.html">ArticulatedSystem API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../GranularMedia.html">Granular Media</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Tendons.html">Tendons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimMatlab.html">RaisimMatlab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../ArticulatedSystem.html">Articulated Systems</a></li>
+      <li class="breadcrumb-item active">Creating an Articulated System</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="creating-an-articulated-system">
+<h1>Creating an Articulated System<a class="headerlink" href="#creating-an-articulated-system" title="Link to this heading"></a></h1>
+<section id="creating-an-instance">
+<h2>Creating an instance<a class="headerlink" href="#creating-an-instance" title="Link to this heading"></a></h2>
+<p>Like any other object, an articulated system is created by the world instance using the <code class="code docutils literal notranslate"><span class="pre">addArticulatedSystem</span></code> method.
+There are four ways to specify an articulated system.</p>
+<ol class="arabic simple">
+<li><p>by providing the path to the URDF file (recommended)</p></li>
+<li><p>by providing the path to the URDF template file</p></li>
+<li><p>by providing a <code class="code docutils literal notranslate"><span class="pre">std::string</span></code> containing the URDF text (useful when working with Xacro)</p></li>
+<li><p>by providing a <code class="code docutils literal notranslate"><span class="pre">raisim::Child</span></code> instance (advanced; not recommended for beginners)</p></li>
+</ol>
+<p><strong>Note that option 1 and 3 use the same method.</strong>
+<strong>You can provide either the path string or the contents string and the class will identify which one is provided.</strong></p>
+<p>To use option 4, you have to provide all details of the robot in C++ code.
+Child is a tree node that contains <code class="docutils literal notranslate"><span class="pre">fixedBodies</span></code> and <code class="docutils literal notranslate"><span class="pre">child</span></code>.
+It also contains <code class="docutils literal notranslate"><span class="pre">joint</span></code>, <code class="docutils literal notranslate"><span class="pre">body</span></code>, and <code class="docutils literal notranslate"><span class="pre">name</span></code>.
+All properties should be filled.
+Make sure that all inertial properties are defined so that the resulting system is physically feasible.</p>
+</section>
+<section id="urdf-convention">
+<h2>URDF convention<a class="headerlink" href="#urdf-convention" title="Link to this heading"></a></h2>
+<p>RaiSim uses a modified URDF protocol to define an articulated system.
+URDF files following the original convention can be read by RaiSim.
+However, since RaiSim offers more features, a RaiSim URDF might not be read by other libraries following the original URDF convention.</p>
+<p>The modifications are as follows:</p>
+<ul class="simple">
+<li><p>Capsule geometry is available for both collision objects and visual objects (with the element <code class="docutils literal notranslate"><span class="pre">&lt;capsule&gt;</span></code>). The geometry is defined by the <code class="docutils literal notranslate"><span class="pre">length</span></code> and <code class="docutils literal notranslate"><span class="pre">radius</span></code> attributes. The length is the distance between the centers of the two spheres.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">&lt;joint&gt;/&lt;dynamics&gt;</span></code> element can have three more attributes: <em>rotor_inertia</em>, <em>spring_mount</em> and <em>stiffness</em>.
+Its standard <em>damping</em> and <em>friction</em> attributes are described in <a class="reference internal" href="JointDampingAndFriction.html"><span class="doc">Joint Damping and Friction</span></a>.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">&lt;robot&gt;</span></code> can have <code class="docutils literal notranslate"><span class="pre">&lt;actuator&gt;</span></code> elements. They attach actuators (motors with their gears, possibly coupled through a transmission) to joints. The torques commanded with <code class="docutils literal notranslate"><span class="pre">setActuatorTorques()</span></code> are limited to the operating regions of their motors (see <a class="reference internal" href="../Actuators.html"><span class="doc">Actuators</span></a>).</p></li>
+</ul>
+<p>Here is an example joint with the RaiSim tags:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;joint</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;link1Tolink2&quot;</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;spherical&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;parent</span><span class="w"> </span><span class="na">link=</span><span class="s">&quot;link1&quot;</span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;child</span><span class="w"> </span><span class="na">link=</span><span class="s">&quot;link2&quot;</span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;origin</span><span class="w"> </span><span class="na">xyz=</span><span class="s">&quot;0 0 -0.24&quot;</span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;axis</span><span class="w"> </span><span class="na">xyz=</span><span class="s">&quot;0 1 0&quot;</span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;dynamics</span><span class="w"> </span><span class="na">rotor_inertia=</span><span class="s">&quot;0.0001&quot;</span><span class="w"> </span><span class="na">spring_mount=</span><span class="s">&quot;0.70710678118 0 0.70710678118 0&quot;</span><span class="w"> </span><span class="na">stiffness=</span><span class="s">&quot;500.0&quot;</span><span class="w"> </span><span class="na">damping=</span><span class="s">&quot;3.&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/joint&gt;</span>
+</pre></div>
+</div>
+<p><strong>rotor_inertia</strong> approximately simulates the rotor inertia of the motor (but omits the resulting gyroscopic effect, which is often negligible).
+It is added to the diagonal elements of the mass matrix, a common way to include the inertial effect of the rotor.
+You can also override it in C++ using <code class="code docutils literal notranslate"><span class="pre">setRotorInertia()</span></code>.
+The value is the reflected rotor inertia observed at the joint, i.e., the rotor inertia multiplied by the square of the gear ratio.
+RaiSim does not derive it from the gear ratio of an <code class="docutils literal notranslate"><span class="pre">&lt;actuator&gt;</span></code>; compute it yourself (see <a class="reference internal" href="../Actuators.html"><span class="doc">Actuators</span></a> for coupled transmissions).</p>
+<p>Two preprocessor features (also available in the RaiSim world configuration file) are available for the URDF template.</p>
+<ul class="simple">
+<li><p>You can specify a variable in a form of “&#64;&#64;Robot_Height”. Its value is given at runtime with the <code class="docutils literal notranslate"><span class="pre">std::vector&lt;raisim::World::ParameterContainer&gt;</span></code> overload of <code class="docutils literal notranslate"><span class="pre">World::addArticulatedSystem</span></code> (see <a class="reference internal" href="#templated-urdf">Templated URDF</a>).</p></li>
+<li><p>You can specify an equation instead of a variable. For example, {&#64;&#64;Robot_Height*&#64;&#64;Robot_Width*2}.</p></li>
+</ul>
+<p>The corresponding URDF template format is shown by resources such as
+<code class="docutils literal notranslate"><span class="pre">rsc/templatedTrackedRobot/trackedTemplate.urdf</span></code>.</p>
+<p>In RaiSim, each body of an articulated system has a set of collision bodies and visual objects.
+Collision bodies contain a collision object of one of the following shapes: <em>mesh</em>, <em>sphere</em>, <em>box</em>, <em>cylinder</em>, <em>capsule</em>.
+Visual objects store specifications for visualization; the actual visualization happens in a visualizer.
+For details, check the <a class="reference external" href="http://wiki.ros.org/urdf/XML">URDF protocol</a>.</p>
+<section id="mesh-collision-mode-for-urdf">
+<h3>Mesh collision mode for URDF<a class="headerlink" href="#mesh-collision-mode-for-urdf" title="Link to this heading"></a></h3>
+<p>URDF does not provide a tag to choose the mesh collision mode. In RaiSim, the mode
+is selected at load time with <code class="docutils literal notranslate"><span class="pre">ArticulatedSystemOption::convexifyCollisionMeshes</span></code>.
+The default is <code class="docutils literal notranslate"><span class="pre">false</span></code>, which keeps each URDF collision mesh as the original
+non-convex triangle mesh. Set it to <code class="docutils literal notranslate"><span class="pre">true</span></code> to build a convex contact mesh for
+each URDF mesh collision element:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">ArticulatedSystemOption</span><span class="w"> </span><span class="n">options</span><span class="p">;</span>
+<span class="n">options</span><span class="p">.</span><span class="n">convexifyCollisionMeshes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">robot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addArticulatedSystem</span><span class="p">(</span><span class="n">urdfPath</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{},</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">-1</span><span class="p">,</span><span class="w"> </span><span class="n">options</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This articulated-system option is a simple original-mesh versus convex-mesh
+choice. It does not expose the single-body <code class="docutils literal notranslate"><span class="pre">CoacdOptions</span></code> path. Use authored
+simplified collision meshes in the URDF when you need precise control over
+robot-link collision geometry. Use <code class="docutils literal notranslate"><span class="pre">raisim::World::addMesh</span></code> with
+<code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEXIFY</span></code> for standalone mesh objects that should use
+CoACD convex decomposition:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">CoacdOptions</span><span class="w"> </span><span class="n">coacd</span><span class="p">;</span>
+<span class="n">coacd</span><span class="p">.</span><span class="n">threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.06</span><span class="p">;</span>
+<span class="n">coacd</span><span class="p">.</span><span class="n">maxConvexHull</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">12</span><span class="p">;</span>
+
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">prop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addMesh</span><span class="p">(</span><span class="n">meshPath</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="n">scale</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;default&quot;</span><span class="p">,</span>
+<span class="w">                           </span><span class="n">raisim</span><span class="o">::</span><span class="n">MeshCollisionMode</span><span class="o">::</span><span class="n">CONVEXIFY</span><span class="p">,</span>
+<span class="w">                           </span><span class="n">raisim</span><span class="o">::</span><span class="n">CollisionGroup</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+<span class="w">                           </span><span class="n">raisim</span><span class="o">::</span><span class="n">CollisionGroup</span><span class="p">(</span><span class="mi">-1</span><span class="p">),</span>
+<span class="w">                           </span><span class="n">coacd</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>For articulated robots, original non-convex triangle-mesh collision can be
+slower and less robust than primitive, convex, or authored collision geometry.
+Prefer primitive collision shapes or simplified convex mesh assets for feet,
+hands, wheels, and links that touch terrain frequently.</p>
+</section>
+<section id="templated-urdf">
+<h3>Templated URDF<a class="headerlink" href="#templated-urdf" title="Link to this heading"></a></h3>
+<p>You can template a URDF and create different robots by providing different parameters in C++.
+An example can be found <a class="reference external" href="https://github.com/raisimTech/raisim2Lib/tree/master/rsc/templatedTrackedRobot">here</a>.</p>
+<p>In the URDF template, variables should be marked with <code class="docutils literal notranslate"><span class="pre">&#64;&#64;</span></code>.
+Just like in a world configuration template, you can write math expressions inside <code class="docutils literal notranslate"><span class="pre">{}</span></code>.
+Only <code class="docutils literal notranslate"><span class="pre">+</span></code>, <code class="docutils literal notranslate"><span class="pre">-</span></code>, <code class="docutils literal notranslate"><span class="pre">*</span></code>, <code class="docutils literal notranslate"><span class="pre">/</span></code>, parentheses, <code class="docutils literal notranslate"><span class="pre">pi</span></code> and the functions <code class="docutils literal notranslate"><span class="pre">sin</span></code>, <code class="docutils literal notranslate"><span class="pre">cos</span></code>, <code class="docutils literal notranslate"><span class="pre">log</span></code> and <code class="docutils literal notranslate"><span class="pre">exp</span></code> are available.</p>
+<p>Template parameters are provided at runtime in <code class="docutils literal notranslate"><span class="pre">raisim::World::addArticulatedSystem</span></code>.
+One of its overloads takes <code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">std::vector&lt;raisim::World::ParameterContainer&gt;&amp;</span> <span class="pre">params</span></code>.
+Each <code class="docutils literal notranslate"><span class="pre">ParameterContainer</span></code> holds the variable <code class="docutils literal notranslate"><span class="pre">name</span></code> (without <code class="docutils literal notranslate"><span class="pre">&#64;&#64;</span></code>) and its value <code class="docutils literal notranslate"><span class="pre">param</span></code> as a string:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">::</span><span class="n">ParameterContainer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">params</span><span class="p">;</span>
+<span class="n">params</span><span class="p">.</span><span class="n">push_back</span><span class="p">({</span><span class="s">&quot;base_length&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span><span class="p">});</span>
+<span class="n">params</span><span class="p">.</span><span class="n">push_back</span><span class="p">({</span><span class="s">&quot;wheel_radius&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;0.17775&quot;</span><span class="p">});</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">robot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addArticulatedSystem</span><span class="p">(</span><span class="n">templatePath</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="urdf-modules-optional-attachments">
+<h2>URDF modules (optional attachments)<a class="headerlink" href="#urdf-modules-optional-attachments" title="Link to this heading"></a></h2>
+<p>Articulated systems can be created from a base URDF plus one or more <em>modules</em>.
+A module is a URDF fragment (e.g., additional links/joints/sensors) that is
+inserted into the base URDF before the closing <code class="docutils literal notranslate"><span class="pre">&lt;/robot&gt;</span></code> tag. This is useful
+for optional payloads or sensor packs without duplicating the entire URDF.</p>
+<p>Use the constructor that takes a list of module filenames:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="w"> </span><span class="n">modules</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;d455.xml&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;livox.xml&quot;</span><span class="p">};</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">robot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addArticulatedSystem</span><span class="p">(</span><span class="n">urdfPath</span><span class="p">,</span><span class="w"> </span><span class="n">modules</span><span class="p">,</span><span class="w"> </span><span class="n">resDir</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Module path resolution follows this order (first match wins):</p>
+<ul class="simple">
+<li><p>absolute path to the module file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[baseDir]/&lt;module&gt;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[baseDir]/modules/&lt;module&gt;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[baseDir]/../modules/&lt;module&gt;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[baseDir]/module/&lt;module&gt;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[baseDir]/../module/&lt;module&gt;</span></code></p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">baseDir</span></code> is the URDF directory unless you pass <code class="docutils literal notranslate"><span class="pre">resDir</span></code> explicitly.
+RaiSim writes a generated URDF named
+<code class="docutils literal notranslate"><span class="pre">generated_&lt;urdf_stem&gt;_&lt;module_stem&gt;[_&lt;module_stem&gt;...].urdf</span></code> into <code class="docutils literal notranslate"><span class="pre">baseDir</span></code>
+and loads that file.</p>
+</section>
+<section id="urdf-loader-details">
+<h2>URDF loader details<a class="headerlink" href="#urdf-loader-details" title="Link to this heading"></a></h2>
+<p>The URDF loader used by <code class="code docutils literal notranslate"><span class="pre">ArticulatedSystem</span></code> has a few behaviors worth noting:</p>
+<ul class="simple">
+<li><p><strong>Base type:</strong> If the root link is named <code class="docutils literal notranslate"><span class="pre">world</span></code>, RaiSim treats the system as
+fixed-base; otherwise it is floating-base.</p></li>
+<li><p><strong>Sensors:</strong> <code class="docutils literal notranslate"><span class="pre">&lt;link</span> <span class="pre">sensor=&quot;...&quot;&gt;</span></code> loads a sensor set XML (see <a class="reference internal" href="../Sensors.html"><span class="doc">Sensors</span></a>) and instantiates
+sensors of type <code class="docutils literal notranslate"><span class="pre">rgb</span></code>, <code class="docutils literal notranslate"><span class="pre">depth</span></code>, <code class="docutils literal notranslate"><span class="pre">imu</span></code>, or <code class="docutils literal notranslate"><span class="pre">spinning_lidar</span></code>. The
+<code class="docutils literal notranslate"><span class="pre">update_rate</span></code> attribute in the sensor XML is applied to each sensor. IMU
+sensors enable inverse dynamics internally.</p></li>
+<li><p><strong>Actuators:</strong> <code class="docutils literal notranslate"><span class="pre">&lt;actuator&gt;</span></code> elements directly under <code class="docutils literal notranslate"><span class="pre">&lt;robot&gt;</span></code> attach actuators to joints,
+with their parameters inline or in a linked file that is searched like a sensor file (see
+<a class="reference internal" href="../Actuators.html"><span class="doc">Actuators</span></a>).</p></li>
+<li><p><strong>Constraints:</strong> A <code class="docutils literal notranslate"><span class="pre">&lt;constraints&gt;</span></code> block with <code class="docutils literal notranslate"><span class="pre">&lt;pin&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;equality&gt;</span></code>
+entries and a <code class="docutils literal notranslate"><span class="pre">nominal_config</span></code> attribute closes kinematic loops
+(see <a class="reference internal" href="ClosedLoopSystems.html"><span class="doc">Closed-Loop Systems</span></a>).</p></li>
+<li><p><strong>Mimic joints:</strong> A <code class="docutils literal notranslate"><span class="pre">&lt;mimic</span> <span class="pre">joint=&quot;...&quot;</span> <span class="pre">multiplier=&quot;...&quot;</span> <span class="pre">offset=&quot;...&quot;/&gt;</span></code> element in a
+revolute, continuous or prismatic <code class="docutils literal notranslate"><span class="pre">&lt;joint&gt;</span></code> makes that joint follow another
+(see <a class="reference internal" href="MimicJoints.html"><span class="doc">Mimic Joints</span></a>).</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../ArticulatedSystem.html" class="btn btn-neutral float-left" title="Articulated Systems" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="StateAndKinematics.html" class="btn btn-neutral float-right" title="State and Kinematics" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

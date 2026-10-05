@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Capture, diagnostics, and headless rendering &mdash; raisim 2.7.0 documentation</title>
+  <title>Capture, diagnostics, and headless rendering &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -74,17 +74,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul class="current">
@@ -161,11 +161,12 @@
              
   <section id="capture-diagnostics-and-headless-rendering">
 <h1>Capture, diagnostics, and headless rendering<a class="headerlink" href="#capture-diagnostics-and-headless-rendering" title="Link to this heading"></a></h1>
-<p>This page covers everything you need to drive rayrai without a GUI: the
-headless/offscreen GL context and context hand-off between renderers, ImGui
-integration, the camera and picking APIs, screenshot/diagnostics captures,
-exposure and calibration helpers, async mesh loading and the mesh caches,
-compressed texture storage, and heightmap texture overrides.</p>
+<p>This page covers embedding rayrai in an application and driving it without a
+GUI: ImGui integration, the headless/offscreen GL context and context hand-off
+between renderers, the camera and picking APIs, screenshot and diagnostics
+captures, exposure and calibration helpers, async mesh loading and the mesh
+caches, compressed texture storage, and heightmap textures and streaming
+updates.</p>
 <section id="imgui-integration-sdl2-opengl">
 <h2>ImGui integration (SDL2 + OpenGL)<a class="headerlink" href="#imgui-integration-sdl2-opengl" title="Link to this heading"></a></h2>
 <p>rayrai is designed to be embedded in custom UI. The repository ships a minimal
@@ -193,9 +194,10 @@ SDL2/ImGui helper in <code class="docutils literal notranslate"><span class="pre
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">renderViewer</span></code> helper uses <code class="docutils literal notranslate"><span class="pre">ImGui::IsItemHovered()</span></code> and mouse positions
-to drive camera interaction and picking. Current offscreen examples exercise
-the camera paths used by rayrai rendering and validation.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">renderViewer</span></code> helper uses <code class="docutils literal notranslate"><span class="pre">ImGui::IsItemHovered()</span></code> and the mouse
+position to drive camera interaction and picking. It renders at the window’s
+drawable (framebuffer) size and scales the cursor from window to drawable
+pixels, so input stays aligned on HiDPI displays.</p>
 </section>
 <section id="headless-offscreen-opengl-context">
 <h2>Headless/offscreen OpenGL context<a class="headerlink" href="#headless-offscreen-opengl-context" title="Link to this heading"></a></h2>
@@ -210,12 +212,17 @@ helpers to create and bind a hidden SDL window context:</p>
 <span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="w"> </span><span class="nf">viewer</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">640</span><span class="p">,</span><span class="w"> </span><span class="mi">480</span><span class="p">);</span>
 </pre></div>
 </div>
+<p><code class="docutils literal notranslate"><span class="pre">createOffscreenGlContext</span></code> initializes SDL video if needed and requests an
+OpenGL 4.3 core context, falling back to 3.3; it aborts when no context can be
+created. The caller owns both handles and releases them with
+<code class="docutils literal notranslate"><span class="pre">SDL_GL_DeleteContext</span></code> and <code class="docutils literal notranslate"><span class="pre">SDL_DestroyWindow</span></code>.</p>
 <p>The offscreen path does not require an ImGui context. If an application embeds rayrai
-without ImGui, pass <code class="docutils literal notranslate"><span class="pre">false</span></code> for hover/click arguments to <code class="docutils literal notranslate"><span class="pre">RayraiWindow::update</span></code> or
-drive camera state explicitly. The renderer guards ImGui input access so headless tests
-and batch image generation can run without creating ImGui state.</p>
+without ImGui, pass <code class="docutils literal notranslate"><span class="pre">false</span></code> for the hover and click arguments of <code class="docutils literal notranslate"><span class="pre">RayraiWindow::update</span></code>
+or drive the camera state explicitly. The renderer guards ImGui input access, so headless
+tests and batch image generation can run without creating ImGui state.</p>
 <p>End-to-end headless capture (build a scene, render once, write a PNG):</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;SDL.h&gt;</span>
+<span class="cp">#define STB_IMAGE_WRITE_IMPLEMENTATION  </span><span class="c1">// in exactly one source file</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stb/stb_image_write.h&gt;</span>
 
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;raisim/World.hpp&gt;</span>
@@ -277,8 +284,9 @@ context created on the main thread to a worker, release it with
 <code class="docutils literal notranslate"><span class="pre">RayraiWindow::detachOffscreenGlContext(window)</span></code> (safe to call when no
 context is current), then call <code class="docutils literal notranslate"><span class="pre">makeOffscreenContextCurrent</span></code> on the worker.
 When several renderers share one thread, switch between their contexts with
-<code class="docutils literal notranslate"><span class="pre">makeOffscreenContextCurrent</span></code> too: it also resets rayrai’s per-thread GL
-binding caches, which a plain <code class="docutils literal notranslate"><span class="pre">SDL_GL_MakeCurrent</span></code> does not.</p>
+<code class="docutils literal notranslate"><span class="pre">makeOffscreenContextCurrent</span></code> too: it also updates glbinding and resets
+rayrai’s per-context GL binding caches, which a plain <code class="docutils literal notranslate"><span class="pre">SDL_GL_MakeCurrent</span></code>
+does not.</p>
 <p>A context created while another one is current joins its share group. Within
 a share group, the geometry of untextured meshes is uploaded once and reused;
 textured meshes and their textures are loaded separately for each context,
@@ -312,9 +320,9 @@ interactive viewer.</p>
 <p>Detectability is not a physics flag. It does not create collision, dynamics,
 or a semantic label, and it does not affect normal viewer visibility.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">renderWithExternalCamera</span></code> overloads that take a RaiSim <code class="docutils literal notranslate"><span class="pre">RGBCamera</span></code> or
-<code class="docutils literal notranslate"><span class="pre">DepthCamera</span></code> are stricter: they disable custom visualization objects and
-point clouds entirely, regardless of detectability. That keeps RaiSim sensor
-images limited to world geometry.</p>
+<code class="docutils literal notranslate"><span class="pre">DepthCamera</span></code> are stricter: they never draw custom visualization objects,
+point clouds, or coordinate frames, regardless of detectability and of the
+overrides. That keeps RaiSim sensor images limited to world geometry.</p>
 </section>
 <section id="camera-control-and-picking">
 <h2>Camera control and picking<a class="headerlink" href="#camera-control-and-picking" title="Link to this heading"></a></h2>
@@ -324,20 +332,22 @@ You can access or override it through <code class="docutils literal notranslate"
 <p>Picking is available through <code class="docutils literal notranslate"><span class="pre">pickWithExternalCamera</span></code>. It renders a
 selection pass and returns the encoded object id for a pixel.</p>
 <p>The internal <code class="docutils literal notranslate"><span class="pre">update</span></code> call drives camera input and picking:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Cursor is in framebuffer coordinates of the render area</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Cursor is in pixels of the render target, top-left origin.</span>
 <span class="n">viewer</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">height</span><span class="p">,</span><span class="w"> </span><span class="n">isHovered</span><span class="p">,</span><span class="w"> </span><span class="n">cursorX</span><span class="p">,</span><span class="w"> </span><span class="n">cursorY</span><span class="p">,</span><span class="w"> </span><span class="n">shouldClick</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>For custom visuals under the internal camera, <code class="docutils literal notranslate"><span class="pre">pickTargetVisualAt</span></code> resolves
-the pick id and returns the public <code class="docutils literal notranslate"><span class="pre">Visuals*</span></code> directly. A null pointer means
-nothing was hit:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// From an ImGui handler: convert the mouse position into the render-target</span>
-<span class="c1">// framebuffer space and pick.</span>
+<p>For custom visuals under the internal camera, <code class="docutils literal notranslate"><span class="pre">pickTargetVisualAt</span></code> runs a
+picking pass immediately (the GL context must be current) and returns the
+picked <code class="docutils literal notranslate"><span class="pre">Visuals*</span></code> directly. A null pointer means nothing was hit:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// From an ImGui handler, right after the ImGui::Image that shows the viewer:</span>
+<span class="c1">// convert the mouse position into render-target pixels and pick.</span>
+<span class="c1">// renderWidth/renderHeight are the sizes passed to viewer.update().</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ImGui</span><span class="o">::</span><span class="n">IsItemHovered</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">ImGui</span><span class="o">::</span><span class="n">IsMouseClicked</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">pos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ImGui</span><span class="o">::</span><span class="n">GetMousePos</span><span class="p">();</span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">origin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ImGui</span><span class="o">::</span><span class="n">GetItemRectMin</span><span class="p">();</span>
-<span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">fbX</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">pos</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">origin</span><span class="p">.</span><span class="n">x</span><span class="p">);</span>
-<span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">fbY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">pos</span><span class="p">.</span><span class="n">y</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">origin</span><span class="p">.</span><span class="n">y</span><span class="p">);</span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">ImVec2</span><span class="w"> </span><span class="n">pos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ImGui</span><span class="o">::</span><span class="n">GetMousePos</span><span class="p">();</span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">ImVec2</span><span class="w"> </span><span class="n">origin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ImGui</span><span class="o">::</span><span class="n">GetItemRectMin</span><span class="p">();</span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">ImVec2</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ImGui</span><span class="o">::</span><span class="n">GetItemRectSize</span><span class="p">();</span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">fbX</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">((</span><span class="n">pos</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">origin</span><span class="p">.</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">renderWidth</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">x</span><span class="p">);</span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">fbY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">((</span><span class="n">pos</span><span class="p">.</span><span class="n">y</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">origin</span><span class="p">.</span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">renderHeight</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="n">y</span><span class="p">);</span>
 
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">visual</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">pickTargetVisualAt</span><span class="p">(</span><span class="n">fbX</span><span class="p">,</span><span class="w"> </span><span class="n">fbY</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="n">viewer</span><span class="p">.</span><span class="n">setTargetVisual</span><span class="p">(</span><span class="n">visual</span><span class="p">);</span>
@@ -369,10 +379,13 @@ frame path.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">captureSupersampledRgba</span></code> renders high-resolution screenshots without
 resizing the caller’s camera. <code class="docutils literal notranslate"><span class="pre">scale</span></code> is clamped to 1–4.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">captureDebugPasses</span></code> captures the standard PBR/post-process debug-pass set
-as top-left ordered RGBA buffers. It overrides the PBR debug output for this
-renderer only and leaves the process environment untouched;
+(25 passes) as top-left ordered RGBA buffers. It overrides the PBR debug
+output for this renderer only and leaves the process environment untouched;
 <code class="docutils literal notranslate"><span class="pre">pbrDebugOutputMode()</span></code> returns the mode in force, which otherwise comes from
-<code class="docutils literal notranslate"><span class="pre">RAYRAI_PBR_DEBUG_OUTPUT</span></code>.</p></li>
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_PBR_DEBUG_OUTPUT</span></code>. The capture temporarily switches to Ultra
+quality and afterwards restores the previous settings through
+<code class="docutils literal notranslate"><span class="pre">setRenderQualitySettings</span></code>, so application-added lights are cleared and the
+preset reads <code class="docutils literal notranslate"><span class="pre">Custom</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">captureRenderPassTimings</span></code> inserts blocking GPU timer queries for pass-level
 measurements of an external camera. Use it for benchmarks, not ordinary
 frames.</p></li>
@@ -391,13 +404,13 @@ workflows.</p></li>
 <span class="k">auto</span><span class="w"> </span><span class="n">timings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">captureRenderPassTimings</span><span class="p">(</span><span class="n">viewer</span><span class="p">.</span><span class="n">getCamera</span><span class="p">(),</span><span class="w"> </span><span class="n">ov</span><span class="p">);</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">viewerTimings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">captureViewerPassTimings</span><span class="p">(</span><span class="mi">1280</span><span class="p">,</span><span class="w"> </span><span class="mi">720</span><span class="p">);</span>
 <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">renderDiagnosticsJson</span><span class="p">();</span>
-<span class="n">viewer</span><span class="p">.</span><span class="n">writeRenderDiagnosticsFiles</span><span class="p">(</span><span class="s">&quot;/tmp/rayrai_diag&quot;</span><span class="p">,</span><span class="w"> </span><span class="cm">/*importReport=*/</span><span class="p">{});</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">writeRenderDiagnosticsFiles</span><span class="p">(</span><span class="s">&quot;/tmp/rayrai_diag&quot;</span><span class="p">,</span><span class="w"> </span><span class="cm">/*importReport=*/</span><span class="k">nullptr</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>When the scene contains foliage batches, both timing captures render twice.
 The coarse passes (<code class="docutils literal notranslate"><span class="pre">shadow</span></code>, <code class="docutils literal notranslate"><span class="pre">scene_color</span></code> or <code class="docutils literal notranslate"><span class="pre">scene_color_and_resolve</span></code>,
 <code class="docutils literal notranslate"><span class="pre">postprocess</span></code>, and so on) come from the first render, and the foliage
-sub-passes (<code class="docutils literal notranslate"><span class="pre">scene_foliage_*</span></code> and <code class="docutils literal notranslate"><span class="pre">shadow_foliage_*</span></code>) from the second. The
+sub-passes (<code class="docutils literal notranslate"><span class="pre">scene_foliage*</span></code> and <code class="docutils literal notranslate"><span class="pre">shadow_foliage*</span></code>) from the second. The
 sub-passes overlap the coarse passes, so do not add them to a frame total.</p>
 <p>Per-frame state can be read without extra rendering, and describes the most
 recent <code class="docutils literal notranslate"><span class="pre">update</span></code> or external-camera render:</p>
@@ -420,28 +433,30 @@ camera; use a single shadow cascade with it. External renders reuse the
 previous frame when the camera, overrides, settings, and scene are unchanged;
 call <code class="docutils literal notranslate"><span class="pre">invalidateExternalFrameCache()</span></code> after editing GL resources in place.
 When the quality settings enable MSAA, an external camera keeps its
-multisample buffers between renders; <code class="docutils literal notranslate"><span class="pre">camera.setSceneMsaaSamples(1)</span></code> releases
-them.</p>
-<p>With <code class="docutils literal notranslate"><span class="pre">setLinearHdrRenderingEnabled(true)</span></code> (off by default), scene colour stays
+multisample buffers between renders; the next render of that camera without
+MSAA, or <code class="docutils literal notranslate"><span class="pre">camera.setSceneMsaaSamples(1)</span></code>, releases them.</p>
+<p>With <code class="docutils literal notranslate"><span class="pre">setLinearHdrRenderingEnabled(true)</span></code> (off by default), scene color stays
 linear through MSAA, fog, bloom, and depth of field, and exposure, the tone
 curve, and gamma are applied once at the end of postprocessing; bloom
-thresholds are then scene-linear. Captures that run the built-in
-postprocessing (<code class="docutils literal notranslate"><span class="pre">RenderOverrides::postProcess</span></code>, the default) follow this
-pipeline, while renders with <code class="docutils literal notranslate"><span class="pre">postProcess</span> <span class="pre">=</span> <span class="pre">false</span></code>, a custom <code class="docutils literal notranslate"><span class="pre">post</span></code> shader,
-or a PBR debug output keep the previous output.</p>
+thresholds are then scene-linear. Renders with reprojected temporal AA use the
+same linear pipeline even when the switch is off. Captures that run the
+built-in postprocessing (<code class="docutils literal notranslate"><span class="pre">RenderOverrides::postProcess</span></code>, the default) follow
+this pipeline, while renders with <code class="docutils literal notranslate"><span class="pre">postProcess</span> <span class="pre">=</span> <span class="pre">false</span></code>, a custom <code class="docutils literal notranslate"><span class="pre">post</span></code>
+shader, or a PBR debug output keep the previous output.</p>
 <p>For transparent scenes, <code class="docutils literal notranslate"><span class="pre">transparentDrawDebugView</span></code> reports draw order, OIT,
 refraction, overdraw, and per-item sorting state. Shadow and reflection-probe
 planning are similarly exposed through <code class="docutils literal notranslate"><span class="pre">shadowDebugOverlaySummary</span></code>,
 <code class="docutils literal notranslate"><span class="pre">planDirectionalShadowCascades</span></code>, <code class="docutils literal notranslate"><span class="pre">planAdditionalShadowAtlas</span></code>, and
 <code class="docutils literal notranslate"><span class="pre">reflectionProbeDebugOverlaySummary</span></code>. <code class="docutils literal notranslate"><span class="pre">shaderWarmupDiagnostics</span></code> reports
 shader compile/link cost from startup, and <code class="docutils literal notranslate"><span class="pre">estimateRenderPassAccounting</span></code>
-returns a CPU-only summary of which passes are active (fast path eligible,
-shadows, post-process, bloom, denoise, readback) along with the dominant
-bottleneck.</p>
-<p>For long-running applications and offline pipelines, see
-<a class="reference internal" href="RenderQuality.html"><span class="doc">Render quality, tone mapping, color grading</span></a> for the <code class="docutils literal notranslate"><span class="pre">recommendDynamicQuality</span></code> and
-<code class="docutils literal notranslate"><span class="pre">recommendMaterialTextureBudget</span></code> helpers that turn <code class="docutils literal notranslate"><span class="pre">captureRenderPassTimings</span></code>
-measurements into proposed setting changes.</p>
+returns a CPU-only estimate of the passes the current settings need (fast-path
+eligibility, shadow, scene, transparent, post-process, bloom, AO-denoise, and
+debug-readback pass counts) together with a heuristic <code class="docutils literal notranslate"><span class="pre">likelyBottleneck</span></code> tag.</p>
+<p>For long-running applications and offline pipelines, <a class="reference internal" href="RenderQuality.html"><span class="doc">Render quality, tone mapping, color grading</span></a>
+describes two helpers that propose setting changes without applying them:
+<code class="docutils literal notranslate"><span class="pre">recommendDynamicQuality</span></code>, which works from <code class="docutils literal notranslate"><span class="pre">captureRenderPassTimings</span></code>
+measurements, and <code class="docutils literal notranslate"><span class="pre">recommendMaterialTextureBudget</span></code>, which works from a
+texture-memory budget.</p>
 </section>
 <section id="exposure-calibration-and-output-transforms">
 <h2>Exposure, calibration, and output transforms<a class="headerlink" href="#exposure-calibration-and-output-transforms" title="Link to this heading"></a></h2>
@@ -467,14 +482,20 @@ with <code class="docutils literal notranslate"><span class="pre">transformRgbaF
 <code class="docutils literal notranslate"><span class="pre">renderRainDebugRgba</span></code>, and <code class="docutils literal notranslate"><span class="pre">renderSnowDebugRgba</span></code> render diagnostic panels
 (luminance histogram, cloud/precipitation breakdown, wet/snow response) as
 plain RGBA buffers for embedding into reports.</p>
-<p>The renderer also has a built-in auto-exposure loop: enable it via
-<code class="docutils literal notranslate"><span class="pre">RenderQualitySettings::autoExposureEnabled</span></code> and the renderer drives
-<code class="docutils literal notranslate"><span class="pre">pbrExposure</span></code> toward <code class="docutils literal notranslate"><span class="pre">autoExposureKey</span></code> (target post-tonemap luma) at
-<code class="docutils literal notranslate"><span class="pre">autoExposureSpeed</span></code> per frame, clamped to <code class="docutils literal notranslate"><span class="pre">[autoExposureMinFactor,</span>
-<span class="pre">autoExposureMaxFactor]</span></code>. For applications that need to drive exposure
-themselves (e.g. tone-matched batch capture), use the static helpers above to
-read the current frame’s luminance and recommend a new exposure value:</p>
+<p>The renderer also has a built-in auto-exposure loop. With
+<code class="docutils literal notranslate"><span class="pre">RenderQualitySettings::autoExposureEnabled</span></code>, each camera multiplies
+<code class="docutils literal notranslate"><span class="pre">pbrExposure</span></code> by its own auto-exposure factor, which moves the average
+luminance of the previous frame toward <code class="docutils literal notranslate"><span class="pre">autoExposureKey</span></code>. Every frame
+corrects the fraction <code class="docutils literal notranslate"><span class="pre">autoExposureSpeed</span></code> of the remaining error, and the
+factor is clamped to <code class="docutils literal notranslate"><span class="pre">[autoExposureMinFactor,</span> <span class="pre">autoExposureMaxFactor]</span></code>;
+<code class="docutils literal notranslate"><span class="pre">pbrExposure</span></code> itself is not modified. For applications that need to drive
+exposure themselves (e.g. tone-matched batch capture), use the static helpers
+above to read the current frame’s luminance and recommend a new exposure value.
+<code class="docutils literal notranslate"><span class="pre">setRenderQualitySettings</span></code> also rebuilds the main light and removes
+additional lights (see <a class="reference internal" href="Lighting.html"><span class="doc">Lighting, shadows, and HDR/IBL</span></a>), so re-add application lights after
+each call in a loop like this one:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Frame loop driving exposure manually from the most recent capture.</span>
+<span class="c1">// dtSeconds is the frame time of the application loop.</span>
 <span class="kt">float</span><span class="w"> </span><span class="n">currentExposure</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">;</span>
 <span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">running</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">frame</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">captureSupersampledRgba</span><span class="p">(</span><span class="n">viewer</span><span class="p">.</span><span class="n">getCamera</span><span class="p">(),</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="p">{});</span>
@@ -540,14 +561,13 @@ invalidated by a fingerprint of the imported geometry, so edits to external
 glTF buffers are detected. <code class="docutils literal notranslate"><span class="pre">RAYRAI_ASYNC_LOD_CACHE_DIR</span></code> stores them in
 another folder instead (if that folder is not writable, nothing is cached).
 Without it, an unwritable asset folder falls back to the system temporary
-directory. Setting <code class="docutils literal notranslate"><span class="pre">RAYRAI_DISABLE_ASYNC_LOD_CACHE</span></code> to any value disables
-this cache.</p></li>
+directory.</p></li>
 </ul>
 </section>
 <section id="compressed-texture-storage">
 <h2>Compressed texture storage<a class="headerlink" href="#compressed-texture-storage" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">rayrai/Bc7TextureStorage.hpp</span></code> provides an opt-in, load-time helper that
-re-encodes eligible colour textures as BC7 to reduce texture memory. Call it
+re-encodes eligible color textures as BC7 to reduce texture memory. Call it
 with the renderer’s GL context current, after the visuals are loaded:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;rayrai/Bc7TextureStorage.hpp&gt;</span>
 
@@ -590,8 +610,9 @@ color patch after the full map has been initialized, and
 <code class="docutils literal notranslate"><span class="pre">updateVisualHeightPatch</span></code> for a visualization-only height update. These
 updates are synchronized into the mirrored rayrai heightmap; they do not create
 a renderer-owned per-name texture override.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">terrain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">addHeightMap</span><span class="p">(</span><span class="cm">/*sample_x=*/</span><span class="mi">256</span><span class="p">,</span><span class="w"> </span><span class="cm">/*sample_y=*/</span><span class="mi">256</span><span class="p">,</span>
-<span class="w">                                    </span><span class="cm">/*size_x=*/</span><span class="mf">40.0</span><span class="p">,</span><span class="w"> </span><span class="cm">/*size_y=*/</span><span class="mf">40.0</span><span class="p">,</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// heights holds 256 * 256 samples, indexed y * 256 + x.</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">terrain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">addHeightMap</span><span class="p">(</span><span class="cm">/*xSamples=*/</span><span class="mi">256</span><span class="p">,</span><span class="w"> </span><span class="cm">/*ySamples=*/</span><span class="mi">256</span><span class="p">,</span>
+<span class="w">                                    </span><span class="cm">/*xSize=*/</span><span class="mf">40.0</span><span class="p">,</span><span class="w"> </span><span class="cm">/*ySize=*/</span><span class="mf">40.0</span><span class="p">,</span>
 <span class="w">                                    </span><span class="cm">/*centerX=*/</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="cm">/*centerY=*/</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">heights</span><span class="p">);</span>
 <span class="n">viewer</span><span class="p">.</span><span class="n">setHeightmapPatternResourcePath</span><span class="p">(</span><span class="s">&quot;/path/to/terrain_albedo.png&quot;</span><span class="p">);</span>
 <span class="n">viewer</span><span class="p">.</span><span class="n">setHeightmapNormalResourcePath</span><span class="p">(</span><span class="s">&quot;/path/to/terrain_normal.png&quot;</span><span class="p">);</span>
@@ -611,8 +632,11 @@ a renderer-owned per-name texture override.</p>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">updateVisualHeightPatch</span></code> also takes inclusive bounds, but its height input is
-the full row-major height array; only the requested region is copied. Call
-<code class="docutils literal notranslate"><span class="pre">update(...)</span></code> instead when physics collision heights must change too.</p>
+the full row-major height array (plus a height offset); only the requested
+region is copied. The center and size arguments must equal the heightmap’s
+current ones, otherwise the call returns <code class="docutils literal notranslate"><span class="pre">false</span></code> without changes. The patch
+changes only the rendered heights; call <code class="docutils literal notranslate"><span class="pre">update(...)</span></code> instead when physics
+collision heights must change too.</p>
 </section>
 </section>
 

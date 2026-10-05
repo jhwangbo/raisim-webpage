@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>World Configuration File &mdash; raisim 2.7.0 documentation</title>
+  <title>World Configuration File &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -71,6 +71,7 @@
 <li class="toctree-l1"><a class="reference internal" href="WorldSystem.html">World</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">World Configuration File</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#object-xml-description">Object XML Description</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#single-bodies">Single bodies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#sphere">sphere</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#capsule-and-cylinder">capsule and cylinder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#box">box</a></li>
@@ -80,8 +81,10 @@
 <li class="toctree-l3"><a class="reference internal" href="#heightmap">heightmap</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#articulatedsystem-articulated-system">articulatedSystem / articulated_system</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#object-class">object_class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#round-trip-elements">Round-trip elements</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#simulation-settings">Simulation settings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#configuration-template">Configuration Template</a></li>
 </ul>
 </li>
@@ -89,17 +92,17 @@
 <li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -137,255 +140,415 @@
              
   <section id="world-configuration-file">
 <h1>World Configuration File<a class="headerlink" href="#world-configuration-file" title="Link to this heading"></a></h1>
-<p>Examples are provided <a class="reference external" href="https://github.com/raisimTech/raisim2Lib/tree/master/rsc/xmlScripts">here</a>.</p>
-<p>The following section outlines the conventions for the RaiSim world configuration XML file.
-Tags marked (optional) indicate elements that are not mandatory within their parent context.
-Unmarked elements are mandatory if their parent element is present.
-Tags marked (multiple) indicate that multiple instances of the element may exist under the same parent.</p>
-<ol class="arabic">
-<li><dl>
-<dt>raisim: Top-level node.</dt><dd><ol class="arabic">
-<li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">version</span></code> : Specifies the RaiSim version used to create the configuration file. Files may be compatible with different versions.</p></li>
-<li><dl>
-<dt>&lt;child&gt; (optional) <code class="docutils literal notranslate"><span class="pre">material</span></code><span class="classifier">Refer to the <a class="reference external" href="https://raisim.com/sections/MaterialSystem.html">Material System</a> section for details and examples.</span></dt><dd><ol class="arabic">
-<li><dl>
-<dt>&lt;child&gt; (optional) <code class="docutils literal notranslate"><span class="pre">default</span></code><span class="classifier">If omitted, default parameters are used as described <a class="reference external" href="https://raisim.com/sections/MaterialSystem.html">here</a>.</span></dt><dd><ol class="arabic simple">
+<p>A RaiSim world configuration file is an XML file with a <code class="docutils literal notranslate"><span class="pre">&lt;raisim&gt;</span></code> root
+element. Load it with <code class="docutils literal notranslate"><span class="pre">raisim::World</span> <span class="pre">world(&quot;path/to/world.xml&quot;)</span></code>; see
+<a class="reference internal" href="WorldSystem.html"><span class="doc">World</span></a>. Example files are in
+<a class="reference external" href="https://github.com/raisimTech/raisim2Lib/tree/main/rsc/xmlScripts">rsc/xmlScripts</a>.</p>
+<p>The following sections describe the elements the loader reads.
+Elements and attributes marked (optional) may be omitted.
+Unmarked elements and attributes are required when their parent element is present.
+Elements marked (multiple) may appear more than once under the same parent.</p>
+<p>Vector-valued attributes (<code class="docutils literal notranslate"><span class="pre">Vec&lt;3&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">Vec&lt;4&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">VecDyn</span></code>) are lists of
+numbers separated by whitespace or by commas, e.g. <code class="docutils literal notranslate"><span class="pre">pos=&quot;0</span> <span class="pre">0</span> <span class="pre">1&quot;</span></code> or
+<code class="docutils literal notranslate"><span class="pre">pos=&quot;0,</span> <span class="pre">0,</span> <span class="pre">1&quot;</span></code>. The token <code class="docutils literal notranslate"><span class="pre">[THIS_DIR]</span></code> anywhere in the file is replaced by
+the directory that contains the file, so resource paths can be written relative
+to the file, e.g. <code class="docutils literal notranslate"><span class="pre">urdf_path=&quot;[THIS_DIR]/../anymal/urdf/anymal.urdf&quot;</span></code>.
+Relative paths without <code class="docutils literal notranslate"><span class="pre">[THIS_DIR]</span></code> are resolved against the process working
+directory.</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">raisim</span></code>: the root element.</p>
+<ol class="arabic simple">
+<li><p>&lt;attribute&gt; (optional) <code class="docutils literal notranslate"><span class="pre">version</span></code> [string]: the RaiSim version that wrote
+the file. The loader does not check it; <code class="docutils literal notranslate"><span class="pre">exportToXml</span></code> writes <code class="docutils literal notranslate"><span class="pre">2.0.0</span></code>.</p></li>
+<li><p>&lt;child&gt; (optional) <code class="docutils literal notranslate"><span class="pre">material</span></code>: material pair properties. See
+<a class="reference internal" href="MaterialSystem.html"><span class="doc">Material System</span></a> for their meaning.</p>
+<ol class="arabic simple">
+<li><p>&lt;child&gt; (optional) <code class="docutils literal notranslate"><span class="pre">default</span></code>: the properties used for material pairs
+without a <code class="docutils literal notranslate"><span class="pre">pair_prop</span></code> entry. If omitted, the built-in defaults are used.</p>
+<ol class="arabic simple">
 <li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">friction</span></code> [float]</p></li>
 <li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">restitution</span></code> [float]</p></li>
 <li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">restitution_threshold</span></code> [float]</p></li>
+<li><p>&lt;attribute&gt; (optional, default = <code class="docutils literal notranslate"><span class="pre">friction</span></code>) <code class="docutils literal notranslate"><span class="pre">static_friction</span></code> [float]</p></li>
+<li><p>&lt;attribute&gt; (optional, default = 1) <code class="docutils literal notranslate"><span class="pre">static_friction_velocity_threshold</span></code> [float]</p></li>
+<li><p>&lt;attribute&gt; (optional, default = 0) <code class="docutils literal notranslate"><span class="pre">rolling_friction</span></code> [float]</p></li>
+<li><p>&lt;attribute&gt; (optional, default = 0) <code class="docutils literal notranslate"><span class="pre">spinning_friction</span></code> [float]</p></li>
 </ol>
-</dd>
-</dl>
 </li>
-<li><dl class="simple">
-<dt>&lt;child&gt; (optional, multiple) <code class="docutils literal notranslate"><span class="pre">pair_prop</span></code></dt><dd><ol class="arabic simple">
+<li><p>&lt;child&gt; (optional, multiple) <code class="docutils literal notranslate"><span class="pre">pair_prop</span></code></p>
+<ol class="arabic simple">
 <li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">name1</span></code> [string]</p></li>
 <li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">name2</span></code> [string]</p></li>
 <li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">friction</span></code> [float]</p></li>
 <li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">restitution</span></code> [float]</p></li>
 <li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">restitution_threshold</span></code> [float]</p></li>
 <li><p>&lt;attribute&gt; (optional, default = <code class="docutils literal notranslate"><span class="pre">friction</span></code>) <code class="docutils literal notranslate"><span class="pre">static_friction</span></code> [float]</p></li>
-<li><p>&lt;attribute&gt; (required when <code class="docutils literal notranslate"><span class="pre">static_friction</span></code> is present) <code class="docutils literal notranslate"><span class="pre">static_friction_velocity_threshold</span></code> [float]</p></li>
+<li><p>&lt;attribute&gt; (required when <code class="docutils literal notranslate"><span class="pre">static_friction</span></code> is present, otherwise
+1e-3) <code class="docutils literal notranslate"><span class="pre">static_friction_velocity_threshold</span></code> [float]</p></li>
 <li><p>&lt;attribute&gt; (optional, default = 0) <code class="docutils literal notranslate"><span class="pre">rolling_friction</span></code> [float]</p></li>
 <li><p>&lt;attribute&gt; (optional, default = 0) <code class="docutils literal notranslate"><span class="pre">spinning_friction</span></code> [float]</p></li>
 </ol>
-</dd>
-</dl>
 </li>
 </ol>
-</dd>
-</dl>
 </li>
-<li><dl class="simple">
-<dt>&lt;child&gt; (optional) <code class="docutils literal notranslate"><span class="pre">gravity</span></code></dt><dd><ol class="arabic simple">
-<li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">value</span></code> [Vec&lt;3&gt;]: default={0, 0, -9.81}</p></li>
+<li><p>&lt;child&gt; (optional) <code class="docutils literal notranslate"><span class="pre">gravity</span></code></p>
+<ol class="arabic simple">
+<li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">value</span></code> [Vec&lt;3&gt;]: default = <code class="docutils literal notranslate"><span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">-9.81</span></code></p></li>
 </ol>
-</dd>
-</dl>
 </li>
-<li><dl class="simple">
-<dt>&lt;child&gt; (optional) <code class="docutils literal notranslate"><span class="pre">timeStep</span></code></dt><dd><ol class="arabic simple">
+<li><p>&lt;child&gt; (optional) <code class="docutils literal notranslate"><span class="pre">timeStep</span></code>. Only this camelCase tag name is read.</p>
+<ol class="arabic simple">
 <li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">value</span></code> [float]: default = 0.005</p></li>
 </ol>
-</dd>
-</dl>
 </li>
-<li><dl class="simple">
-<dt>&lt;child&gt; (optional) <code class="docutils literal notranslate"><span class="pre">erp</span></code><span class="classifier">(Advanced) Defines spring and damping terms for error dynamics.</span></dt><dd><ol class="arabic simple">
-<li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">erp</span></code> : spring term [float]</p></li>
-<li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">erp2</span></code> : damping term [float]</p></li>
+<li><p>&lt;child&gt; (optional) <code class="docutils literal notranslate"><span class="pre">erp</span></code>: (advanced) the spring and damping terms of the
+contact error dynamics; see <code class="docutils literal notranslate"><span class="pre">World::setERP</span></code>.</p>
+<ol class="arabic simple">
+<li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">erp</span></code> [float]: spring term</p></li>
+<li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">erp2</span></code> [float]: damping term</p></li>
 </ol>
-</dd>
-</dl>
 </li>
-<li><p>&lt;child&gt; <code class="docutils literal notranslate"><span class="pre">objects</span></code> : Detailed in the “Object XML Description” section.</p></li>
-<li><dl>
-<dt>&lt;child&gt; <code class="docutils literal notranslate"><span class="pre">wire</span></code><span class="classifier"><a class="reference external" href="https://raisim.com/sections/Constraints.html">DESCRIPTION</a>, <a class="reference external" href="https://github.com/raisimTech/raisim2Lib/blob/master/rsc/xmlScripts/wire/newtonsCradle.xml">EXAMPLES</a></span></dt><dd><ol class="arabic simple">
-<li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">name</span></code> [string]: Wire name.</p></li>
-<li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">type</span></code> [string]: Wire type (“stiff”, “compliant”, or “custom”).</p></li>
-<li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">stretch_type</span></code> [string]: Stretch type.</p></li>
-<li><dl class="simple">
-<dt>&lt;child&gt; <code class="docutils literal notranslate"><span class="pre">object1</span></code> and <code class="docutils literal notranslate"><span class="pre">object2</span></code><span class="classifier">The objects to which the wire is attached.</span></dt><dd><p>Option 1 (Single Body Object):
-1. &lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">local_index</span></code> [int]: The body index for attachment (0 for singleBodyObject).
-2. &lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">pos</span></code> [Vec&lt;3&gt;]: The attachment position in the local body frame.
-Option 2 (Articulated System):
-1. &lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">frame</span></code> [string]: The name of the frame where the wire is attached.</p>
-</dd>
-</dl>
+<li><p>&lt;child&gt; (optional) <code class="docutils literal notranslate"><span class="pre">simulation</span></code>: solver, contact-detection and sleeping
+settings. See <a class="reference internal" href="#simulation-settings">Simulation settings</a>.</p></li>
+<li><p>&lt;child&gt; (optional) <code class="docutils literal notranslate"><span class="pre">object_class</span></code>: reusable object templates. See
+<a class="reference internal" href="#object-class">object_class</a>.</p></li>
+<li><p>&lt;child&gt; (optional) <code class="docutils literal notranslate"><span class="pre">objects</span></code>: the objects of the world. See
+<a class="reference internal" href="#object-xml-description">Object XML Description</a>.</p></li>
+<li><p>&lt;child&gt; (optional, multiple) <code class="docutils literal notranslate"><span class="pre">tendon</span></code> and <code class="docutils literal notranslate"><span class="pre">tendon_coupling</span></code>: see the
+native world XML section of <a class="reference internal" href="tendons/Reference.html"><span class="doc">Tendon API and model files</span></a>.</p></li>
+<li><p>&lt;child&gt; (optional, multiple) <code class="docutils literal notranslate"><span class="pre">wire</span></code>: legacy length constraint. The
+loader converts each wire into a two-site tendon; exports write
+<code class="docutils literal notranslate"><span class="pre">tendon</span></code> elements instead. See <a class="reference internal" href="Constraints.html"><span class="doc">Constraints</span></a> and the
+<a class="reference external" href="https://github.com/raisimTech/raisim2Lib/blob/main/rsc/xmlScripts/wire/newtonsCradle.xml">wire example</a>.</p>
+<ol class="arabic simple">
+<li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">name</span></code> [string]: wire (tendon) name.</p></li>
+<li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">type</span></code> [string]: <code class="docutils literal notranslate"><span class="pre">stiff</span></code>, <code class="docutils literal notranslate"><span class="pre">compliant</span></code>, or <code class="docutils literal notranslate"><span class="pre">custom</span></code>.</p></li>
+<li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">length</span></code> [float]: nominal length (m), at least 0.</p></li>
+<li><p>&lt;attribute&gt; (optional) <code class="docutils literal notranslate"><span class="pre">stretch_type</span></code> [string]: <code class="docutils literal notranslate"><span class="pre">stretch_only</span></code>,
+<code class="docutils literal notranslate"><span class="pre">compression_only</span></code>, or <code class="docutils literal notranslate"><span class="pre">both</span></code>. Default: <code class="docutils literal notranslate"><span class="pre">stretch_only</span></code> for
+stiff and compliant wires, <code class="docutils literal notranslate"><span class="pre">compression_only</span></code> for custom wires.</p></li>
+<li><p>&lt;attribute&gt; (required for <code class="docutils literal notranslate"><span class="pre">compliant</span></code>) <code class="docutils literal notranslate"><span class="pre">stiffness</span></code> [float]</p></li>
+<li><p>&lt;attribute&gt; (optional, <code class="docutils literal notranslate"><span class="pre">custom</span></code> only, default = 0) <code class="docutils literal notranslate"><span class="pre">tension</span></code> [float]</p></li>
+<li><p>&lt;attribute&gt; (optional, default = 0.02) <code class="docutils literal notranslate"><span class="pre">width</span></code> [float] and
+(optional, default = <code class="docutils literal notranslate"><span class="pre">1,</span> <span class="pre">1,</span> <span class="pre">1,</span> <span class="pre">1</span></code>) <code class="docutils literal notranslate"><span class="pre">color</span></code> [Vec&lt;4&gt;]: appearance.</p></li>
+<li><p>&lt;child&gt; <code class="docutils literal notranslate"><span class="pre">object1</span></code> and <code class="docutils literal notranslate"><span class="pre">object2</span></code>: the two attachment points. Each
+has a <code class="docutils literal notranslate"><span class="pre">name</span></code> [string] attribute naming the attached object and one
+of the following:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">local_index</span></code> [int] and <code class="docutils literal notranslate"><span class="pre">pos</span></code> [Vec&lt;3&gt;]: the local body index
+(0 for a single-body object) and the attachment point in that
+body’s frame; or</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">frame</span></code> [string] (articulated systems only): the name of the
+frame to attach to.</p></li>
+</ul>
 </li>
 </ol>
-</dd>
-</dl>
 </li>
+<li><p>&lt;child&gt; (optional, multiple) <code class="docutils literal notranslate"><span class="pre">include</span></code> and <code class="docutils literal notranslate"><span class="pre">params</span></code>: see
+<a class="reference internal" href="#configuration-template">Configuration Template</a>.</p></li>
 </ol>
-</dd>
-</dl>
 </li>
 </ol>
 <section id="object-xml-description">
 <h2>Object XML Description<a class="headerlink" href="#object-xml-description" title="Link to this heading"></a></h2>
-<p>The XML reader accepts both the snake_case names documented below and the camelCase aliases used by older examples for common attributes, such as <code class="docutils literal notranslate"><span class="pre">collisionGroup</span></code>, <code class="docutils literal notranslate"><span class="pre">collisionMask</span></code>, <code class="docutils literal notranslate"><span class="pre">xSample</span></code>, <code class="docutils literal notranslate"><span class="pre">ySample</span></code>, <code class="docutils literal notranslate"><span class="pre">xSize</span></code>, <code class="docutils literal notranslate"><span class="pre">ySize</span></code>, <code class="docutils literal notranslate"><span class="pre">centerX</span></code>, <code class="docutils literal notranslate"><span class="pre">centerY</span></code>, <code class="docutils literal notranslate"><span class="pre">resDir</span></code>, <code class="docutils literal notranslate"><span class="pre">urdfPath</span></code>, <code class="docutils literal notranslate"><span class="pre">linVel</span></code>, and <code class="docutils literal notranslate"><span class="pre">angVel</span></code>.</p>
-<p>Collision groups and masks can be specified as <code class="docutils literal notranslate"><span class="pre">collision[1]</span></code> or <code class="docutils literal notranslate"><span class="pre">collision[1|4|6]</span></code>.
-The former represents collision group 1.
-The latter defines a collision mask interacting with groups 1, 4, and 6.
-The mask <code class="docutils literal notranslate"><span class="pre">collision[-1]</span></code> indicates collision with any group (note: collision logic is an AND operation; both mask and group pairs must be compatible).</p>
+<p>Each child element of <code class="docutils literal notranslate"><span class="pre">objects</span></code> creates one object. The element name selects
+the object type (<code class="docutils literal notranslate"><span class="pre">sphere</span></code>, <code class="docutils literal notranslate"><span class="pre">box</span></code>, <code class="docutils literal notranslate"><span class="pre">capsule</span></code>, <code class="docutils literal notranslate"><span class="pre">cylinder</span></code>, <code class="docutils literal notranslate"><span class="pre">compound</span></code>,
+<code class="docutils literal notranslate"><span class="pre">mesh</span></code>, <code class="docutils literal notranslate"><span class="pre">ground</span></code>, <code class="docutils literal notranslate"><span class="pre">heightmap</span></code>, <code class="docutils literal notranslate"><span class="pre">articulatedSystem</span></code>, <code class="docutils literal notranslate"><span class="pre">deformable</span></code>,
+<code class="docutils literal notranslate"><span class="pre">granular</span></code>) or names an <code class="docutils literal notranslate"><span class="pre">object_class</span></code> defined in the same file.</p>
+<p>Every object requires a <code class="docutils literal notranslate"><span class="pre">name</span></code> attribute, and an object with
+<code class="docutils literal notranslate"><span class="pre">exist=&quot;false&quot;</span></code> is skipped (see <a class="reference internal" href="#configuration-template">Configuration Template</a>).</p>
+<p>The XML reader accepts both the snake_case names documented below and the camelCase aliases used by older examples for common attributes, such as <code class="docutils literal notranslate"><span class="pre">collisionGroup</span></code>, <code class="docutils literal notranslate"><span class="pre">collisionMask</span></code>, <code class="docutils literal notranslate"><span class="pre">xSample</span></code>, <code class="docutils literal notranslate"><span class="pre">ySample</span></code>, <code class="docutils literal notranslate"><span class="pre">xSize</span></code>, <code class="docutils literal notranslate"><span class="pre">ySize</span></code>, <code class="docutils literal notranslate"><span class="pre">centerX</span></code>, <code class="docutils literal notranslate"><span class="pre">centerY</span></code>, <code class="docutils literal notranslate"><span class="pre">resDir</span></code>, <code class="docutils literal notranslate"><span class="pre">urdfPath</span></code>, <code class="docutils literal notranslate"><span class="pre">fileName</span></code>, <code class="docutils literal notranslate"><span class="pre">linVel</span></code>, and <code class="docutils literal notranslate"><span class="pre">angVel</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">collision_group</span></code> and <code class="docutils literal notranslate"><span class="pre">collision_mask</span></code> accept two notations:</p>
+<ul class="simple">
+<li><p>a plain decimal integer is the raw bitmask, so <code class="docutils literal notranslate"><span class="pre">collision_group=&quot;1&quot;</span></code> is
+bit 0 and <code class="docutils literal notranslate"><span class="pre">&quot;-1&quot;</span></code> sets every bit;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">collision[i|j|...]</span></code> sets bits <code class="docutils literal notranslate"><span class="pre">i</span></code>, <code class="docutils literal notranslate"><span class="pre">j</span></code>, …; for example,
+<code class="docutils literal notranslate"><span class="pre">collision[1|4|6]</span></code> is <code class="docutils literal notranslate"><span class="pre">(1</span> <span class="pre">&lt;&lt;</span> <span class="pre">1)</span> <span class="pre">|</span> <span class="pre">(1</span> <span class="pre">&lt;&lt;</span> <span class="pre">4)</span> <span class="pre">|</span> <span class="pre">(1</span> <span class="pre">&lt;&lt;</span> <span class="pre">6)</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">collision[-1]</span></code> sets every bit.</p></li>
+</ul>
+<p>Two objects can collide only if each object’s group shares a bit with the other
+object’s mask. See <a class="reference internal" href="Contact.html"><span class="doc">Contact and Collision</span></a> for details.</p>
+<section id="single-bodies">
+<h3>Single bodies<a class="headerlink" href="#single-bodies" title="Link to this heading"></a></h3>
+<p><a class="reference external" href="https://github.com/raisimTech/raisim2Lib/blob/main/rsc/xmlScripts/objects/SingleBodies.xml">Example</a></p>
+<p><code class="docutils literal notranslate"><span class="pre">sphere</span></code>, <code class="docutils literal notranslate"><span class="pre">box</span></code>, <code class="docutils literal notranslate"><span class="pre">capsule</span></code>, <code class="docutils literal notranslate"><span class="pre">cylinder</span></code>, <code class="docutils literal notranslate"><span class="pre">compound</span></code>, and <code class="docutils literal notranslate"><span class="pre">mesh</span></code>
+share the following attributes and children. The type-specific parts follow in
+the next sections.</p>
+<p><strong>attributes</strong>: <code class="docutils literal notranslate"><span class="pre">name</span></code> [string], <code class="docutils literal notranslate"><span class="pre">mass</span></code> [float],
+(optional, default=1) <code class="docutils literal notranslate"><span class="pre">collision_group</span></code>,
+(optional, default=-1) <code class="docutils literal notranslate"><span class="pre">collision_mask</span></code>,
+(optional, default <code class="docutils literal notranslate"><span class="pre">default</span></code>) <code class="docutils literal notranslate"><span class="pre">material</span></code> [string] (ignored by <code class="docutils literal notranslate"><span class="pre">compound</span></code>,
+whose children carry their own materials),
+(optional) <code class="docutils literal notranslate"><span class="pre">appearance</span></code> [string],
+(optional, default <code class="docutils literal notranslate"><span class="pre">dynamic</span></code>) <code class="docutils literal notranslate"><span class="pre">body_type</span></code> [string]: <code class="docutils literal notranslate"><span class="pre">dynamic</span></code>, <code class="docutils literal notranslate"><span class="pre">kinematic</span></code>, or <code class="docutils literal notranslate"><span class="pre">static</span></code>,
+(optional for primitives, default <code class="docutils literal notranslate"><span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">0</span></code>) <code class="docutils literal notranslate"><span class="pre">com</span></code> [Vec&lt;3&gt;]: the center of
+mass in the body frame</p>
+<ol class="arabic simple">
+<li><p>&lt;child&gt; <code class="docutils literal notranslate"><span class="pre">inertia</span></code>: &lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">xx</span></code>, <code class="docutils literal notranslate"><span class="pre">xy</span></code>, <code class="docutils literal notranslate"><span class="pre">xz</span></code>, <code class="docutils literal notranslate"><span class="pre">yy</span></code>, <code class="docutils literal notranslate"><span class="pre">yz</span></code>,
+<code class="docutils literal notranslate"><span class="pre">zz</span></code> [float], the inertia about the center of mass in the body frame.
+Optional for <code class="docutils literal notranslate"><span class="pre">sphere</span></code>, <code class="docutils literal notranslate"><span class="pre">box</span></code>, <code class="docutils literal notranslate"><span class="pre">capsule</span></code>, and <code class="docutils literal notranslate"><span class="pre">cylinder</span></code>, which
+otherwise derive it from the geometry assuming uniform density. Required for
+<code class="docutils literal notranslate"><span class="pre">mesh</span></code> and <code class="docutils literal notranslate"><span class="pre">compound</span></code>: without it their inertia is zero, which is
+rejected as not positive definite.</p></li>
+<li><p>&lt;child&gt; <code class="docutils literal notranslate"><span class="pre">state</span></code>: &lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">pos</span></code> [Vec&lt;3&gt;], (optional, default <code class="docutils literal notranslate"><span class="pre">1,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">0</span></code>)
+<code class="docutils literal notranslate"><span class="pre">quat</span></code> [Vec&lt;4&gt;], (optional, default <code class="docutils literal notranslate"><span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">0</span></code>) <code class="docutils literal notranslate"><span class="pre">lin_vel</span></code> [Vec&lt;3&gt;],
+(optional, default <code class="docutils literal notranslate"><span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">0</span></code>) <code class="docutils literal notranslate"><span class="pre">ang_vel</span></code> [Vec&lt;3&gt;]</p></li>
+</ol>
+</section>
 <section id="sphere">
 <h3>sphere<a class="headerlink" href="#sphere" title="Link to this heading"></a></h3>
-<p><a class="reference external" href="https://github.com/raisimTech/raisim2Lib/blob/master/rsc/xmlScripts/objects/SingleBodies.xml">EXAMPLES</a></p>
-<p><strong>attributes</strong>: (optional, default=1) <code class="docutils literal notranslate"><span class="pre">collision_group</span></code> [uint64_t], (optional, default=-1) <code class="docutils literal notranslate"><span class="pre">collision_mask</span></code> [uint64_t], (optional) <code class="docutils literal notranslate"><span class="pre">appearance</span></code> [string], (optional) <code class="docutils literal notranslate"><span class="pre">body_type</span></code> [string]: {dynamic, kinematic, static}, (optional) <code class="docutils literal notranslate"><span class="pre">name</span></code> [string], <code class="docutils literal notranslate"><span class="pre">mass</span></code> [float]</p>
 <ol class="arabic simple">
-<li><p>&lt;child&gt; (optional, default=Derived from geometry assuming uniform density) <code class="docutils literal notranslate"><span class="pre">inertia</span></code> : &lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">xx</span></code> [float], <code class="docutils literal notranslate"><span class="pre">xy</span></code> [float], <code class="docutils literal notranslate"><span class="pre">xz</span></code> [float], <code class="docutils literal notranslate"><span class="pre">yy</span></code> [float], <code class="docutils literal notranslate"><span class="pre">yz</span></code> [float], <code class="docutils literal notranslate"><span class="pre">zz</span></code> [float]</p></li>
-<li><p>&lt;child&gt; dim: &lt;attribute&gt; radius[float]</p></li>
-<li><p>&lt;child&gt; state: &lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">pos</span></code> [Vec&lt;3&gt;], (optional, default=1,0,0,0) <code class="docutils literal notranslate"><span class="pre">quat</span></code> [Vec&lt;4&gt;], (optional, default=0,0,0) <code class="docutils literal notranslate"><span class="pre">lin_vel</span></code> [Vec&lt;3&gt;], (optional, default=0,0,0) <code class="docutils literal notranslate"><span class="pre">ang_vel</span></code> [Vec&lt;3&gt;]</p></li>
+<li><p>&lt;child&gt; <code class="docutils literal notranslate"><span class="pre">dim</span></code>: &lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">radius</span></code> [float]</p></li>
 </ol>
 </section>
 <section id="capsule-and-cylinder">
 <h3>capsule and cylinder<a class="headerlink" href="#capsule-and-cylinder" title="Link to this heading"></a></h3>
-<p><a class="reference external" href="https://github.com/raisimTech/raisim2Lib/blob/master/rsc/xmlScripts/objects/SingleBodies.xml">EXAMPLES</a></p>
-<p><strong>attributes</strong>: (optional, default=1) collision_group[uint64_t], (optional, default=-1) collision_mask[uint64_t], (optional) appearance[string], (optional) body_type[string]: {dynamic, kinematic, static}, (optional) name[string], mass[float]</p>
 <ol class="arabic simple">
-<li><p>&lt;child&gt; (optional, default=Derived from geometry assuming uniform density) <code class="docutils literal notranslate"><span class="pre">inertia</span></code> : &lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">xx</span></code> [float], <code class="docutils literal notranslate"><span class="pre">xy</span></code> [float], <code class="docutils literal notranslate"><span class="pre">xz</span></code> [float], <code class="docutils literal notranslate"><span class="pre">yy</span></code> [float], <code class="docutils literal notranslate"><span class="pre">yz</span></code> [float], <code class="docutils literal notranslate"><span class="pre">zz</span></code> [float]</p></li>
-<li><p>&lt;child&gt; dim: &lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">radius</span></code> [float], <code class="docutils literal notranslate"><span class="pre">height</span></code> [float]</p></li>
-<li><p>&lt;child&gt; state: &lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">pos</span></code> [Vec&lt;3&gt;], (optional, default=1,0,0,0) <code class="docutils literal notranslate"><span class="pre">quat</span></code> [Vec&lt;4&gt;], (optional, default=0,0,0) <code class="docutils literal notranslate"><span class="pre">lin_vel</span></code> [Vec&lt;3&gt;], (optional, default=0,0,0) <code class="docutils literal notranslate"><span class="pre">ang_vel</span></code> [Vec&lt;3&gt;]</p></li>
+<li><p>&lt;child&gt; <code class="docutils literal notranslate"><span class="pre">dim</span></code>: &lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">radius</span></code> [float], <code class="docutils literal notranslate"><span class="pre">height</span></code> [float]</p></li>
 </ol>
 </section>
 <section id="box">
 <h3>box<a class="headerlink" href="#box" title="Link to this heading"></a></h3>
-<p><a class="reference external" href="https://github.com/raisimTech/raisim2Lib/blob/master/rsc/xmlScripts/objects/SingleBodies.xml">EXAMPLES</a></p>
-<p><strong>attributes</strong>: (optional, default=1) <code class="docutils literal notranslate"><span class="pre">collision_group</span></code> [uint64_t], (optional, default=-1) <code class="docutils literal notranslate"><span class="pre">collision_mask</span></code> [uint64_t], (optional) <code class="docutils literal notranslate"><span class="pre">appearance</span></code> [string], (optional) <code class="docutils literal notranslate"><span class="pre">body_type</span></code> [string]: {dynamic, kinematic, static}, (optional) <code class="docutils literal notranslate"><span class="pre">name</span></code> [string], <code class="docutils literal notranslate"><span class="pre">mass</span></code> [float]</p>
 <ol class="arabic simple">
-<li><p>&lt;child&gt; (optional, default=Derived from geometry assuming uniform density) <code class="docutils literal notranslate"><span class="pre">inertia</span></code> : &lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">xx</span></code> [float], <code class="docutils literal notranslate"><span class="pre">xy</span></code> [float], <code class="docutils literal notranslate"><span class="pre">xz</span></code> [float], <code class="docutils literal notranslate"><span class="pre">yy</span></code> [float], <code class="docutils literal notranslate"><span class="pre">yz</span></code> [float], <code class="docutils literal notranslate"><span class="pre">zz</span></code> [float]</p></li>
-<li><p>&lt;child&gt; dim: &lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">x</span></code> [float], <code class="docutils literal notranslate"><span class="pre">y</span></code> [float], <code class="docutils literal notranslate"><span class="pre">z</span></code> [float]</p></li>
-<li><p>&lt;child&gt; state: &lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">pos</span></code> [Vec&lt;3&gt;], (optional, default=1,0,0,0) <code class="docutils literal notranslate"><span class="pre">quat</span></code> [Vec&lt;4&gt;], (optional, default=0,0,0) <code class="docutils literal notranslate"><span class="pre">lin_vel</span></code> [Vec&lt;3&gt;], (optional, default=0,0,0) <code class="docutils literal notranslate"><span class="pre">ang_vel</span></code> [Vec&lt;3&gt;]</p></li>
+<li><p>&lt;child&gt; <code class="docutils literal notranslate"><span class="pre">dim</span></code>: &lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">x</span></code> [float], <code class="docutils literal notranslate"><span class="pre">y</span></code> [float], <code class="docutils literal notranslate"><span class="pre">z</span></code> [float]:
+the full side lengths along the body axes</p></li>
 </ol>
 </section>
 <section id="compound">
 <h3>compound<a class="headerlink" href="#compound" title="Link to this heading"></a></h3>
-<p><a class="reference external" href="https://github.com/raisimTech/raisim2Lib/blob/master/rsc/xmlScripts/objects/SingleBodies.xml">EXAMPLES</a></p>
-<p><strong>attributes</strong>: (optional, default=1) <code class="docutils literal notranslate"><span class="pre">collision_group</span></code> [uint64_t], (optional, default=-1) <code class="docutils literal notranslate"><span class="pre">collision_mask</span></code> [uint64_t], (optional) <code class="docutils literal notranslate"><span class="pre">appearance</span></code> [string], (optional) <code class="docutils literal notranslate"><span class="pre">body_type</span></code> [string]: {dynamic, kinematic, static}, (optional) <code class="docutils literal notranslate"><span class="pre">name</span></code> [string], <code class="docutils literal notranslate"><span class="pre">com</span></code> [Vec&lt;3&gt;], <code class="docutils literal notranslate"><span class="pre">mass</span></code> [float]</p>
+<p>A single rigid body made of several primitive collision shapes. <code class="docutils literal notranslate"><span class="pre">com</span></code> and the
+<code class="docutils literal notranslate"><span class="pre">inertia</span></code> child are required.</p>
 <ol class="arabic">
-<li><dl class="simple">
-<dt>&lt;child&gt; (optional, default=Derived from geometry assuming uniform density) <code class="docutils literal notranslate"><span class="pre">inertia</span></code></dt><dd><p><strong>attributes</strong>: <code class="docutils literal notranslate"><span class="pre">xx</span></code> [float], <code class="docutils literal notranslate"><span class="pre">xy</span></code> [float], <code class="docutils literal notranslate"><span class="pre">xz</span></code> [float], <code class="docutils literal notranslate"><span class="pre">yy</span></code> [float], <code class="docutils literal notranslate"><span class="pre">yz</span></code> [float], <code class="docutils literal notranslate"><span class="pre">zz</span></code> [float]</p>
-</dd>
-</dl>
-</li>
-<li><p>&lt;child&gt; <code class="docutils literal notranslate"><span class="pre">children</span></code>
-Common attributes of the children: <code class="docutils literal notranslate"><span class="pre">appearance</span></code> [string]</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">child</span><span class="o">&gt;</span> <span class="p">(</span><span class="n">optional</span><span class="p">,</span> <span class="n">multiple</span><span class="p">)</span> <span class="n">sphere</span>
-  <span class="o">&lt;</span><span class="n">child</span><span class="o">&gt;</span> <span class="n">dim</span>
-    <span class="o">&lt;</span><span class="n">attribute</span><span class="o">&gt;</span> <span class="n">radius</span> <span class="p">[</span><span class="nb">float</span><span class="p">]</span>
-  <span class="o">&lt;</span><span class="n">attribute</span><span class="o">&gt;</span> <span class="p">(</span><span class="n">optional</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">)</span> <span class="n">material</span>
-<span class="o">&lt;</span><span class="n">child</span><span class="o">&gt;</span> <span class="p">(</span><span class="n">optional</span><span class="p">,</span> <span class="n">multiple</span><span class="p">)</span> <span class="n">cylinder</span>
-  <span class="o">&lt;</span><span class="n">child</span><span class="o">&gt;</span> <span class="n">dim</span>
-    <span class="o">&lt;</span><span class="n">attribute</span><span class="o">&gt;</span> <span class="n">radius</span> <span class="p">[</span><span class="nb">float</span><span class="p">]</span>
-    <span class="o">&lt;</span><span class="n">attribute</span><span class="o">&gt;</span> <span class="n">height</span> <span class="p">[</span><span class="nb">float</span><span class="p">]</span>
-  <span class="o">&lt;</span><span class="n">attribute</span><span class="o">&gt;</span> <span class="p">(</span><span class="n">optional</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">)</span> <span class="n">material</span>
-<span class="o">&lt;</span><span class="n">child</span><span class="o">&gt;</span> <span class="p">(</span><span class="n">optional</span><span class="p">,</span> <span class="n">multiple</span><span class="p">)</span> <span class="n">capsule</span>
-  <span class="o">&lt;</span><span class="n">child</span><span class="o">&gt;</span> <span class="n">dim</span>
-    <span class="o">&lt;</span><span class="n">attribute</span><span class="o">&gt;</span> <span class="n">radius</span> <span class="p">[</span><span class="nb">float</span><span class="p">]</span>
-    <span class="o">&lt;</span><span class="n">attribute</span><span class="o">&gt;</span> <span class="n">height</span> <span class="p">[</span><span class="nb">float</span><span class="p">]</span>
-  <span class="o">&lt;</span><span class="n">attribute</span><span class="o">&gt;</span> <span class="p">(</span><span class="n">optional</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">)</span> <span class="n">material</span>
-<span class="o">&lt;</span><span class="n">child</span><span class="o">&gt;</span> <span class="p">(</span><span class="n">optional</span><span class="p">,</span> <span class="n">multiple</span><span class="p">)</span> <span class="n">box</span>
-  <span class="o">&lt;</span><span class="n">child</span><span class="o">&gt;</span> <span class="n">dim</span>
-    <span class="o">&lt;</span><span class="n">attribute</span><span class="o">&gt;</span> <span class="n">x</span> <span class="p">[</span><span class="nb">float</span><span class="p">]</span>
-    <span class="o">&lt;</span><span class="n">attribute</span><span class="o">&gt;</span> <span class="n">y</span> <span class="p">[</span><span class="nb">float</span><span class="p">]</span>
-    <span class="o">&lt;</span><span class="n">attribute</span><span class="o">&gt;</span> <span class="n">z</span> <span class="p">[</span><span class="nb">float</span><span class="p">]</span>
-  <span class="o">&lt;</span><span class="n">attribute</span><span class="o">&gt;</span> <span class="p">(</span><span class="n">optional</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">)</span> <span class="n">material</span>
+<li><p>&lt;child&gt; <code class="docutils literal notranslate"><span class="pre">children</span></code>: one element per shape, in any order. Each element is
+<code class="docutils literal notranslate"><span class="pre">sphere</span></code>, <code class="docutils literal notranslate"><span class="pre">box</span></code>, <code class="docutils literal notranslate"><span class="pre">capsule</span></code>, <code class="docutils literal notranslate"><span class="pre">cylinder</span></code>, or the name of a compound
+<code class="docutils literal notranslate"><span class="pre">object_class</span></code> (whose shapes are inserted at this pose). Other attributes
+of the shape elements, such as <code class="docutils literal notranslate"><span class="pre">name</span></code> or <code class="docutils literal notranslate"><span class="pre">mass</span></code>, are ignored.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">attribute</span><span class="o">&gt;</span> <span class="p">(</span><span class="n">optional</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">)</span> <span class="n">material</span> <span class="p">[</span><span class="n">string</span><span class="p">]</span>
+<span class="o">&lt;</span><span class="n">attribute</span><span class="o">&gt;</span> <span class="p">(</span><span class="n">optional</span><span class="p">)</span> <span class="n">appearance</span> <span class="p">[</span><span class="n">string</span><span class="p">]</span>
+<span class="o">&lt;</span><span class="n">child</span><span class="o">&gt;</span> <span class="n">dim</span>               <span class="p">(</span><span class="ow">not</span> <span class="n">used</span> <span class="k">for</span> <span class="n">an</span> <span class="n">object_class</span> <span class="n">child</span><span class="p">)</span>
+  <span class="n">sphere</span><span class="p">:</span>             <span class="o">&lt;</span><span class="n">attribute</span><span class="o">&gt;</span> <span class="n">radius</span> <span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+  <span class="n">capsule</span><span class="p">,</span> <span class="n">cylinder</span><span class="p">:</span>  <span class="o">&lt;</span><span class="n">attribute</span><span class="o">&gt;</span> <span class="n">radius</span> <span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">height</span> <span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+  <span class="n">box</span><span class="p">:</span>                <span class="o">&lt;</span><span class="n">attribute</span><span class="o">&gt;</span> <span class="n">x</span> <span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">y</span> <span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">z</span> <span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+<span class="o">&lt;</span><span class="n">child</span><span class="o">&gt;</span> <span class="n">state</span>             <span class="p">(</span><span class="n">pose</span> <span class="n">of</span> <span class="n">the</span> <span class="n">shape</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">compound</span> <span class="n">body</span> <span class="n">frame</span><span class="p">)</span>
+  <span class="o">&lt;</span><span class="n">attribute</span><span class="o">&gt;</span> <span class="n">pos</span> <span class="p">[</span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;</span><span class="p">]</span>
+  <span class="o">&lt;</span><span class="n">attribute</span><span class="o">&gt;</span> <span class="p">(</span><span class="n">optional</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="n">quat</span> <span class="p">[</span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">4</span><span class="o">&gt;</span><span class="p">]</span>
 </pre></div>
 </div>
-</li>
-<li><dl class="simple">
-<dt>&lt;child&gt; state</dt><dd><p><strong>attributes</strong>: <code class="docutils literal notranslate"><span class="pre">pos</span></code> [Vec&lt;3&gt;], (optional, default=1,0,0,0) <code class="docutils literal notranslate"><span class="pre">quat</span></code> [Vec&lt;4&gt;], (optional, default=0,0,0) <code class="docutils literal notranslate"><span class="pre">lin_vel</span></code> [Vec&lt;3&gt;], (optional, default=0,0,0) <code class="docutils literal notranslate"><span class="pre">ang_vel</span></code> [Vec&lt;3&gt;]</p>
-</dd>
-</dl>
 </li>
 </ol>
 </section>
 <section id="mesh">
 <h3>mesh<a class="headerlink" href="#mesh" title="Link to this heading"></a></h3>
-<p><a class="reference external" href="https://github.com/raisimTech/raisim2Lib/blob/master/rsc/xmlScripts/objects/SingleBodies.xml">EXAMPLES</a></p>
-<p><strong>attributes</strong>: (optional, default=1) <code class="docutils literal notranslate"><span class="pre">collision_group</span></code> [uint64_t], (optional, default=-1) <code class="docutils literal notranslate"><span class="pre">collision_mask</span></code> [uint64_t], (optional) <code class="docutils literal notranslate"><span class="pre">appearance</span></code> [string], (optional) <code class="docutils literal notranslate"><span class="pre">body_type</span></code> [string]: {dynamic, kinematic, static}, (optional) <code class="docutils literal notranslate"><span class="pre">name</span></code> [string], <code class="docutils literal notranslate"><span class="pre">mass</span></code> [float], <code class="docutils literal notranslate"><span class="pre">file_name</span></code> [string], <code class="docutils literal notranslate"><span class="pre">com</span></code> [Vec&lt;3&gt;], <code class="docutils literal notranslate"><span class="pre">scale</span></code> [Vec&lt;3&gt;]</p>
+<p><code class="docutils literal notranslate"><span class="pre">com</span></code> and the <code class="docutils literal notranslate"><span class="pre">inertia</span></code> child are required.</p>
+<p><strong>attributes</strong>:
+<code class="docutils literal notranslate"><span class="pre">file_name</span></code> [string]: the mesh file,
+<code class="docutils literal notranslate"><span class="pre">scale</span></code> [Vec&lt;3&gt;]: mesh scale; only the first component is used (uniform scale),
+(optional, default=0) <code class="docutils literal notranslate"><span class="pre">collision_mode</span></code> [int]: <code class="docutils literal notranslate"><span class="pre">0</span></code> keeps the triangle mesh,
+<code class="docutils literal notranslate"><span class="pre">1</span></code> uses its convex hull, <code class="docutils literal notranslate"><span class="pre">2</span></code> uses a CoACD convex decomposition</p>
 <ol class="arabic simple">
-<li><dl class="simple">
-<dt>&lt;child&gt; (optional, default=Derived from geometry assuming uniform density) <code class="docutils literal notranslate"><span class="pre">inertia</span></code></dt><dd><p><strong>attributes</strong>: <code class="docutils literal notranslate"><span class="pre">xx</span></code> [float], <code class="docutils literal notranslate"><span class="pre">xy</span></code> [float], <code class="docutils literal notranslate"><span class="pre">xz</span></code> [float], <code class="docutils literal notranslate"><span class="pre">yy</span></code> [float], <code class="docutils literal notranslate"><span class="pre">yz</span></code> [float], <code class="docutils literal notranslate"><span class="pre">zz</span></code> [float]</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>&lt;child&gt; <code class="docutils literal notranslate"><span class="pre">state</span></code></dt><dd><p><strong>attributes</strong>: <code class="docutils literal notranslate"><span class="pre">pos</span></code> [Vec&lt;3&gt;], (optional, default=1,0,0,0) <code class="docutils literal notranslate"><span class="pre">quat</span></code> [Vec&lt;4&gt;], (optional, default=0,0,0) <code class="docutils literal notranslate"><span class="pre">lin_vel</span></code> [Vec&lt;3&gt;], (optional, default=0,0,0) <code class="docutils literal notranslate"><span class="pre">ang_vel</span></code> [Vec&lt;3&gt;]</p>
-</dd>
-</dl>
-</li>
+<li><p>&lt;child&gt; (optional) <code class="docutils literal notranslate"><span class="pre">coacd</span></code>: CoACD parameters used with <code class="docutils literal notranslate"><span class="pre">collision_mode=&quot;2&quot;</span></code>.
+The attributes <code class="docutils literal notranslate"><span class="pre">threshold</span></code>, <code class="docutils literal notranslate"><span class="pre">max_hulls</span></code>, <code class="docutils literal notranslate"><span class="pre">preprocess</span></code>,
+<code class="docutils literal notranslate"><span class="pre">prep_resolution</span></code>, <code class="docutils literal notranslate"><span class="pre">sample_resolution</span></code>, <code class="docutils literal notranslate"><span class="pre">mcts_nodes</span></code>,
+<code class="docutils literal notranslate"><span class="pre">mcts_iterations</span></code>, <code class="docutils literal notranslate"><span class="pre">mcts_depth</span></code>, <code class="docutils literal notranslate"><span class="pre">pca</span></code>, <code class="docutils literal notranslate"><span class="pre">merge</span></code>, <code class="docutils literal notranslate"><span class="pre">decimate</span></code>,
+<code class="docutils literal notranslate"><span class="pre">max_vertices</span></code>, <code class="docutils literal notranslate"><span class="pre">extrude</span></code>, <code class="docutils literal notranslate"><span class="pre">extrude_margin</span></code>, <code class="docutils literal notranslate"><span class="pre">approximation</span></code>,
+<code class="docutils literal notranslate"><span class="pre">seed</span></code>, and <code class="docutils literal notranslate"><span class="pre">real_metric</span></code> map to the fields of <code class="docutils literal notranslate"><span class="pre">raisim::CoacdOptions</span></code>;
+omitted attributes keep their defaults.</p></li>
 </ol>
 </section>
 <section id="ground">
 <h3>ground<a class="headerlink" href="#ground" title="Link to this heading"></a></h3>
-<p><a class="reference external" href="https://github.com/raisimTech/raisim2Lib/blob/master/rsc/xmlScripts/material/material.xml">EXAMPLES</a></p>
-<p><strong>attributes</strong>: (optional, default=-1) <code class="docutils literal notranslate"><span class="pre">collision_mask</span></code> [uint64_t], (optional) <code class="docutils literal notranslate"><span class="pre">appearance</span></code> [string], (optional) <code class="docutils literal notranslate"><span class="pre">name</span></code> [string], (optional, default=0) <code class="docutils literal notranslate"><span class="pre">height</span></code> [float]</p>
+<p><a class="reference external" href="https://github.com/raisimTech/raisim2Lib/blob/main/rsc/xmlScripts/material/material.xml">Example</a></p>
+<p>An infinite static plane. Its collision group is fixed, so only the mask can be set.</p>
+<p><strong>attributes</strong>: <code class="docutils literal notranslate"><span class="pre">name</span></code> [string], (optional, default=0) <code class="docutils literal notranslate"><span class="pre">height</span></code> [float],
+(optional, default <code class="docutils literal notranslate"><span class="pre">default</span></code>) <code class="docutils literal notranslate"><span class="pre">material</span></code> [string], (optional, default=-1)
+<code class="docutils literal notranslate"><span class="pre">collision_mask</span></code>, (optional) <code class="docutils literal notranslate"><span class="pre">appearance</span></code> [string]</p>
 </section>
 <section id="heightmap">
 <h3>heightmap<a class="headerlink" href="#heightmap" title="Link to this heading"></a></h3>
-<p><a class="reference external" href="https://github.com/raisimTech/raisim2Lib/tree/master/rsc/xmlScripts/heightMaps">EXAMPLES</a></p>
-<p><strong>Options</strong></p>
+<p><a class="reference external" href="https://github.com/raisimTech/raisim2Lib/tree/main/rsc/xmlScripts/heightMaps">Examples</a></p>
+<p><strong>attributes (all options)</strong>: <code class="docutils literal notranslate"><span class="pre">name</span></code> [string],
+(optional, default <code class="docutils literal notranslate"><span class="pre">default</span></code>) <code class="docutils literal notranslate"><span class="pre">material</span></code> [string],
+(optional) <code class="docutils literal notranslate"><span class="pre">appearance</span></code> [string],
+(optional, default=1) <code class="docutils literal notranslate"><span class="pre">collision_group</span></code>, (optional, default=-1) <code class="docutils literal notranslate"><span class="pre">collision_mask</span></code>,
+(optional, default=0) <code class="docutils literal notranslate"><span class="pre">center_x</span></code>, <code class="docutils literal notranslate"><span class="pre">center_y</span></code>, <code class="docutils literal notranslate"><span class="pre">center_z</span></code> [float].
+<code class="docutils literal notranslate"><span class="pre">center_z</span></code> sets the height-map position along z.</p>
+<p>The height data comes from exactly one of the following options. If several
+are present, the first one in this list is used.</p>
 <ol class="arabic simple">
-<li><p><strong>attributes</strong>: (optional, default=-1) <code class="docutils literal notranslate"><span class="pre">collision_mask</span></code> [uint64_t], (optional) <code class="docutils literal notranslate"><span class="pre">appearance</span></code> [string], (optional, default=default) <code class="docutils literal notranslate"><span class="pre">material</span></code> [string], (optional) <code class="docutils literal notranslate"><span class="pre">name</span></code> [string], <code class="docutils literal notranslate"><span class="pre">x_sample</span></code> [size_t], <code class="docutils literal notranslate"><span class="pre">y_sample</span></code> [size_t], <code class="docutils literal notranslate"><span class="pre">x_size</span></code> [float], <code class="docutils literal notranslate"><span class="pre">y_size</span></code> [float], <code class="docutils literal notranslate"><span class="pre">center_x</span></code> [float], <code class="docutils literal notranslate"><span class="pre">center_y</span></code> [float], <code class="docutils literal notranslate"><span class="pre">height</span></code> [std::vector&lt;float&gt;]</p></li>
-<li><p><strong>attributes</strong>: (optional, default=-1) <code class="docutils literal notranslate"><span class="pre">collision_mask</span></code> [uint64_t], (optional) <code class="docutils literal notranslate"><span class="pre">appearance</span></code> [string], (optional, default=default) <code class="docutils literal notranslate"><span class="pre">material</span></code> [string], (optional) <code class="docutils literal notranslate"><span class="pre">name</span></code> [string], <code class="docutils literal notranslate"><span class="pre">x_sample</span></code> [size_t], <code class="docutils literal notranslate"><span class="pre">y_sample</span></code> [size_t], <code class="docutils literal notranslate"><span class="pre">x_size</span></code> [float], <code class="docutils literal notranslate"><span class="pre">y_size</span></code> [float], <code class="docutils literal notranslate"><span class="pre">center_x</span></code> [float], <code class="docutils literal notranslate"><span class="pre">center_y</span></code> [float], <code class="docutils literal notranslate"><span class="pre">z_scale</span></code> [float], <code class="docutils literal notranslate"><span class="pre">z_offset</span></code> [float], <code class="docutils literal notranslate"><span class="pre">png</span></code> [string]</p></li>
-<li><p><strong>attributes</strong>: (optional, default=-1) <code class="docutils literal notranslate"><span class="pre">collision_mask</span></code> [uint64_t], (optional) <code class="docutils literal notranslate"><span class="pre">appearance</span></code> [string], (optional, default=default) <code class="docutils literal notranslate"><span class="pre">material</span></code> [string], (optional) <code class="docutils literal notranslate"><span class="pre">name</span></code> [string], <code class="docutils literal notranslate"><span class="pre">center_x</span></code> [float], <code class="docutils literal notranslate"><span class="pre">center_y</span></code> [float], <code class="docutils literal notranslate"><span class="pre">text</span></code> [string]</p></li>
-<li><dl class="simple">
-<dt><strong>attributes</strong>: (optional, default=-1) <code class="docutils literal notranslate"><span class="pre">collision_mask</span></code> [uint64_t], (optional) <code class="docutils literal notranslate"><span class="pre">appearance</span></code> [string], (optional, default=default) <code class="docutils literal notranslate"><span class="pre">material</span></code> [string], (optional) <code class="docutils literal notranslate"><span class="pre">name</span></code> [string], <code class="docutils literal notranslate"><span class="pre">x_sample</span></code> [size_t], <code class="docutils literal notranslate"><span class="pre">y_sample</span></code> [size_t], <code class="docutils literal notranslate"><span class="pre">x_size</span></code> [float], <code class="docutils literal notranslate"><span class="pre">y_size</span></code> [float], <code class="docutils literal notranslate"><span class="pre">center_x</span></code> [float], <code class="docutils literal notranslate"><span class="pre">center_y</span></code> [float]</dt><dd><ol class="arabic simple">
-<li><dl class="simple">
-<dt>&lt;child&gt; <code class="docutils literal notranslate"><span class="pre">terrain_properties</span></code></dt><dd><p><strong>attributes</strong>: <code class="docutils literal notranslate"><span class="pre">z_scale</span></code> [float], <code class="docutils literal notranslate"><span class="pre">fractal_octaves</span></code> [size_t], <code class="docutils literal notranslate"><span class="pre">fractal_lacunarity</span></code> [float], <code class="docutils literal notranslate"><span class="pre">fractal_gain</span></code> [float], <code class="docutils literal notranslate"><span class="pre">step_size</span></code> [float], (optional, default=0) <code class="docutils literal notranslate"><span class="pre">height_offset</span></code> [float], <code class="docutils literal notranslate"><span class="pre">frequency</span></code> [float], <code class="docutils literal notranslate"><span class="pre">seed</span></code> [size_t]</p>
-</dd>
-</dl>
-</li>
-</ol>
-</dd>
-</dl>
-</li>
+<li><p>Raw heights: <code class="docutils literal notranslate"><span class="pre">x_sample</span></code> [int], <code class="docutils literal notranslate"><span class="pre">y_sample</span></code> [int], (optional, default=10)
+<code class="docutils literal notranslate"><span class="pre">x_size</span></code> and <code class="docutils literal notranslate"><span class="pre">y_size</span></code> [float], and <code class="docutils literal notranslate"><span class="pre">height</span></code> [list of float] with
+<code class="docutils literal notranslate"><span class="pre">x_sample</span> <span class="pre">*</span> <span class="pre">y_sample</span></code> values.</p></li>
+<li><p>Terrain generator: <code class="docutils literal notranslate"><span class="pre">x_sample</span></code> [int], <code class="docutils literal notranslate"><span class="pre">y_sample</span></code> [int], (optional,
+default=10) <code class="docutils literal notranslate"><span class="pre">x_size</span></code> and <code class="docutils literal notranslate"><span class="pre">y_size</span></code> [float], and a child
+<code class="docutils literal notranslate"><span class="pre">terrain_properties</span></code> (alias <code class="docutils literal notranslate"><span class="pre">terrainProperties</span></code>) with the attributes
+<code class="docutils literal notranslate"><span class="pre">frequency</span></code> [float], <code class="docutils literal notranslate"><span class="pre">z_scale</span></code> [float], <code class="docutils literal notranslate"><span class="pre">fractal_octaves</span></code> [int],
+<code class="docutils literal notranslate"><span class="pre">fractal_lacunarity</span></code> [float], <code class="docutils literal notranslate"><span class="pre">fractal_gain</span></code> [float], <code class="docutils literal notranslate"><span class="pre">step_size</span></code>
+[float], <code class="docutils literal notranslate"><span class="pre">seed</span></code> [int], and (optional, default=0) <code class="docutils literal notranslate"><span class="pre">height_offset</span></code> [float].
+This option currently ignores <code class="docutils literal notranslate"><span class="pre">collision_group</span></code> and <code class="docutils literal notranslate"><span class="pre">collision_mask</span></code>.</p></li>
+<li><p>PNG image: <code class="docutils literal notranslate"><span class="pre">png</span></code> [string], (optional, default=10) <code class="docutils literal notranslate"><span class="pre">x_size</span></code> and <code class="docutils literal notranslate"><span class="pre">y_size</span></code>
+[float], <code class="docutils literal notranslate"><span class="pre">z_scale</span></code> (alias <code class="docutils literal notranslate"><span class="pre">height_scale</span></code>) [float], and <code class="docutils literal notranslate"><span class="pre">z_offset</span></code>
+(alias <code class="docutils literal notranslate"><span class="pre">height_offset</span></code>) [float]. The sample counts come from the image
+resolution.</p></li>
+<li><p>Text file: <code class="docutils literal notranslate"><span class="pre">text</span></code> [string], the path of a height-map text file, which also
+stores the sample counts and sizes.</p></li>
 </ol>
 </section>
 <section id="articulatedsystem-articulated-system">
 <h3>articulatedSystem / articulated_system<a class="headerlink" href="#articulatedsystem-articulated-system" title="Link to this heading"></a></h3>
-<p><a class="reference external" href="https://github.com/raisimTech/raisim2Lib/blob/master/rsc/xmlScripts/heightMaps/heightMapUsingPng.xml">EXAMPLES</a></p>
+<p><a class="reference external" href="https://github.com/raisimTech/raisim2Lib/blob/main/rsc/xmlScripts/heightMaps/heightMapUsingPng.xml">Example</a></p>
 <p>Both tag names are accepted by the XML reader. <code class="docutils literal notranslate"><span class="pre">articulatedSystem</span></code> is the canonical exported form.</p>
-<p><strong>attributes</strong>: (optional, default=1) <code class="docutils literal notranslate"><span class="pre">collision_group</span></code> [uint64_t], (optional, default=-1) <code class="docutils literal notranslate"><span class="pre">collision_mask</span></code> [uint64_t], (optional) <code class="docutils literal notranslate"><span class="pre">name</span></code> [string], (optional, default=URDF directory) <code class="docutils literal notranslate"><span class="pre">res_dir</span></code> [string], <code class="docutils literal notranslate"><span class="pre">urdf_path</span></code> [string], (optional) <code class="docutils literal notranslate"><span class="pre">modules</span></code> [space-separated string list]</p>
+<p><strong>attributes</strong>: <code class="docutils literal notranslate"><span class="pre">name</span></code> [string], <code class="docutils literal notranslate"><span class="pre">urdf_path</span></code> [string],
+(optional, default=URDF directory) <code class="docutils literal notranslate"><span class="pre">res_dir</span></code> [string],
+(optional, default=1) <code class="docutils literal notranslate"><span class="pre">collision_group</span></code>, (optional, default=-1) <code class="docutils literal notranslate"><span class="pre">collision_mask</span></code>,
+(optional) <code class="docutils literal notranslate"><span class="pre">modules</span></code> [space-separated string list],
+(optional) <code class="docutils literal notranslate"><span class="pre">joint_order</span></code> [space-separated joint names]: redefines the joint
+order (a child joint cannot precede its parent),
+(optional, default=0) <code class="docutils literal notranslate"><span class="pre">collide_parent</span></code> [int]: 1 enables collisions between a
+link and its parent,
+(optional, default=0) <code class="docutils literal notranslate"><span class="pre">convexify_meshes</span></code> [int]: 1 treats the URDF collision
+meshes as convex shapes</p>
+<p>Use an absolute <code class="docutils literal notranslate"><span class="pre">urdf_path</span></code> or one that starts with <code class="docutils literal notranslate"><span class="pre">[THIS_DIR]</span></code>.</p>
 <ol class="arabic simple">
-<li><dl class="simple">
-<dt>&lt;child&gt; <code class="docutils literal notranslate"><span class="pre">state</span></code></dt><dd><p><strong>attributes</strong>: <code class="docutils literal notranslate"><span class="pre">qpos</span></code> [VecDyn], (optional, default=zeros) <code class="docutils literal notranslate"><span class="pre">qvel</span></code> [VecDyn]</p>
-</dd>
-</dl>
-</li>
+<li><p>&lt;child&gt; <code class="docutils literal notranslate"><span class="pre">state</span></code>: &lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">qpos</span></code> [VecDyn], the generalized coordinate,
+(optional, default=zeros) <code class="docutils literal notranslate"><span class="pre">qvel</span></code> [VecDyn], the generalized velocity</p></li>
 </ol>
 </section>
 <section id="object-class">
 <h3>object_class<a class="headerlink" href="#object-class" title="Link to this heading"></a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">object_class</span></code> defines reusable object templates under the top-level <code class="docutils literal notranslate"><span class="pre">raisim</span></code> node. Each child node name becomes a class name that can be used as an object tag under <code class="docutils literal notranslate"><span class="pre">objects</span></code>.</p>
-<p>Common class attributes are <code class="docutils literal notranslate"><span class="pre">type</span></code> [string], (required for movable single bodies) <code class="docutils literal notranslate"><span class="pre">mass</span></code> [float], (optional) <code class="docutils literal notranslate"><span class="pre">material</span></code> [string], (optional) <code class="docutils literal notranslate"><span class="pre">com</span></code> [Vec&lt;3&gt;], and optional child <code class="docutils literal notranslate"><span class="pre">inertia</span></code> with attributes <code class="docutils literal notranslate"><span class="pre">xx</span></code>, <code class="docutils literal notranslate"><span class="pre">xy</span></code>, <code class="docutils literal notranslate"><span class="pre">xz</span></code>, <code class="docutils literal notranslate"><span class="pre">yy</span></code>, <code class="docutils literal notranslate"><span class="pre">yz</span></code>, and <code class="docutils literal notranslate"><span class="pre">zz</span></code>.</p>
-<p>Primitive classes use child <code class="docutils literal notranslate"><span class="pre">dimension</span></code> with the same shape parameters as <code class="docutils literal notranslate"><span class="pre">dim</span></code>. Mesh classes use child <code class="docutils literal notranslate"><span class="pre">file</span></code> with attribute <code class="docutils literal notranslate"><span class="pre">name</span></code> and child <code class="docutils literal notranslate"><span class="pre">scale</span></code> with attributes <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>, and <code class="docutils literal notranslate"><span class="pre">z</span></code>. Articulated-system classes use attributes <code class="docutils literal notranslate"><span class="pre">urdf_path</span></code> and optional <code class="docutils literal notranslate"><span class="pre">res_dir</span></code>. Compound classes use child <code class="docutils literal notranslate"><span class="pre">children</span></code>; each child uses <code class="docutils literal notranslate"><span class="pre">object_param</span></code> [VecDyn], <code class="docutils literal notranslate"><span class="pre">pos</span></code> [VecDyn], optional <code class="docutils literal notranslate"><span class="pre">quat</span></code> [Vec&lt;4&gt;], optional <code class="docutils literal notranslate"><span class="pre">material</span></code>, and optional <code class="docutils literal notranslate"><span class="pre">appearance</span></code>.</p>
+<p>Common class attributes are <code class="docutils literal notranslate"><span class="pre">type</span></code> [string] (an object type name such as
+<code class="docutils literal notranslate"><span class="pre">sphere</span></code>), (required for <code class="docutils literal notranslate"><span class="pre">sphere</span></code>, <code class="docutils literal notranslate"><span class="pre">box</span></code>, <code class="docutils literal notranslate"><span class="pre">capsule</span></code>, <code class="docutils literal notranslate"><span class="pre">cylinder</span></code>,
+<code class="docutils literal notranslate"><span class="pre">mesh</span></code>, and <code class="docutils literal notranslate"><span class="pre">compound</span></code>) <code class="docutils literal notranslate"><span class="pre">mass</span></code> [float], (optional) <code class="docutils literal notranslate"><span class="pre">material</span></code>
+[string], (optional) <code class="docutils literal notranslate"><span class="pre">com</span></code> [Vec&lt;3&gt;], and the optional child <code class="docutils literal notranslate"><span class="pre">inertia</span></code> with
+attributes <code class="docutils literal notranslate"><span class="pre">xx</span></code>, <code class="docutils literal notranslate"><span class="pre">xy</span></code>, <code class="docutils literal notranslate"><span class="pre">xz</span></code>, <code class="docutils literal notranslate"><span class="pre">yy</span></code>, <code class="docutils literal notranslate"><span class="pre">yz</span></code>, and <code class="docutils literal notranslate"><span class="pre">zz</span></code>.</p>
+<p>Primitive classes use the child <code class="docutils literal notranslate"><span class="pre">dimension</span></code> with the same shape parameters as
+<code class="docutils literal notranslate"><span class="pre">dim</span></code>. Mesh classes use the child <code class="docutils literal notranslate"><span class="pre">file</span></code> with the attribute <code class="docutils literal notranslate"><span class="pre">name</span></code> and the
+child <code class="docutils literal notranslate"><span class="pre">scale</span></code> with the attributes <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>, and <code class="docutils literal notranslate"><span class="pre">z</span></code> (only <code class="docutils literal notranslate"><span class="pre">x</span></code> is used).
+Articulated-system classes use the attributes <code class="docutils literal notranslate"><span class="pre">urdf_path</span></code> and optional
+<code class="docutils literal notranslate"><span class="pre">res_dir</span></code>. Compound classes use the child <code class="docutils literal notranslate"><span class="pre">children</span></code>; each child element is
+named after a primitive type or another compound class and uses the attributes
+<code class="docutils literal notranslate"><span class="pre">object_param</span></code> [VecDyn] (the shape parameters: radius; radius and height; or
+x, y and z), <code class="docutils literal notranslate"><span class="pre">pos</span></code> [Vec&lt;3&gt;], optional <code class="docutils literal notranslate"><span class="pre">quat</span></code> [Vec&lt;4&gt;], optional
+<code class="docutils literal notranslate"><span class="pre">material</span></code>, and optional <code class="docutils literal notranslate"><span class="pre">appearance</span></code>.</p>
+<p>An instance of a class under <code class="docutils literal notranslate"><span class="pre">objects</span></code> takes <code class="docutils literal notranslate"><span class="pre">name</span></code>, the collision
+attributes, <code class="docutils literal notranslate"><span class="pre">body_type</span></code>, <code class="docutils literal notranslate"><span class="pre">state</span></code>, and <code class="docutils literal notranslate"><span class="pre">exist</span></code> like the corresponding
+built-in type; its shape, mass, and material come from the class.</p>
 </section>
+<section id="round-trip-elements">
+<h3>Round-trip elements<a class="headerlink" href="#round-trip-elements" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">World::exportToXml</span></code> also writes the following elements so that an exported
+world reloads in the same state. They are rarely written by hand; generate them
+with <code class="docutils literal notranslate"><span class="pre">exportToXml</span></code>.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">deformable</span></code> and <code class="docutils literal notranslate"><span class="pre">granular</span></code> objects, with their particles, constraints,
+and particle materials.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tuning</span></code> child of an object: damping and gyroscopic mode of single bodies,
+the pose of <code class="docutils literal notranslate"><span class="pre">ground</span></code> and <code class="docutils literal notranslate"><span class="pre">heightmap</span></code> objects, and the integration
+scheme, control mode, PD gains, targets, and feedforward force of
+articulated systems (<code class="docutils literal notranslate"><span class="pre">kp</span></code>, <code class="docutils literal notranslate"><span class="pre">kd</span></code>, <code class="docutils literal notranslate"><span class="pre">qref</span></code>, <code class="docutils literal notranslate"><span class="pre">uref</span></code>, and <code class="docutils literal notranslate"><span class="pre">feedforward</span></code>
+are then required).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sensors</span></code> and <code class="docutils literal notranslate"><span class="pre">actuators</span></code> children of an articulated system. See
+<a class="reference internal" href="Sensors.html"><span class="doc">Sensors</span></a> and <a class="reference internal" href="Actuators.html"><span class="doc">Actuators</span></a>.</p></li>
+</ul>
+</section>
+</section>
+<section id="simulation-settings">
+<h2>Simulation settings<a class="headerlink" href="#simulation-settings" title="Link to this heading"></a></h2>
+<p>The optional <code class="docutils literal notranslate"><span class="pre">simulation</span></code> element under <code class="docutils literal notranslate"><span class="pre">raisim</span></code> sets solver,
+contact-detection, and sleeping parameters. Every attribute is optional;
+omitted attributes keep the current values. Boolean attributes are written as
+<code class="docutils literal notranslate"><span class="pre">0</span></code> or <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 40.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Attributes</p></th>
+<th class="head"><p>Setting</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">world_time</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">World::setWorldTime</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">solver_order</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">World::setContactSolverIterationOrder</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">solver_iterations</span></code>, <code class="docutils literal notranslate"><span class="pre">solver_threshold</span></code></p></td>
+<td><p>maximum contact-solver iterations and termination threshold
+(<code class="docutils literal notranslate"><span class="pre">World::setContactSolverParam</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">alpha_init</span></code>, <code class="docutils literal notranslate"><span class="pre">alpha_low</span></code>, <code class="docutils literal notranslate"><span class="pre">alpha_decay</span></code></p></td>
+<td><p>accepted for compatibility; the solver ignores them</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">gjk_iterations</span></code>, <code class="docutils literal notranslate"><span class="pre">gjk_tolerance</span></code>, <code class="docutils literal notranslate"><span class="pre">epa_iterations</span></code>,
+<code class="docutils literal notranslate"><span class="pre">epa_tolerance</span></code>, <code class="docutils literal notranslate"><span class="pre">max_contacts</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">gjkMaxIterations</span></code>, <code class="docutils literal notranslate"><span class="pre">gjkTolerance</span></code>, <code class="docutils literal notranslate"><span class="pre">epaMaxIterations</span></code>,
+<code class="docutils literal notranslate"><span class="pre">epaTolerance</span></code>, <code class="docutils literal notranslate"><span class="pre">maxContactsPerPair</span></code> of <code class="docutils literal notranslate"><span class="pre">contact::ContactSettings</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">swept_ccd</span></code>, <code class="docutils literal notranslate"><span class="pre">ccd_min_speed</span></code>, <code class="docutils literal notranslate"><span class="pre">ccd_margin</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sweptCcdEnabled</span></code>, <code class="docutils literal notranslate"><span class="pre">sweptCcdMinSpeed</span></code>, <code class="docutils literal notranslate"><span class="pre">sweptCcdSpeculativeMargin</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">broadphase</span></code></p></td>
+<td><p>broadphase type: <code class="docutils literal notranslate"><span class="pre">0</span></code> = <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">1</span></code> = <code class="docutils literal notranslate"><span class="pre">Sap3Axis</span></code>, <code class="docutils literal notranslate"><span class="pre">2</span></code> =
+<code class="docutils literal notranslate"><span class="pre">MultiBoxPrune</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mbp_min_x/y/z</span></code>, <code class="docutils literal notranslate"><span class="pre">mbp_max_x/y/z</span></code>, <code class="docutils literal notranslate"><span class="pre">mbp_cell_x/y/z</span></code>,
+<code class="docutils literal notranslate"><span class="pre">mbp_bounds</span></code>, <code class="docutils literal notranslate"><span class="pre">mbp_padding</span></code>, <code class="docutils literal notranslate"><span class="pre">mbp_max_axis</span></code>, <code class="docutils literal notranslate"><span class="pre">mbp_max_object</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">mbpWorldMin</span></code>, <code class="docutils literal notranslate"><span class="pre">mbpWorldMax</span></code>, <code class="docutils literal notranslate"><span class="pre">mbpCellSize</span></code>,
+<code class="docutils literal notranslate"><span class="pre">mbpUseWorldBounds</span></code>, <code class="docutils literal notranslate"><span class="pre">mbpPadding</span></code>, <code class="docutils literal notranslate"><span class="pre">mbpMaxCellsPerAxis</span></code>,
+<code class="docutils literal notranslate"><span class="pre">mbpMaxCellsPerObject</span></code> of <code class="docutils literal notranslate"><span class="pre">contact::BroadphaseSettings</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sleeping</span></code>, <code class="docutils literal notranslate"><span class="pre">sleep_linear</span></code>, <code class="docutils literal notranslate"><span class="pre">sleep_angular</span></code>, <code class="docutils literal notranslate"><span class="pre">sleep_steps</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">World::setSleepingEnabled</span></code> and <code class="docutils literal notranslate"><span class="pre">World::setSleepingParameters</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>See <a class="reference internal" href="WorldSystem.html"><span class="doc">World</span></a> for the meaning and defaults of these settings.</p>
 </section>
 <section id="configuration-template">
 <h2>Configuration Template<a class="headerlink" href="#configuration-template" title="Link to this heading"></a></h2>
-<p>Configuration templates facilitate the systematic creation of simulation worlds.
-An example is available <a class="reference external" href="https://github.com/raisimTech/raisim2Lib/tree/master/rsc/xmlScripts/templatedWorld/templatedWorld.xml">here</a>.</p>
-<p>External configuration files can be imported using the <code class="docutils literal notranslate"><span class="pre">include</span></code> tag.
-This is beneficial for modularly combining sub-worlds.</p>
-<p>Parameters are denoted by the prefix <code class="docutils literal notranslate"><span class="pre">&#64;&#64;</span></code>.
-Variables may be defined within the script using the <code class="docutils literal notranslate"><span class="pre">params</span></code> tag.
-An example is available <a class="reference external" href="https://github.com/raisimTech/raisim2Lib/tree/master/rsc/xmlScripts/templatedWorld/templatedWorld.xml">here</a>.
-This allows for runtime modification of the world or the generation of configuration variants.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">array</span></code> tag enables the creation of <strong>loops</strong> within the configuration file.
-An example is available <a class="reference external" href="https://github.com/raisimTech/raisim2Lib/tree/master/rsc/xmlScripts/templatedWorld/spheres.xml">here</a>.
-The attributes <code class="docutils literal notranslate"><span class="pre">idx</span></code>, <code class="docutils literal notranslate"><span class="pre">start</span></code>, <code class="docutils literal notranslate"><span class="pre">end</span></code>, and <code class="docutils literal notranslate"><span class="pre">increment</span></code> are mandatory.
-The latter three attributes must be integers.</p>
-<p>Mathematical expressions are also supported within the configuration file.
-An example is available in the same file.
-Expressions must be encapsulated within <code class="docutils literal notranslate"><span class="pre">{}</span></code>.
-Supported functions include basic operations and <code class="docutils literal notranslate"><span class="pre">sin</span></code>, <code class="docutils literal notranslate"><span class="pre">cos</span></code>, <code class="docutils literal notranslate"><span class="pre">exp</span></code>, and <code class="docutils literal notranslate"><span class="pre">log</span></code>.
-Parentheses <code class="docutils literal notranslate"><span class="pre">()</span></code> are used for function calls and grouping, consistent with C++ syntax.</p>
-<p>Objects support an optional <code class="docutils literal notranslate"><span class="pre">exist</span></code> attribute.
-This enables conditional object existence based on runtime parameters.
-An example file is available <a class="reference external" href="https://github.com/raisimTech/raisim2Lib/tree/master/rsc/xmlScripts/templatedWorld/spheres.xml">here</a>.</p>
+<p>Configuration templates build worlds systematically from parameters, loops, and
+reusable files. See
+<a class="reference external" href="https://github.com/raisimTech/raisim2Lib/blob/main/rsc/xmlScripts/templatedWorld/templatedWorld.xml">templatedWorld.xml</a>
+and the <code class="docutils literal notranslate"><span class="pre">xml_templated_world</span></code> example, which loads it.</p>
+<p><strong>Includes.</strong> <code class="docutils literal notranslate"><span class="pre">&lt;include</span> <span class="pre">value=&quot;[THIS_DIR]/terrain.xml&quot;/&gt;</span></code> loads another world
+file into the same world before the including file’s own content. Use it to
+combine sub-worlds.</p>
+<p><strong>Parameters.</strong> A token <code class="docutils literal notranslate"><span class="pre">&#64;&#64;name</span></code> is replaced by the value of the parameter
+<code class="docutils literal notranslate"><span class="pre">name</span></code>. Define values in the file:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;params&gt;</span>
+<span class="w">    </span><span class="nt">&lt;object_spawn_height</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;0.3&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/params&gt;</span>
+</pre></div>
+</div>
+<p>or pass them to the constructor:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">::</span><span class="n">ParameterContainer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{{</span><span class="s">&quot;floor_height&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;-1&quot;</span><span class="p">}};</span>
+<span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">(</span><span class="s">&quot;templatedWorld.xml&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;params&gt;</span></code> values apply only to the file that defines them, while constructor
+values also apply to included files. A <code class="docutils literal notranslate"><span class="pre">&lt;params&gt;</span></code> value takes precedence over
+a constructor value with the same name. An <code class="docutils literal notranslate"><span class="pre">&#64;&#64;</span></code> token that is still
+unresolved after substitution is a fatal error.</p>
+<p><strong>Loops.</strong> <code class="docutils literal notranslate"><span class="pre">&lt;array</span> <span class="pre">idx=&quot;&#64;&#64;i&quot;</span> <span class="pre">start=&quot;0&quot;</span> <span class="pre">end=&quot;9&quot;</span> <span class="pre">increment=&quot;1&quot;&gt;</span> <span class="pre">...</span> <span class="pre">&lt;/array&gt;</span></code>
+repeats its content for <code class="docutils literal notranslate"><span class="pre">i</span> <span class="pre">=</span> <span class="pre">start,</span> <span class="pre">start</span> <span class="pre">+</span> <span class="pre">increment,</span> <span class="pre">...</span></code> up to and
+including <code class="docutils literal notranslate"><span class="pre">end</span></code>, replacing every occurrence of the <code class="docutils literal notranslate"><span class="pre">idx</span></code> symbol with the
+integer value. <code class="docutils literal notranslate"><span class="pre">idx</span></code>, <code class="docutils literal notranslate"><span class="pre">start</span></code>, <code class="docutils literal notranslate"><span class="pre">end</span></code>, and <code class="docutils literal notranslate"><span class="pre">increment</span></code> are required;
+<code class="docutils literal notranslate"><span class="pre">start</span></code>, <code class="docutils literal notranslate"><span class="pre">end</span></code>, and <code class="docutils literal notranslate"><span class="pre">increment</span></code> must be integers (possibly supplied by
+parameters), <code class="docutils literal notranslate"><span class="pre">start</span></code> must not exceed <code class="docutils literal notranslate"><span class="pre">end</span></code>, and <code class="docutils literal notranslate"><span class="pre">increment</span></code> must be
+positive. Arrays can be nested. See
+<a class="reference external" href="https://github.com/raisimTech/raisim2Lib/blob/main/rsc/xmlScripts/templatedWorld/spheres.xml">spheres.xml</a>.</p>
+<p><strong>Math expressions.</strong> Text enclosed in <code class="docutils literal notranslate"><span class="pre">{}</span></code> is evaluated after parameters and
+loops are expanded and replaced by the result, e.g.
+<code class="docutils literal notranslate"><span class="pre">pos=&quot;{cos(0.1*&#64;&#64;i)}</span> <span class="pre">{sin(0.1*&#64;&#64;i)}</span> <span class="pre">1&quot;</span></code>. Expressions support <code class="docutils literal notranslate"><span class="pre">+</span></code>, <code class="docutils literal notranslate"><span class="pre">-</span></code>,
+<code class="docutils literal notranslate"><span class="pre">*</span></code>, <code class="docutils literal notranslate"><span class="pre">/</span></code> with the usual precedence, parentheses, the functions <code class="docutils literal notranslate"><span class="pre">sin</span></code>,
+<code class="docutils literal notranslate"><span class="pre">cos</span></code>, <code class="docutils literal notranslate"><span class="pre">exp</span></code>, and <code class="docutils literal notranslate"><span class="pre">log</span></code>, and the constant <code class="docutils literal notranslate"><span class="pre">pi</span></code>. Write numbers in plain
+decimal notation; exponent notation such as <code class="docutils literal notranslate"><span class="pre">1e-3</span></code> is not supported.</p>
+<p><strong>Conditional objects.</strong> An object with <code class="docutils literal notranslate"><span class="pre">exist=&quot;false&quot;</span></code> (or <code class="docutils literal notranslate"><span class="pre">&quot;False&quot;</span></code>) is
+skipped. Combined with a parameter, e.g. <code class="docutils literal notranslate"><span class="pre">exist=&quot;&#64;&#64;spawn_box&quot;</span></code>, this enables
+or disables objects at load time.</p>
 </section>
 </section>
 

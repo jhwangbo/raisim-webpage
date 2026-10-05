@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tendon examples and Rayrai &mdash; raisim 2.7.0 documentation</title>
+  <title>Tendon examples and Rayrai &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -74,14 +74,15 @@
 <li class="toctree-l1"><a class="reference internal" href="../OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../Tendons.html">Tendons</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="CodeExamples.html">Tendon code examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Physics.html">Tendon physics</a></li>
@@ -103,7 +104,6 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -143,7 +143,8 @@
   <section id="tendon-examples-and-rayrai">
 <h1>Tendon examples and Rayrai<a class="headerlink" href="#tendon-examples-and-rayrai" title="Link to this heading"></a></h1>
 <p>For short C++ examples of individual features, including length locks,
-bounded force control, and the existing wire API, start with <a class="reference internal" href="CodeExamples.html"><span class="doc">Tendon code examples</span></a>.</p>
+bounded force control, and straight two-site connections, start with
+<a class="reference internal" href="CodeExamples.html"><span class="doc">Tendon code examples</span></a>.</p>
 <p>The examples use procedural primitives and embedded URDF descriptions, so they
 need no external robot or texture assets. Their source lives under
 <code class="docutils literal notranslate"><span class="pre">examples/src/server/dynamics</span></code> and <code class="docutils literal notranslate"><span class="pre">examples/src/rayrai/dynamics</span></code> in the
@@ -196,10 +197,8 @@ changes servo targets instead of assigning animated body poses.</p>
 <a class="reference internal image-reference" href="../../_images/tendon_coupling.png"><img alt="Orange shoulder cable and turquoise elbow cable coupled by their physical lengths" src="../../_images/tendon_coupling.png" style="width: 100%;" />
 </a>
 <p>The coupling cables above are the actual spatial routes used by the constraint.
-Earlier revisions of <code class="docutils literal notranslate"><span class="pre">tendon_coupling</span></code> coupled only fixed joint coordinates,
-so they had no cable lines. Rebuild <code class="docutils literal notranslate"><span class="pre">tendon_coupling</span></code> and <code class="docutils literal notranslate"><span class="pre">rayrai_tendons</span></code>
-and restart the program to see this revised scene. Fixed tendons in general
-still have no spatial route of their own.</p>
+The fixed shoulder/elbow transmission that drives the mechanism has no spatial
+route of its own, so it is not drawn.</p>
 </section>
 <section id="build-and-run">
 <h2>Build and run<a class="headerlink" href="#build-and-run" title="Link to this heading"></a></h2>
@@ -216,8 +215,8 @@ cmake<span class="w"> </span>--build<span class="w"> </span>/tmp/raisim-tendon-e
 Linux compiler override when using the normal macOS or Visual Studio toolchain.
 With Visual Studio, build with <code class="docutils literal notranslate"><span class="pre">--config</span> <span class="pre">Release</span></code> and run <code class="docutils literal notranslate"><span class="pre">.exe</span></code> files from
 <code class="docutils literal notranslate"><span class="pre">BUILD/bin</span></code>. Use an appropriate temporary/build directory for the host.
-CMake checks installed package capabilities and skips unavailable tendon targets
-with a message. No release version change is needed to enable the examples.</p>
+The four tendon targets are part of the regular example build
+(<code class="docutils literal notranslate"><span class="pre">RAISIM_EXAMPLE</span></code>, on by default).</p>
 <p>Normal license discovery applies. Every example accepts
 <code class="docutils literal notranslate"><span class="pre">--activation-key</span> <span class="pre">/path/to/activation.raisim</span></code>. <code class="docutils literal notranslate"><span class="pre">--help</span></code> lists its options
 without creating a world.</p>
@@ -248,8 +247,9 @@ replace the analytic length calculation used by physics.</p>
 </a>
 <p>The same automatic paths work in a local <code class="docutils literal notranslate"><span class="pre">raisin::RayraiWindow</span></code>, in a TCP
 viewer receiving <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> updates, and in a viewer simulating a loaded
-native XML world. Custom cable-rendering code is unnecessary. Fixed tendons have no spatial route to draw. A coupling adds no separate
-geometry of its own; its participating spatial tendons supply the visible paths.</p>
+native XML world. Custom cable-rendering code is unnecessary. Fixed tendons
+have no spatial route to draw. A coupling adds no separate geometry of its own;
+its participating spatial tendons supply the visible paths.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">appearance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cable</span><span class="o">-&gt;</span><span class="n">getProperties</span><span class="p">();</span>
 <span class="n">appearance</span><span class="p">.</span><span class="n">width</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.012</span><span class="p">;</span><span class="w">                 </span><span class="c1">// Radius in metres.</span>
 <span class="n">appearance</span><span class="p">.</span><span class="n">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.58</span><span class="p">,</span><span class="w"> </span><span class="mf">0.08</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">};</span>
@@ -310,32 +310,33 @@ properties, references, activation state, and current drive configuration.
 Future C++ servo commands are not part of the exported scene, so loading a file
 alone does not replay the demo controller. The exported embedded articulated
 models have URDF sidecars; see <a class="reference internal" href="Reference.html"><span class="doc">Tendon API and model files</span></a> for path handling.</p>
-<p>Register tests with <code class="docutils literal notranslate"><span class="pre">RAISIM_TENDON_EXAMPLE_TESTS=ON</span></code>. Optionally set
-<code class="docutils literal notranslate"><span class="pre">RAISIM_EXAMPLE_ACTIVATION_KEY</span></code> to pass an explicit license to CTest. After
-configuring from the repository root and building the four example targets,
-include the export and coupling-check targets:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>--build<span class="w"> </span>BUILD<span class="w"> </span>--target<span class="w"> </span>tendon_example_export_check<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>tendon_example_coupling_check<span class="w"> </span>tendon_example_coupling_tcp_check
-ctest<span class="w"> </span>--test-dir<span class="w"> </span>BUILD/examples<span class="w"> </span>-j<span class="w"> </span><span class="m">12</span><span class="w"> </span>--output-on-failure<span class="w"> </span>-R<span class="w"> </span>tendon_example
+<p>Automated checks for these examples are registered by the RaiSim engine source
+tree (<code class="docutils literal notranslate"><span class="pre">test/examples</span></code>), which compiles the example sources from an adjacent
+<code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> checkout; the <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> example build itself registers no
+tests. Configure the engine build with <code class="docutils literal notranslate"><span class="pre">-DRAISIM_TENDON_EXAMPLE_TESTS=ON</span></code> and,
+optionally, <code class="docutils literal notranslate"><span class="pre">-DRAISIM_EXAMPLE_ACTIVATION_KEY=/path/to/activation.raisim</span></code> to
+pass an explicit license to the tests. The Rayrai and TCP checks are added only
+when the engine build includes Rayrai. Then build and run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>--build<span class="w"> </span>BUILD<span class="w"> </span>--parallel<span class="w"> </span><span class="m">12</span>
+ctest<span class="w"> </span>--test-dir<span class="w"> </span>BUILD<span class="w"> </span>-j<span class="w"> </span><span class="m">12</span><span class="w"> </span>--output-on-failure<span class="w"> </span>-R<span class="w"> </span>tendon_example
 </pre></div>
 </div>
-<p>For a standalone <code class="docutils literal notranslate"><span class="pre">cmake</span> <span class="pre">-S</span> <span class="pre">examples</span> <span class="pre">-B</span> <span class="pre">BUILD</span></code> configuration, use
-<code class="docutils literal notranslate"><span class="pre">--test-dir</span> <span class="pre">BUILD</span></code>. On Windows also use <code class="docutils literal notranslate"><span class="pre">--config</span> <span class="pre">Release</span></code> for building and
+<p>On Windows also use <code class="docutils literal notranslate"><span class="pre">--config</span> <span class="pre">Release</span></code> for building and
 <code class="docutils literal notranslate"><span class="pre">-C</span> <span class="pre">Release</span></code> for CTest. The checks cover the individual/combined headless
 scenes, invalid command-line arguments, XML/URDF export, and a round trip that
 compares initial placement and controlled trajectories after 1,200 steps. The
 finite Rayrai checks verify generated spatial visuals for the combined and
 coupling scenes. A separate test checks that both coupling cables transmit
 forces, and another compares their moving routes, radii, and colors after actual
-server serialization and TCP viewer parsing. Each graphics test returns skip code 77
-if SDL cannot create a graphics context.</p>
-<p>For the engine source checkout, the <code class="docutils literal notranslate"><span class="pre">TendonTest.*</span></code> tests additionally cover
+server serialization and TCP viewer parsing. Each graphics test returns skip
+code 77 if SDL cannot create a graphics context.</p>
+<p>In the same engine build, the <code class="docutils literal notranslate"><span class="pre">TendonTest.*</span></code> tests additionally cover
 analytic lengths and gradients, moving-guide torques, force signs and ratios,
 contact coupling, friction/stiction, implicit stiffness, armature curvature,
 polynomial derivatives, particle attachments, enable/removal behavior,
-XML/MJCF loading, and checkpoint replay. They can be selected from the engine’s
-CTest build with <code class="docutils literal notranslate"><span class="pre">-R</span> <span class="pre">TendonTest</span></code> and the same <code class="docutils literal notranslate"><span class="pre">-j</span> <span class="pre">12</span></code> setting. The public
-binary distribution’s example tests do not require that source checkout.</p>
+sleeping islands, XML/MJCF loading, and checkpoint replay. Select them with
+<code class="docutils literal notranslate"><span class="pre">-R</span> <span class="pre">TendonTest</span></code> and the same <code class="docutils literal notranslate"><span class="pre">-j</span> <span class="pre">12</span></code> setting. These tests are not part of
+the binary distribution.</p>
 </section>
 </section>
 

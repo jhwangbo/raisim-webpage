@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Feature Map &mdash; raisim 2.7.0 documentation</title>
+  <title>Feature Map &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -81,17 +81,17 @@
 <li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -160,29 +160,47 @@ For build, test, benchmark, and documentation commands, use <a class="reference 
 <td><p><code class="docutils literal notranslate"><span class="pre">World::addArticulatedSystem</span></code></p></td>
 <td><p><a class="reference internal" href="ArticulatedSystem.html"><span class="doc">Articulated Systems</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p>Add mesh collision geometry</p></td>
+<tr class="row-odd"><td><p>Model geared or coupled actuators whose torques are limited to their motor operating regions</p></td>
+<td><p>URDF <code class="docutils literal notranslate"><span class="pre">&lt;actuator&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">ArticulatedSystem::setActuatorTorques</span></code>,
+<code class="docutils literal notranslate"><span class="pre">getActuatorTorqueBounds</span></code>, <code class="docutils literal notranslate"><span class="pre">getActuatorStates</span></code>, <code class="docutils literal notranslate"><span class="pre">setBusVoltage</span></code></p></td>
+<td><p><a class="reference internal" href="Actuators.html"><span class="doc">Actuators</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>Add joint friction and damping</p></td>
+<td><p>URDF <code class="docutils literal notranslate"><span class="pre">&lt;dynamics</span> <span class="pre">damping</span> <span class="pre">friction&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">ArticulatedSystem::setJointDamping</span></code></p></td>
+<td><p><a class="reference internal" href="articulated_system/JointDampingAndFriction.html"><span class="doc">Joint Damping and Friction</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Control joints with the built-in PD controller or a generalized force</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ArticulatedSystem::setPdGains</span></code>, <code class="docutils literal notranslate"><span class="pre">setPdTarget</span></code>, <code class="docutils literal notranslate"><span class="pre">setGeneralizedForce</span></code></p></td>
+<td><p><a class="reference internal" href="articulated_system/DynamicsAndControl.html"><span class="doc">Dynamics and Control</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>Add mesh collision geometry</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">World::addMesh</span></code>, mesh preprocessing options, mesh collision modes</p></td>
 <td><p><a class="reference internal" href="SingleBodyObjects.html"><span class="doc">Single-Body Objects</span></a>, <a class="reference internal" href="Examples.html"><span class="doc">Examples</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p>Add terrain</p></td>
+<tr class="row-odd"><td><p>Add terrain</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">World::addHeightMap</span></code>, <code class="docutils literal notranslate"><span class="pre">raisim::HeightMap</span></code></p></td>
 <td><p><a class="reference internal" href="HeightMap.html"><span class="doc">Height Map</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p>Add deformable cloth or meshes</p></td>
+<tr class="row-even"><td><p>Add deformable cloth or meshes</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">World::addDeformableCloth</span></code>, <code class="docutils literal notranslate"><span class="pre">World::addDeformableObject</span></code></p></td>
 <td><p><a class="reference internal" href="DeformableObject.html"><span class="doc">Deformable Objects</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p>Add granular particles</p></td>
+<tr class="row-odd"><td><p>Add granular particles</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">World::addGranularBox</span></code>, <code class="docutils literal notranslate"><span class="pre">World::addGranularParticles</span></code>,
 <code class="docutils literal notranslate"><span class="pre">raisim::GranularSystem</span></code></p></td>
 <td><p><a class="reference internal" href="GranularMedia.html"><span class="doc">Granular Media</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p>Add length constraints, tendons, or pins</p></td>
+<tr class="row-even"><td><p>Add length constraints, tendons, or loop constraints</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">addSpatialTendon</span></code>, <code class="docutils literal notranslate"><span class="pre">addFixedTendon</span></code>, <code class="docutils literal notranslate"><span class="pre">addTendonCoupling</span></code>,
-articulated-system pin constraints</p></td>
-<td><p><a class="reference internal" href="Constraints.html"><span class="doc">Constraints</span></a>, <a class="reference internal" href="ArticulatedSystem.html"><span class="doc">Articulated Systems</span></a></p></td>
+articulated-system pin and equality constraints</p></td>
+<td><p><a class="reference internal" href="Constraints.html"><span class="doc">Constraints</span></a>, <a class="reference internal" href="articulated_system/ClosedLoopSystems.html"><span class="doc">Closed-Loop Systems</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p>Route cables or couple joint transmissions</p></td>
+<tr class="row-odd"><td><p>Make one joint follow another (mimic)</p></td>
+<td><p>URDF <code class="docutils literal notranslate"><span class="pre">&lt;mimic&gt;</span></code>, MJCF <code class="docutils literal notranslate"><span class="pre">&lt;equality&gt;&lt;joint&gt;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">ArticulatedSystem::addMimicConstraint</span></code></p></td>
+<td><p><a class="reference internal" href="articulated_system/MimicJoints.html"><span class="doc">Mimic Joints</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>Route cables or couple joints with tendons</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">World::addSpatialTendon</span></code>, <code class="docutils literal notranslate"><span class="pre">addFixedTendon</span></code>, <code class="docutils literal notranslate"><span class="pre">addTendonCoupling</span></code></p></td>
 <td><p><a class="reference internal" href="Tendons.html"><span class="doc">Tendons</span></a>, <a class="reference internal" href="tendons/Physics.html"><span class="doc">Tendon physics</span></a>, <a class="reference internal" href="tendons/Examples.html"><span class="doc">Tendon examples and Rayrai</span></a></p></td>
 </tr>
@@ -297,21 +315,27 @@ rolling/spinning friction coefficients</p></td>
 <code class="docutils literal notranslate"><span class="pre">rayrai_forest</span></code></p></td>
 <td><p><a class="reference internal" href="rayrai/Visuals.html"><span class="doc">Custom visuals, instancing, and scene helpers</span></a>, <a class="reference internal" href="examples/rayrai/rayrai_forest.html"><span class="doc">Rayrai Example: Forest</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p>Render glass</p></td>
+<tr class="row-even"><td><p>Load a RaiSim Engine <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> scene (from v2.7.1, not yet released)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">raisim::World(path)</span></code>, <code class="docutils literal notranslate"><span class="pre">raisin::applyRscene</span></code>,
+<code class="docutils literal notranslate"><span class="pre">raisin::rsceneRenderSettings</span></code>; <code class="docutils literal notranslate"><span class="pre">rayrai_forest_from_rscene</span></code></p></td>
+<td><p><a class="reference internal" href="RsceneFile.html"><span class="doc">.rscene File</span></a>, <a class="reference internal" href="WorldSystem.html"><span class="doc">World</span></a>,
+<a class="reference internal" href="examples/rayrai/rayrai_forest_from_rscene.html"><span class="doc">Rayrai Example: Forest From .rscene</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Render glass</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">Material::glass</span></code>, <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings::screenSpaceRefraction</span></code>,
 <code class="docutils literal notranslate"><span class="pre">RenderQualitySettings::geometryRefraction</span></code></p></td>
 <td><p><a class="reference internal" href="rayrai/Materials.html"><span class="doc">PBR materials</span></a>, <a class="reference internal" href="rayrai/PostProcess.html"><span class="doc">Post-process effects</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p>Visualize tendons</p></td>
+<tr class="row-even"><td><p>Visualize tendons</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">RayraiWindow::getTendonVisual</span></code>, <code class="docutils literal notranslate"><span class="pre">rayrai_tendons</span></code></p></td>
 <td><p><a class="reference internal" href="tendons/Examples.html"><span class="doc">Tendon examples and Rayrai</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p>Exercise sensor and rayrai rendering examples</p></td>
+<tr class="row-odd"><td><p>Exercise sensor and rayrai rendering examples</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">rayrai_rgb_camera</span></code>, <code class="docutils literal notranslate"><span class="pre">rayrai_depth_camera</span></code>,
 <code class="docutils literal notranslate"><span class="pre">rayrai_lidar_pointcloud</span></code>, <code class="docutils literal notranslate"><span class="pre">rayrai_complete_showcase</span></code></p></td>
 <td><p><a class="reference internal" href="Examples.html"><span class="doc">Examples</span></a>, <a class="reference internal" href="BuildAndTest.html"><span class="doc">Build, Test, and Benchmark</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p>Tune simulation performance</p></td>
+<tr class="row-even"><td><p>Tune simulation performance</p></td>
 <td><p>timing examples, collision settings, sleeping islands, solver settings</p></td>
 <td><p><a class="reference internal" href="Performance.html"><span class="doc">Performance</span></a>, <a class="reference internal" href="BuildAndTest.html"><span class="doc">Build, Test, and Benchmark</span></a></p></td>
 </tr>

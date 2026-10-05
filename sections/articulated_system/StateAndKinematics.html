@@ -1,0 +1,379 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>State and Kinematics &mdash; raisim 2.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Dynamics and Control" href="DynamicsAndControl.html" />
+    <link rel="prev" title="Creating an Articulated System" href="Creation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../FeatureMap.html">Feature Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ProjectLayout.html">Project Layout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Performance.html">Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Benchmark.html">Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RsceneFile.html">.rscene File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../OpenUSD.html">OpenUSD Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../ArticulatedSystem.html">Articulated Systems</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Creation.html">Creating an Articulated System</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">State and Kinematics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#state-representation">State Representation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#joints">Joints</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#types-of-indices">Types of Indices</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#conversions-between-indices">Conversions Between Indices</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#kinematics">Kinematics</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#frames">Frames</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#joint-limits">Joint limits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#jacobians">Jacobians</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="DynamicsAndControl.html">Dynamics and Control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JointDampingAndFriction.html">Joint Damping and Friction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Actuators.html">Actuators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Sensors.html">Sensors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ModifyingTheModel.html">Modifying the Model in Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ClosedLoopSystems.html">Closed-Loop Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MimicJoints.html">Mimic Joints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="API.html">ArticulatedSystem API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../GranularMedia.html">Granular Media</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Tendons.html">Tendons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimMatlab.html">RaisimMatlab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../ArticulatedSystem.html">Articulated Systems</a></li>
+      <li class="breadcrumb-item active">State and Kinematics</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="state-and-kinematics">
+<h1>State and Kinematics<a class="headerlink" href="#state-and-kinematics" title="Link to this heading"></a></h1>
+<section id="state-representation">
+<h2>State Representation<a class="headerlink" href="#state-representation" title="Link to this heading"></a></h2>
+<p>The state of an articulated system can be represented by a <strong>generalized state</strong> <span class="math notranslate nohighlight">\(\boldsymbol{S}\)</span>, which is composed of a <strong>generalized coordinate</strong> <span class="math notranslate nohighlight">\(\boldsymbol{q}\)</span> and a <strong>generalized velocity</strong> <span class="math notranslate nohighlight">\(\boldsymbol{u}\)</span>.
+Since we are not constraining their parameterization, in general,</p>
+<div class="math notranslate nohighlight">
+\[\begin{equation}
+  \boldsymbol{u}\neq\dot{\boldsymbol{q}}.
+\end{equation}\]</div>
+<p>A generalized coordinate fully represents the configuration of the articulated system and a generalized velocity fully represents the velocity state of the articulated system.
+They are independently defined in general.</p>
+<p>Every joint has a corresponding generalized coordinate and generalized velocity.
+The concatenation of all joint generalized coordinates and velocities forms the generalized coordinates and velocities of the articulated system, respectively.
+The order of this concatenation is called <strong>joint order</strong>.
+The joint order can be accessed through <code class="code docutils literal notranslate"><span class="pre">getMovableJointNames()</span></code>.
+Note the keyword “movable”.
+The fixed joints contribute to neither the generalized coordinate nor the generalized velocity.
+Only movable joints do.</p>
+<p>The <strong>root body</strong> is the first body (body 0) of the articulated system.
+For floating-base systems, the root body is the floating base. Its floating joint comes first in the joint order and is named <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> in <code class="code docutils literal notranslate"><span class="pre">getMovableJointNames()</span></code>.
+For fixed-base systems, the root body is the one rigidly attached to the world. Its joint is fixed, so it is not part of the joint order, and the joint order starts with the first movable joint.
+Even though the fixed base cannot move physically, users can move it using <code class="code docutils literal notranslate"><span class="pre">setBaseOrientation</span></code> and <code class="code docutils literal notranslate"><span class="pre">setBasePos</span></code>.</p>
+<p>To set the state of the system, the following methods can be used</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">setGeneralizedCoordinate</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">setGeneralizedVelocity</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">setState</span></code></p></li>
+</ul>
+<p>To obtain the state of the system, the following methods can be used</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">getGeneralizedCoordinate</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">getGeneralizedVelocity</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">getState</span></code></p></li>
+</ul>
+<p>The dimensions of each vector can be obtained respectively by</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">getGeneralizedCoordinateDim</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">getDOF</span></code> or <code class="code docutils literal notranslate"><span class="pre">getGeneralizedVelocityDim</span></code> (these two methods are identical)</p></li>
+</ul>
+</section>
+<section id="joints">
+<span id="articulated-systems"></span><h2>Joints<a class="headerlink" href="#joints" title="Link to this heading"></a></h2>
+<p>Here are the available joints in RaiSim.</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Joint Properties (<span class="math notranslate nohighlight">\(|\cdot|\)</span> is a symbol for dimension size (i.e., cardinality))</span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 16.5%" />
+<col style="width: 16.5%" />
+<col style="width: 17.6%" />
+<col style="width: 16.5%" />
+<col style="width: 16.5%" />
+<col style="width: 16.5%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>Fixed</p></th>
+<th class="head"><p>Floating</p></th>
+<th class="head"><p>Revolute</p></th>
+<th class="head"><p>Prismatic</p></th>
+<th class="head"><p>Spherical</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(|\boldsymbol{u}|\)</span></p></td>
+<td><p>0</p></td>
+<td><p>6</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>3</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(|\boldsymbol{q}|\)</span></p></td>
+<td><p>0</p></td>
+<td><p>7</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-even"><td><p>Velocity</p></td>
+<td></td>
+<td><p><span class="math notranslate nohighlight">\(m/s\)</span>, <span class="math notranslate nohighlight">\(rad/s\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(rad/s\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(m/s\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(rad/s\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>Position</p></td>
+<td></td>
+<td><p><span class="math notranslate nohighlight">\(m\)</span>, <span class="math notranslate nohighlight">\(rad\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(rad\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(m\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(rad\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>Force</p></td>
+<td></td>
+<td><p><span class="math notranslate nohighlight">\(N\)</span>, <span class="math notranslate nohighlight">\(Nm\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(Nm\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(N\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(Nm\)</span></p></td>
+</tr>
+</tbody>
+</table>
+<p>The generalized coordinates/velocities of a joint are expressed in the <strong>joint frame</strong> and with respect to the <strong>parent body</strong>.
+Joint frame is the frame attached to every joint and fixed to the parent body.
+Parent body is the one closer to the root body among the two bodies connected via the joint.
+Note that the angular velocity of a floating base is also expressed in the parent frame (which is the <strong>world frame</strong>).
+Other libraries (e.g., RBDL) might have a different convention, so special care is required during conversion.</p>
+</section>
+<section id="types-of-indices">
+<h2>Types of Indices<a class="headerlink" href="#types-of-indices" title="Link to this heading"></a></h2>
+<p>The ArticulatedSystem class contains multiple types of indices. To query a specific quantity, you have to provide an index of the right type. The types of indices in Articulated Systems are:</p>
+<ul class="simple">
+<li><p><strong>Body/Joint Index</strong>: Links connected by fixed joints are merged into a single body. Each body has a unique body index. Because every body has exactly one parent joint, there is a 1-to-1 mapping between the joints and the bodies and they share the same index. For a fixed-base system, the body rigidly fixed to the world is body 0. For a floating-base system, the floating base is body 0. Retrieve it with <code class="code docutils literal notranslate"><span class="pre">getBodyIdx()</span></code>.</p></li>
+<li><p><strong>Generalized Velocity (DOF) Index</strong>: The index of an entry in the generalized velocity (and in the generalized force). Each movable joint occupies a block of 1 (revolute, prismatic), 3 (spherical) or 6 (floating) consecutive entries.</p></li>
+<li><p><strong>Generalized Coordinate Index</strong>: The index of an entry in the generalized coordinate. Each movable joint occupies a block of 1 (revolute, prismatic), 4 (spherical) or 7 (floating) consecutive entries.</p></li>
+<li><p><strong>Frame Index</strong>: The index of a frame in <code class="code docutils literal notranslate"><span class="pre">getFrames()</span></code>. Every joint, including fixed joints, has a frame (see <a class="reference internal" href="#frames">Frames</a>). Retrieve it with <code class="code docutils literal notranslate"><span class="pre">getFrameIdxByName()</span></code>.</p></li>
+</ul>
+<section id="conversions-between-indices">
+<h3>Conversions Between Indices<a class="headerlink" href="#conversions-between-indices" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>A body index to a generalized velocity index: <code class="code docutils literal notranslate"><span class="pre">ArticulatedSystem::getMappingFromBodyIndexToGeneralizedVelocityIndex()</span></code></p></li>
+<li><p>A body index to a generalized coordinate index: <code class="code docutils literal notranslate"><span class="pre">ArticulatedSystem::getMappingFromBodyIndexToGeneralizedCoordinateIndex()</span></code></p></li>
+</ul>
+</section>
+</section>
+<section id="kinematics">
+<h2>Kinematics<a class="headerlink" href="#kinematics" title="Link to this heading"></a></h2>
+<section id="frames">
+<h3>Frames<a class="headerlink" href="#frames" title="Link to this heading"></a></h3>
+<p>The position and velocity of a specific point on a body of an articulated system can be obtained by attaching a <strong>frame</strong>.
+<strong>Frames</strong> are rigidly attached to a body of the system and have a constant position and orientation (w.r.t. parent frame).
+This is the recommended way to get kinematics information for a point of an articulated system in RaiSim.</p>
+<p>All joints have a frame attached and their names are the same as the joint name.
+To create a custom frame, define a fixed joint at the point of interest.
+A dummy link with zero inertia and zero mass must be added as the child of the fixed joint to complete the kinematic tree.</p>
+<p>A frame can be stored locally as an index in user code. For example:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;raisim/World.hpp&quot;</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="w"> </span><span class="n">world</span><span class="p">;</span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">anymal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addArticulatedSystem</span><span class="p">(</span><span class="n">PATH_TO_URDF</span><span class="p">);</span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">footFrameIndex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getFrameIdxByName</span><span class="p">(</span><span class="s">&quot;foot_joint&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// the URDF has a joint named &quot;foot_joint&quot;</span>
+<span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="n">footPosition</span><span class="p">,</span><span class="w"> </span><span class="n">footVelocity</span><span class="p">,</span><span class="w"> </span><span class="n">footAngularVelocity</span><span class="p">;</span>
+<span class="w">  </span><span class="n">raisim</span><span class="o">::</span><span class="n">Mat</span><span class="o">&lt;</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="n">footOrientation</span><span class="p">;</span>
+<span class="w">  </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getFramePosition</span><span class="p">(</span><span class="n">footFrameIndex</span><span class="p">,</span><span class="w"> </span><span class="n">footPosition</span><span class="p">);</span>
+<span class="w">  </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getFrameOrientation</span><span class="p">(</span><span class="n">footFrameIndex</span><span class="p">,</span><span class="w"> </span><span class="n">footOrientation</span><span class="p">);</span>
+<span class="w">  </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getFrameVelocity</span><span class="p">(</span><span class="n">footFrameIndex</span><span class="p">,</span><span class="w"> </span><span class="n">footVelocity</span><span class="p">);</span>
+<span class="w">  </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getFrameAngularVelocity</span><span class="p">(</span><span class="n">footFrameIndex</span><span class="p">,</span><span class="w"> </span><span class="n">footAngularVelocity</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>You can also store a Frame reference.
+For example, you can replace <code class="code docutils literal notranslate"><span class="pre">getFrameIdxByName</span></code> with <code class="code docutils literal notranslate"><span class="pre">getFrameByName</span></code> in the example above.
+In this way, you can access internal variables and modify them.
+Modifying frames does not affect the joints.
+Frames are instantiated during initialization of the articulated system instance and affect neither kinematics nor dynamics, even if you change them.</p>
+</section>
+<section id="joint-limits">
+<h3>Joint limits<a class="headerlink" href="#joint-limits" title="Link to this heading"></a></h3>
+<p>Joint limits can be defined in a URDF file <strong>per joint</strong> as follows:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;limit</span><span class="w"> </span><span class="na">effort=</span><span class="s">&quot;80&quot;</span><span class="w"> </span><span class="na">lower=</span><span class="s">&quot;-6.28&quot;</span><span class="w"> </span><span class="na">upper=</span><span class="s">&quot;6.28&quot;</span><span class="w"> </span><span class="na">velocity=</span><span class="s">&quot;15&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">lower</span></code> and <code class="docutils literal notranslate"><span class="pre">upper</span></code> are joint position limits and the <code class="docutils literal notranslate"><span class="pre">velocity</span></code> is the joint velocity limit.
+The joint limits are implemented as if there is a hard stop at the limits.
+This means that there is a hard collision (with a restitution coefficient of 0) when the joint hits a limit.
+The <code class="docutils literal notranslate"><span class="pre">effort</span></code> is not a joint limit but the actuation limit of the joint: it bounds the feedforward generalized force plus the built-in PD torque (see <a class="reference internal" href="DynamicsAndControl.html"><span class="doc">Dynamics and Control</span></a>).
+It does not bound actuator torques, which are limited by the operating regions of their motors (see <a class="reference internal" href="../Actuators.html"><span class="doc">Actuators</span></a>).</p>
+<p>You can modify the joint position limits in C++ using <code class="docutils literal notranslate"><span class="pre">raisim::ArticulatedSystem::setJointLimits()</span></code> (one entry per degree of freedom) and the joint velocity limits using <code class="docutils literal notranslate"><span class="pre">raisim::ArticulatedSystem::setJointVelocityLimits()</span></code> (one entry per body; a non-finite entry means no limit).</p>
+<p>During simulation, you can get information on joint limit violations using <code class="docutils literal notranslate"><span class="pre">raisim::ArticulatedSystem::getJointLimitViolations(*world.getContactProblem())</span></code>.
+Even though joint limits are collisions (and thus handled by a contact solver), they are not listed in <code class="docutils literal notranslate"><span class="pre">raisim::Object::getContacts()</span></code>.</p>
+</section>
+<section id="jacobians">
+<h3>Jacobians<a class="headerlink" href="#jacobians" title="Link to this heading"></a></h3>
+<p>Jacobians of a point in RaiSim satisfy the following equation:</p>
+<div class="math notranslate nohighlight">
+\[\begin{equation}
+  \boldsymbol{J}\boldsymbol{u} = \boldsymbol{v}
+\end{equation}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\boldsymbol{v}\)</span> represents the linear velocity of the associated point.
+If a rotational Jacobian is used, the right-hand side changes to a rotational velocity expressed in the world frame.</p>
+<p>To get the Jacobians associated with the linear velocity, the following methods are used</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">getSparseJacobian</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">getDenseJacobian</span></code> – this method only fills non-zero values. The matrix should be initialized to a zero matrix of an appropriate size.</p></li>
+</ul>
+<p>To get the rotational Jacobians, the following methods are used</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">getSparseRotationalJacobian</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">getDenseRotationalJacobian</span></code> – this method only fills non-zero values. The matrix should be initialized to a zero matrix of an appropriate size.</p></li>
+</ul>
+<p>The main Jacobian class in RaiSim is <code class="code docutils literal notranslate"><span class="pre">raisim::SparseJacobian</span></code>.
+RaiSim uses only sparse Jacobians because it is more memory-efficient.
+Note that only the joints between the child body and the root body affect the motion of the point.</p>
+<p>The class <code class="code docutils literal notranslate"><span class="pre">raisim::SparseJacobian</span></code> has a member <code class="code docutils literal notranslate"><span class="pre">idx</span></code> which stores the indices of columns whose values are non-zero.
+The member <code class="code docutils literal notranslate"><span class="pre">v</span></code> stores the Jacobian except the zero columns.
+In other words, ith column of <code class="code docutils literal notranslate"><span class="pre">v</span></code> corresponds to <code class="code docutils literal notranslate"><span class="pre">idx[i]</span></code> generalized velocity dimension.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Creation.html" class="btn btn-neutral float-left" title="Creating an Articulated System" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="DynamicsAndControl.html" class="btn btn-neutral float-right" title="Dynamics and Control" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

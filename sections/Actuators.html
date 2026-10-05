@@ -1,0 +1,1265 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Actuators &mdash; raisim 2.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Sensors" href="Sensors.html" />
+    <link rel="prev" title="Joint Damping and Friction" href="articulated_system/JointDampingAndFriction.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FeatureMap.html">Feature Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ProjectLayout.html">Project Layout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Benchmark.html">Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RsceneFile.html">.rscene File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="articulated_system/Creation.html">Creating an Articulated System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="articulated_system/StateAndKinematics.html">State and Kinematics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="articulated_system/DynamicsAndControl.html">Dynamics and Control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="articulated_system/JointDampingAndFriction.html">Joint Damping and Friction</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Actuators</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#the-motor-model">The motor model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#defining-actuators-in-a-urdf">Defining actuators in a URDF</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#actuator"><code class="docutils literal notranslate"><span class="pre">&lt;actuator&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#actuator-model"><code class="docutils literal notranslate"><span class="pre">&lt;actuator_model&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#motor"><code class="docutils literal notranslate"><span class="pre">&lt;motor&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#coupling"><code class="docutils literal notranslate"><span class="pre">&lt;coupling&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bus-voltage">Bus voltage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#actuator-names">Actuator names</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#errors">Errors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#couplings">Couplings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#what-happens-in-a-simulation-step">What happens in a simulation step</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#time-step-and-the-voltage-limit">Time step and the voltage limit</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#accuracy">Accuracy</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#commanding-actuator-torques">Commanding actuator torques</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#actuator-torque-bounds">Actuator torque bounds</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#reading-the-actuator-states">Reading the actuator states</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#monitoring-without-enforcing">Monitoring without enforcing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#c-api">C++ API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#raisimgymtorch-and-raisim-engine2">raisimGymTorch and raisim_engine2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#api">API</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim17DcMotorParametersE"><code class="docutils literal notranslate"><span class="pre">raisim::DcMotorParameters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim18ActuatorDefinitionE"><code class="docutils literal notranslate"><span class="pre">raisim::ActuatorDefinition</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim16ActuatorCouplingE"><code class="docutils literal notranslate"><span class="pre">raisim::ActuatorCoupling</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim13ActuatorStateE"><code class="docutils literal notranslate"><span class="pre">raisim::ActuatorState</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim15MotorSaturationE"><code class="docutils literal notranslate"><span class="pre">MotorSaturation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim17MotorTorqueBoundsE"><code class="docutils literal notranslate"><span class="pre">raisim::MotorTorqueBounds</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim17motorTorqueBoundsERK17DcMotorParametersd"><code class="docutils literal notranslate"><span class="pre">motorTorqueBounds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim17motorTorqueBoundsEdddd"><code class="docutils literal notranslate"><span class="pre">motorTorqueBounds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim15clipMotorTorqueERK17DcMotorParametersddP15MotorSaturation"><code class="docutils literal notranslate"><span class="pre">clipMotorTorque()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim29motorOperatingRegionViolationERK17DcMotorParametersdd"><code class="docutils literal notranslate"><span class="pre">motorOperatingRegionViolation()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Sensors.html">Sensors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="articulated_system/ModifyingTheModel.html">Modifying the Model in Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="articulated_system/ClosedLoopSystems.html">Closed-Loop Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="articulated_system/MimicJoints.html">Mimic Joints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="articulated_system/API.html">ArticulatedSystem API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="ArticulatedSystem.html">Articulated Systems</a></li>
+      <li class="breadcrumb-item active">Actuators</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="actuators">
+<h1>Actuators<a class="headerlink" href="#actuators" title="Link to this heading"></a></h1>
+<p>An <strong>actuator</strong> is a DC or BLDC motor with its gear; it drives one joint of an articulated system.
+On this page, “motor” means only the electric part of an actuator (its resistance, torque
+constant, speed and torque). RaiSim limits the torque of every actuator to what its motor can
+actually produce: the <strong>motor operating region</strong> (MOR), which depends on the motor speed, the bus
+voltage and the peak torque.</p>
+<p>The URDF <code class="docutils literal notranslate"><span class="pre">&lt;limit</span> <span class="pre">effort</span> <span class="pre">velocity&gt;</span></code> of a joint describes a rectangle in the torque-speed plane. Kim
+et al. call it the <em>Box-MOR</em> in “Reinforcement Learning for High-Speed Quadrupedal Locomotion With
+Motor Operating Region Constraints” (IEEE Robotics &amp; Automation Magazine, 2025). A real motor
+cannot use that whole rectangle. While it drives a load, the back EMF eats into the bus voltage, so
+the available torque drops with speed. While it brakes, the back EMF adds to the bus voltage and
+more torque is available than the rectangle allows. Policies trained with the Box-MOR exploit
+torques that the real motors cannot deliver at high speed. Training with the electro-mechanical
+MOR (<em>EM-MOR</em>) removes that sim-to-real gap.</p>
+<p>RaiSim:</p>
+<ul class="simple">
+<li><p>reads actuators from the URDF (an <code class="docutils literal notranslate"><span class="pre">&lt;actuator&gt;</span></code> element links an actuator file, just like a
+<code class="docutils literal notranslate"><span class="pre">&lt;link&gt;</span></code> links a sensor file) or from C++,</p></li>
+<li><p>takes one torque per actuator (<code class="docutils literal notranslate"><span class="pre">setActuatorTorques()</span></code>) and, every step, clips each actuator’s
+motor torque to its EM-MOR. The region limits only the torque: external forces and torques can
+still drive a motor at any speed,</p></li>
+<li><p>lets an actuator’s motor also turn with other joints (couplings), e.g., a knee motor on the body
+that drives the knee through a reducer turning with the thigh, and</p></li>
+<li><p>reports the speed and the MOR-limited torque of every actuator’s motor.</p></li>
+</ul>
+<p>The MOR applies only to actuator torques. Torques from <code class="docutils literal notranslate"><span class="pre">setGeneralizedForce()</span></code>, the built-in PD
+controller, damping, springs and friction add on top and are not clipped by it, and the joint
+effort limits do not clip actuator torques (see <a class="reference internal" href="#what-happens-in-a-simulation-step">What happens in a simulation step</a>).</p>
+<nav class="contents local" id="on-this-page">
+<p class="topic-title">On this page</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#the-motor-model" id="id2">The motor model</a></p></li>
+<li><p><a class="reference internal" href="#defining-actuators-in-a-urdf" id="id3">Defining actuators in a URDF</a></p>
+<ul>
+<li><p><a class="reference internal" href="#actuator" id="id4"><code class="docutils literal notranslate"><span class="pre">&lt;actuator&gt;</span></code></a></p></li>
+<li><p><a class="reference internal" href="#actuator-model" id="id5"><code class="docutils literal notranslate"><span class="pre">&lt;actuator_model&gt;</span></code></a></p></li>
+<li><p><a class="reference internal" href="#motor" id="id6"><code class="docutils literal notranslate"><span class="pre">&lt;motor&gt;</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coupling" id="id7"><code class="docutils literal notranslate"><span class="pre">&lt;coupling&gt;</span></code></a></p></li>
+<li><p><a class="reference internal" href="#bus-voltage" id="id8">Bus voltage</a></p></li>
+<li><p><a class="reference internal" href="#actuator-names" id="id9">Actuator names</a></p></li>
+<li><p><a class="reference internal" href="#errors" id="id10">Errors</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#couplings" id="id11">Couplings</a></p></li>
+<li><p><a class="reference internal" href="#what-happens-in-a-simulation-step" id="id12">What happens in a simulation step</a></p>
+<ul>
+<li><p><a class="reference internal" href="#time-step-and-the-voltage-limit" id="id13">Time step and the voltage limit</a></p></li>
+<li><p><a class="reference internal" href="#accuracy" id="id14">Accuracy</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#commanding-actuator-torques" id="id15">Commanding actuator torques</a></p>
+<ul>
+<li><p><a class="reference internal" href="#actuator-torque-bounds" id="id16">Actuator torque bounds</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#reading-the-actuator-states" id="id17">Reading the actuator states</a></p></li>
+<li><p><a class="reference internal" href="#monitoring-without-enforcing" id="id18">Monitoring without enforcing</a></p></li>
+<li><p><a class="reference internal" href="#c-api" id="id19">C++ API</a></p></li>
+<li><p><a class="reference internal" href="#raisimgymtorch-and-raisim-engine2" id="id20">raisimGymTorch and raisim_engine2</a></p></li>
+<li><p><a class="reference internal" href="#example" id="id21">Example</a></p></li>
+<li><p><a class="reference internal" href="#api" id="id22">API</a></p></li>
+</ul>
+</nav>
+<section id="the-motor-model">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">The motor model</a><a class="headerlink" href="#the-motor-model" title="Link to this heading"></a></h2>
+<p>Under quasi-static conditions (the current changes slowly compared to the simulation step, the same
+assumption as a dynamometer torque-speed curve), the voltage over a DC motor is</p>
+<div class="math notranslate nohighlight">
+\[V = R\,i + \frac{\omega}{K_v}, \qquad \tau = K_t\, i,\]</div>
+<p>with the winding resistance <span class="math notranslate nohighlight">\(R\)</span>, the current <span class="math notranslate nohighlight">\(i\)</span>, the motor speed <span class="math notranslate nohighlight">\(\omega\)</span>, the
+velocity constant <span class="math notranslate nohighlight">\(K_v\)</span> (the inverse of the back-EMF constant) and the torque constant
+<span class="math notranslate nohighlight">\(K_t\)</span>. The motor driver can apply any voltage between <span class="math notranslate nohighlight">\(-V_{bus}\)</span> and <span class="math notranslate nohighlight">\(V_{bus}\)</span>.
+Together with the peak torque <span class="math notranslate nohighlight">\(\tau_{peak}\)</span>, at which the iron core saturates and the windings
+heat up quickly, the motor torque is limited to</p>
+<div class="math notranslate nohighlight">
+\[-V_{bus} \le \frac{R}{K_t}\,\tau + \frac{\omega}{K_v} \le V_{bus},
+\qquad |\tau| \le \tau_{peak}.\]</div>
+<p>All values are on the motor (rotor) side of the reducer and in SI units.</p>
+<p>The electromagnetic torque <span class="math notranslate nohighlight">\(\tau = K_t i\)</span> is what the operating region limits. The actuator
+also loses torque to friction and damping in its gear and bearings. These losses are specified as
+measured <strong>at the output</strong> of the actuator, i.e., at the joint, and they simply add to the joint’s
+own <code class="docutils literal notranslate"><span class="pre">&lt;dynamics</span> <span class="pre">friction</span> <span class="pre">damping&gt;</span></code> with the same model (see
+<a class="reference internal" href="articulated_system/JointDampingAndFriction.html"><span class="doc">Joint Damping and Friction</span></a>). For an actuator with gear ratio <span class="math notranslate nohighlight">\(G\)</span> and
+the joint velocity <span class="math notranslate nohighlight">\(u\)</span> (the joint’s entry of the generalized velocity, see
+<a class="reference internal" href="articulated_system/StateAndKinematics.html"><span class="doc">State and Kinematics</span></a>), the joint torque from the motor torque <span class="math notranslate nohighlight">\(\tau\)</span> is</p>
+<div class="math notranslate nohighlight">
+\[\tau_j = G\,\tau - (b_{joint} + b_{out})\,u - (\tau_{c,joint} + \tau_{c,out})\,\mathrm{sgn}(u),\]</div>
+<p>and at rest the friction holds the joint as long as the other torques on it stay below
+<span class="math notranslate nohighlight">\(\tau_{c,joint} + \tau_{c,out}\)</span> (stiction). The losses are passive: they are never clipped
+by the region, and they do not change it. In the motor’s torque-speed plane, output losses appear
+reduced by the gear ratio, <span class="math notranslate nohighlight">\(\tau_{c}/G\)</span> and <span class="math notranslate nohighlight">\(b/G^2\)</span>, which is the orange outline below.</p>
+<a class="reference internal image-reference" href="../_images/actuator_motor_operating_region.png"><img alt="the motor operating region: a parallelogram cut by the peak torque, inside a band of two parallel voltage-limit lines, next to the Box-MOR rectangle" src="../_images/actuator_motor_operating_region.png" style="width: 100%;" />
+</a>
+<p>The region is a parallelogram. Its slanted edges are the bus-voltage limits, its horizontal edges
+the peak torque. Several speeds characterize it:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 30.0%" />
+<col style="width: 45.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Quantity</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>stall torque</p></td>
+<td><p><span class="math notranslate nohighlight">\(K_t V_{bus} / R\)</span></p></td>
+<td><p>voltage-limited torque at zero speed</p></td>
+</tr>
+<tr class="row-odd"><td><p>no-load speed</p></td>
+<td><p><span class="math notranslate nohighlight">\(K_v V_{bus}\)</span></p></td>
+<td><p>the motor cannot drive faster</p></td>
+</tr>
+<tr class="row-even"><td><p>corner speed</p></td>
+<td><p><span class="math notranslate nohighlight">\(K_v (V_{bus} - R\,\tau_{peak}/K_t)\)</span></p></td>
+<td><p>above it, the voltage limit (not the peak torque) limits driving</p></td>
+</tr>
+<tr class="row-odd"><td><p>overspeed limit</p></td>
+<td><p><span class="math notranslate nohighlight">\(K_v (V_{bus} + R\,\tau_{peak}/K_t)\)</span></p></td>
+<td><p>above it, even full reverse voltage drives more than the peak current</p></td>
+</tr>
+<tr class="row-even"><td><p>back-EMF damping</p></td>
+<td><p><span class="math notranslate nohighlight">\(K_t / (R K_v)\)</span></p></td>
+<td><p>slope of the voltage limit; a motor at its voltage limit acts as a damper</p></td>
+</tr>
+</tbody>
+</table>
+<p>The region defines which torque the motor can produce at a speed; it does not limit the speed.
+External forces and torques, e.g., a foot impact or gravity on a falling leg, can back-drive a motor
+beyond its no-load speed, where only braking torque is left. Beyond the overspeed limit the
+peak-torque band and the voltage band no longer overlap: every voltage the driver can apply drives
+more than the peak current against the back EMF. The saturated core caps the torque, so the only
+torque left is the peak torque against the rotation, and the region continues as the line
+<span class="math notranslate nohighlight">\(\tau = -\tau_{peak}\)</span> (<span class="math notranslate nohighlight">\(+\tau_{peak}\)</span> below the negative overspeed limit).</p>
+</section>
+<section id="defining-actuators-in-a-urdf">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Defining actuators in a URDF</a><a class="headerlink" href="#defining-actuators-in-a-urdf" title="Link to this heading"></a></h2>
+<p>An <code class="docutils literal notranslate"><span class="pre">&lt;actuator&gt;</span></code> element, placed directly under <code class="docutils literal notranslate"><span class="pre">&lt;robot&gt;</span></code>, puts one actuator on one joint. The
+actuator’s model (its gear ratio, its output losses and its <code class="docutils literal notranslate"><span class="pre">&lt;motor&gt;</span></code>) usually lives in its own
+file with an <code class="docutils literal notranslate"><span class="pre">&lt;actuator_model&gt;</span></code> root, so that one model can be shared by all joints and robots that
+use it:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;robot</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;quadruped&quot;</span><span class="nt">&gt;</span>
+<span class="w">  </span>...
+<span class="w">  </span><span class="nt">&lt;actuator</span><span class="w"> </span><span class="na">joint=</span><span class="s">&quot;LF_HAA&quot;</span><span class="w"> </span><span class="na">file=</span><span class="s">&quot;abduction_actuator.xml&quot;</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;actuator</span><span class="w"> </span><span class="na">joint=</span><span class="s">&quot;LF_HFE&quot;</span><span class="w"> </span><span class="na">file=</span><span class="s">&quot;hound_leg_actuator.xml&quot;</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;actuator</span><span class="w"> </span><span class="na">joint=</span><span class="s">&quot;LF_KFE&quot;</span><span class="w"> </span><span class="na">file=</span><span class="s">&quot;hound_leg_actuator.xml&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;coupling</span><span class="w"> </span><span class="na">joint=</span><span class="s">&quot;LF_HFE&quot;</span><span class="w"> </span><span class="na">ratio=</span><span class="s">&quot;1&quot;</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/actuator&gt;</span>
+<span class="nt">&lt;/robot&gt;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">actuators/abduction_actuator.xml</span></code>, a motor behind a 6:1 reducer:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;actuator_model</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;abduction_6to1&quot;</span><span class="w"> </span><span class="na">gear_ratio=</span><span class="s">&quot;6&quot;</span><span class="nt">&gt;</span>
+<span class="w">  </span><span class="nt">&lt;motor</span><span class="w"> </span><span class="na">resistance=</span><span class="s">&quot;0.4&quot;</span><span class="w"> </span><span class="na">torque_constant=</span><span class="s">&quot;0.1&quot;</span><span class="w"> </span><span class="na">velocity_constant=</span><span class="s">&quot;10&quot;</span><span class="w"> </span><span class="na">bus_voltage=</span><span class="s">&quot;24&quot;</span>
+<span class="w">         </span><span class="na">peak_torque=</span><span class="s">&quot;3&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/actuator_model&gt;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">actuators/hound_leg_actuator.xml</span></code>, the same motor behind a 10:1 reducer, used for the hip and the
+knee. The knee motor also turns with the hip, which its <code class="docutils literal notranslate"><span class="pre">&lt;coupling&gt;</span></code> declares (see <a class="reference internal" href="#couplings">Couplings</a>):</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;actuator_model</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;hound_leg&quot;</span><span class="w"> </span><span class="na">gear_ratio=</span><span class="s">&quot;10&quot;</span><span class="nt">&gt;</span>
+<span class="w">  </span><span class="nt">&lt;motor</span><span class="w"> </span><span class="na">resistance=</span><span class="s">&quot;0.4&quot;</span><span class="w"> </span><span class="na">torque_constant=</span><span class="s">&quot;0.1&quot;</span><span class="w"> </span><span class="na">velocity_constant=</span><span class="s">&quot;10&quot;</span><span class="w"> </span><span class="na">bus_voltage=</span><span class="s">&quot;24&quot;</span>
+<span class="w">         </span><span class="na">peak_torque=</span><span class="s">&quot;3&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/actuator_model&gt;</span>
+</pre></div>
+</div>
+<p>The actuator file is searched like a sensor file: first in the directory of the URDF file, then in
+<code class="docutils literal notranslate"><span class="pre">[urdf_dir]/actuator</span></code>, <code class="docutils literal notranslate"><span class="pre">[urdf_dir]/actuators</span></code>, <code class="docutils literal notranslate"><span class="pre">[urdf_dir]/..</span></code> and
+<code class="docutils literal notranslate"><span class="pre">[urdf_dir]/../actuators</span></code>. For a URDF given as a string, the resource directory passed to
+<code class="docutils literal notranslate"><span class="pre">World::addArticulatedSystem()</span></code> takes the place of <code class="docutils literal notranslate"><span class="pre">[urdf_dir]</span></code>.</p>
+<p>Instead of linking a file, the model can be written on the <code class="docutils literal notranslate"><span class="pre">&lt;actuator&gt;</span></code> itself. This is
+convenient for URDF strings and quick experiments:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;actuator</span><span class="w"> </span><span class="na">joint=</span><span class="s">&quot;wheel&quot;</span><span class="w"> </span><span class="na">gear_ratio=</span><span class="s">&quot;8&quot;</span><span class="nt">&gt;</span>
+<span class="w">  </span><span class="nt">&lt;motor</span><span class="w"> </span><span class="na">resistance=</span><span class="s">&quot;0.2&quot;</span><span class="w"> </span><span class="na">torque_constant=</span><span class="s">&quot;0.1&quot;</span><span class="w"> </span><span class="na">back_emf_constant=</span><span class="s">&quot;0.1&quot;</span><span class="w"> </span><span class="na">bus_voltage=</span><span class="s">&quot;48&quot;</span>
+<span class="w">         </span><span class="na">peak_torque=</span><span class="s">&quot;1.5&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/actuator&gt;</span>
+</pre></div>
+</div>
+<p>RaiSim reads only its own <code class="docutils literal notranslate"><span class="pre">&lt;actuator&gt;</span></code> elements. The ROS <code class="docutils literal notranslate"><span class="pre">&lt;transmission&gt;</span></code> and Gazebo elements
+that many URDFs contain are ignored.</p>
+<section id="actuator">
+<h3><a class="toc-backref" href="#id4" role="doc-backlink"><code class="docutils literal notranslate"><span class="pre">&lt;actuator&gt;</span></code></a><a class="headerlink" href="#actuator" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute or child</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">joint</span></code></p></td>
+<td><p>the driven joint (required). It must be a revolute (or continuous) or prismatic joint, and
+each joint can be driven by only one actuator.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p>actuator name, unique within the robot (default: the joint name, see <a class="reference internal" href="#actuator-names">Actuator names</a>)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">file</span></code></p></td>
+<td><p>actuator file with an <code class="docutils literal notranslate"><span class="pre">&lt;actuator_model&gt;</span></code> root. Without it, the <code class="docutils literal notranslate"><span class="pre">&lt;actuator&gt;</span></code> holds the model
+itself: the <code class="docutils literal notranslate"><span class="pre">&lt;actuator_model&gt;</span></code> attributes and its <code class="docutils literal notranslate"><span class="pre">&lt;motor&gt;</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">model</span></code></p></td>
+<td><p>model name of an inline model (informational). A linked file gives the name of its
+<code class="docutils literal notranslate"><span class="pre">&lt;actuator_model&gt;</span></code> instead.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;coupling&gt;</span></code></p></td>
+<td><p>another joint the motor also turns with (optional, any number, see <a class="reference internal" href="#couplings">Couplings</a>)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="actuator-model">
+<h3><a class="toc-backref" href="#id5" role="doc-backlink"><code class="docutils literal notranslate"><span class="pre">&lt;actuator_model&gt;</span></code></a><a class="headerlink" href="#actuator-model" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute or child</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p>model name, reported by <code class="docutils literal notranslate"><span class="pre">ActuatorDefinition::model</span></code> (informational)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">gear_ratio</span></code></p></td>
+<td><p>gear ratio <span class="math notranslate nohighlight">\(G\)</span>: motor speed per unit speed of the driven joint (required, positive)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">output_damping</span></code></p></td>
+<td><p>viscous damping of the actuator measured at its output [Nm s/rad] (optional, default 0). It
+adds to the damping of the driven joint.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">output_friction</span></code></p></td>
+<td><p>Coulomb friction torque of the actuator measured at its output [Nm] (optional, default 0). It
+adds to the friction of the driven joint.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;motor&gt;</span></code></p></td>
+<td><p>the motor inside the actuator (exactly one)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="motor">
+<h3><a class="toc-backref" href="#id6" role="doc-backlink"><code class="docutils literal notranslate"><span class="pre">&lt;motor&gt;</span></code></a><a class="headerlink" href="#motor" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">resistance</span></code></p></td>
+<td><p>winding resistance <span class="math notranslate nohighlight">\(R\)</span> [Ohm] (required)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">torque_constant</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(K_t\)</span> [Nm/A] (required)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">velocity_constant</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(K_v\)</span> [rad/s/V]</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">back_emf_constant</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(1/K_v\)</span> [V s/rad]. Give exactly one of <code class="docutils literal notranslate"><span class="pre">velocity_constant</span></code> and <code class="docutils literal notranslate"><span class="pre">back_emf_constant</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">bus_voltage</span></code></p></td>
+<td><p>bus voltage <span class="math notranslate nohighlight">\(V_{bus}\)</span> [V] (required, see <a class="reference internal" href="#bus-voltage">Bus voltage</a>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">peak_torque</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(\tau_{peak}\)</span> [Nm] (optional; without it, only the voltage limits apply)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="coupling">
+<h3><a class="toc-backref" href="#id7" role="doc-backlink"><code class="docutils literal notranslate"><span class="pre">&lt;coupling&gt;</span></code></a><a class="headerlink" href="#coupling" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">joint</span></code></p></td>
+<td><p>a revolute or prismatic joint other than the driven one (required). It does not need an
+actuator of its own.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ratio</span></code></p></td>
+<td><p>motor speed per unit speed of that joint (required, finite, any sign)</p></td>
+</tr>
+</tbody>
+</table>
+<p>Datasheets often list <span class="math notranslate nohighlight">\(K_v\)</span> in rpm/V: multiply by <span class="math notranslate nohighlight">\(2\pi/60\)</span> to get rad/s/V. Make sure
+<span class="math notranslate nohighlight">\(R\)</span> and <span class="math notranslate nohighlight">\(K_t\)</span> refer to the same winding convention (phase or line-to-line) that the
+driver’s current control uses.</p>
+<p><code class="docutils literal notranslate"><span class="pre">output_damping</span></code> and <code class="docutils literal notranslate"><span class="pre">output_friction</span></code> are joint-side values: the friction and damping you
+measure at the joint, e.g., by back-driving it. They act on the driven joint. In the Hound leg (see
+<a class="reference internal" href="#couplings">Couplings</a>), this is also where the knee reducer’s gears move: its ring gear turns with the thigh,
+so its meshes slide with the knee speed, not with the knee motor speed. RaiSim adds them to the
+joint’s own <code class="docutils literal notranslate"><span class="pre">&lt;dynamics</span> <span class="pre">friction</span> <span class="pre">damping&gt;</span></code>, so you can keep losses in either place or split them.
+The rotor inertia is still set at the joint with <code class="docutils literal notranslate"><span class="pre">&lt;dynamics</span> <span class="pre">rotor_inertia&gt;</span></code> as the reflected
+inertia <span class="math notranslate nohighlight">\(G^2 J_{rotor}\)</span>.</p>
+</section>
+<section id="bus-voltage">
+<h3><a class="toc-backref" href="#id8" role="doc-backlink">Bus voltage</a><a class="headerlink" href="#bus-voltage" title="Link to this heading"></a></h3>
+<p>The bus voltage belongs to the power supply, not to the motor: all motors on one battery see the
+same voltage, and it sags together as the battery drains. Every actuator that links the same model
+file gets the voltage of its <code class="docutils literal notranslate"><span class="pre">&lt;motor&gt;</span></code>.</p>
+<p>The voltage can be changed at runtime with a single call, for example to follow the battery voltage
+or to randomize it during training. It only changes the stored voltage and can be called every step:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">setBusVoltage</span><span class="p">(</span><span class="mf">46.5</span><span class="p">);</span><span class="w">            </span><span class="c1">// all actuators</span>
+<span class="n">robot</span><span class="o">-&gt;</span><span class="n">setBusVoltage</span><span class="p">(</span><span class="s">&quot;LF_KFE&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">46.5</span><span class="p">);</span><span class="w">  </span><span class="c1">// one actuator, by name</span>
+</pre></div>
+</div>
+</section>
+<section id="actuator-names">
+<h3><a class="toc-backref" href="#id9" role="doc-backlink">Actuator names</a><a class="headerlink" href="#actuator-names" title="Link to this heading"></a></h3>
+<p>Every actuator has a name that is unique within the articulated system: its <code class="docutils literal notranslate"><span class="pre">name</span></code> attribute, or
+the name of its joint. <code class="docutils literal notranslate"><span class="pre">getActuatorNames()</span></code> lists the actuators in the order of the
+<code class="docutils literal notranslate"><span class="pre">&lt;actuator&gt;</span></code> elements; <code class="docutils literal notranslate"><span class="pre">getActuatorIndex(name)</span></code> returns the position of a name.</p>
+</section>
+<section id="errors">
+<h3><a class="toc-backref" href="#id10" role="doc-backlink">Errors</a><a class="headerlink" href="#errors" title="Link to this heading"></a></h3>
+<p>Invalid actuators are fatal errors. Errors in an actuator file or an <code class="docutils literal notranslate"><span class="pre">&lt;actuator&gt;</span></code> element name the
+file and row: a missing <code class="docutils literal notranslate"><span class="pre">joint</span></code> or <code class="docutils literal notranslate"><span class="pre">gear_ratio</span></code>, a gear ratio that is not positive, a missing or
+doubly given motor constant, a missing bus voltage, a non-positive or non-finite motor parameter,
+negative output losses, a model without exactly one <code class="docutils literal notranslate"><span class="pre">&lt;motor&gt;</span></code>, a <code class="docutils literal notranslate"><span class="pre">&lt;coupling&gt;</span></code> without a joint or
+a finite ratio, a missing actuator file, and an <code class="docutils literal notranslate"><span class="pre">&lt;actuator&gt;</span></code> with both a <code class="docutils literal notranslate"><span class="pre">file</span></code> and an inline
+model. When the robot is built, RaiSim also rejects an unknown, fixed or spherical joint (driven or
+coupled), a joint driven by two actuators, a coupling to the driven joint itself or twice to one
+joint, and duplicate actuator names.</p>
+</section>
+</section>
+<section id="couplings">
+<h2><a class="toc-backref" href="#id11" role="doc-backlink">Couplings</a><a class="headerlink" href="#couplings" title="Link to this heading"></a></h2>
+<p>An actuator’s motor turns with its joint through the gear, <span class="math notranslate nohighlight">\(\omega_m = G\,u\)</span>. A
+<code class="docutils literal notranslate"><span class="pre">&lt;coupling&gt;</span></code> adds another joint that the motor also turns with:</p>
+<div class="math notranslate nohighlight">
+\[\omega_m = G\,u + \sum_c r_c\,u_c .\]</div>
+<p>By conservation of power, <span class="math notranslate nohighlight">\(\tau_m\,\omega_m = \sum_j \tau_j\,u_j\)</span>, the motor torque
+<span class="math notranslate nohighlight">\(\tau_m\)</span> acts on the driven joint with <span class="math notranslate nohighlight">\(G\,\tau_m\)</span>, the actuator torque, and on each
+coupled joint with <span class="math notranslate nohighlight">\(r_c\,\tau_m\)</span>.</p>
+<p>KAIST Hound (the robot of the paper) puts the hip (HFE) and the knee (KFE) motor of a leg on the
+body. The hip motor turns the thigh through a planetary reducer with ratio <span class="math notranslate nohighlight">\(G_H\)</span>. The knee
+motor drives the sun gear of a planetary reducer whose ring gear is attached to the thigh, and the
+planet carrier drives the knee. Relative to the thigh, the knee reducer is an ordinary reducer with
+ratio <span class="math notranslate nohighlight">\(G_K\)</span>, so <span class="math notranslate nohighlight">\(\omega_{sun} - \omega_{HFE} = G_K\,\omega_{KFE}\)</span>, i.e.,</p>
+<div class="math notranslate nohighlight">
+\[\omega_{KFE,m} = G_K\,u_{KFE} + 1 \cdot u_{HFE}:\]</div>
+<p>the knee actuator has the gear ratio <span class="math notranslate nohighlight">\(G_K\)</span> and a coupling of ratio 1 to the hip,</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;actuator</span><span class="w"> </span><span class="na">joint=</span><span class="s">&quot;LF_KFE&quot;</span><span class="w"> </span><span class="na">file=</span><span class="s">&quot;hound_leg_actuator.xml&quot;</span><span class="nt">&gt;</span>
+<span class="w">  </span><span class="nt">&lt;coupling</span><span class="w"> </span><span class="na">joint=</span><span class="s">&quot;LF_HFE&quot;</span><span class="w"> </span><span class="na">ratio=</span><span class="s">&quot;1&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/actuator&gt;</span>
+</pre></div>
+</div>
+<p>The knee motor torque also loads the hip: <span class="math notranslate nohighlight">\(\tau_{HFE} = G_H\,\tau_{HFE,m} + \tau_{KFE,m}\)</span>. When
+the hip swings, the knee motor turns even if the knee does not, and it can run out of voltage because
+of the hip speed alone.</p>
+<p>Written for all actuators and joints at once, the gear and coupling ratios form the transmission
+matrix <span class="math notranslate nohighlight">\(\boldsymbol{T}\)</span>, one row per actuator: <span class="math notranslate nohighlight">\(\boldsymbol{\omega}_m = \boldsymbol{T}\,\boldsymbol{u}\)</span> for the motor speeds and the
+joint velocities, and <span class="math notranslate nohighlight">\(\boldsymbol{\tau}_{act} = \boldsymbol{T}^T \boldsymbol{\tau}_m\)</span> for the actuator torques on the joints. For the
+Hound leg,</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>[ w_hip_motor  ]   [ G_H   0  ] [ u_HFE ]
+[ w_knee_motor ] = [  1   G_K ] [ u_KFE ]
+</pre></div>
+</div>
+<p>A coupling changes which torque a motor can apply and where its torque goes. It does not tie the
+joints together: every joint keeps its degree of freedom, and the dynamics are still computed for
+the joints. A mechanism that does tie joints together, e.g., one motor that drives two joints
+through a linkage, is a constraint between the joints and cannot be described with couplings.</p>
+<p>The rotor inertia is the one place where a coupling would also change the dynamics. The kinetic
+energy of the motors, <span class="math notranslate nohighlight">\(\frac{1}{2}\,\boldsymbol{\omega}_m^T \boldsymbol{J}_{rotor}\,\boldsymbol{\omega}_m\)</span> with the diagonal matrix of rotor inertias
+<span class="math notranslate nohighlight">\(\boldsymbol{J}_{rotor}\)</span> and <span class="math notranslate nohighlight">\(\boldsymbol{\omega}_m = \boldsymbol{T}\,\boldsymbol{u}\)</span>, gives the joints the reflected inertia
+<span class="math notranslate nohighlight">\(\boldsymbol{T}^T \boldsymbol{J}_{rotor}\,\boldsymbol{T}\)</span>. For the Hound leg its off-diagonal term is <span class="math notranslate nohighlight">\(J_{rotor,K}\,G_K\)</span>
+between hip and knee. RaiSim models the rotor inertia per joint (<code class="docutils literal notranslate"><span class="pre">rotor_inertia</span></code> in
+<code class="docutils literal notranslate"><span class="pre">&lt;dynamics&gt;</span></code>), so this term is not simulated. Set <code class="docutils literal notranslate"><span class="pre">rotor_inertia</span></code> to the diagonal of
+<span class="math notranslate nohighlight">\(\boldsymbol{T}^T \boldsymbol{J}_{rotor}\,\boldsymbol{T}\)</span> (<span class="math notranslate nohighlight">\(G_H^2 J_{rotor,H} + J_{rotor,K}\)</span> for the hip and
+<span class="math notranslate nohighlight">\(G_K^2 J_{rotor,K}\)</span> for the knee). The off-diagonal term is typically a tenth of the knee’s
+own reflected inertia or less.</p>
+</section>
+<section id="what-happens-in-a-simulation-step">
+<h2><a class="toc-backref" href="#id12" role="doc-backlink">What happens in a simulation step</a><a class="headerlink" href="#what-happens-in-a-simulation-step" title="Link to this heading"></a></h2>
+<p>The operating region applies to the actuator torques and only to them. At the beginning of every
+step, with the joint velocities <span class="math notranslate nohighlight">\(\boldsymbol{u}_t\)</span> of that moment, each actuator (gear ratio <span class="math notranslate nohighlight">\(G\)</span>,
+driven joint <span class="math notranslate nohighlight">\(j\)</span>, couplings <span class="math notranslate nohighlight">\((c, r_c)\)</span> and the torque <span class="math notranslate nohighlight">\(\tau_a\)</span> set with
+<code class="docutils literal notranslate"><span class="pre">setActuatorTorques()</span></code>) computes its motor speed, the bounds of its region at that speed and its
+motor torque:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\omega_m     &amp;= G\,u_{t,j} + \textstyle\sum_c r_c\,u_{t,c} \\
+\tau_{m,min} &amp;= \mathrm{clamp}\bigl(-\tau_{stall} - b\,\omega_m,\; -\tau_{peak},\; \tau_{peak}\bigr) \\
+\tau_{m,max} &amp;= \mathrm{clamp}\bigl(\phantom{-}\tau_{stall} - b\,\omega_m,\; -\tau_{peak},\; \tau_{peak}\bigr) \\
+\tau_m       &amp;= \mathrm{clamp}\bigl(\tau_a / G,\; \tau_{m,min},\; \tau_{m,max}\bigr)\end{split}\]</div>
+<p>with the stall torque <span class="math notranslate nohighlight">\(\tau_{stall} = K_t V_{bus} / R\)</span> and the back-EMF damping
+<span class="math notranslate nohighlight">\(b = K_t / (R K_v)\)</span>. In monitor mode (see <a class="reference internal" href="#monitoring-without-enforcing">Monitoring without enforcing</a>),
+<span class="math notranslate nohighlight">\(\tau_m = \tau_a / G\)</span>. The motor torque acts with <span class="math notranslate nohighlight">\(G\,\tau_m\)</span> on the driven joint and
+with <span class="math notranslate nohighlight">\(r_c\,\tau_m\)</span> on each coupled joint, constant for the whole step. With
+<span class="math notranslate nohighlight">\(\tau_{act,i}\)</span> the sum of these torques on joint <span class="math notranslate nohighlight">\(i\)</span>, the torque on the joint over the
+step is</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\tau_i = {} &amp; \mathrm{clamp}\bigl(\tau_{ff,i} + \tau_{PD,i},\; -\tau_{effort,i},\; \tau_{effort,i}\bigr)
+              - \frac{1}{2}\,(b_{joint,i} + b_{out,i})\,\bigl(u_{t,i} + u_{t+1,i}\bigr) \\
+            &amp; {} + \tau_{act,i} + \tau_{spring,i} + \tau_{ext,i} + \tau_{friction,i} + \tau_{contact,i}\end{split}\]</div>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\tau_{ff}\)</span> is set with <code class="docutils literal notranslate"><span class="pre">setGeneralizedForce()</span></code> and <span class="math notranslate nohighlight">\(\tau_{PD}\)</span> is the built-in
+PD torque. Only this sum is clamped to the actuation limits (URDF <code class="docutils literal notranslate"><span class="pre">effort</span></code> or
+<code class="docutils literal notranslate"><span class="pre">setActuationLimits()</span></code>).</p></li>
+<li><p><span class="math notranslate nohighlight">\(b_{joint,i}\)</span> is the joint’s own damping and <span class="math notranslate nohighlight">\(b_{out,i}\)</span> the actuator’s output
+damping. <span class="math notranslate nohighlight">\(u_{t,i}\)</span> and <span class="math notranslate nohighlight">\(u_{t+1,i}\)</span> are the joint velocity at the beginning and at the
+end of the step. Damping is passive and is never clipped. It is integrated with the trapezoidal
+rule (see <a class="reference internal" href="articulated_system/JointDampingAndFriction.html"><span class="doc">Joint Damping and Friction</span></a>).</p></li>
+<li><p><span class="math notranslate nohighlight">\(\tau_{friction}\)</span> is the joint friction (the joint’s own plus the actuator’s output
+friction). The contact solver solves it together with the contacts, as an impulse bounded by
+<span class="math notranslate nohighlight">\((\tau_{c,joint} + \tau_{c,out})\,\Delta t\)</span> that stops the joint or opposes its motion.
+This also applies to joints without an actuator.</p></li>
+<li><p>Springs, external forces and contacts are not clipped either, and the sum is not clamped again.</p></li>
+</ul>
+<p>The PD controller and the springs are integrated implicitly, and the clamp bounds only the explicit
+part of the PD torque. <a class="reference internal" href="articulated_system/DynamicsAndControl.html#joint-torque-of-a-step"><span class="std std-ref">Joint torque of a simulation step</span></a> in the articulated system section writes out
+every term.</p>
+<p>Joint effort limits and MOR are separate limits: <strong>effort limits do not clip actuator torques,
+and MOR does not clip the generalized force or the built-in PD torque</strong>. For example, take a
+turntable joint <code class="docutils literal notranslate"><span class="pre">spin</span></code> with a 5 Nm effort limit and no PD, damping, springs or external forces,
+driven by the actuator <code class="docutils literal notranslate"><span class="pre">spin</span></code> (gear ratio 10; <span class="math notranslate nohighlight">\(R = 0.2\ \Omega\)</span>, <span class="math notranslate nohighlight">\(K_t = 0.1\)</span> Nm/A,
+<span class="math notranslate nohighlight">\(K_v = 10\)</span> rad/s/V, <span class="math notranslate nohighlight">\(V_{bus} = 24\)</span> V and a 1.5 Nm peak torque), whose region allows
+15 Nm at the gear output at rest:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">setGeneralizedForce</span><span class="p">(</span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="o">::</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mf">100.</span><span class="p">));</span>
+<span class="n">robot</span><span class="o">-&gt;</span><span class="n">setActuatorTorque</span><span class="p">(</span><span class="s">&quot;spin&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">100.</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The generalized force contributes 5 Nm and the actuator 15 Nm, 20 Nm in total. At a joint speed of
+23.8 rad/s (238 rad/s at the motor, just below its 240 rad/s no-load speed), the voltage limit
+allows only the 12 Nm stall torque minus the back-EMF damping times the speed,
+<span class="math notranslate nohighlight">\(12 - 0.05 \cdot 238 = 0.1\)</span> Nm, at the motor, i.e., 1 Nm at the gear output, and
+the same commands contribute 5 Nm plus 1 Nm, 6 Nm in total. The generalized force is still bounded
+by the effort limit and the actuator torque by the region; neither limit is applied to their sum.</p>
+<p>Because the actuator torques are fixed for the step, contacts and impacts cannot push them out of
+the region. Compare an applied motor torque with the region at the speed at the <strong>beginning</strong> of
+the step, <code class="docutils literal notranslate"><span class="pre">ActuatorState::motorSpeed</span></code>.</p>
+<p>A controller should therefore send its torques as actuator torques. RaiSim’s built-in PD
+controller acts on the joints and is not an actuator torque; to keep a PD controller inside the
+operating regions, compute it explicitly and send the result with <code class="docutils literal notranslate"><span class="pre">setActuatorTorques()</span></code>.</p>
+<section id="time-step-and-the-voltage-limit">
+<h3><a class="toc-backref" href="#id13" role="doc-backlink">Time step and the voltage limit</a><a class="headerlink" href="#time-step-and-the-voltage-limit" title="Link to this heading"></a></h3>
+<p>At the voltage limit the torque falls with the speed: the motor acts as a damper of
+<span class="math notranslate nohighlight">\(G^2 K_t / (R K_v)\)</span> at the joint. Because the limit is evaluated at the speed at the beginning
+of the step, this damper is explicit. A motor driven into its voltage limit settles at the no-load
+speed if the time step is below twice the mechanical time constant of the drive,</p>
+<div class="math notranslate nohighlight">
+\[\Delta t &lt; 2\,\frac{I\,R\,K_v}{G^2 K_t},\]</div>
+<p>with <span class="math notranslate nohighlight">\(I\)</span> the inertia at the joint, including the reflected rotor inertia
+<span class="math notranslate nohighlight">\(G^2 J_{rotor}\)</span> (<code class="docutils literal notranslate"><span class="pre">rotor_inertia</span></code> in <code class="docutils literal notranslate"><span class="pre">&lt;dynamics&gt;</span></code>). The reflected rotor inertia usually
+dominates, so the bound is about twice the motor’s own mechanical time constant
+<span class="math notranslate nohighlight">\(R K_v J_{rotor} / K_t\)</span>, a few milliseconds for typical drives. With larger steps the speed
+oscillates around the no-load speed instead of settling, but the torque stays inside the region and
+the oscillation cannot grow beyond the peak torque. Model the rotor inertia: without it, the bound is
+set by the light link alone and is much smaller.</p>
+</section>
+<section id="accuracy">
+<h3><a class="toc-backref" href="#id14" role="doc-backlink">Accuracy</a><a class="headerlink" href="#accuracy" title="Link to this heading"></a></h3>
+<p>The applied motor torques are the commanded ones clipped to their regions, so they lie inside the
+regions to round-off, also under foot impacts. The tests check this to <span class="math notranslate nohighlight">\(10^{-12}\)</span> of the peak
+torque.</p>
+</section>
+</section>
+<section id="commanding-actuator-torques">
+<h2><a class="toc-backref" href="#id15" role="doc-backlink">Commanding actuator torques</a><a class="headerlink" href="#commanding-actuator-torques" title="Link to this heading"></a></h2>
+<p>Every actuator takes one torque, at the output of its gear:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// one entry per actuator, in this order:</span>
+<span class="c1">// {&quot;LF_HAA&quot;, &quot;LF_HFE&quot;, &quot;LF_KFE&quot;, &quot;RF_HAA&quot;, ...}</span>
+<span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getActuatorNames</span><span class="p">();</span>
+
+<span class="n">robot</span><span class="o">-&gt;</span><span class="n">setActuatorTorques</span><span class="p">(</span><span class="n">torques</span><span class="p">);</span><span class="w">        </span><span class="c1">// Eigen::VectorXd, one torque per actuator</span>
+<span class="n">robot</span><span class="o">-&gt;</span><span class="n">setActuatorTorque</span><span class="p">(</span><span class="s">&quot;LF_KFE&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">12.</span><span class="p">);</span><span class="w">   </span><span class="c1">// one actuator, by name</span>
+<span class="n">robot</span><span class="o">-&gt;</span><span class="n">setActuatorTorque</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mf">12.</span><span class="p">);</span><span class="w">          </span><span class="c1">// the same actuator, by index</span>
+</pre></div>
+</div>
+<p>The order and the names are described in <a class="reference internal" href="#actuator-names">Actuator names</a>. The same order is used by
+<code class="docutils literal notranslate"><span class="pre">getActuators()</span></code>, <code class="docutils literal notranslate"><span class="pre">getActuatorTorques()</span></code>, <code class="docutils literal notranslate"><span class="pre">getActuatorTorqueBounds()</span></code> and
+<code class="docutils literal notranslate"><span class="pre">getActuatorStates()</span></code>.</p>
+<p>The torque is at the output of the actuator’s gear: its motor torque times its gear ratio. It is the
+torque on the driven joint. An actuator with couplings also applies its motor torque times the
+coupling ratio to each coupled joint: 12 Nm on the Hound knee is a knee motor torque of 1.2 Nm, which
+also loads the hip with 1.2 Nm.</p>
+<p>The actuator torques hold until they are set again. <code class="docutils literal notranslate"><span class="pre">getActuatorTorques()</span></code> returns the torques
+that were set; <code class="docutils literal notranslate"><span class="pre">getActuatorStates()</span></code> reports what the motors applied. <code class="docutils literal notranslate"><span class="pre">getGeneralizedForce()</span></code>
+returns the effort-clipped generalized force and built-in PD contribution plus the mapped
+actuator torques clipped to MOR at the current motor speeds. It excludes passive damping, springs
+and friction, and its built-in PD contribution is approximate because PD is integrated implicitly.</p>
+<section id="actuator-torque-bounds">
+<h3><a class="toc-backref" href="#id16" role="doc-backlink">Actuator torque bounds</a><a class="headerlink" href="#actuator-torque-bounds" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">getActuatorTorqueBounds(lower,</span> <span class="pre">upper)</span></code> returns, per actuator, the torques it can apply now, at
+the output of its gear: its motor’s region at the current motor speed, times its gear ratio. These
+are exactly the bounds to which the next step clips <code class="docutils literal notranslate"><span class="pre">setActuatorTorques()</span></code>.
+Use them, e.g., to scale a policy’s actions into the admissible range:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">VecDyn</span><span class="w"> </span><span class="n">lower</span><span class="p">,</span><span class="w"> </span><span class="n">upper</span><span class="p">;</span>
+<span class="n">robot</span><span class="o">-&gt;</span><span class="n">getActuatorTorqueBounds</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span><span class="w"> </span><span class="n">upper</span><span class="p">);</span><span class="w">  </span><span class="c1">// [Nm or N], getActuatorNames() order</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getActuatorNames</span><span class="p">().</span><span class="n">size</span><span class="p">();</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span>
+<span class="w">  </span><span class="n">torques</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">lower</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">upper</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">upper</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">lower</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">action</span><span class="p">[</span><span class="n">i</span><span class="p">];</span><span class="w">  </span><span class="c1">// action in [-1, 1]</span>
+<span class="n">robot</span><span class="o">-&gt;</span><span class="n">setActuatorTorques</span><span class="p">(</span><span class="n">torques</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>With the region not enforced (see <a class="reference internal" href="#monitoring-without-enforcing">Monitoring without enforcing</a>), the bounds are infinite.</p>
+</section>
+</section>
+<section id="reading-the-actuator-states">
+<h2><a class="toc-backref" href="#id17" role="doc-backlink">Reading the actuator states</a><a class="headerlink" href="#reading-the-actuator-states" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">getActuatorStates()</span></code> returns one <code class="docutils literal notranslate"><span class="pre">raisim::ActuatorState</span></code> per actuator for the last step. Except
+for <code class="docutils literal notranslate"><span class="pre">jointLossTorque</span></code>, its fields describe the actuator’s motor, on the rotor side of the gear.
+Multiply a motor torque by the gear ratio to get the actuator torque on the driven joint, and by a
+coupling ratio to get the torque on a coupled joint.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 75.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">motorSpeed</span></code></p></td>
+<td><p>motor speed at the beginning of the step [rad/s]; the region of the step is evaluated at it</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">averageMotorSpeed</span></code></p></td>
+<td><p>motor speed averaged over the step [rad/s]; <code class="docutils literal notranslate"><span class="pre">motorTorque</span> <span class="pre">*</span> <span class="pre">averageMotorSpeed</span></code> is the
+mechanical power of the motor</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">commandedMotorTorque</span></code></p></td>
+<td><p>motor torque requested with <code class="docutils literal notranslate"><span class="pre">setActuatorTorques()</span></code> (the actuator torque divided by its gear
+ratio) [Nm]</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">motorTorque</span></code></p></td>
+<td><p>electromagnetic motor torque <span class="math notranslate nohighlight">\(K_t i\)</span>: the commanded motor torque clipped to the
+operating region [Nm]. The effort limits do not clip it.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">jointLossTorque</span></code></p></td>
+<td><p>friction and damping torque on the driven joint over the step [Nm, at the joint]: the joint’s
+own plus the actuator’s output losses. It opposes the joint motion.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">saturation</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">NONE</span></code>, <code class="docutils literal notranslate"><span class="pre">PEAK_TORQUE</span></code> or <code class="docutils literal notranslate"><span class="pre">VOLTAGE</span></code>: the bound that limited the command</p></td>
+</tr>
+</tbody>
+</table>
+<p>The states are computed at the end of integration and describe that completed step. A subsequent
+<code class="docutils literal notranslate"><span class="pre">setState()</span></code> reset does not mix new velocities into the previous step. Concurrent reads are
+supported while no thread integrates or changes the actuator configuration; synchronize readers
+with those mutations.</p>
+<p>To check the region, or to use the motor torques in a reward (power, saturation penalties):</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">states</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getActuatorStates</span><span class="p">();</span>
+<span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">actuators</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getActuators</span><span class="p">();</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">states</span><span class="p">.</span><span class="n">size</span><span class="p">();</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// [Nm], zero inside the region</span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">outside</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">motorOperatingRegionViolation</span><span class="p">(</span>
+<span class="w">      </span><span class="n">actuators</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">motor</span><span class="p">,</span><span class="w"> </span><span class="n">states</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">motorSpeed</span><span class="p">,</span><span class="w"> </span><span class="n">states</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">motorTorque</span><span class="p">);</span>
+<span class="w">  </span><span class="c1">// mechanical power of the motor [W]</span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">power</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">states</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">motorTorque</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">states</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">averageMotorSpeed</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The free functions <code class="docutils literal notranslate"><span class="pre">raisim::motorTorqueBounds(parameters,</span> <span class="pre">speed)</span></code> (the admissible torque interval
+at a speed), <code class="docutils literal notranslate"><span class="pre">raisim::clipMotorTorque(parameters,</span> <span class="pre">speed,</span> <span class="pre">torque)</span></code> and
+<code class="docutils literal notranslate"><span class="pre">raisim::motorOperatingRegionViolation(parameters,</span> <span class="pre">speed,</span> <span class="pre">torque)</span></code> work on the <strong>motor alone</strong>,
+without its gear: they take a rotor-side speed and a rotor-side torque, like the <code class="docutils literal notranslate"><span class="pre">ActuatorState</span></code>
+fields. For torques at the gear output, i.e., in the units of <code class="docutils literal notranslate"><span class="pre">setActuatorTorques()</span></code>, use
+<code class="docutils literal notranslate"><span class="pre">getActuatorTorqueBounds()</span></code> (see <a class="reference internal" href="#actuator-torque-bounds">Actuator torque bounds</a>).</p>
+</section>
+<section id="monitoring-without-enforcing">
+<h2><a class="toc-backref" href="#id18" role="doc-backlink">Monitoring without enforcing</a><a class="headerlink" href="#monitoring-without-enforcing" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">setMotorOperatingRegionEnforced(false)</span></code> applies the actuator torques as commanded, without
+clipping (monitor mode), and <code class="docutils literal notranslate"><span class="pre">getActuatorStates()</span></code> still reports the motor quantities, including
+the bound that the command exceeds. This reproduces the paper’s comparison: run a controller without
+the motor operating region and measure how far it leaves the region. The output friction and
+damping still act, and the effort limits still clamp only the feedforward and PD torque.</p>
+</section>
+<section id="c-api">
+<h2><a class="toc-backref" href="#id19" role="doc-backlink">C++ API</a><a class="headerlink" href="#c-api" title="Link to this heading"></a></h2>
+<p>An <code class="docutils literal notranslate"><span class="pre">ActuatorDefinition</span></code> is the C++ form of one <code class="docutils literal notranslate"><span class="pre">&lt;actuator&gt;</span></code> element with its model: <code class="docutils literal notranslate"><span class="pre">name</span></code>
+(empty: the joint name), <code class="docutils literal notranslate"><span class="pre">model</span></code>, <code class="docutils literal notranslate"><span class="pre">joint</span></code>, <code class="docutils literal notranslate"><span class="pre">gearRatio</span></code>, the <code class="docutils literal notranslate"><span class="pre">couplings</span></code> (each an
+<code class="docutils literal notranslate"><span class="pre">ActuatorCoupling</span></code> with a <code class="docutils literal notranslate"><span class="pre">joint</span></code> and a <code class="docutils literal notranslate"><span class="pre">ratio</span></code>), the <code class="docutils literal notranslate"><span class="pre">motor</span></code> (<code class="docutils literal notranslate"><span class="pre">DcMotorParameters</span></code>), and
+<code class="docutils literal notranslate"><span class="pre">outputDamping</span></code> and <code class="docutils literal notranslate"><span class="pre">outputFriction</span></code>.</p>
+<p>To change only the bus voltage, use <code class="docutils literal notranslate"><span class="pre">setBusVoltage()</span></code> (see <a class="reference internal" href="#bus-voltage">Bus voltage</a>). Other parameters,
+such as a randomized winding resistance, are changed by editing the definitions and setting them
+again. <code class="docutils literal notranslate"><span class="pre">setActuators()</span></code> replaces all actuators, including those from the URDF, and resets every
+actuator torque to zero:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">actuators</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getActuators</span><span class="p">();</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">actuator</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">actuators</span><span class="p">)</span>
+<span class="w">  </span><span class="n">actuator</span><span class="p">.</span><span class="n">motor</span><span class="p">.</span><span class="n">resistance</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span><span class="w"> </span><span class="mf">1.1</span><span class="p">);</span>
+<span class="n">robot</span><span class="o">-&gt;</span><span class="n">setActuators</span><span class="p">(</span><span class="n">actuators</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>A Hound knee from scratch:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">ActuatorDefinition</span><span class="w"> </span><span class="n">knee</span><span class="p">;</span>
+<span class="n">knee</span><span class="p">.</span><span class="n">joint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;LF_KFE&quot;</span><span class="p">;</span>
+<span class="n">knee</span><span class="p">.</span><span class="n">gearRatio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">10.</span><span class="p">;</span>
+<span class="n">knee</span><span class="p">.</span><span class="n">couplings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{{</span><span class="s">&quot;LF_HFE&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">1.</span><span class="p">}};</span><span class="w">  </span><span class="c1">// the knee motor also turns with the hip</span>
+<span class="n">knee</span><span class="p">.</span><span class="n">motor</span><span class="p">.</span><span class="n">resistance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.4</span><span class="p">;</span>
+<span class="n">knee</span><span class="p">.</span><span class="n">motor</span><span class="p">.</span><span class="n">torqueConstant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.1</span><span class="p">;</span>
+<span class="n">knee</span><span class="p">.</span><span class="n">motor</span><span class="p">.</span><span class="n">velocityConstant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">10.</span><span class="p">;</span>
+<span class="n">knee</span><span class="p">.</span><span class="n">motor</span><span class="p">.</span><span class="n">busVoltage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">24.</span><span class="p">;</span>
+<span class="n">knee</span><span class="p">.</span><span class="n">motor</span><span class="p">.</span><span class="n">peakTorque</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3.</span><span class="p">;</span>
+<span class="n">robot</span><span class="o">-&gt;</span><span class="n">setActuators</span><span class="p">({</span><span class="n">knee</span><span class="p">});</span>
+</pre></div>
+</div>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text"><code class="docutils literal notranslate"><span class="pre">raisim::ArticulatedSystem</span></code></span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 40.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">setActuators(actuators)</span></code></p></td>
+<td><p>replace the actuators (one <code class="docutils literal notranslate"><span class="pre">ActuatorDefinition</span></code> per actuator) and zero their torques; an
+empty vector removes them</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">getActuators()</span></code></p></td>
+<td><p>the actuator definitions, with their names and the bus voltages set since</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">getNumberOfActuators()</span></code>, <code class="docutils literal notranslate"><span class="pre">getActuatorNames()</span></code>, <code class="docutils literal notranslate"><span class="pre">getActuatorIndex(name)</span></code></p></td>
+<td><p>number of actuators, their names in the order used by all per-actuator methods, the index of
+a name (<code class="docutils literal notranslate"><span class="pre">size_t(-1)</span></code> if unknown)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">setActuatorTorques(torques)</span></code>, <code class="docutils literal notranslate"><span class="pre">setActuatorTorque(name</span> <span class="pre">or</span> <span class="pre">index,</span> <span class="pre">torque)</span></code></p></td>
+<td><p>set actuator torques at the gear outputs; they hold until set again</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">getActuatorTorques()</span></code></p></td>
+<td><p>the actuator torques as set</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">getActuatorTorqueBounds(lower,</span> <span class="pre">upper)</span></code></p></td>
+<td><p>admissible actuator torques at the gear outputs at the current motor speeds</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">setBusVoltage(voltage)</span></code>, <code class="docutils literal notranslate"><span class="pre">setBusVoltage(actuatorName,</span> <span class="pre">voltage)</span></code></p></td>
+<td><p>change the bus voltage of all actuators or of one</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">getActuatorStates()</span></code></p></td>
+<td><p>motor speeds and torques of the last step</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">setMotorOperatingRegionEnforced(enforce)</span></code>, <code class="docutils literal notranslate"><span class="pre">isMotorOperatingRegionEnforced()</span></code></p></td>
+<td><p>clip to the region (default) or only monitor it</p></td>
+</tr>
+</tbody>
+</table>
+<p>A change to the actuators wakes a sleeping robot only if it changes the force on it: a changed
+actuator torque, a bus voltage or enforcement change while an actuator torque acts, or
+<code class="docutils literal notranslate"><span class="pre">setActuators()</span></code> while an old actuator torque was nonzero or when the output losses change.</p>
+<p>Actuators are part of world checkpoints (<code class="docutils literal notranslate"><span class="pre">World::captureCheckpoint()</span></code>), so changing them between
+a capture and a restore is undone by the restore.</p>
+</section>
+<section id="raisimgymtorch-and-raisim-engine2">
+<h2><a class="toc-backref" href="#id20" role="doc-backlink">raisimGymTorch and raisim_engine2</a><a class="headerlink" href="#raisimgymtorch-and-raisim-engine2" title="Link to this heading"></a></h2>
+<p>Actuators are part of the URDF, so a <code class="docutils literal notranslate"><span class="pre">world.xml</span></code> that refers to the URDF brings them along.
+<code class="docutils literal notranslate"><span class="pre">World::exportToXml()</span></code> also writes the current actuators of every articulated system into an
+<code class="docutils literal notranslate"><span class="pre">&lt;actuators&gt;</span></code> element of its entry: actuators set with <code class="docutils literal notranslate"><span class="pre">setActuators()</span></code>, bus voltages changed at
+run time, nonzero actuator torques and the monitor mode. Each is an <code class="docutils literal notranslate"><span class="pre">&lt;actuator&gt;</span></code> with its model
+inline and, if nonzero, a <code class="docutils literal notranslate"><span class="pre">torque</span></code> attribute. Loading that <code class="docutils literal notranslate"><span class="pre">world.xml</span></code> replaces the URDF’s
+actuators with them.
+<code class="docutils literal notranslate"><span class="pre">raisim_engine2</span></code>’s <strong>Export for raisimGymTorch</strong> bundles linked actuator files together with the
+URDF, like sensor files, so the exported package loads with its actuators on another machine.</p>
+<p>In a raisimGymTorch environment, scale the policy’s actions with <code class="docutils literal notranslate"><span class="pre">getActuatorTorqueBounds()</span></code>
+before <code class="docutils literal notranslate"><span class="pre">setActuatorTorques()</span></code>, and read <code class="docutils literal notranslate"><span class="pre">getActuatorStates()</span></code> after <code class="docutils literal notranslate"><span class="pre">world-&gt;integrate()</span></code> to add
+the motor speeds or the saturation to the observation, or to penalize torques that saturate the
+motors.</p>
+</section>
+<section id="example">
+<h2><a class="toc-backref" href="#id21" role="doc-backlink">Example</a><a class="headerlink" href="#example" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">rayrai_motor_operating_region</span></code> drives the twelve actuators of a fixed-base quadruped rig randomly
+and plots the operating regions and operating points of their motors. See
+<a class="reference internal" href="examples/rayrai/rayrai_motor_operating_region.html"><span class="doc">Rayrai Example: Motor Operating Region</span></a>.</p>
+<a class="reference internal image-reference" href="../_images/rayrai_motor_operating_region.png"><img alt="twelve torque-speed plots with green parallelogram regions next to a quadruped rig" src="../_images/rayrai_motor_operating_region.png" style="width: 100%;" />
+</a>
+</section>
+<section id="api">
+<h2><a class="toc-backref" href="#id22" role="doc-backlink">API</a><a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim17DcMotorParametersE">
+<span id="_CPPv3N6raisim17DcMotorParametersE"></span><span id="_CPPv2N6raisim17DcMotorParametersE"></span><span id="raisim::DcMotorParameters"></span><span class="target" id="structraisim_1_1DcMotorParameters"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DcMotorParameters</span></span></span><a class="headerlink" href="#_CPPv4N6raisim17DcMotorParametersE" title="Link to this definition"></a><br /></dt>
+<dd><p>Steady-state electrical model of the DC/BLDC motor inside an actuator, on the motor (rotor) side of the actuator’s gear, in SI units. The operating region limits the motor’s electromagnetic torque Kt i. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim17DcMotorParameters13torquePerVoltEv">
+<span id="_CPPv3NK6raisim17DcMotorParameters13torquePerVoltEv"></span><span id="_CPPv2NK6raisim17DcMotorParameters13torquePerVoltEv"></span><span id="raisim::DcMotorParameters::torquePerVoltC"></span><span class="target" id="structraisim_1_1DcMotorParameters_1a0895f5539d902bcc08a5154995b91d26"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">torquePerVolt</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim17DcMotorParameters13torquePerVoltEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>motor torque per volt, Kt / R [Nm/V] </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim17DcMotorParameters14backEmfDampingEv">
+<span id="_CPPv3NK6raisim17DcMotorParameters14backEmfDampingEv"></span><span id="_CPPv2NK6raisim17DcMotorParameters14backEmfDampingEv"></span><span id="raisim::DcMotorParameters::backEmfDampingC"></span><span class="target" id="structraisim_1_1DcMotorParameters_1a8e4a19869dd8f6d4e174ee20250573b1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">backEmfDamping</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim17DcMotorParameters14backEmfDampingEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>slope of the voltage limit, Kt / (R Kv) [Nm s/rad]. A motor at its voltage limit acts as a damper with this coefficient. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim17DcMotorParameters11stallTorqueEv">
+<span id="_CPPv3NK6raisim17DcMotorParameters11stallTorqueEv"></span><span id="_CPPv2NK6raisim17DcMotorParameters11stallTorqueEv"></span><span id="raisim::DcMotorParameters::stallTorqueC"></span><span class="target" id="structraisim_1_1DcMotorParameters_1a784bda4c4ef8335f4ab7950fe433f9b5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stallTorque</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim17DcMotorParameters11stallTorqueEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torque at zero speed and full bus voltage, Kt Vbus / R [Nm] </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim17DcMotorParameters11noLoadSpeedEv">
+<span id="_CPPv3NK6raisim17DcMotorParameters11noLoadSpeedEv"></span><span id="_CPPv2NK6raisim17DcMotorParameters11noLoadSpeedEv"></span><span id="raisim::DcMotorParameters::noLoadSpeedC"></span><span class="target" id="structraisim_1_1DcMotorParameters_1a075b504cd361c8441df7bd8ae5c7dc88"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">noLoadSpeed</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim17DcMotorParameters11noLoadSpeedEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>speed at zero torque and full bus voltage, Kv Vbus [rad/s] </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim17DcMotorParameters7isValidEv">
+<span id="_CPPv3NK6raisim17DcMotorParameters7isValidEv"></span><span id="_CPPv2NK6raisim17DcMotorParameters7isValidEv"></span><span id="raisim::DcMotorParameters::isValidC"></span><span class="target" id="structraisim_1_1DcMotorParameters_1a03e5e7fd2a2544c3da22d11615d8defe"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isValid</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim17DcMotorParameters7isValidEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>true if R, Kt, Kv and Vbus are positive and finite, the peak torque is positive (it may be infinite), and the constants derived from them (torque per volt, stall torque, back-EMF damping, no-load speed) are positive and finite. Finite parameters can overflow the derived constants, which would make the region undefined. <a class="reference internal" href="articulated_system/API.html#classraisim_1_1ArticulatedSystem_1a3a968546a36320cc9624b75a31781ba6"><span class="std std-ref">ArticulatedSystem::setActuators()</span></a>, <a class="reference internal" href="articulated_system/API.html#classraisim_1_1ArticulatedSystem_1a63d63da73934b3b8fa44bd38e1fdac75"><span class="std std-ref">ArticulatedSystem::setBusVoltage()</span></a> and the URDF loader reject invalid motors. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim17DcMotorParameters10resistanceE">
+<span id="_CPPv3N6raisim17DcMotorParameters10resistanceE"></span><span id="_CPPv2N6raisim17DcMotorParameters10resistanceE"></span><span id="raisim::DcMotorParameters::resistance__double"></span><span class="target" id="structraisim_1_1DcMotorParameters_1a7448ce7b4a74d45ca5a07f21a50acd2c"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">resistance</span></span></span><a class="headerlink" href="#_CPPv4N6raisim17DcMotorParameters10resistanceE" title="Link to this definition"></a><br /></dt>
+<dd><p>winding resistance R [Ohm] </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim17DcMotorParameters14torqueConstantE">
+<span id="_CPPv3N6raisim17DcMotorParameters14torqueConstantE"></span><span id="_CPPv2N6raisim17DcMotorParameters14torqueConstantE"></span><span id="raisim::DcMotorParameters::torqueConstant__double"></span><span class="target" id="structraisim_1_1DcMotorParameters_1a44e561e749ed2049456399fc9e600ad6"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">torqueConstant</span></span></span><a class="headerlink" href="#_CPPv4N6raisim17DcMotorParameters14torqueConstantE" title="Link to this definition"></a><br /></dt>
+<dd><p>torque constant Kt [Nm/A] </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim17DcMotorParameters16velocityConstantE">
+<span id="_CPPv3N6raisim17DcMotorParameters16velocityConstantE"></span><span id="_CPPv2N6raisim17DcMotorParameters16velocityConstantE"></span><span id="raisim::DcMotorParameters::velocityConstant__double"></span><span class="target" id="structraisim_1_1DcMotorParameters_1af7c26ac71a884fb7c3eaa0346a106599"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">velocityConstant</span></span></span><a class="headerlink" href="#_CPPv4N6raisim17DcMotorParameters16velocityConstantE" title="Link to this definition"></a><br /></dt>
+<dd><p>velocity constant Kv [rad/s/V]. It is the inverse of the back-EMF constant. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim17DcMotorParameters10busVoltageE">
+<span id="_CPPv3N6raisim17DcMotorParameters10busVoltageE"></span><span id="_CPPv2N6raisim17DcMotorParameters10busVoltageE"></span><span id="raisim::DcMotorParameters::busVoltage__double"></span><span class="target" id="structraisim_1_1DcMotorParameters_1a2e83853c35786cbbde59f97d08d438b8"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">busVoltage</span></span></span><a class="headerlink" href="#_CPPv4N6raisim17DcMotorParameters10busVoltageE" title="Link to this definition"></a><br /></dt>
+<dd><p>bus voltage Vbus [V] </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim17DcMotorParameters10peakTorqueE">
+<span id="_CPPv3N6raisim17DcMotorParameters10peakTorqueE"></span><span id="_CPPv2N6raisim17DcMotorParameters10peakTorqueE"></span><span id="raisim::DcMotorParameters::peakTorque__double"></span><span class="target" id="structraisim_1_1DcMotorParameters_1a1665fd6f7dc90439d1cf5fa604dd64ee"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">peakTorque</span></span></span><a class="headerlink" href="#_CPPv4N6raisim17DcMotorParameters10peakTorqueE" title="Link to this definition"></a><br /></dt>
+<dd><p>peak torque [Nm] at which the core saturates. Infinity leaves only the voltage limit. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim18ActuatorDefinitionE">
+<span id="_CPPv3N6raisim18ActuatorDefinitionE"></span><span id="_CPPv2N6raisim18ActuatorDefinitionE"></span><span id="raisim::ActuatorDefinition"></span><span class="target" id="structraisim_1_1ActuatorDefinition"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ActuatorDefinition</span></span></span><a class="headerlink" href="#_CPPv4N6raisim18ActuatorDefinitionE" title="Link to this definition"></a><br /></dt>
+<dd><p>An actuator: a DC/BLDC motor with its gear. It drives one revolute or prismatic joint, and its torque is commanded at the output of the gear (<a class="reference internal" href="articulated_system/API.html#classraisim_1_1ArticulatedSystem_1a2d774322f16f65e7fdd98065f73052e7"><span class="std std-ref">ArticulatedSystem::setActuatorTorques()</span></a>): the motor torque times the gear ratio.</p>
+<p>Its motor turns at w_m = gearRatio * qdot_joint + sum_c ratio_c * qdot_c where the sum runs over its couplings. A coupling describes a motor that also turns with another joint, e.g. a knee motor whose reducer housing turns with the hip (KAIST Hound): ratio 1 on the hip. By conservation of power, the motor torque tau_m acts on the driven joint with gearRatio * tau_m (the actuator torque) and on each coupled joint with ratio_c * tau_m. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim18ActuatorDefinition7isValidEv">
+<span id="_CPPv3NK6raisim18ActuatorDefinition7isValidEv"></span><span id="_CPPv2NK6raisim18ActuatorDefinition7isValidEv"></span><span id="raisim::ActuatorDefinition::isValidC"></span><span class="target" id="structraisim_1_1ActuatorDefinition_1ada95e5117154f6f3614e679f637b92b5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isValid</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim18ActuatorDefinition7isValidEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>true if the motor is valid (<a class="reference internal" href="#structraisim_1_1DcMotorParameters_1a03e5e7fd2a2544c3da22d11615d8defe"><span class="std std-ref">DcMotorParameters::isValid()</span></a>), the gear ratio is positive and finite, the coupling ratios are finite and the output losses are non-negative and finite </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim18ActuatorDefinition4nameE">
+<span id="_CPPv3N6raisim18ActuatorDefinition4nameE"></span><span id="_CPPv2N6raisim18ActuatorDefinition4nameE"></span><span id="raisim::ActuatorDefinition::name__ss"></span><span class="target" id="structraisim_1_1ActuatorDefinition_1a77f3399d15f85613fe9d18361138f2da"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><a class="headerlink" href="#_CPPv4N6raisim18ActuatorDefinition4nameE" title="Link to this definition"></a><br /></dt>
+<dd><p>actuator name. <a class="reference internal" href="articulated_system/API.html#classraisim_1_1ArticulatedSystem_1a3a968546a36320cc9624b75a31781ba6"><span class="std std-ref">ArticulatedSystem::setActuators()</span></a> names an actuator without a name after its joint. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim18ActuatorDefinition5modelE">
+<span id="_CPPv3N6raisim18ActuatorDefinition5modelE"></span><span id="_CPPv2N6raisim18ActuatorDefinition5modelE"></span><span id="raisim::ActuatorDefinition::model__ss"></span><span class="target" id="structraisim_1_1ActuatorDefinition_1a8efbafccd57e77bb02e8eef3aa5e8507"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">model</span></span></span><a class="headerlink" href="#_CPPv4N6raisim18ActuatorDefinition5modelE" title="Link to this definition"></a><br /></dt>
+<dd><p>model name, e.g. the name of its &lt;actuator_model&gt; (informational) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim18ActuatorDefinition5jointE">
+<span id="_CPPv3N6raisim18ActuatorDefinition5jointE"></span><span id="_CPPv2N6raisim18ActuatorDefinition5jointE"></span><span id="raisim::ActuatorDefinition::joint__ss"></span><span class="target" id="structraisim_1_1ActuatorDefinition_1aee0742b90f152b4e997fc7960dd4485e"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">joint</span></span></span><a class="headerlink" href="#_CPPv4N6raisim18ActuatorDefinition5jointE" title="Link to this definition"></a><br /></dt>
+<dd><p>name of the driven revolute or prismatic joint </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim18ActuatorDefinition9gearRatioE">
+<span id="_CPPv3N6raisim18ActuatorDefinition9gearRatioE"></span><span id="_CPPv2N6raisim18ActuatorDefinition9gearRatioE"></span><span id="raisim::ActuatorDefinition::gearRatio__double"></span><span class="target" id="structraisim_1_1ActuatorDefinition_1a90db07eb53c7c4cda5d577dc999a8b52"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">gearRatio</span></span></span><a class="headerlink" href="#_CPPv4N6raisim18ActuatorDefinition9gearRatioE" title="Link to this definition"></a><br /></dt>
+<dd><p>gear ratio: motor speed per unit speed of the driven joint (positive) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim18ActuatorDefinition9couplingsE">
+<span id="_CPPv3N6raisim18ActuatorDefinition9couplingsE"></span><span id="_CPPv2N6raisim18ActuatorDefinition9couplingsE"></span><span id="raisim::ActuatorDefinition::couplings__std::vector:ActuatorCoupling:"></span><span class="target" id="structraisim_1_1ActuatorDefinition_1a31942888734bea5ed5ba91a9abc9a7de"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6raisim16ActuatorCouplingE" title="raisim::ActuatorCoupling"><span class="n"><span class="pre">ActuatorCoupling</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">couplings</span></span></span><a class="headerlink" href="#_CPPv4N6raisim18ActuatorDefinition9couplingsE" title="Link to this definition"></a><br /></dt>
+<dd><p>joints other than the driven one that the motor also turns with </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim18ActuatorDefinition5motorE">
+<span id="_CPPv3N6raisim18ActuatorDefinition5motorE"></span><span id="_CPPv2N6raisim18ActuatorDefinition5motorE"></span><span id="raisim::ActuatorDefinition::motor__DcMotorParameters"></span><span class="target" id="structraisim_1_1ActuatorDefinition_1ae4408b328262ae138401262110af1ceb"></span><a class="reference internal" href="#_CPPv4N6raisim17DcMotorParametersE" title="raisim::DcMotorParameters"><span class="n"><span class="pre">DcMotorParameters</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">motor</span></span></span><a class="headerlink" href="#_CPPv4N6raisim18ActuatorDefinition5motorE" title="Link to this definition"></a><br /></dt>
+<dd><p>the motor inside the actuator </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim18ActuatorDefinition13outputDampingE">
+<span id="_CPPv3N6raisim18ActuatorDefinition13outputDampingE"></span><span id="_CPPv2N6raisim18ActuatorDefinition13outputDampingE"></span><span id="raisim::ActuatorDefinition::outputDamping__double"></span><span class="target" id="structraisim_1_1ActuatorDefinition_1a816d786becdb2a252391903e8c50442c"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">outputDamping</span></span></span><a class="headerlink" href="#_CPPv4N6raisim18ActuatorDefinition13outputDampingE" title="Link to this definition"></a><br /></dt>
+<dd><p>viscous damping of the actuator, measured at its output [Nm s/rad]. It adds to the damping of the joint the actuator drives. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim18ActuatorDefinition14outputFrictionE">
+<span id="_CPPv3N6raisim18ActuatorDefinition14outputFrictionE"></span><span id="_CPPv2N6raisim18ActuatorDefinition14outputFrictionE"></span><span id="raisim::ActuatorDefinition::outputFriction__double"></span><span class="target" id="structraisim_1_1ActuatorDefinition_1a998d07e2649f94a3711f34d04fca0549"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">outputFriction</span></span></span><a class="headerlink" href="#_CPPv4N6raisim18ActuatorDefinition14outputFrictionE" title="Link to this definition"></a><br /></dt>
+<dd><p>Coulomb friction torque of the actuator, measured at its output [Nm]. It adds to the friction of the joint the actuator drives. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16ActuatorCouplingE">
+<span id="_CPPv3N6raisim16ActuatorCouplingE"></span><span id="_CPPv2N6raisim16ActuatorCouplingE"></span><span id="raisim::ActuatorCoupling"></span><span class="target" id="structraisim_1_1ActuatorCoupling"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ActuatorCoupling</span></span></span><a class="headerlink" href="#_CPPv4N6raisim16ActuatorCouplingE" title="Link to this definition"></a><br /></dt>
+<dd><p>A coupling of an actuator’s motor to a joint other than the one the actuator drives (see <a class="reference internal" href="#structraisim_1_1ActuatorDefinition"><span class="std std-ref">ActuatorDefinition</span></a>). </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16ActuatorCoupling5jointE">
+<span id="_CPPv3N6raisim16ActuatorCoupling5jointE"></span><span id="_CPPv2N6raisim16ActuatorCoupling5jointE"></span><span id="raisim::ActuatorCoupling::joint__ss"></span><span class="target" id="structraisim_1_1ActuatorCoupling_1a7dacd615d01ceb8dd41b9388d3db1abd"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">joint</span></span></span><a class="headerlink" href="#_CPPv4N6raisim16ActuatorCoupling5jointE" title="Link to this definition"></a><br /></dt>
+<dd><p>name of the coupled revolute or prismatic joint </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim16ActuatorCoupling5ratioE">
+<span id="_CPPv3N6raisim16ActuatorCoupling5ratioE"></span><span id="_CPPv2N6raisim16ActuatorCoupling5ratioE"></span><span id="raisim::ActuatorCoupling::ratio__double"></span><span class="target" id="structraisim_1_1ActuatorCoupling_1a05e863a7606fdd35edf2385183e50bfd"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ratio</span></span></span><a class="headerlink" href="#_CPPv4N6raisim16ActuatorCoupling5ratioE" title="Link to this definition"></a><br /></dt>
+<dd><p>motor speed per unit speed of the coupled joint [rad/s per rad/s, or rad/s per m/s] </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim13ActuatorStateE">
+<span id="_CPPv3N6raisim13ActuatorStateE"></span><span id="_CPPv2N6raisim13ActuatorStateE"></span><span id="raisim::ActuatorState"></span><span class="target" id="structraisim_1_1ActuatorState"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ActuatorState</span></span></span><a class="headerlink" href="#_CPPv4N6raisim13ActuatorStateE" title="Link to this definition"></a><br /></dt>
+<dd><p>The state of an actuator in the last simulation step, with the motor quantities on the motor (rotor) side of its gear. The region is evaluated at the motor speed at the beginning of the step and the MOR-limited motor torque is constant over the step, so (motorSpeed, motorTorque) is the operating point to compare with the region: motorOperatingRegionViolation(motor, motorSpeed, motorTorque) is zero when the region is enforced (see <a class="reference internal" href="articulated_system/API.html#classraisim_1_1ArticulatedSystem_1a3a968546a36320cc9624b75a31781ba6"><span class="std std-ref">ArticulatedSystem::setActuators()</span></a>). The joint effort limits do not clip actuator torques. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim13ActuatorState10motorSpeedE">
+<span id="_CPPv3N6raisim13ActuatorState10motorSpeedE"></span><span id="_CPPv2N6raisim13ActuatorState10motorSpeedE"></span><span id="raisim::ActuatorState::motorSpeed__double"></span><span class="target" id="structraisim_1_1ActuatorState_1a4a47e983d808f7c1664bb3494930bf35"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">motorSpeed</span></span></span><a class="headerlink" href="#_CPPv4N6raisim13ActuatorState10motorSpeedE" title="Link to this definition"></a><br /></dt>
+<dd><p>motor speed at the beginning of the step [rad/s]; the region of the step is evaluated at it </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim13ActuatorState17averageMotorSpeedE">
+<span id="_CPPv3N6raisim13ActuatorState17averageMotorSpeedE"></span><span id="_CPPv2N6raisim13ActuatorState17averageMotorSpeedE"></span><span id="raisim::ActuatorState::averageMotorSpeed__double"></span><span class="target" id="structraisim_1_1ActuatorState_1a5574c00a0edf7a75691fb54a2680c4b3"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">averageMotorSpeed</span></span></span><a class="headerlink" href="#_CPPv4N6raisim13ActuatorState17averageMotorSpeedE" title="Link to this definition"></a><br /></dt>
+<dd><p>motor speed averaged over the step [rad/s]; motorTorque * averageMotorSpeed is the mechanical power of the motor </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim13ActuatorState20commandedMotorTorqueE">
+<span id="_CPPv3N6raisim13ActuatorState20commandedMotorTorqueE"></span><span id="_CPPv2N6raisim13ActuatorState20commandedMotorTorqueE"></span><span id="raisim::ActuatorState::commandedMotorTorque__double"></span><span class="target" id="structraisim_1_1ActuatorState_1aa1feff39719b4cb4388c34694771dc36"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">commandedMotorTorque</span></span></span><a class="headerlink" href="#_CPPv4N6raisim13ActuatorState20commandedMotorTorqueE" title="Link to this definition"></a><br /></dt>
+<dd><p>motor torque requested with setActuatorTorques() (the actuator torque divided by its gear ratio) [Nm] </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim13ActuatorState11motorTorqueE">
+<span id="_CPPv3N6raisim13ActuatorState11motorTorqueE"></span><span id="_CPPv2N6raisim13ActuatorState11motorTorqueE"></span><span id="raisim::ActuatorState::motorTorque__double"></span><span class="target" id="structraisim_1_1ActuatorState_1ad9e9c8a833aa87311e75282c30c67319"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">motorTorque</span></span></span><a class="headerlink" href="#_CPPv4N6raisim13ActuatorState11motorTorqueE" title="Link to this definition"></a><br /></dt>
+<dd><p>electromagnetic motor torque Kt i [Nm]: the commanded motor torque clipped to the operating region </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim13ActuatorState15jointLossTorqueE">
+<span id="_CPPv3N6raisim13ActuatorState15jointLossTorqueE"></span><span id="_CPPv2N6raisim13ActuatorState15jointLossTorqueE"></span><span id="raisim::ActuatorState::jointLossTorque__double"></span><span class="target" id="structraisim_1_1ActuatorState_1aac29d45fa2cb666e03aafab15e422367"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">jointLossTorque</span></span></span><a class="headerlink" href="#_CPPv4N6raisim13ActuatorState15jointLossTorqueE" title="Link to this definition"></a><br /></dt>
+<dd><p>friction and damping torque on the actuator’s joint over the step [Nm or N, at the joint]: the joint’s own friction and damping plus the output losses of the actuator. It opposes the joint motion. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim13ActuatorState10saturationE">
+<span id="_CPPv3N6raisim13ActuatorState10saturationE"></span><span id="_CPPv2N6raisim13ActuatorState10saturationE"></span><span id="raisim::ActuatorState::saturation__MotorSaturation"></span><span class="target" id="structraisim_1_1ActuatorState_1a024141f32a767a937f00e8f21d900f34"></span><a class="reference internal" href="#_CPPv4N6raisim15MotorSaturationE" title="raisim::MotorSaturation"><span class="n"><span class="pre">MotorSaturation</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">saturation</span></span></span><a class="headerlink" href="#_CPPv4N6raisim13ActuatorState10saturationE" title="Link to this definition"></a><br /></dt>
+<dd><p>the bound that limited the commanded motor torque (NONE if it was admissible) </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim15MotorSaturationE">
+<span id="_CPPv3N6raisim15MotorSaturationE"></span><span id="_CPPv2N6raisim15MotorSaturationE"></span><span class="target" id="namespaceraisim_1a535724655e170d53681dc6e4d63cb672"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">MotorSaturation</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><a class="headerlink" href="#_CPPv4N6raisim15MotorSaturationE" title="Link to this definition"></a><br /></dt>
+<dd><p>The bound of the operating region that limits a motor torque. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim15MotorSaturation4NONEE">
+<span id="_CPPv3N6raisim15MotorSaturation4NONEE"></span><span id="_CPPv2N6raisim15MotorSaturation4NONEE"></span><span class="target" id="namespaceraisim_1a535724655e170d53681dc6e4d63cb672ab50339a10e1de285ac99d4c3990b8693"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NONE</span></span></span><a class="headerlink" href="#_CPPv4N6raisim15MotorSaturation4NONEE" title="Link to this definition"></a><br /></dt>
+<dd><p>the torque is inside the operating region </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim15MotorSaturation11PEAK_TORQUEE">
+<span id="_CPPv3N6raisim15MotorSaturation11PEAK_TORQUEE"></span><span id="_CPPv2N6raisim15MotorSaturation11PEAK_TORQUEE"></span><span class="target" id="namespaceraisim_1a535724655e170d53681dc6e4d63cb672ad4d2441026a55a8e837eb812c385d758"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PEAK_TORQUE</span></span></span><a class="headerlink" href="#_CPPv4N6raisim15MotorSaturation11PEAK_TORQUEE" title="Link to this definition"></a><br /></dt>
+<dd><p>the torque is limited by the peak torque </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim15MotorSaturation7VOLTAGEE">
+<span id="_CPPv3N6raisim15MotorSaturation7VOLTAGEE"></span><span id="_CPPv2N6raisim15MotorSaturation7VOLTAGEE"></span><span class="target" id="namespaceraisim_1a535724655e170d53681dc6e4d63cb672ad19d26898eee98e71fc8b0ad69bb898b"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VOLTAGE</span></span></span><a class="headerlink" href="#_CPPv4N6raisim15MotorSaturation7VOLTAGEE" title="Link to this definition"></a><br /></dt>
+<dd><p>the torque is limited by the bus voltage (back EMF) </p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim17MotorTorqueBoundsE">
+<span id="_CPPv3N6raisim17MotorTorqueBoundsE"></span><span id="_CPPv2N6raisim17MotorTorqueBoundsE"></span><span id="raisim::MotorTorqueBounds"></span><span class="target" id="structraisim_1_1MotorTorqueBounds"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MotorTorqueBounds</span></span></span><a class="headerlink" href="#_CPPv4N6raisim17MotorTorqueBoundsE" title="Link to this definition"></a><br /></dt>
+<dd><p>admissible motor torque interval at a given motor speed </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim17MotorTorqueBounds5lowerE">
+<span id="_CPPv3N6raisim17MotorTorqueBounds5lowerE"></span><span id="_CPPv2N6raisim17MotorTorqueBounds5lowerE"></span><span id="raisim::MotorTorqueBounds::lower__double"></span><span class="target" id="structraisim_1_1MotorTorqueBounds_1a939f26abde6833d9855d7581d0c07b89"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lower</span></span></span><a class="headerlink" href="#_CPPv4N6raisim17MotorTorqueBounds5lowerE" title="Link to this definition"></a><br /></dt>
+<dd><p>lowest admissible motor torque [Nm] </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim17MotorTorqueBounds5upperE">
+<span id="_CPPv3N6raisim17MotorTorqueBounds5upperE"></span><span id="_CPPv2N6raisim17MotorTorqueBounds5upperE"></span><span id="raisim::MotorTorqueBounds::upper__double"></span><span class="target" id="structraisim_1_1MotorTorqueBounds_1ad31d2a577e6f3649dd65721721ce837b"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">upper</span></span></span><a class="headerlink" href="#_CPPv4N6raisim17MotorTorqueBounds5upperE" title="Link to this definition"></a><br /></dt>
+<dd><p>highest admissible motor torque [Nm] </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim17MotorTorqueBounds15lowerSaturationE">
+<span id="_CPPv3N6raisim17MotorTorqueBounds15lowerSaturationE"></span><span id="_CPPv2N6raisim17MotorTorqueBounds15lowerSaturationE"></span><span id="raisim::MotorTorqueBounds::lowerSaturation__MotorSaturation"></span><span class="target" id="structraisim_1_1MotorTorqueBounds_1ae548e4bbd7d45fce04fab1a37cc18825"></span><a class="reference internal" href="#_CPPv4N6raisim15MotorSaturationE" title="raisim::MotorSaturation"><span class="n"><span class="pre">MotorSaturation</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lowerSaturation</span></span></span><a class="headerlink" href="#_CPPv4N6raisim17MotorTorqueBounds15lowerSaturationE" title="Link to this definition"></a><br /></dt>
+<dd><p>bound that limits torques below <code class="docutils literal notranslate"><a class="reference internal" href="#structraisim_1_1MotorTorqueBounds_1a939f26abde6833d9855d7581d0c07b89"><span class="std std-ref"><span class="pre">lower</span></span></a></code></p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim17MotorTorqueBounds15upperSaturationE">
+<span id="_CPPv3N6raisim17MotorTorqueBounds15upperSaturationE"></span><span id="_CPPv2N6raisim17MotorTorqueBounds15upperSaturationE"></span><span id="raisim::MotorTorqueBounds::upperSaturation__MotorSaturation"></span><span class="target" id="structraisim_1_1MotorTorqueBounds_1ad3ebfeea57b75ab8f7f00585b0ee16bd"></span><a class="reference internal" href="#_CPPv4N6raisim15MotorSaturationE" title="raisim::MotorSaturation"><span class="n"><span class="pre">MotorSaturation</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">upperSaturation</span></span></span><a class="headerlink" href="#_CPPv4N6raisim17MotorTorqueBounds15upperSaturationE" title="Link to this definition"></a><br /></dt>
+<dd><p>bound that limits torques above <code class="docutils literal notranslate"><a class="reference internal" href="#structraisim_1_1MotorTorqueBounds_1ad31d2a577e6f3649dd65721721ce837b"><span class="std std-ref"><span class="pre">upper</span></span></a></code></p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<p>The <code class="docutils literal notranslate"><span class="pre">ArticulatedSystem</span></code> methods are documented with the class in <a class="reference internal" href="articulated_system/API.html"><span class="doc">ArticulatedSystem API</span></a>.</p>
+<p>The following free functions work on the motor alone (rotor-side speed and torque, without the
+gear):</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim17motorTorqueBoundsERK17DcMotorParametersd">
+<span id="_CPPv3N6raisim17motorTorqueBoundsERK17DcMotorParametersd"></span><span id="_CPPv2N6raisim17motorTorqueBoundsERK17DcMotorParametersd"></span><span id="raisim::motorTorqueBounds__DcMotorParametersCR.double"></span><span class="target" id="namespaceraisim_1a42452ca1955caa7b8cc056488572260d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim17MotorTorqueBoundsE" title="raisim::MotorTorqueBounds"><span class="n"><span class="pre">MotorTorqueBounds</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">motorTorqueBounds</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim17DcMotorParametersE" title="raisim::DcMotorParameters"><span class="n"><span class="pre">DcMotorParameters</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">motor</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">speed</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim17motorTorqueBoundsERK17DcMotorParametersd" title="Link to this definition"></a><br /></dt>
+<dd><p>Admissible motor torque at motor speed <code class="docutils literal notranslate"><span class="pre">speed</span></code> [rad/s]. Above the speed at which even full reverse voltage cannot keep the current below the peak, the voltage band no longer reaches the peak-torque band: every admissible voltage drives more than the peak current against the back EMF. The saturated core caps the torque at the peak torque, so the interval collapses to the peak torque that opposes the motion (-peak above the forward overspeed, +peak below the reverse one). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>motor</strong> – <strong>[in]</strong> motor parameters </p></li>
+<li><p><strong>speed</strong> – <strong>[in]</strong> motor (rotor-side) speed [rad/s] </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the admissible torque interval and the bound that limits each side </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim17motorTorqueBoundsEdddd">
+<span id="_CPPv3N6raisim17motorTorqueBoundsEdddd"></span><span id="_CPPv2N6raisim17motorTorqueBoundsEdddd"></span><span id="raisim::motorTorqueBounds__double.double.double.double"></span><span class="target" id="namespaceraisim_1a0134da5a3553ef06950dfb77435a370d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim17MotorTorqueBoundsE" title="raisim::MotorTorqueBounds"><span class="n"><span class="pre">MotorTorqueBounds</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">motorTorqueBounds</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stallTorque</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">backEmfDamping</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">peakTorque</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">speed</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim17motorTorqueBoundsEdddd" title="Link to this definition"></a><br /></dt>
+<dd><p><a class="reference internal" href="#namespaceraisim_1a0134da5a3553ef06950dfb77435a370d"><span class="std std-ref">motorTorqueBounds()</span></a> with the motor constants evaluated once: both voltage limits are lines of slope -backEmfDamping through +/-stallTorque. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stallTorque</strong> – <strong>[in]</strong> <a class="reference internal" href="#structraisim_1_1DcMotorParameters_1a784bda4c4ef8335f4ab7950fe433f9b5"><span class="std std-ref">DcMotorParameters::stallTorque()</span></a> [Nm] </p></li>
+<li><p><strong>backEmfDamping</strong> – <strong>[in]</strong> <a class="reference internal" href="#structraisim_1_1DcMotorParameters_1a8e4a19869dd8f6d4e174ee20250573b1"><span class="std std-ref">DcMotorParameters::backEmfDamping()</span></a> [Nm s/rad] </p></li>
+<li><p><strong>peakTorque</strong> – <strong>[in]</strong> <a class="reference internal" href="#structraisim_1_1DcMotorParameters_1a1665fd6f7dc90439d1cf5fa604dd64ee"><span class="std std-ref">DcMotorParameters::peakTorque</span></a> [Nm] </p></li>
+<li><p><strong>speed</strong> – <strong>[in]</strong> motor (rotor-side) speed [rad/s] </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the admissible torque interval and the bound that limits each side </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim15clipMotorTorqueERK17DcMotorParametersddP15MotorSaturation">
+<span id="_CPPv3N6raisim15clipMotorTorqueERK17DcMotorParametersddP15MotorSaturation"></span><span id="_CPPv2N6raisim15clipMotorTorqueERK17DcMotorParametersddP15MotorSaturation"></span><span id="raisim::clipMotorTorque__DcMotorParametersCR.double.double.MotorSaturationP"></span><span class="target" id="namespaceraisim_1a7506a02b0538731ec880d80f4a19902c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">clipMotorTorque</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim17DcMotorParametersE" title="raisim::DcMotorParameters"><span class="n"><span class="pre">DcMotorParameters</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">motor</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">speed</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">torque</span></span>, <a class="reference internal" href="#_CPPv4N6raisim15MotorSaturationE" title="raisim::MotorSaturation"><span class="n"><span class="pre">MotorSaturation</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">saturation</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim15clipMotorTorqueERK17DcMotorParametersddP15MotorSaturation" title="Link to this definition"></a><br /></dt>
+<dd><p>Clips a motor torque request to the operating region at motor speed <code class="docutils literal notranslate"><span class="pre">speed</span></code>. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>motor</strong> – <strong>[in]</strong> motor parameters </p></li>
+<li><p><strong>speed</strong> – <strong>[in]</strong> motor (rotor-side) speed [rad/s] </p></li>
+<li><p><strong>torque</strong> – <strong>[in]</strong> requested motor torque [Nm] </p></li>
+<li><p><strong>saturation</strong> – <strong>[out]</strong> the bound that limited the torque (NONE if the request was admissible) </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the admissible motor torque closest to the request </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim29motorOperatingRegionViolationERK17DcMotorParametersdd">
+<span id="_CPPv3N6raisim29motorOperatingRegionViolationERK17DcMotorParametersdd"></span><span id="_CPPv2N6raisim29motorOperatingRegionViolationERK17DcMotorParametersdd"></span><span id="raisim::motorOperatingRegionViolation__DcMotorParametersCR.double.double"></span><span class="target" id="namespaceraisim_1aa242bd6457ac75dceb80310cde8de3ac"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">motorOperatingRegionViolation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim17DcMotorParametersE" title="raisim::DcMotorParameters"><span class="n"><span class="pre">DcMotorParameters</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">motor</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">speed</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">torque</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim29motorOperatingRegionViolationERK17DcMotorParametersdd" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>motor</strong> – <strong>[in]</strong> motor parameters </p></li>
+<li><p><strong>speed</strong> – <strong>[in]</strong> motor (rotor-side) speed [rad/s] </p></li>
+<li><p><strong>torque</strong> – <strong>[in]</strong> motor torque [Nm] </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>how far [Nm] the torque lies outside the operating region at <code class="docutils literal notranslate"><span class="pre">speed</span></code> (zero inside) </p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="articulated_system/JointDampingAndFriction.html" class="btn btn-neutral float-left" title="Joint Damping and Friction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Sensors.html" class="btn btn-neutral float-right" title="Sensors" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RaiSim Engine 2 &mdash; raisim 2.7.0 documentation</title>
+  <title>RaiSim Engine 2 &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -74,17 +74,17 @@
 <li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul class="current">
@@ -128,10 +128,12 @@
 <h1>RaiSim Engine 2<a class="headerlink" href="#raisim-engine-2" title="Link to this heading"></a></h1>
 <section id="availability">
 <h2>Availability<a class="headerlink" href="#availability" title="Link to this heading"></a></h2>
-<p>RaiSim Engine 2 is an internal, closed-source authoring component. It is not
-part of the public <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> distribution. The public repository does not
-ship Engine 2 executables, headers, libraries, CMake targets, examples, or
-tests, so users cannot build or invoke it from <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code>.</p>
+<p>RaiSim Engine 2 is an internal, closed-source world-authoring tool. It builds
+RaiSim worlds, for example worlds to train in with <a class="reference internal" href="RaisimGymTorch.html"><span class="doc">RaisimGymTorch</span></a>, but it
+does not train policies itself. It is not part of the public <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code>
+distribution. The public repository does not ship Engine 2 executables,
+headers, libraries, CMake targets, examples, or tests, so users cannot build or
+invoke it from <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code>.</p>
 <p>The public package boundary is the downloaded RaiSim and rayrai binaries and
 headers together with the example, wrapper, resource, and documentation sources
 in <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code>. Engine 2 implementation paths and internal build options are
@@ -147,9 +149,15 @@ therefore intentionally not documented as user workflows.</p>
 <li><p>use <a class="reference internal" href="Rayrai.html"><span class="doc">rayrai Visualizer</span></a> or <a class="reference internal" href="RayraiTcpViewer.html"><span class="doc">Rayrai TCP Viewer</span></a> for visualization; and</p></li>
 <li><p>use <a class="reference internal" href="RaisimGymTorch.html"><span class="doc">RaisimGymTorch</span></a> for reinforcement-learning training.</p></li>
 </ul>
-<p><code class="docutils literal notranslate"><span class="pre">.rscene</span></code> and <code class="docutils literal notranslate"><span class="pre">.re2</span></code> are internal Engine 2 formats, not supported public
-interchange formats in the current binary release. See <a class="reference internal" href="RsceneFile.html"><span class="doc">.rscene File</span></a> for
-the public availability boundary.</p>
+<p><code class="docutils literal notranslate"><span class="pre">.re2</span></code> is an internal Engine 2 format. <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> is the scene file Engine 2
+writes. RaiSim and rayrai read it through <code class="docutils literal notranslate"><span class="pre">raisim::World(path)</span></code> and
+<code class="docutils literal notranslate"><span class="pre">raisin::applyRscene</span></code>, available from v2.7.1 (not yet released; the v2.7.0
+package does not include the reader), and show what Engine 2’s viewport
+shows, except articulated systems, compounds, deformables, granular media,
+decals, irradiance volumes and point clouds. <a class="reference internal" href="RsceneFile.html"><span class="doc">.rscene File</span></a> documents the
+format and the supported records, and
+<a class="reference internal" href="examples/rayrai/rayrai_forest_from_rscene.html"><span class="doc">Rayrai Example: Forest From .rscene</span></a> loads a scene file shipped in
+<code class="docutils literal notranslate"><span class="pre">rsc/forest</span></code>.</p>
 </section>
 </section>
 

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Performance &mdash; raisim 2.7.0 documentation</title>
+  <title>Performance &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -83,17 +83,17 @@
 <li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -168,7 +168,7 @@ candidate contacts.</p></td>
 <td><p>Use primitives, height maps, simplified convex collision assets, or cached
 mesh preprocessing where possible. See <a class="reference internal" href="SingleBodyObjects.html"><span class="doc">Single-Body Objects</span></a>.</p></td>
 </tr>
-<tr class="row-even"><td><p>Contact properties</p></td>
+<tr class="row-even"><td><p>Contact count</p></td>
 <td><p>Many articulated bodies touching many other bodies.</p></td>
 <td><p>Remove unnecessary collision shapes and split non-interacting objects with
 collision masks.</p></td>
@@ -204,12 +204,16 @@ not automatically become collision meshes. Prefer this order:</p>
 <li><p>preprocessed convex collision assets for irregular objects;</p></li>
 <li><p>mesh collision only when the task really needs mesh-level contact.</p></li>
 </ol>
-<p>Use <code class="docutils literal notranslate"><span class="pre">World::addMesh</span></code> preprocessing and cache reuse when a mesh collision asset
-is needed repeatedly. For broadphase-heavy scenes, configure
-<code class="docutils literal notranslate"><span class="pre">contact::BroadphaseType::MultiBoxPrune</span></code> with bounds and cell sizes that match
-the active world volume. For very small scenes or debugging, brute-force
-broadphase can be useful, but it should not be the default assumption for large
-worlds.</p>
+<p>When a mesh collision asset is needed repeatedly, reuse the CoACD decomposition
+cache that <code class="docutils literal notranslate"><span class="pre">World::addMesh</span></code> writes and the normalized OBJ cache produced by
+<code class="docutils literal notranslate"><span class="pre">Mesh::preprocessMesh</span></code> (see <a class="reference internal" href="SingleBodyObjects.html"><span class="doc">Single-Body Objects</span></a>). The default broadphase
+is <code class="docutils literal notranslate"><span class="pre">contact::BroadphaseType::Sap3Axis</span></code>. For broadphase-heavy scenes, try
+<code class="docutils literal notranslate"><span class="pre">contact::BroadphaseType::MultiBoxPrune</span></code> through
+<code class="docutils literal notranslate"><span class="pre">World::setBroadphaseSettings</span></code>, with grid bounds and cell sizes
+(<code class="docutils literal notranslate"><span class="pre">mbpWorldMin</span></code>, <code class="docutils literal notranslate"><span class="pre">mbpWorldMax</span></code>, <code class="docutils literal notranslate"><span class="pre">mbpCellSize</span></code>) that match the active world
+volume, and measure both. Scenes with fewer than 35 collision bodies already use
+an all-pairs AABB test regardless of the setting. <code class="docutils literal notranslate"><span class="pre">BroadphaseType::None</span></code>
+skips AABB culling entirely and is only meant for debugging.</p>
 </section>
 <section id="contacts-and-solver-work">
 <h2>Contacts and Solver Work<a class="headerlink" href="#contacts-and-solver-work" title="Link to this heading"></a></h2>
@@ -225,19 +229,22 @@ not matter for the task:</p>
 <li><p>keep timesteps and material parameters within the stability range required by
 the task.</p></li>
 </ul>
-<p><code class="docutils literal notranslate"><span class="pre">World::setContactSolverParam</span></code> exposes solver parameters for advanced users,
+<p><code class="docutils literal notranslate"><span class="pre">World::setContactSolverParam</span></code> exposes solver parameters for advanced users
+(only the maximum iteration count and the termination threshold take effect),
 but it is usually a later step. Reducing redundant contacts tends to be more
-robust than asking the solver to process a harder problem faster.</p>
+robust than asking the solver to process a harder problem faster. See
+<a class="reference internal" href="Contact.html"><span class="doc">Contact and Collision</span></a> for the solver notes.</p>
 </section>
 <section id="sleeping-islands">
 <h2>Sleeping Islands<a class="headerlink" href="#sleeping-islands" title="Link to this heading"></a></h2>
-<p>Sleeping is enabled by default. RaiSim can skip simulation work for dynamic
-islands whose velocities remain below the configured thresholds for 5 consecutive
-steps by default.
-This helps scenes with piles, props, or objects that settle and then stay quiet.</p>
+<p>Sleeping is enabled by default. RaiSim skips simulation work for a dynamic
+island once every body in it stays below the linear (0.002 m/s) and angular
+(0.01 rad/s) speed thresholds for 5 consecutive steps; these are the defaults.
+This helps scenes with piles, props, or objects that settle and then stay quiet.
+Disabling sleeping wakes every sleeping object.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">world</span><span class="p">.</span><span class="n">setSleepingEnabled</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
-<span class="n">world</span><span class="p">.</span><span class="n">setSleepingParameters</span><span class="p">(</span><span class="cm">/*linear*/</span><span class="w"> </span><span class="mf">0.002</span><span class="p">,</span><span class="w"> </span><span class="cm">/*angular*/</span><span class="w"> </span><span class="mf">0.01</span><span class="p">,</span><span class="w"> </span><span class="cm">/*quietSteps*/</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span>
-<span class="n">world</span><span class="p">.</span><span class="n">wakeAll</span><span class="p">();</span>
+<span class="n">world</span><span class="p">.</span><span class="n">setSleepingParameters</span><span class="p">(</span><span class="cm">/*linear*/</span><span class="w"> </span><span class="mf">0.002</span><span class="p">,</span><span class="w"> </span><span class="cm">/*angular*/</span><span class="w"> </span><span class="mf">0.01</span><span class="p">,</span><span class="w"> </span><span class="cm">/*quietSteps*/</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span><span class="w">  </span><span class="c1">// defaults</span>
+<span class="n">world</span><span class="p">.</span><span class="n">wakeAll</span><span class="p">();</span><span class="w">  </span><span class="c1">// wake every object on the next step</span>
 </pre></div>
 </div>
 <p>Disable sleeping when every object must remain numerically active every step, or
@@ -257,7 +264,7 @@ mode and run timing commands on one thread:</p>
 <span class="w">    </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-DRAISIM_EXAMPLE<span class="o">=</span>ON
 cmake<span class="w"> </span>--build<span class="w"> </span>build-examples<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--target<span class="w"> </span>anymal_standing_benchmark<span class="w"> </span>articulated_system_benchmark<span class="w"> </span>-j12
+<span class="w">    </span>--target<span class="w"> </span>anymal_standing_benchmark<span class="w"> </span>articulated_system_benchmark<span class="w"> </span>--parallel<span class="w"> </span><span class="m">12</span>
 <span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>./build-examples/examples/anymal_standing_benchmark<span class="w"> </span>--fast
 <span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
@@ -265,7 +272,9 @@ cmake<span class="w"> </span>--build<span class="w"> </span>build-examples<span 
 </pre></div>
 </div>
 <p>The public workspace does not install these example executables; run them from
-the build tree shown above.</p>
+the build tree shown above (<code class="docutils literal notranslate"><span class="pre">build-examples\bin</span></code> on Windows).
+<code class="docutils literal notranslate"><span class="pre">--fast</span></code> caps <code class="docutils literal notranslate"><span class="pre">anymal_standing_benchmark</span></code> at 20,000 steps; <code class="docutils literal notranslate"><span class="pre">--steps=N</span></code>
+sets the step count explicitly.</p>
 <p>Public timing and visualization examples include:</p>
 <table class="docutils align-default">
 <colgroup>
@@ -305,7 +314,7 @@ parallel is an application-level design choice; it is different from changing th
 deterministic stepping behavior of one <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code>.</p>
 <p><code class="docutils literal notranslate"><span class="pre">World::setContactSolverIterationOrder(order)</span></code> sets the starting sweep
 direction for the next contact solve. The solver flips the stored direction
-after each solve, so reset it before each measured step only if the experiment
+after each solve, so call it before each measured step only if the experiment
 requires the same starting sweep every time. For reproducible benchmark numbers,
 also control random seeds in the benchmark or application, keep visualization
 disabled unless measured, and pin the same benchmark arguments.</p>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Determinism &mdash; raisim 2.7.0 documentation</title>
+  <title>Determinism &mdash; raisim 2.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dfec817d"></script>
+      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -74,17 +74,17 @@
 <li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#length-constraints-use-tendons">Length constraints use tendons</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#migrating-the-former-wire-api">Migrating the former wire API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Constraints.html#pin-constraints">Pin constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Sensors.html">Sensors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Related software</span></p>
 <ul>
@@ -122,8 +122,23 @@
              
   <section id="determinism">
 <h1>Determinism<a class="headerlink" href="#determinism" title="Link to this heading"></a></h1>
-<p>RaiSim can achieve full determinism by defining the iteration order of the contact solver.
-This order is configured via <code class="docutils literal notranslate"><span class="pre">raisim::World::setContactSolverIterationOrder</span></code>.</p>
+<p>A RaiSim world is deterministic: stepping the same world from the same state
+with the same inputs reproduces the same trajectory. The one piece of state that
+is easy to overlook is the contact solver’s sweep direction. The solver
+alternates between forward and backward sweeps through the contacts and flips
+the direction after every solve, so the result of a step also depends on how
+many solves preceded it.</p>
+<p>To make a step depend only on the world state, set the direction explicitly
+with <code class="docutils literal notranslate"><span class="pre">raisim::World::setContactSolverIterationOrder(order)</span></code> before stepping,
+for example after resetting a world to an initial state or before each step of
+a rollout that must match another one. <code class="docutils literal notranslate"><span class="pre">World::captureCheckpoint()</span></code> and
+<code class="docutils literal notranslate"><span class="pre">restoreCheckpoint()</span></code> save and restore the solver direction together with the
+rest of the world state, so a replay from a restored checkpoint follows the
+original run. See <a class="reference internal" href="WorldSystem.html"><span class="doc">World</span></a> for both APIs.</p>
+<p>Bit-identical results are expected for repeated runs of the same program with
+the same RaiSim library. Different builds, compilers, or CPU architectures can
+round floating-point operations differently and produce slightly different
+trajectories.</p>
 <p>Determinism is critical for two primary reasons.
 First, it permits precise control over simulation stochasticity.
 This facilitates the implementation of numerous sampling-based stochastic optimal control methods.
