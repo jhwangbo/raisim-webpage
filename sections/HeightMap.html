@@ -17,6 +17,7 @@
       <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -82,6 +83,8 @@
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Height Map</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#position-and-orientation">Position and orientation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#querying-the-surface">Querying the surface</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#runtime-updates">Runtime updates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example">Example</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="HeightMap_example_png.html">Height Map Using a PNG File</a></li>
@@ -144,15 +147,40 @@
   <section id="height-map">
 <h1>Height Map<a class="headerlink" href="#height-map" title="Link to this heading"></a></h1>
 <p>A height map is a grid of points that are triangulated to form a surface.
-Since it is axis-aligned, collision checking is very efficient and it is a recommended way to create terrain.
+Because the surface over any point is found directly from the grid, collision checking is very
+efficient, and it is the recommended way to create terrain.
 A height map is always a static object. Height samples are stored row by row:
 the sample at grid index <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> is <code class="docutils literal notranslate"><span class="pre">height[y</span> <span class="pre">*</span> <span class="pre">xSamples</span> <span class="pre">+</span> <span class="pre">x]</span></code>.</p>
-<p>Heightmap collision requires identity orientation. Translating a heightmap is
-supported: <code class="docutils literal notranslate"><span class="pre">setPosition(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code> moves its center to <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> and offsets
-all heights by <code class="docutils literal notranslate"><span class="pre">z</span></code>. <code class="docutils literal notranslate"><span class="pre">setOrientation</span></code> accepts only the identity, and
-collision detection raises a fatal error and terminates the simulation process
-if a heightmap is rotated. These checks are active in every build
-configuration. Use a mesh when the terrain surface itself must be rotated.</p>
+<section id="position-and-orientation">
+<h2>Position and orientation<a class="headerlink" href="#position-and-orientation" title="Link to this heading"></a></h2>
+<p>The grid lives in the height map’s own frame: the center of the grid is the
+origin and the heights rise along the local z axis. <code class="docutils literal notranslate"><span class="pre">setPosition(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code>
+moves the center to <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> and offsets all heights by <code class="docutils literal notranslate"><span class="pre">z</span></code>.
+<code class="docutils literal notranslate"><span class="pre">setOrientation(...)</span></code> rotates the map about its center: with the center
+<span class="math notranslate nohighlight">\(\boldsymbol{c}\)</span> and the rotation <span class="math notranslate nohighlight">\(\boldsymbol{R}\)</span>, the point
+<span class="math notranslate nohighlight">\(\boldsymbol{p}\)</span> of the unrotated (translated) map lies at
+<span class="math notranslate nohighlight">\(\boldsymbol{c} + \boldsymbol{R}(\boldsymbol{p} - \boldsymbol{c})\)</span> in the world.
+Any rotation is allowed: a tilted map is a slope, a map rotated 90 degrees about x is a wall,
+and one rotated 180 degrees is a ceiling. A world XML file sets the orientation with the
+<code class="docutils literal notranslate"><span class="pre">quat</span></code> attribute of the height map.</p>
+<a class="reference internal image-reference" href="../_images/heightmap_rotation.png"><img alt="A rough height map tilted into a slope and a bumpy height map stood up as a wall" src="../_images/heightmap_rotation.png" style="width: 100%;" />
+</a>
+<p>Two rotated height maps: a slope tilted 20 degrees and a wall at its foot. The
+box and the cylinder rest on the slope, held by friction, while the ball (its
+descent shown light to dark), the capsule and the small sphere roll and slide
+down and stop against the wall.</p>
+<p>Everything that touches the surface follows the orientation: contacts with
+every shape, ray tests and the sensors built on them, swept CCD, granular
+particles, and rendering in rayrai and the TCP viewer. A scene on a rotated map
+moves like the same scene on the unrotated map, with every body and gravity
+rotated along with it; the two agree to rounding error. A height map is one-sided whatever its
+orientation: everything below the surface, along the local -z axis, is inside
+the terrain, and a body that ends up there is pushed back out through the
+surface. The <code class="docutils literal notranslate"><span class="pre">rotated_blocky_heightmap_drop</span></code> example (see <a class="reference internal" href="Examples.html"><span class="doc">Examples</span></a>) tilts a map by
+15 degrees.</p>
+</section>
+<section id="querying-the-surface">
+<h2>Querying the surface<a class="headerlink" href="#querying-the-surface" title="Link to this heading"></a></h2>
 <p>You can query the surface at a world-frame <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> position:</p>
 <ul class="simple">
 <li><p>height: <code class="code docutils literal notranslate"><span class="pre">getHeight(x,</span> <span class="pre">y)</span></code> (visual height) and
@@ -160,7 +188,30 @@ configuration. Use a mesh when the terrain surface itself must be rotated.</p>
 a visual-only update)</p></li>
 <li><p>normal vector: <code class="code docutils literal notranslate"><span class="pre">getNormal(x,</span> <span class="pre">y,</span> <span class="pre">normal)</span></code> (collision surface, written to
 the output argument)</p></li>
+<li><p>color: <code class="code docutils literal notranslate"><span class="pre">getColor(x,</span> <span class="pre">y)</span></code></p></li>
 </ul>
+<p>These queries ignore the orientation by design: they read the height field as if only the
+translation were applied, so <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> addresses the grid directly whether or not the map is
+rotated. To evaluate a rotated map, query its unrotated coordinates and rotate the result:</p>
+<ul class="simple">
+<li><p>the surface point above <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> of the unrotated map is
+<span class="math notranslate nohighlight">\(\boldsymbol{c} + \boldsymbol{R}\,((x, y, h) - \boldsymbol{c})\)</span> with
+<span class="math notranslate nohighlight">\(h\)</span> = <code class="code docutils literal notranslate"><span class="pre">getHeight(x,</span> <span class="pre">y)</span></code>, and its normal is <span class="math notranslate nohighlight">\(\boldsymbol{R}\)</span> times the
+result of <code class="code docutils literal notranslate"><span class="pre">getNormal(x,</span> <span class="pre">y,</span> <span class="pre">normal)</span></code>;</p></li>
+<li><p>a world point <span class="math notranslate nohighlight">\(\boldsymbol{w}\)</span> has the unrotated coordinates
+<span class="math notranslate nohighlight">\(\boldsymbol{c} + \boldsymbol{R}^T(\boldsymbol{w} - \boldsymbol{c})\)</span>; it is above
+the surface if their z exceeds <code class="code docutils literal notranslate"><span class="pre">getHeight</span></code> at their x and y.</p></li>
+</ul>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// the point 0.5 m above the rotated surface at the unrotated map&#39;s (x, y)</span>
+<span class="k">const</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">heightMap</span><span class="o">-&gt;</span><span class="n">getPosition</span><span class="p">();</span>
+<span class="k">const</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Matrix3d</span><span class="w"> </span><span class="n">R</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">heightMap</span><span class="o">-&gt;</span><span class="n">getRotationMatrix</span><span class="p">();</span>
+<span class="n">raisim</span><span class="o">::</span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="n">normal</span><span class="p">;</span>
+<span class="n">heightMap</span><span class="o">-&gt;</span><span class="n">getNormal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">normal</span><span class="p">);</span>
+<span class="k">const</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span><span class="w"> </span><span class="n">surface</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">R</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">heightMap</span><span class="o">-&gt;</span><span class="n">getHeight</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">))</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">c</span><span class="p">);</span>
+<span class="k">const</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span><span class="w"> </span><span class="n">above</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">surface</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">R</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">normal</span><span class="p">.</span><span class="n">e</span><span class="p">();</span>
+</pre></div>
+</div>
+</section>
 <section id="runtime-updates">
 <h2>Runtime updates<a class="headerlink" href="#runtime-updates" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">update(...)</span></code> changes the visual and collision height data; it cannot change
@@ -209,7 +260,8 @@ range.</p>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9HeightMapE">
 <span id="_CPPv3N6raisim9HeightMapE"></span><span id="_CPPv2N6raisim9HeightMapE"></span><span id="raisim::HeightMap"></span><span class="target" id="classraisim_1_1HeightMap"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HeightMap</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="SingleBodyObjects.html#_CPPv4N6raisim16SingleBodyObjectE" title="raisim::SingleBodyObject"><span class="n"><span class="pre">SingleBodyObject</span></span></a><a class="headerlink" href="#_CPPv4N6raisim9HeightMapE" title="Link to this definition"></a><br /></dt>
-<dd><p>A static terrain defined by a regular grid of heights (create it with <a class="reference internal" href="WorldSystem.html#classraisim_1_1World_1a54061aae9f815014622cba1bdb13ca12"><span class="std std-ref">World::addHeightMap()</span></a>). The grid covers [centerX - xSize/2, centerX + xSize/2] x [centerY - ySize/2, centerY + ySize/2]; sample (x, y) is stored at index y * xSamples + x, with index 0 at the minimum x and y. Heights are interpolated over two triangles per cell. Translation is supported; rotation is not. </p>
+<dd><p>A static terrain defined by a regular grid of heights (create it with <a class="reference internal" href="WorldSystem.html#classraisim_1_1World_1a54061aae9f815014622cba1bdb13ca12"><span class="std std-ref">World::addHeightMap()</span></a>). The grid covers [centerX - xSize/2, centerX + xSize/2] x [centerY - ySize/2, centerY + ySize/2]; sample (x, y) is stored at index y * xSamples + x, with index 0 at the minimum x and y. Height samples may be NaN or infinity and are stored without filtering. Heights are interpolated over two triangles per cell.</p>
+<p>The heightmap can be translated and rotated arbitrarily (<a class="reference internal" href="#classraisim_1_1HeightMap_1acef70a45075b4fccd4d65be2cb78d499"><span class="std std-ref">setPosition()</span></a>, <a class="reference internal" href="#classraisim_1_1HeightMap_1a1c6df249ae8a4ea416315dc38f9132af"><span class="std std-ref">setOrientation()</span></a>); the grid then lies in the heightmap’s own frame, whose origin is the center and whose +z is the “up” side of the surface. Collision, ray tests and rendering follow the rotation. The point queries (<a class="reference internal" href="#classraisim_1_1HeightMap_1a5036590f8600ea5f5523fd3d0ba54141"><span class="std std-ref">getHeight()</span></a>, <a class="reference internal" href="#classraisim_1_1HeightMap_1a56739ca9eb7d5be2653dfd76ea96c4da"><span class="std std-ref">getContactHeight()</span></a>, <a class="reference internal" href="#classraisim_1_1HeightMap_1a4f3782f78c2b453c78e0ee5ecc9602b9"><span class="std std-ref">getNormal()</span></a>, <a class="reference internal" href="#classraisim_1_1HeightMap_1ad5d6b6872c3754b566b81acb9290cd24"><span class="std std-ref">getColor()</span></a>) do not: they always treat the orientation as the identity, as if only the translation were applied. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
@@ -259,7 +311,7 @@ range.</p>
 <li><p><strong>ySize</strong> – <strong>[in]</strong> size in y (m) </p></li>
 <li><p><strong>centerX</strong> – <strong>[in]</strong> x coordinate of the center in the world frame (m) </p></li>
 <li><p><strong>centerY</strong> – <strong>[in]</strong> y coordinate of the center in the world frame (m) </p></li>
-<li><p><strong>height</strong> – <strong>[in]</strong> xSamples*ySamples finite heights, indexed y * xSamples + x (m) </p></li>
+<li><p><strong>height</strong> – <strong>[in]</strong> xSamples*ySamples heights, indexed y * xSamples + x (m). NaN and infinity are copied unchanged. </p></li>
 </ul>
 </dd>
 </dl>
@@ -278,7 +330,7 @@ range.</p>
 <li><p><strong>ySize</strong> – <strong>[in]</strong> size in y (m) </p></li>
 <li><p><strong>centerX</strong> – <strong>[in]</strong> x coordinate of the center in the world frame (m) </p></li>
 <li><p><strong>centerY</strong> – <strong>[in]</strong> y coordinate of the center in the world frame (m) </p></li>
-<li><p><strong>heightIn</strong> – <strong>[in]</strong> xSamples*ySamples finite heights, indexed y * xSamples + x (m) </p></li>
+<li><p><strong>heightIn</strong> – <strong>[in]</strong> xSamples*ySamples heights, indexed y * xSamples + x (m). NaN and infinity are copied unchanged. </p></li>
 </ul>
 </dd>
 </dl>
@@ -295,7 +347,7 @@ range.</p>
 <li><p><strong>ySize</strong> – <strong>[in]</strong> size in y (m) </p></li>
 <li><p><strong>centerX</strong> – <strong>[in]</strong> x coordinate of the center in the world frame (m) </p></li>
 <li><p><strong>centerY</strong> – <strong>[in]</strong> y coordinate of the center in the world frame (m) </p></li>
-<li><p><strong>heightIn</strong> – <strong>[in]</strong> heights; heightIn(i, j) is the sample at x index i and y index j (m) </p></li>
+<li><p><strong>heightIn</strong> – <strong>[in]</strong> heights; heightIn(i, j) is the sample at x index i and y index j (m). NaN and infinity are copied unchanged. </p></li>
 </ul>
 </dd>
 </dl>
@@ -334,15 +386,15 @@ range.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9HeightMap6updateEddddRKNSt6vectorIdEE">
 <span id="_CPPv3N6raisim9HeightMap6updateEddddRKNSt6vectorIdEE"></span><span id="_CPPv2N6raisim9HeightMap6updateEddddRKNSt6vectorIdEE"></span><span id="raisim::HeightMap::update__double.double.double.double.std::vector:double:CR"></span><span class="target" id="classraisim_1_1HeightMap_1a343ed534f8f6ed3b996c4d6a638039f6"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">update</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">centerX</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">centerY</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sizeX</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sizeY</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">height</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim9HeightMap6updateEddddRKNSt6vectorIdEE" title="Link to this definition"></a><br /></dt>
-<dd><p>Update the existing heightmap with a new terrain properties. The size should be the same. You cannot change the topology. If you want to create a new topology, delete an old one and make a new heightmap. </p>
+<dd><p>Update the existing heightmap and rebuild its collision surface. The sample count is fixed; recreate the heightmap to change its topology. Height samples may be NaN or infinity and are copied without filtering. Invalid sample count or geometry leaves the previous state unchanged. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>centerX</strong> – <strong>[in]</strong> center of the heightmap </p></li>
-<li><p><strong>centerY</strong> – <strong>[in]</strong> center of the heightmap Invalid input is ignored with a warning (the previous state is kept). The collision surface is rebuilt. </p></li>
+<li><p><strong>centerY</strong> – <strong>[in]</strong> center of the heightmap </p></li>
 <li><p><strong>sizeX</strong> – <strong>[in]</strong> height map size in the x direction </p></li>
 <li><p><strong>sizeY</strong> – <strong>[in]</strong> height map size in the y direction </p></li>
-<li><p><strong>height</strong> – <strong>[in]</strong> height samples, height[y * xSamples + x]; must have exactly xSamples*ySamples finite values </p></li>
+<li><p><strong>height</strong> – <strong>[in]</strong> height samples, height[y * xSamples + x]; must have exactly xSamples*ySamples values. NaN and infinity samples are copied unchanged. </p></li>
 </ul>
 </dd>
 </dl>
@@ -351,7 +403,7 @@ range.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9HeightMap18updateVisualHeightEddddRKNSt6vectorIdEE">
 <span id="_CPPv3N6raisim9HeightMap18updateVisualHeightEddddRKNSt6vectorIdEE"></span><span id="_CPPv2N6raisim9HeightMap18updateVisualHeightEddddRKNSt6vectorIdEE"></span><span id="raisim::HeightMap::updateVisualHeight__double.double.double.double.std::vector:double:CR"></span><span class="target" id="classraisim_1_1HeightMap_1a586fd009dc77916c4558297648f9d805"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">updateVisualHeight</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">centerX</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">centerY</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sizeX</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sizeY</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">height</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim9HeightMap18updateVisualHeightEddddRKNSt6vectorIdEE" title="Link to this definition"></a><br /></dt>
-<dd><p>Update height samples for visualization/server synchronization without rebuilding the contact heightmap used by physics. Call update(…) when collision must be synchronized immediately. The center and size must equal the current ones (otherwise the call is ignored with a warning). </p>
+<dd><p>Update height samples for visualization/server synchronization without rebuilding the contact heightmap used by physics. Call update(…) when collision must be synchronized immediately. Height samples may be NaN or infinity; they are copied without filtering. The center and size must equal the current ones (otherwise the call is ignored with a warning). </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -359,7 +411,7 @@ range.</p>
 <li><p><strong>centerY</strong> – <strong>[in]</strong> current center y (m) </p></li>
 <li><p><strong>sizeX</strong> – <strong>[in]</strong> current size in x (m) </p></li>
 <li><p><strong>sizeY</strong> – <strong>[in]</strong> current size in y (m) </p></li>
-<li><p><strong>height</strong> – <strong>[in]</strong> new height samples, height[y * xSamples + x] </p></li>
+<li><p><strong>height</strong> – <strong>[in]</strong> new height samples, height[y * xSamples + x]; NaN and infinity are copied unchanged </p></li>
 </ul>
 </dd>
 </dl>
@@ -368,7 +420,7 @@ range.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9HeightMap23updateVisualHeightPatchEddddRKNSt6vectorIdEEd6size_t6size_t6size_t6size_t">
 <span id="_CPPv3N6raisim9HeightMap23updateVisualHeightPatchEddddRKNSt6vectorIdEEd6size_t6size_t6size_t6size_t"></span><span id="_CPPv2N6raisim9HeightMap23updateVisualHeightPatchEddddRKNSt6vectorIdEEd6size_t6size_t6size_t6size_t"></span><span id="raisim::HeightMap::updateVisualHeightPatch__double.double.double.double.std::vector:double:CR.double.s.s.s.s"></span><span class="target" id="classraisim_1_1HeightMap_1ad3fac1cd92e00c7ef611e76eaeff9483"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">updateVisualHeightPatch</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">centerX</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">centerY</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sizeX</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sizeY</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">height</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">heightOffset</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">minX</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxX</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">minY</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxY</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim9HeightMap23updateVisualHeightPatchEddddRKNSt6vectorIdEEd6size_t6size_t6size_t6size_t" title="Link to this definition"></a><br /></dt>
-<dd><p>Update a rectangular sample patch for visualization without copying/rebuilding the whole heightmap or its contact data. Sample bounds are inclusive and clamped to the grid. </p>
+<dd><p>Update a rectangular sample patch for visualization without copying/rebuilding the whole heightmap or its contact data. Sample bounds are inclusive and clamped to the grid. Patch samples and resulting values may be NaN or infinity; they are stored without filtering. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -377,7 +429,7 @@ range.</p>
 <li><p><strong>sizeX</strong> – <strong>[in]</strong> current size in x (must match exactly) </p></li>
 <li><p><strong>sizeY</strong> – <strong>[in]</strong> current size in y (must match exactly) </p></li>
 <li><p><strong>height</strong> – <strong>[in]</strong> full-size height vector (at least xSamples*ySamples, indexed y * xSamples + x); only the patch is read </p></li>
-<li><p><strong>heightOffset</strong> – <strong>[in]</strong> offset added to every copied sample </p></li>
+<li><p><strong>heightOffset</strong> – <strong>[in]</strong> offset added to every copied sample; non-finite results are retained </p></li>
 <li><p><strong>minX</strong> – <strong>[in]</strong> first x sample index </p></li>
 <li><p><strong>maxX</strong> – <strong>[in]</strong> last x sample index </p></li>
 <li><p><strong>minY</strong> – <strong>[in]</strong> first y sample index </p></li>
@@ -385,7 +437,7 @@ range.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>false (and no change) if the geometry does not match, the patch is empty or a value is non-finite </p>
+<dd class="field-even"><p>false (and no change) if the geometry does not match or the patch is empty </p>
 </dd>
 </dl>
 </dd></dl>
@@ -422,7 +474,7 @@ range.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim9HeightMap9getHeightEdd">
 <span id="_CPPv3NK6raisim9HeightMap9getHeightEdd"></span><span id="_CPPv2NK6raisim9HeightMap9getHeightEdd"></span><span id="raisim::HeightMap::getHeight__double.doubleC"></span><span class="target" id="classraisim_1_1HeightMap_1a5036590f8600ea5f5523fd3d0ba54141"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getHeight</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim9HeightMap9getHeightEdd" title="Link to this definition"></a><br /></dt>
-<dd><p>Get visual height at a given coordinate. After a visual-only update this can intentionally differ from the collision surface. Points outside the map use the nearest edge samples. </p>
+<dd><p>Get visual height at a given coordinate. After a visual-only update this can intentionally differ from the collision surface. Points outside the map use the nearest edge samples. The orientation is ignored: the result is the height of the unrotated heightmap at its current position. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -439,7 +491,7 @@ range.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim9HeightMap16getContactHeightEdd">
 <span id="_CPPv3NK6raisim9HeightMap16getContactHeightEdd"></span><span id="_CPPv2NK6raisim9HeightMap16getContactHeightEdd"></span><span id="raisim::HeightMap::getContactHeight__double.doubleC"></span><span class="target" id="classraisim_1_1HeightMap_1a56739ca9eb7d5be2653dfd76ea96c4da"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getContactHeight</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim9HeightMap16getContactHeightEdd" title="Link to this definition"></a><br /></dt>
-<dd><p>Get the collision-surface height at a given coordinate (same interpolation as <a class="reference internal" href="#classraisim_1_1HeightMap_1a5036590f8600ea5f5523fd3d0ba54141"><span class="std std-ref">getHeight()</span></a>). </p>
+<dd><p>Get the collision-surface height at a given coordinate (same interpolation as <a class="reference internal" href="#classraisim_1_1HeightMap_1a5036590f8600ea5f5523fd3d0ba54141"><span class="std std-ref">getHeight()</span></a>). Like <a class="reference internal" href="#classraisim_1_1HeightMap_1a5036590f8600ea5f5523fd3d0ba54141"><span class="std std-ref">getHeight()</span></a>, this ignores the orientation. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -456,7 +508,7 @@ range.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim9HeightMap9getNormalEddR3VecIXL3EEE">
 <span id="_CPPv3NK6raisim9HeightMap9getNormalEddR3VecIXL3EEE"></span><span id="_CPPv2NK6raisim9HeightMap9getNormalEddR3VecIX3EE"></span><span id="raisim::HeightMap::getNormal__double.double.Vec:3:RC"></span><span class="target" id="classraisim_1_1HeightMap_1a4f3782f78c2b453c78e0ee5ecc9602b9"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getNormal</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span>, <span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">normal</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim9HeightMap9getNormalEddR3VecIXL3EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>Get the collision-surface normal at a given coordinate </p>
+<dd><p>Get the collision-surface normal at a given coordinate. Like <a class="reference internal" href="#classraisim_1_1HeightMap_1a5036590f8600ea5f5523fd3d0ba54141"><span class="std std-ref">getHeight()</span></a>, this ignores the orientation. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -648,10 +700,10 @@ range.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9HeightMap14setOrientationERKN5Eigen11QuaterniondE">
 <span id="_CPPv3N6raisim9HeightMap14setOrientationERKN5Eigen11QuaterniondE"></span><span id="_CPPv2N6raisim9HeightMap14setOrientationERKN5Eigen11QuaterniondE"></span><span id="raisim::HeightMap::setOrientation__Eigen::QuaterniondCR"></span><span class="target" id="classraisim_1_1HeightMap_1a1c6df249ae8a4ea416315dc38f9132af"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setOrientation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Quaterniond</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quaternion</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim9HeightMap14setOrientationERKN5Eigen11QuaterniondE" title="Link to this definition"></a><br /></dt>
-<dd><p>Only the identity orientation is accepted (fatal error otherwise). </p>
+<dd><p>Set the orientation; the grid rotates about the heightmap center. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>quaternion</strong> – <strong>[in]</strong> must be the identity </p>
+<dd class="field-odd"><p><strong>quaternion</strong> – <strong>[in]</strong> orientation </p>
 </dd>
 </dl>
 </dd></dl>
@@ -659,10 +711,10 @@ range.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9HeightMap14setOrientationERKN5Eigen8Vector4dE">
 <span id="_CPPv3N6raisim9HeightMap14setOrientationERKN5Eigen8Vector4dE"></span><span id="_CPPv2N6raisim9HeightMap14setOrientationERKN5Eigen8Vector4dE"></span><span id="raisim::HeightMap::setOrientation__Eigen::Vector4dCR"></span><span class="target" id="classraisim_1_1HeightMap_1af1b05a422014a9b8400c337db55ee1b0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setOrientation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector4d</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quaternion</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim9HeightMap14setOrientationERKN5Eigen8Vector4dE" title="Link to this definition"></a><br /></dt>
-<dd><p>Only the identity orientation is accepted (fatal error otherwise). </p>
+<dd><p>Set the orientation; the grid rotates about the heightmap center. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>quaternion</strong> – <strong>[in]</strong> must be the identity (w, x, y, z) </p>
+<dd class="field-odd"><p><strong>quaternion</strong> – <strong>[in]</strong> orientation (w, x, y, z) </p>
 </dd>
 </dl>
 </dd></dl>
@@ -670,10 +722,10 @@ range.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9HeightMap14setOrientationERK3VecIXL4EEE">
 <span id="_CPPv3N6raisim9HeightMap14setOrientationERK3VecIXL4EEE"></span><span id="_CPPv2N6raisim9HeightMap14setOrientationERK3VecIX4EE"></span><span id="raisim::HeightMap::setOrientation__Vec:4:CR"></span><span class="target" id="classraisim_1_1HeightMap_1a2dee8c928c847d725e4640e299c22b02"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setOrientation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">4</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quaternion</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim9HeightMap14setOrientationERK3VecIXL4EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>Only the identity orientation is accepted (fatal error otherwise). </p>
+<dd><p>Set the orientation; the grid rotates about the heightmap center. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>quaternion</strong> – <strong>[in]</strong> must be the identity (w, x, y, z) </p>
+<dd class="field-odd"><p><strong>quaternion</strong> – <strong>[in]</strong> orientation (w, x, y, z) </p>
 </dd>
 </dl>
 </dd></dl>
@@ -681,7 +733,7 @@ range.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9HeightMap14setOrientationEdddd">
 <span id="_CPPv3N6raisim9HeightMap14setOrientationEdddd"></span><span id="_CPPv2N6raisim9HeightMap14setOrientationEdddd"></span><span id="raisim::HeightMap::setOrientation__double.double.double.double"></span><span class="target" id="classraisim_1_1HeightMap_1a6b987379eecb0c70b21c816517359ae0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setOrientation</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">w</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">z</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim9HeightMap14setOrientationEdddd" title="Link to this definition"></a><br /></dt>
-<dd><p>Only the identity orientation is accepted (fatal error otherwise). </p>
+<dd><p>Set the orientation; the grid rotates about the heightmap center. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -697,10 +749,10 @@ range.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9HeightMap14setOrientationERKN5Eigen8Matrix3dE">
 <span id="_CPPv3N6raisim9HeightMap14setOrientationERKN5Eigen8Matrix3dE"></span><span id="_CPPv2N6raisim9HeightMap14setOrientationERKN5Eigen8Matrix3dE"></span><span id="raisim::HeightMap::setOrientation__Eigen::Matrix3dCR"></span><span class="target" id="classraisim_1_1HeightMap_1ae0ba12e4f3c18a4b0019cea76436f36f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setOrientation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Matrix3d</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rotationMatrix</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim9HeightMap14setOrientationERKN5Eigen8Matrix3dE" title="Link to this definition"></a><br /></dt>
-<dd><p>Only the identity orientation is accepted (fatal error otherwise). </p>
+<dd><p>Set the orientation; the grid rotates about the heightmap center. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>rotationMatrix</strong> – <strong>[in]</strong> must be the identity </p>
+<dd class="field-odd"><p><strong>rotationMatrix</strong> – <strong>[in]</strong> orientation (heightmap frame to world) </p>
 </dd>
 </dl>
 </dd></dl>
@@ -750,7 +802,7 @@ range.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim9HeightMap8getColorEdd">
 <span id="_CPPv3NK6raisim9HeightMap8getColorEdd"></span><span id="_CPPv2NK6raisim9HeightMap8getColorEdd"></span><span id="raisim::HeightMap::getColor__double.doubleC"></span><span class="target" id="classraisim_1_1HeightMap_1ad5d6b6872c3754b566b81acb9290cd24"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">ColorRGB</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getColor</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim9HeightMap8getColorEdd" title="Link to this definition"></a><br /></dt>
-<dd><p>Returns color of the heightmap at specified point. The color from an RGB camera can be different from this because this is the base color and lighting changes the appearance. </p>
+<dd><p>Returns color of the heightmap at specified point. The color from an RGB camera can be different from this because this is the base color and lighting changes the appearance. Like <a class="reference internal" href="#classraisim_1_1HeightMap_1a5036590f8600ea5f5523fd3d0ba54141"><span class="std std-ref">getHeight()</span></a>, this ignores the orientation. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

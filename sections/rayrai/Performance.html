@@ -1081,7 +1081,7 @@ renderer’s object lists must be current before the next render.</p></li>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>albedoPath</strong> – Secondary albedo image (sRGB); reloaded only when the path changes. </p></li>
-<li><p><strong>controlTexId</strong> – Single-channel control texture (e.g. from <a class="reference internal" href="#classraisin_1_1RayraiWindow_1ad77668e9aed9e42ad8484796d7f1ef72"><span class="std std-ref">updateSingleChannelTexture()</span></a>); its red channel is the secondary weight (0 = primary only, 1 = secondary only). Not owned. </p></li>
+<li><p><strong>controlTexId</strong> – Single-channel control texture (e.g. from <a class="reference internal" href="#classraisin_1_1RayraiWindow_1ad77668e9aed9e42ad8484796d7f1ef72"><span class="std std-ref">updateSingleChannelTexture()</span></a>); its red channel is the secondary weight (0 = primary only, 1 = secondary only). Not owned. All coordinates below are world XY of the terrain as if it were unrotated (its translation applied, its orientation ignored), like <a class="reference internal" href="../HeightMap.html#classraisim_1_1HeightMap_1a5036590f8600ea5f5523fd3d0ba54141"><span class="std std-ref">raisim::HeightMap::getHeight()</span></a>; for a rotated heightmap the layer therefore turns with the terrain. </p></li>
 <li><p><strong>primaryUvScale</strong> – Primary albedo tiling: UV = world XY * scale (default 0.25). </p></li>
 <li><p><strong>secondaryUvScale</strong> – Secondary albedo tiling: UV = world XY * scale (default 0.25). </p></li>
 <li><p><strong>controlBounds</strong> – World XY rectangle covered by the control texture as (minX, minY, sizeX, sizeY) in metres; outside it the edge value is used. </p></li>
@@ -14558,6 +14558,17 @@ Missing tangents are generated and an empty TexCoords2 set is filled from TexCoo
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh13updateIndicesERKNSt6vectorIjEE">
+<span id="_CPPv3N10OpenGLMesh13updateIndicesERKNSt6vectorIjEE"></span><span id="_CPPv2N10OpenGLMesh13updateIndicesERKNSt6vectorIjEE"></span><span id="OpenGLMesh::updateIndices__std::vector:unsigned-i:CR"></span><span class="target" id="classOpenGLMesh_1a49f468878de76c2587ca225fadeb9122"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">updateIndices</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">indices</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10OpenGLMesh13updateIndicesERKNSt6vectorIjEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Replace the triangle index buffer, including clearing it with an empty vector. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>indices</strong> – New indices into the current vertex buffer. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK10OpenGLMesh19localBoundingSphereERN3glm4vec3ERf">
 <span id="_CPPv3NK10OpenGLMesh19localBoundingSphereERN3glm4vec3ERf"></span><span id="_CPPv2NK10OpenGLMesh19localBoundingSphereERN3glm4vec3ERf"></span><span id="OpenGLMesh::localBoundingSphere__glm::vec3R.floatRC"></span><span class="target" id="classOpenGLMesh_1ad04c33f5ebc1def0590a1943ea428073"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">localBoundingSphere</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec3</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">center</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">radius</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10OpenGLMesh19localBoundingSphereERN3glm4vec3ERf" title="Link to this definition"></a><br /></dt>
 <dd><p>Conservative local sphere, cached until geometry is uploaded again. Returns false when GPU-only uploads have detached the CPU geometry. </p>
@@ -23748,10 +23759,10 @@ points and the fast-path boundaries for those APIs.</p>
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin12RaisimObject21updateHeightMapVisualEv">
 <span id="_CPPv3N6raisin12RaisimObject21updateHeightMapVisualEv"></span><span id="_CPPv2N6raisin12RaisimObject21updateHeightMapVisualEv"></span><span id="raisin::RaisimObject::updateHeightMapVisual"></span><span class="target" id="classraisin_1_1RaisimObject_1ade39b2b856ca028d87d787ccebf5ceae"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">updateHeightMapVisual</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RaisimObject21updateHeightMapVisualEv" title="Link to this definition"></a><br /></dt>
 <dd><p>Refresh a heightmap object’s existing mesh vertices without rebuilding its mesh. </p>
-<p>Uploads only the heightmap’s visual dirty rows when available, otherwise all vertices. Requires a current GL context. </p>
+<p>Uploads only the heightmap’s visual dirty rows when available, otherwise all vertices. Triangles touching NaN or infinite heights are omitted; their index buffer is refreshed when holes appear or disappear. Requires a current GL context. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>False if this is not a heightmap or the vertex count changed (the mesh must then be rebuilt). </p>
+<dd class="field-odd"><p>False if this is not a heightmap or its samples are unavailable. </p>
 </dd>
 </dl>
 </dd></dl>
