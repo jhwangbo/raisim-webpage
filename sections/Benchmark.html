@@ -178,8 +178,8 @@ multi-threading or SIMD batching across bodies. <code class="docutils literal no
 </tr>
 <tr class="row-odd"><td><p>Metric</p></td>
 <td><p>Wall-clock seconds of each benchmark run, measured by the benchmark launcher. This includes
-building the scene, which takes a few milliseconds except for the Strandbeest (see
-<a class="reference internal" href="#results">Results</a>). Lower is better. <code class="docutils literal notranslate"><span class="pre">Speedup</span></code> is the median MuJoCo time divided by the median
+building the scene, which takes a few milliseconds. The Strandbeest is the exception: its
+row reports the simulation loop alone (see <a class="reference internal" href="#results">Results</a>). Lower is better. <code class="docutils literal notranslate"><span class="pre">Speedup</span></code> is the median MuJoCo time divided by the median
 RaiSim time, so values above 1 mean RaiSim was faster.</p></td>
 </tr>
 <tr class="row-even"><td><p>Settings</p></td>
@@ -356,10 +356,10 @@ charts below show both the median timings and the relative speedup.</p>
 <td><p>1.093 (1.092–1.096)</p></td>
 <td><p>3.86×</p></td>
 </tr>
-<tr class="row-odd"><td><p>Strandbeest</p></td>
-<td><p>0.178 (0.178–0.207)</p></td>
-<td><p>0.478 (0.477–0.479)</p></td>
-<td><p>2.69×</p></td>
+<tr class="row-odd"><td><p>Strandbeest (simulation loop)</p></td>
+<td><p>0.155 (0.154–0.155)</p></td>
+<td><p>0.470 (0.470–0.475)</p></td>
+<td><p>3.03×</p></td>
 </tr>
 <tr class="row-even"><td><p>Primitive speed</p></td>
 <td><p>3.376 (3.357–3.395)</p></td>
@@ -379,9 +379,10 @@ charts below show both the median timings and the relative speedup.</p>
 </tbody>
 </table>
 </div>
-<p>The Strandbeest’s times include loading the scene: RaiSim imports the OpenUSD file (about 0.02 s),
-while MuJoCo loads the prepared MJCF. The simulation loop alone takes 52 µs per step in RaiSim and
-157 µs in MuJoCo, a ratio of 3.03.</p>
+<p>The Strandbeest row times its 3,000 simulation steps alone: 52 µs per step in RaiSim and 157 µs in
+MuJoCo. Loading the scene is left out because the two engines do different work there: RaiSim
+imports the OpenUSD file (about 0.02 s), while MuJoCo loads the prepared MJCF. Including it, the
+whole runs take 0.178 s and 0.478 s, a ratio of 2.69.</p>
 <p>Absolute times depend on hardware, compiler, and scene configuration, so treat them as relative
 magnitudes rather than fixed specifications.</p>
 </section>
