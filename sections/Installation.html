@@ -316,8 +316,13 @@ it in:</p>
 <code class="docutils literal notranslate"><span class="pre">raisim::World::setActivationKey()</span></code>. If that file is not found, it falls back
 to the user-directory location above (<code class="docutils literal notranslate"><span class="pre">$HOME</span></code> on Linux and macOS,
 <code class="docutils literal notranslate"><span class="pre">%USERPROFILE%</span></code> on Windows) and then to <code class="docutils literal notranslate"><span class="pre">raisim/activation.raisim</span></code> in the
-same user directory. If no key is found, RaiSim prints the checked paths and
-your machine id and stops with a fatal error. RaiSim locates and validates the
+same user directory. The user directory is also taken from the operating
+system’s account records, so a process started without <code class="docutils literal notranslate"><span class="pre">$HOME</span></code>, for example
+by a service manager or a launcher that clears the environment, still finds the
+key. If the current user has no key, RaiSim checks the same locations in the
+other users’ home directories on the machine and prints which key it uses. If
+no key is found, RaiSim prints the checked paths and your machine id and stops
+with a fatal error. RaiSim locates and validates the
 key once per process, when the first <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> is constructed, so call
 <code class="docutils literal notranslate"><span class="pre">setActivationKey()</span></code> before creating any world.</p>
 </section>

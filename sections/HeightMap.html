@@ -153,14 +153,28 @@ A height map is always a static object. Height samples are stored row by row:
 the sample at grid index <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> is <code class="docutils literal notranslate"><span class="pre">height[y</span> <span class="pre">*</span> <span class="pre">xSamples</span> <span class="pre">+</span> <span class="pre">x]</span></code>.</p>
 <section id="position-and-orientation">
 <h2>Position and orientation<a class="headerlink" href="#position-and-orientation" title="Link to this heading"></a></h2>
-<p>The grid lives in the height map’s own frame: the center of the grid is the
-origin and the heights rise along the local z axis. <code class="docutils literal notranslate"><span class="pre">setPosition(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code>
-moves the center to <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> and offsets all heights by <code class="docutils literal notranslate"><span class="pre">z</span></code>.
-<code class="docutils literal notranslate"><span class="pre">setOrientation(...)</span></code> rotates the map about its center: with the center
-<span class="math notranslate nohighlight">\(\boldsymbol{c}\)</span> and the rotation <span class="math notranslate nohighlight">\(\boldsymbol{R}\)</span>, the point
-<span class="math notranslate nohighlight">\(\boldsymbol{p}\)</span> of the unrotated (translated) map lies at
-<span class="math notranslate nohighlight">\(\boldsymbol{c} + \boldsymbol{R}(\boldsymbol{p} - \boldsymbol{c})\)</span> in the world.
-Any rotation is allowed: a tilted map is a slope, a map rotated 90 degrees about x is a wall,
+<p>The grid lives in the height map’s own frame. It is centered at <code class="docutils literal notranslate"><span class="pre">(centerX,</span> <span class="pre">centerY)</span></code> there,
+the center given when the map is created or updated (<code class="docutils literal notranslate"><span class="pre">getCenterX()</span></code>, <code class="docutils literal notranslate"><span class="pre">getCenterY()</span></code>), and the
+heights rise along the frame’s z axis. Like every other object, the height map is placed by the
+pose of its frame: <code class="docutils literal notranslate"><span class="pre">setPosition(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code> moves the frame origin and <code class="docutils literal notranslate"><span class="pre">setOrientation(...)</span></code>
+rotates the frame about that origin. With the position <span class="math notranslate nohighlight">\(\boldsymbol{o}\)</span> and the rotation
+<span class="math notranslate nohighlight">\(\boldsymbol{R}\)</span>, the point <span class="math notranslate nohighlight">\(\boldsymbol{p}\)</span> of the frame lies at
+<span class="math notranslate nohighlight">\(\boldsymbol{o} + \boldsymbol{R}\boldsymbol{p}\)</span> in the world, whichever of the two is set
+first. A new height map has the identity pose, so its grid is centered at <code class="docutils literal notranslate"><span class="pre">(centerX,</span> <span class="pre">centerY)</span></code>
+in the world, and <code class="docutils literal notranslate"><span class="pre">getComPosition()</span></code> returns the world position of the grid center. A map
+created around the frame origin (<code class="docutils literal notranslate"><span class="pre">centerX</span> <span class="pre">=</span> <span class="pre">centerY</span> <span class="pre">=</span> <span class="pre">0</span></code>) therefore rotates about its own
+center, while a map centered elsewhere swings around the origin, like a mesh whose vertices lie
+away from its body frame origin.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// a 4 m x 4 m map centered at (10, 0), raised by 0.5 m: move the frame, not the center</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addHeightMap</span><span class="p">(</span><span class="mi">41</span><span class="p">,</span><span class="w"> </span><span class="mi">41</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">,</span><span class="w"> </span><span class="mf">10.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">heights</span><span class="p">);</span>
+<span class="n">map</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">);</span>
+<span class="c1">// the same placement built around the frame origin, so it can be tilted about its center</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">tilted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addHeightMap</span><span class="p">(</span><span class="mi">41</span><span class="p">,</span><span class="w"> </span><span class="mi">41</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">heights</span><span class="p">);</span>
+<span class="n">tilted</span><span class="o">-&gt;</span><span class="n">setPosition</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">);</span>
+<span class="n">tilted</span><span class="o">-&gt;</span><span class="n">setOrientation</span><span class="p">(</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Matrix3d</span><span class="p">(</span><span class="n">Eigen</span><span class="o">::</span><span class="n">AngleAxisd</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span><span class="o">::</span><span class="n">UnitY</span><span class="p">())));</span>
+</pre></div>
+</div>
+<p>Any rotation is allowed: a tilted map is a slope, a map rotated 90 degrees about x is a wall,
 and one rotated 180 degrees is a ceiling. A world XML file sets the orientation with the
 <code class="docutils literal notranslate"><span class="pre">quat</span></code> attribute of the height map.</p>
 <a class="reference internal image-reference" href="../_images/heightmap_rotation.png"><img alt="A rough height map tilted into a slope and a bumpy height map stood up as a wall" src="../_images/heightmap_rotation.png" style="width: 100%;" />
@@ -191,23 +205,25 @@ the output argument)</p></li>
 <li><p>color: <code class="code docutils literal notranslate"><span class="pre">getColor(x,</span> <span class="pre">y)</span></code></p></li>
 </ul>
 <p>These queries ignore the orientation by design: they read the height field as if only the
-translation were applied, so <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> addresses the grid directly whether or not the map is
-rotated. To evaluate a rotated map, query its unrotated coordinates and rotate the result:</p>
+translation were applied, so <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> addresses the grid, centered at the position plus
+<code class="docutils literal notranslate"><span class="pre">(centerX,</span> <span class="pre">centerY)</span></code>, whether or not the map is rotated. To evaluate a rotated map, query its
+unrotated coordinates and rotate the result about the origin <span class="math notranslate nohighlight">\(\boldsymbol{o}\)</span>
+(<code class="docutils literal notranslate"><span class="pre">getPosition()</span></code>):</p>
 <ul class="simple">
 <li><p>the surface point above <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> of the unrotated map is
-<span class="math notranslate nohighlight">\(\boldsymbol{c} + \boldsymbol{R}\,((x, y, h) - \boldsymbol{c})\)</span> with
+<span class="math notranslate nohighlight">\(\boldsymbol{o} + \boldsymbol{R}\,((x, y, h) - \boldsymbol{o})\)</span> with
 <span class="math notranslate nohighlight">\(h\)</span> = <code class="code docutils literal notranslate"><span class="pre">getHeight(x,</span> <span class="pre">y)</span></code>, and its normal is <span class="math notranslate nohighlight">\(\boldsymbol{R}\)</span> times the
 result of <code class="code docutils literal notranslate"><span class="pre">getNormal(x,</span> <span class="pre">y,</span> <span class="pre">normal)</span></code>;</p></li>
 <li><p>a world point <span class="math notranslate nohighlight">\(\boldsymbol{w}\)</span> has the unrotated coordinates
-<span class="math notranslate nohighlight">\(\boldsymbol{c} + \boldsymbol{R}^T(\boldsymbol{w} - \boldsymbol{c})\)</span>; it is above
+<span class="math notranslate nohighlight">\(\boldsymbol{o} + \boldsymbol{R}^T(\boldsymbol{w} - \boldsymbol{o})\)</span>; it is above
 the surface if their z exceeds <code class="code docutils literal notranslate"><span class="pre">getHeight</span></code> at their x and y.</p></li>
 </ul>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// the point 0.5 m above the rotated surface at the unrotated map&#39;s (x, y)</span>
-<span class="k">const</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">heightMap</span><span class="o">-&gt;</span><span class="n">getPosition</span><span class="p">();</span>
+<span class="k">const</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span><span class="w"> </span><span class="n">o</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">heightMap</span><span class="o">-&gt;</span><span class="n">getPosition</span><span class="p">();</span>
 <span class="k">const</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Matrix3d</span><span class="w"> </span><span class="n">R</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">heightMap</span><span class="o">-&gt;</span><span class="n">getRotationMatrix</span><span class="p">();</span>
 <span class="n">raisim</span><span class="o">::</span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="n">normal</span><span class="p">;</span>
 <span class="n">heightMap</span><span class="o">-&gt;</span><span class="n">getNormal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">normal</span><span class="p">);</span>
-<span class="k">const</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span><span class="w"> </span><span class="n">surface</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">R</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">heightMap</span><span class="o">-&gt;</span><span class="n">getHeight</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">))</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">c</span><span class="p">);</span>
+<span class="k">const</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span><span class="w"> </span><span class="n">surface</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">o</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">R</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">heightMap</span><span class="o">-&gt;</span><span class="n">getHeight</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">))</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">o</span><span class="p">);</span>
 <span class="k">const</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span><span class="w"> </span><span class="n">above</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">surface</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">R</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">normal</span><span class="p">.</span><span class="n">e</span><span class="p">();</span>
 </pre></div>
 </div>
@@ -221,7 +237,8 @@ a warning and leaves the existing map unchanged.</p>
 <p>For visualization-only streaming, <code class="docutils literal notranslate"><span class="pre">updateVisualHeight(...)</span></code> replaces the
 full visual height array and <code class="docutils literal notranslate"><span class="pre">updateVisualHeightPatch(...)</span></code> updates an
 inclusive rectangular sample range without rebuilding collision. Both require
-the center and size arguments to match the current ones. The patch method
+the center and size arguments to match the current ones; the center, like that of <code class="docutils literal notranslate"><span class="pre">update(...)</span></code>,
+is in the height map frame (<code class="docutils literal notranslate"><span class="pre">getCenterX()</span></code>, <code class="docutils literal notranslate"><span class="pre">getCenterY()</span></code>). The patch method
 receives the full row-major height array and copies only the requested range. Per-vertex colors use <code class="docutils literal notranslate"><span class="pre">setColor(...)</span></code>; after a full color map has been
 initialized, <code class="docutils literal notranslate"><span class="pre">setColorPatch(...)</span></code> updates a tightly packed rectangular color
 range.</p>
@@ -260,8 +277,8 @@ range.</p>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9HeightMapE">
 <span id="_CPPv3N6raisim9HeightMapE"></span><span id="_CPPv2N6raisim9HeightMapE"></span><span id="raisim::HeightMap"></span><span class="target" id="classraisim_1_1HeightMap"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HeightMap</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="SingleBodyObjects.html#_CPPv4N6raisim16SingleBodyObjectE" title="raisim::SingleBodyObject"><span class="n"><span class="pre">SingleBodyObject</span></span></a><a class="headerlink" href="#_CPPv4N6raisim9HeightMapE" title="Link to this definition"></a><br /></dt>
-<dd><p>A static terrain defined by a regular grid of heights (create it with <a class="reference internal" href="WorldSystem.html#classraisim_1_1World_1a54061aae9f815014622cba1bdb13ca12"><span class="std std-ref">World::addHeightMap()</span></a>). The grid covers [centerX - xSize/2, centerX + xSize/2] x [centerY - ySize/2, centerY + ySize/2]; sample (x, y) is stored at index y * xSamples + x, with index 0 at the minimum x and y. Height samples may be NaN or infinity and are stored without filtering. Heights are interpolated over two triangles per cell.</p>
-<p>The heightmap can be translated and rotated arbitrarily (<a class="reference internal" href="#classraisim_1_1HeightMap_1acef70a45075b4fccd4d65be2cb78d499"><span class="std std-ref">setPosition()</span></a>, <a class="reference internal" href="#classraisim_1_1HeightMap_1a1c6df249ae8a4ea416315dc38f9132af"><span class="std std-ref">setOrientation()</span></a>); the grid then lies in the heightmap’s own frame, whose origin is the center and whose +z is the “up” side of the surface. Collision, ray tests and rendering follow the rotation. The point queries (<a class="reference internal" href="#classraisim_1_1HeightMap_1a5036590f8600ea5f5523fd3d0ba54141"><span class="std std-ref">getHeight()</span></a>, <a class="reference internal" href="#classraisim_1_1HeightMap_1a56739ca9eb7d5be2653dfd76ea96c4da"><span class="std std-ref">getContactHeight()</span></a>, <a class="reference internal" href="#classraisim_1_1HeightMap_1a4f3782f78c2b453c78e0ee5ecc9602b9"><span class="std std-ref">getNormal()</span></a>, <a class="reference internal" href="#classraisim_1_1HeightMap_1ad5d6b6872c3754b566b81acb9290cd24"><span class="std std-ref">getColor()</span></a>) do not: they always treat the orientation as the identity, as if only the translation were applied. </p>
+<dd><p>A static terrain defined by a regular grid of heights (create it with <a class="reference internal" href="WorldSystem.html#classraisim_1_1World_1a54061aae9f815014622cba1bdb13ca12"><span class="std std-ref">World::addHeightMap()</span></a>). The grid lies in the heightmap’s own frame. It covers [centerX - xSize/2, centerX + xSize/2] x [centerY - ySize/2, centerY + ySize/2] there, and the heights are z coordinates in that frame; sample (x, y) is stored at index y * xSamples + x, with index 0 at the minimum x and y. Height samples may be NaN or infinity and are stored without filtering. Heights are interpolated over two triangles per cell.</p>
+<p>Like every other object, the heightmap is placed by the pose of its frame: <a class="reference internal" href="#classraisim_1_1HeightMap_1acef70a45075b4fccd4d65be2cb78d499"><span class="std std-ref">setPosition()</span></a> moves the frame origin and <a class="reference internal" href="#classraisim_1_1HeightMap_1a1c6df249ae8a4ea416315dc38f9132af"><span class="std std-ref">setOrientation()</span></a> rotates the frame about that origin, so a point p of the frame lies at position + R p in the world. A new heightmap has the identity pose, so its grid is centered at (centerX, centerY) in the world. Collision, ray tests and rendering follow the full pose. The point queries (<a class="reference internal" href="#classraisim_1_1HeightMap_1a5036590f8600ea5f5523fd3d0ba54141"><span class="std std-ref">getHeight()</span></a>, <a class="reference internal" href="#classraisim_1_1HeightMap_1a56739ca9eb7d5be2653dfd76ea96c4da"><span class="std std-ref">getContactHeight()</span></a>, <a class="reference internal" href="#classraisim_1_1HeightMap_1a4f3782f78c2b453c78e0ee5ecc9602b9"><span class="std std-ref">getNormal()</span></a>, <a class="reference internal" href="#classraisim_1_1HeightMap_1ad5d6b6872c3754b566b81acb9290cd24"><span class="std std-ref">getColor()</span></a>) treat the orientation as the identity, as if only the translation were applied. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
@@ -271,8 +288,8 @@ range.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>centerX</strong> – <strong>[in]</strong> x coordinate of the heightmap center in the world frame (m) </p></li>
-<li><p><strong>centerY</strong> – <strong>[in]</strong> y coordinate of the heightmap center in the world frame (m) </p></li>
+<li><p><strong>centerX</strong> – <strong>[in]</strong> x coordinate of the grid center in the heightmap frame (m) </p></li>
+<li><p><strong>centerY</strong> – <strong>[in]</strong> y coordinate of the grid center in the heightmap frame (m) </p></li>
 <li><p><strong>raisimHeightMapFileName</strong> – <strong>[in]</strong> path to the text file </p></li>
 </ul>
 </dd>
@@ -286,8 +303,8 @@ range.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>centerX</strong> – <strong>[in]</strong> x coordinate of the heightmap center in the world frame (m) </p></li>
-<li><p><strong>centerY</strong> – <strong>[in]</strong> y coordinate of the heightmap center in the world frame (m) </p></li>
+<li><p><strong>centerX</strong> – <strong>[in]</strong> x coordinate of the grid center in the heightmap frame (m) </p></li>
+<li><p><strong>centerY</strong> – <strong>[in]</strong> y coordinate of the grid center in the heightmap frame (m) </p></li>
 <li><p><strong>pngFileName</strong> – <strong>[in]</strong> path to the PNG file (must have the .png extension) </p></li>
 <li><p><strong>xSize</strong> – <strong>[in]</strong> size in x (m) </p></li>
 <li><p><strong>ySize</strong> – <strong>[in]</strong> size in y (m) </p></li>
@@ -309,8 +326,8 @@ range.</p>
 <li><p><strong>ysamples</strong> – <strong>[in]</strong> number of samples in y (at least 2) </p></li>
 <li><p><strong>xSize</strong> – <strong>[in]</strong> size in x (m) </p></li>
 <li><p><strong>ySize</strong> – <strong>[in]</strong> size in y (m) </p></li>
-<li><p><strong>centerX</strong> – <strong>[in]</strong> x coordinate of the center in the world frame (m) </p></li>
-<li><p><strong>centerY</strong> – <strong>[in]</strong> y coordinate of the center in the world frame (m) </p></li>
+<li><p><strong>centerX</strong> – <strong>[in]</strong> x coordinate of the grid center in the heightmap frame (m) </p></li>
+<li><p><strong>centerY</strong> – <strong>[in]</strong> y coordinate of the grid center in the heightmap frame (m) </p></li>
 <li><p><strong>height</strong> – <strong>[in]</strong> xSamples*ySamples heights, indexed y * xSamples + x (m). NaN and infinity are copied unchanged. </p></li>
 </ul>
 </dd>
@@ -328,8 +345,8 @@ range.</p>
 <li><p><strong>ysamples</strong> – <strong>[in]</strong> number of samples in y (at least 2) </p></li>
 <li><p><strong>xSize</strong> – <strong>[in]</strong> size in x (m) </p></li>
 <li><p><strong>ySize</strong> – <strong>[in]</strong> size in y (m) </p></li>
-<li><p><strong>centerX</strong> – <strong>[in]</strong> x coordinate of the center in the world frame (m) </p></li>
-<li><p><strong>centerY</strong> – <strong>[in]</strong> y coordinate of the center in the world frame (m) </p></li>
+<li><p><strong>centerX</strong> – <strong>[in]</strong> x coordinate of the grid center in the heightmap frame (m) </p></li>
+<li><p><strong>centerY</strong> – <strong>[in]</strong> y coordinate of the grid center in the heightmap frame (m) </p></li>
 <li><p><strong>heightIn</strong> – <strong>[in]</strong> xSamples*ySamples heights, indexed y * xSamples + x (m). NaN and infinity are copied unchanged. </p></li>
 </ul>
 </dd>
@@ -345,8 +362,8 @@ range.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>xSize</strong> – <strong>[in]</strong> size in x (m) </p></li>
 <li><p><strong>ySize</strong> – <strong>[in]</strong> size in y (m) </p></li>
-<li><p><strong>centerX</strong> – <strong>[in]</strong> x coordinate of the center in the world frame (m) </p></li>
-<li><p><strong>centerY</strong> – <strong>[in]</strong> y coordinate of the center in the world frame (m) </p></li>
+<li><p><strong>centerX</strong> – <strong>[in]</strong> x coordinate of the grid center in the heightmap frame (m) </p></li>
+<li><p><strong>centerY</strong> – <strong>[in]</strong> y coordinate of the grid center in the heightmap frame (m) </p></li>
 <li><p><strong>heightIn</strong> – <strong>[in]</strong> heights; heightIn(i, j) is the sample at x index i and y index j (m). NaN and infinity are copied unchanged. </p></li>
 </ul>
 </dd>
@@ -360,8 +377,8 @@ range.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>centerX</strong> – <strong>[in]</strong> x coordinate of the center in the world frame (m) </p></li>
-<li><p><strong>centerY</strong> – <strong>[in]</strong> y coordinate of the center in the world frame (m) </p></li>
+<li><p><strong>centerX</strong> – <strong>[in]</strong> x coordinate of the grid center in the heightmap frame (m) </p></li>
+<li><p><strong>centerY</strong> – <strong>[in]</strong> y coordinate of the grid center in the heightmap frame (m) </p></li>
 <li><p><strong>terrainProperties</strong> – <strong>[in]</strong> terrain generation parameters (sample counts, size, …) </p></li>
 </ul>
 </dd>
@@ -375,8 +392,8 @@ range.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>centerX</strong> – <strong>[in]</strong> center of the heightmap </p></li>
-<li><p><strong>centerY</strong> – <strong>[in]</strong> center of the heightmap </p></li>
+<li><p><strong>centerX</strong> – <strong>[in]</strong> x coordinate of the grid center in the heightmap frame (m) </p></li>
+<li><p><strong>centerY</strong> – <strong>[in]</strong> y coordinate of the grid center in the heightmap frame (m) </p></li>
 <li><p><strong>terrainProperties</strong> – <strong>[in]</strong> new terrain properties. You cannot change the sample size </p></li>
 </ul>
 </dd>
@@ -390,8 +407,8 @@ range.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>centerX</strong> – <strong>[in]</strong> center of the heightmap </p></li>
-<li><p><strong>centerY</strong> – <strong>[in]</strong> center of the heightmap </p></li>
+<li><p><strong>centerX</strong> – <strong>[in]</strong> x coordinate of the grid center in the heightmap frame (m) </p></li>
+<li><p><strong>centerY</strong> – <strong>[in]</strong> y coordinate of the grid center in the heightmap frame (m) </p></li>
 <li><p><strong>sizeX</strong> – <strong>[in]</strong> height map size in the x direction </p></li>
 <li><p><strong>sizeY</strong> – <strong>[in]</strong> height map size in the y direction </p></li>
 <li><p><strong>height</strong> – <strong>[in]</strong> height samples, height[y * xSamples + x]; must have exactly xSamples*ySamples values. NaN and infinity samples are copied unchanged. </p></li>
@@ -407,8 +424,8 @@ range.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>centerX</strong> – <strong>[in]</strong> current center x (m) </p></li>
-<li><p><strong>centerY</strong> – <strong>[in]</strong> current center y (m) </p></li>
+<li><p><strong>centerX</strong> – <strong>[in]</strong> current grid center x in the heightmap frame (m) </p></li>
+<li><p><strong>centerY</strong> – <strong>[in]</strong> current grid center y in the heightmap frame (m) </p></li>
 <li><p><strong>sizeX</strong> – <strong>[in]</strong> current size in x (m) </p></li>
 <li><p><strong>sizeY</strong> – <strong>[in]</strong> current size in y (m) </p></li>
 <li><p><strong>height</strong> – <strong>[in]</strong> new height samples, height[y * xSamples + x]; NaN and infinity are copied unchanged </p></li>
@@ -573,10 +590,10 @@ range.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim9HeightMap10getCenterXEv">
 <span id="_CPPv3NK6raisim9HeightMap10getCenterXEv"></span><span id="_CPPv2NK6raisim9HeightMap10getCenterXEv"></span><span id="raisim::HeightMap::getCenterXC"></span><span class="target" id="classraisim_1_1HeightMap_1adbe26556cdc29f9c59fc1f5f14dddbd7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getCenterX</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim9HeightMap10getCenterXEv" title="Link to this definition"></a><br /></dt>
-<dd><p>Get the center position of the heightmap in x-axis </p>
+<dd><p>Get the x coordinate of the grid center in the heightmap frame, as given to the constructor or <a class="reference internal" href="#classraisim_1_1HeightMap_1ade53596d5b2abf0d100452515a3b9a17"><span class="std std-ref">update()</span></a>. It is the world x of the center only while the heightmap has the identity pose; the world position of the center is <a class="reference internal" href="SingleBodyObjects.html#classraisim_1_1SingleBodyObject_1aef26cf3545d0f12704da67799cf70bea"><span class="std std-ref">getComPosition()</span></a>. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>position </p>
+<dd class="field-odd"><p>center x in the heightmap frame (m) </p>
 </dd>
 </dl>
 </dd></dl>
@@ -584,10 +601,10 @@ range.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim9HeightMap10getCenterYEv">
 <span id="_CPPv3NK6raisim9HeightMap10getCenterYEv"></span><span id="_CPPv2NK6raisim9HeightMap10getCenterYEv"></span><span id="raisim::HeightMap::getCenterYC"></span><span class="target" id="classraisim_1_1HeightMap_1a75ade612901c93dc068dc0a9d70edace"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getCenterY</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim9HeightMap10getCenterYEv" title="Link to this definition"></a><br /></dt>
-<dd><p>Get the center position of the heightmap in y-axis </p>
+<dd><p>Get the y coordinate of the grid center in the heightmap frame (see <a class="reference internal" href="#classraisim_1_1HeightMap_1adbe26556cdc29f9c59fc1f5f14dddbd7"><span class="std std-ref">getCenterX()</span></a>). </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>position </p>
+<dd class="field-odd"><p>center y in the heightmap frame (m) </p>
 </dd>
 </dl>
 </dd></dl>
@@ -674,10 +691,10 @@ range.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9HeightMap11setPositionERKN5Eigen3RefIKN5Eigen8Vector3dEN5Eigen9UnalignedEEE">
 <span id="_CPPv3N6raisim9HeightMap11setPositionERKN5Eigen3RefIKN5Eigen8Vector3dEN5Eigen9UnalignedEEE"></span><span id="_CPPv2N6raisim9HeightMap11setPositionERKN5Eigen3RefIKN5Eigen8Vector3dEN5Eigen9UnalignedEEE"></span><span id="raisim::HeightMap::setPosition__Eigen::Ref:Eigen::Vector3dC.Eigen::Unaligned:CR"></span><span class="target" id="classraisim_1_1HeightMap_1acef70a45075b4fccd4d65be2cb78d499"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setPosition</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Ref</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector3d</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Unaligned</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">originPosition</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim9HeightMap11setPositionERKN5Eigen3RefIKN5Eigen8Vector3dEN5Eigen9UnalignedEEE" title="Link to this definition"></a><br /></dt>
-<dd><p>Move the heightmap. x and y become the new center; z offsets all heights. </p>
+<dd><p>Move the heightmap frame origin. The grid moves with it, keeping its center (centerX, centerY) in the heightmap frame; z raises all heights. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>originPosition</strong> – <strong>[in]</strong> new center position (m) </p>
+<dd class="field-odd"><p><strong>originPosition</strong> – <strong>[in]</strong> position of the heightmap frame origin in the world frame (m) </p>
 </dd>
 </dl>
 </dd></dl>
@@ -685,13 +702,13 @@ range.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9HeightMap11setPositionEddd">
 <span id="_CPPv3N6raisim9HeightMap11setPositionEddd"></span><span id="_CPPv2N6raisim9HeightMap11setPositionEddd"></span><span id="raisim::HeightMap::setPosition__double.double.double"></span><span class="target" id="classraisim_1_1HeightMap_1a3abfa28473b8d87bce158c3e73159a91"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setPosition</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">z</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim9HeightMap11setPositionEddd" title="Link to this definition"></a><br /></dt>
-<dd><p>Move the heightmap. x and y become the new center; z offsets all heights. </p>
+<dd><p>Move the heightmap frame origin (see the Eigen overload). </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> – <strong>[in]</strong> center x (m) </p></li>
-<li><p><strong>y</strong> – <strong>[in]</strong> center y (m) </p></li>
-<li><p><strong>z</strong> – <strong>[in]</strong> height offset (m) </p></li>
+<li><p><strong>x</strong> – <strong>[in]</strong> origin x (m) </p></li>
+<li><p><strong>y</strong> – <strong>[in]</strong> origin y (m) </p></li>
+<li><p><strong>z</strong> – <strong>[in]</strong> origin z (m) </p></li>
 </ul>
 </dd>
 </dl>
@@ -700,7 +717,7 @@ range.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9HeightMap14setOrientationERKN5Eigen11QuaterniondE">
 <span id="_CPPv3N6raisim9HeightMap14setOrientationERKN5Eigen11QuaterniondE"></span><span id="_CPPv2N6raisim9HeightMap14setOrientationERKN5Eigen11QuaterniondE"></span><span id="raisim::HeightMap::setOrientation__Eigen::QuaterniondCR"></span><span class="target" id="classraisim_1_1HeightMap_1a1c6df249ae8a4ea416315dc38f9132af"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setOrientation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Quaterniond</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quaternion</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim9HeightMap14setOrientationERKN5Eigen11QuaterniondE" title="Link to this definition"></a><br /></dt>
-<dd><p>Set the orientation; the grid rotates about the heightmap center. </p>
+<dd><p>Set the orientation; the heightmap rotates about its frame origin (<a class="reference internal" href="SingleBodyObjects.html#classraisim_1_1SingleBodyObject_1ab35be4b7d32259c094f3b7544b1737bf"><span class="std std-ref">getPosition()</span></a>), like every other object, so a grid centered away from the origin swings around it. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>quaternion</strong> – <strong>[in]</strong> orientation </p>
@@ -711,7 +728,7 @@ range.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9HeightMap14setOrientationERKN5Eigen8Vector4dE">
 <span id="_CPPv3N6raisim9HeightMap14setOrientationERKN5Eigen8Vector4dE"></span><span id="_CPPv2N6raisim9HeightMap14setOrientationERKN5Eigen8Vector4dE"></span><span id="raisim::HeightMap::setOrientation__Eigen::Vector4dCR"></span><span class="target" id="classraisim_1_1HeightMap_1af1b05a422014a9b8400c337db55ee1b0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setOrientation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector4d</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quaternion</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim9HeightMap14setOrientationERKN5Eigen8Vector4dE" title="Link to this definition"></a><br /></dt>
-<dd><p>Set the orientation; the grid rotates about the heightmap center. </p>
+<dd><p>Set the orientation; the heightmap rotates about its frame origin. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>quaternion</strong> – <strong>[in]</strong> orientation (w, x, y, z) </p>
@@ -722,7 +739,7 @@ range.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9HeightMap14setOrientationERK3VecIXL4EEE">
 <span id="_CPPv3N6raisim9HeightMap14setOrientationERK3VecIXL4EEE"></span><span id="_CPPv2N6raisim9HeightMap14setOrientationERK3VecIX4EE"></span><span id="raisim::HeightMap::setOrientation__Vec:4:CR"></span><span class="target" id="classraisim_1_1HeightMap_1a2dee8c928c847d725e4640e299c22b02"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setOrientation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">4</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quaternion</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim9HeightMap14setOrientationERK3VecIXL4EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>Set the orientation; the grid rotates about the heightmap center. </p>
+<dd><p>Set the orientation; the heightmap rotates about its frame origin. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>quaternion</strong> – <strong>[in]</strong> orientation (w, x, y, z) </p>
@@ -733,7 +750,7 @@ range.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9HeightMap14setOrientationEdddd">
 <span id="_CPPv3N6raisim9HeightMap14setOrientationEdddd"></span><span id="_CPPv2N6raisim9HeightMap14setOrientationEdddd"></span><span id="raisim::HeightMap::setOrientation__double.double.double.double"></span><span class="target" id="classraisim_1_1HeightMap_1a6b987379eecb0c70b21c816517359ae0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setOrientation</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">w</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">z</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim9HeightMap14setOrientationEdddd" title="Link to this definition"></a><br /></dt>
-<dd><p>Set the orientation; the grid rotates about the heightmap center. </p>
+<dd><p>Set the orientation; the heightmap rotates about its frame origin. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -749,7 +766,7 @@ range.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9HeightMap14setOrientationERKN5Eigen8Matrix3dE">
 <span id="_CPPv3N6raisim9HeightMap14setOrientationERKN5Eigen8Matrix3dE"></span><span id="_CPPv2N6raisim9HeightMap14setOrientationERKN5Eigen8Matrix3dE"></span><span id="raisim::HeightMap::setOrientation__Eigen::Matrix3dCR"></span><span class="target" id="classraisim_1_1HeightMap_1ae0ba12e4f3c18a4b0019cea76436f36f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setOrientation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Matrix3d</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rotationMatrix</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim9HeightMap14setOrientationERKN5Eigen8Matrix3dE" title="Link to this definition"></a><br /></dt>
-<dd><p>Set the orientation; the grid rotates about the heightmap center. </p>
+<dd><p>Set the orientation; the heightmap rotates about its frame origin. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>rotationMatrix</strong> – <strong>[in]</strong> orientation (heightmap frame to world) </p>
