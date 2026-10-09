@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sensors &mdash; raisim 2.8.0 documentation</title>
+  <title>Sensors &mdash; raisim 2.8.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=69ff2ef9"></script>
+      <script src="../_static/documentation_options.js?v=cd87aae0"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -352,6 +352,14 @@ broadphase for the scan, then raycasts only the candidate bodies.</p>
 pitch are each specified as <code class="docutils literal notranslate"><span class="pre">start</span> <span class="pre">angle,</span> <span class="pre">signed</span> <span class="pre">increment,</span> <span class="pre">count</span></code>. See
 <a class="reference internal" href="RayTest.html"><span class="doc">Ray Test</span></a> for the exact signature, sampling order, compact-output behavior,
 and performance considerations.</p>
+<p><code class="docutils literal notranslate"><span class="pre">update()</span></code> first advances the spinning head with <code class="docutils literal notranslate"><span class="pre">advanceSweep(worldTime)</span></code>,
+which returns the yaw columns swept since the last update (<code class="docutils literal notranslate"><span class="pre">first</span></code>, <code class="docutils literal notranslate"><span class="pre">count</span></code>
+and <code class="docutils literal notranslate"><span class="pre">direction</span></code>; a sweep longer than one turn repeats columns) and sets the
+current yaw and timestamps, and then casts those columns. Another ray tracer can
+call <code class="docutils literal notranslate"><span class="pre">advanceSweep()</span></code> itself, cast the columns against
+<code class="docutils literal notranslate"><span class="pre">World::getRayCastBodies()</span></code> (the collision bodies the ray tests see, with
+their world poses) and store the points with <code class="docutils literal notranslate"><span class="pre">setScan()</span></code>. rayrai’s GPU LiDAR
+does exactly this and returns the same points as <code class="docutils literal notranslate"><span class="pre">update()</span></code>.</p>
 </section>
 <section id="imu">
 <h2>IMU<a class="headerlink" href="#imu" title="Link to this heading"></a></h2>
@@ -607,7 +615,8 @@ order.</p>
 <code class="docutils literal notranslate"><span class="pre">SpinningLidar</span></code> on the CPU with <code class="docutils literal notranslate"><span class="pre">update(world)</span></code>, transforms the sensor-frame
 points to world coordinates and displays them as a rayrai point cloud. To
 measure the scan on the GPU instead, call <code class="docutils literal notranslate"><span class="pre">measureSpinningLidarSingleDrawGPU</span></code>,
-which stores the sensor-frame hit points in the LiDAR with <code class="docutils literal notranslate"><span class="pre">setScan()</span></code>:</p>
+which casts the same rays against the same collision geometry and stores the
+same sensor-frame points in the LiDAR with <code class="docutils literal notranslate"><span class="pre">setScan()</span></code>:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">lidar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getSensorSet</span><span class="p">(</span><span class="s">&quot;livox_lidar_0&quot;</span><span class="p">)</span>
 <span class="w">              </span><span class="o">-&gt;</span><span class="n">getSensor</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">SpinningLidar</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;lidar&quot;</span><span class="p">);</span>
 
@@ -945,6 +954,16 @@ points, and timestamps without a visualizer, but it is the CPU fallback path.</p
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>frame id (index into <a class="reference internal" href="articulated_system/API.html#classraisim_1_1ArticulatedSystem_1a7d59fc7907078798d0b12973a4171119"><span class="std std-ref">ArticulatedSystem::getFrames()</span></a>); size_t(-1) if not attached yet </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim6Sensor20getArticulatedSystemEv">
+<span id="_CPPv3NK6raisim6Sensor20getArticulatedSystemEv"></span><span id="_CPPv2NK6raisim6Sensor20getArticulatedSystemEv"></span><span id="raisim::Sensor::getArticulatedSystemC"></span><span class="target" id="classraisim_1_1Sensor_1afc393d536e9e529768f77c79b5a8578d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><a class="reference internal" href="articulated_system/API.html#_CPPv4N6raisim17ArticulatedSystemE" title="raisim::ArticulatedSystem"><span class="n"><span class="pre">ArticulatedSystem</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">getArticulatedSystem</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim6Sensor20getArticulatedSystemEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The articulated system the sensor is attached to, or nullptr for a detached sensor. </p>
 </dd>
 </dl>
 </dd></dl>

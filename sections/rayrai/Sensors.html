@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sensors and depth/LiDAR &mdash; raisim 2.8.0 documentation</title>
+  <title>Sensors and depth/LiDAR &mdash; raisim 2.8.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
+      <script src="../../_static/documentation_options.js?v=cd87aae0"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -323,33 +323,41 @@ full request/response sequence and troubleshooting guidance.</p>
 </section>
 <section id="depth-and-lidar">
 <h2>Depth and LiDAR<a class="headerlink" href="#depth-and-lidar" title="Link to this heading"></a></h2>
-<p>The renderer supports a linear depth plane and a GPU-assisted LiDAR pass. These sensor
-passes render RaiSim world objects only; visualization-only objects are intentionally
-ignored so they cannot leak into training observations.</p>
+<p>The renderer supports a linear depth plane and a GPU LiDAR. The depth pass renders RaiSim world
+objects only; visualization-only objects are intentionally ignored so they cannot leak into
+training observations. The GPU LiDAR scans the collision geometry, exactly like the CPU LiDAR.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">renderDepthPlaneDistance</span></code> renders camera-plane distance into the camera’s
 <code class="docutils literal notranslate"><span class="pre">R32F</span></code> linear-depth texture; pixels without geometry are <code class="docutils literal notranslate"><span class="pre">0</span></code>. Its
 optional <code class="docutils literal notranslate"><span class="pre">drawVisualizationObjects</span></code> argument (default <code class="docutils literal notranslate"><span class="pre">false</span></code>) adds custom
 and instanced visuals; only detectable ones are included unless
 <code class="docutils literal notranslate"><span class="pre">visualizationObjectsMustBeDetectable</span></code> is <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">measureSpinningLidarSingleDrawGPU</span></code> renders, using a spherical chunk
-shader, the yaw span the LiDAR swept since the previous call (from the world
-time and the spin rate) and stores the hits, in the sensor frame, with
-<code class="docutils literal notranslate"><span class="pre">SpinningLidar::setScan</span></code>. Pass <code class="docutils literal notranslate"><span class="pre">objectToExclude</span></code> (for example the robot
-carrying the sensor) to leave one object out of the scan.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">measureSpinningLidarSingleDrawGPU</span></code> advances the LiDAR head with
+<code class="docutils literal notranslate"><span class="pre">SpinningLidar::advanceSweep</span></code> and casts the swept rays on the GPU against
+the collision bodies of the world (<code class="docutils literal notranslate"><span class="pre">World::getRayCastBodies</span></code>): primitives,
+heightmaps and meshes, intersected exactly. It returns the points of
+<code class="docutils literal notranslate"><span class="pre">SpinningLidar::update</span></code>, ray by ray and in the same order, to float
+precision (about 1e-5 of the range), and stores them in the sensor frame with
+<code class="docutils literal notranslate"><span class="pre">SpinningLidar::setScan</span></code>. As on the CPU, rays start at the minimum range and
+the body carrying the sensor is ignored. Pass <code class="docutils literal notranslate"><span class="pre">objectToExclude</span></code> to leave out
+every body of one more object.</p></li>
 </ul>
 <p>Read the depth texture of an external camera with
 <code class="docutils literal notranslate"><span class="pre">Camera::getLinearDepthTexture()</span></code>; <code class="docutils literal notranslate"><span class="pre">getDepthPlaneTexture()</span></code> returns the one
 of the viewer’s internal camera.</p>
-<p>LiDAR usage has two paths. Prefer the rayrai GPU path when rayrai is available:</p>
+<p>The two LiDAR paths share the head state, so a LiDAR can switch between them at
+any update. Both return the same points; they differ in cost. A GPU update pays
+a fixed synchronous readback of about 0.1 ms and then casts thousands of rays
+almost for free; a CPU update costs about 0.1 to 0.3 µs per ray. For an Ouster
+OS1-64 (32,768 rays per turn) over a heightmap, updating at the sensor’s 100 Hz
+rate, the GPU path is about 8 to 9 times faster; called every 1 ms physics step
+(330 rays per update) the two are about even.</p>
 <ol class="arabic simple">
-<li><p>GPU slice rendering via <code class="docutils literal notranslate"><span class="pre">measureSpinningLidarSingleDrawGPU</span></code> for fast
-incremental updates.</p></li>
-<li><p>CPU-based scan via RaiSim (<code class="docutils literal notranslate"><span class="pre">SpinningLidar::update</span></code>), then visualize with a
-point cloud, only when rayrai is unavailable or deterministic CPU ray-query
-behavior is required.</p></li>
+<li><p>GPU: <code class="docutils literal notranslate"><span class="pre">measureSpinningLidarSingleDrawGPU</span></code>, preferred when rayrai is
+available and each update casts a few thousand rays or more.</p></li>
+<li><p>CPU: <code class="docutils literal notranslate"><span class="pre">SpinningLidar::update</span></code>, needs no GL context.</p></li>
 </ol>
-<p>GPU slice example:</p>
+<p>GPU example:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">lidar</span><span class="o">-&gt;</span><span class="n">updatePose</span><span class="p">();</span>
 <span class="k">const</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">dvec3</span><span class="w"> </span><span class="n">posW</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">toGlm</span><span class="p">(</span><span class="n">lidar</span><span class="o">-&gt;</span><span class="n">getPosition</span><span class="p">());</span>
 <span class="k">const</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">dmat3</span><span class="w"> </span><span class="n">rotW</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">toGlm</span><span class="p">(</span><span class="n">lidar</span><span class="o">-&gt;</span><span class="n">getOrientation</span><span class="p">());</span>

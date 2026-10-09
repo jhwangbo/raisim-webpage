@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Performance notes and the C++ API reference &mdash; raisim 2.8.0 documentation</title>
+  <title>Performance notes and the C++ API reference &mdash; raisim 2.8.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=69ff2ef9"></script>
+      <script src="../../_static/documentation_options.js?v=cd87aae0"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -3374,16 +3374,19 @@ Identical to <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow33measureSpinningLidarSingleDrawGPUERN6raisim13SpinningLidarERKN3glm5dvec3ERKN3glm5dmat3EPKN6raisim6ObjectE">
 <span id="_CPPv3N6raisin12RayraiWindow33measureSpinningLidarSingleDrawGPUERN6raisim13SpinningLidarERKN3glm5dvec3ERKN3glm5dmat3EPKN6raisim6ObjectE"></span><span id="_CPPv2N6raisin12RayraiWindow33measureSpinningLidarSingleDrawGPUERN6raisim13SpinningLidarERKN3glm5dvec3ERKN3glm5dmat3EPKN6raisim6ObjectE"></span><span id="raisin::RayraiWindow::measureSpinningLidarSingleDrawGPU__raisim::SpinningLidarR.glm::dvec3CR.glm::dmat3CR.raisim::ObjectCP"></span><span class="target" id="classraisin_1_1RayraiWindow_1a0c01f68c2bf69b4c8e9b7ab7718100da"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">measureSpinningLidarSingleDrawGPU</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">SpinningLidar</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">lidar</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">dvec3</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">sensorPosW</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">dmat3</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">sensorRotW</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../Object.html#_CPPv4N6raisim6ObjectE" title="raisim::Object"><span class="n"><span class="pre">Object</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">objectToExclude</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow33measureSpinningLidarSingleDrawGPUERN6raisim13SpinningLidarERKN3glm5dvec3ERKN3glm5dmat3EPKN6raisim6ObjectE" title="Link to this definition"></a><br /></dt>
-<dd><p>Render a single-draw incremental GPU LiDAR slice. </p>
-<p>Renders the largest contiguous yaw span swept since the previous call (from the world time and the lidar’s spin rate) using a spherical chunk shader, then stores the hit points, in the sensor frame, with lidar.setScan() and stamps the world time. Per-lidar sweep state is keyed by the lidar’s address. Requires this renderer’s GL context.</p>
+<dd><p>Measure a spinning LiDAR on the GPU. </p>
+<p>Advances the head with SpinningLidar::advanceSweep() (the sweep state is shared with SpinningLidar::update(), so the two can alternate) and casts the swept yaw columns against the world’s collision bodies (World::getRayCastBodies()), stores the hits in the sensor frame with lidar.setScan() and stamps the world time. The scan reproduces SpinningLidar::update(): the same columns and point order, exact intersections with primitives, heightmaps and meshes, rays starting at rangeMin, and the sensor’s own body ignored. Ranges agree to float precision (about 1e-5 of the range); a ray grazing a silhouette within that tolerance may differ. Requires this renderer’s GL context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lidar</strong> – Raisim spinning lidar to update. </p></li>
 <li><p><strong>sensorPosW</strong> – LiDAR position in world coordinates. </p></li>
 <li><p><strong>sensorRotW</strong> – LiDAR orientation in world coordinates. </p></li>
-<li><p><strong>objectToExclude</strong> – Optional object to exclude from rendering (e.g., the carrier). </p></li>
+<li><p><strong>objectToExclude</strong> – Optional object whose bodies are all ignored (e.g. the carrier). </p></li>
 </ul>
+</dd>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">runtime_error</span></span></span> – if a GL resource cannot be created or the scene exceeds a GPU limit. </p>
 </dd>
 </dl>
 </dd></dl>
