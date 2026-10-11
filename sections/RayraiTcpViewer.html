@@ -6,15 +6,16 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rayrai TCP Viewer &mdash; raisim 2.8.1 documentation</title>
+  <title>Rayrai TCP Viewer &mdash; raisim 2.9.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
 
   
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=cd87aae0"></script>
+      <script src="../_static/documentation_options.js?v=182a64a0"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -52,6 +53,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="FeatureMap.html">Feature Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DebugTools.html">Regression and Debug Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ProjectLayout.html">Project Layout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Benchmark.html">Benchmark</a></li>
@@ -82,6 +84,7 @@
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableTerrain.html">Deformable terrain</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
@@ -1341,11 +1344,12 @@ or generalized-coordinate requests.</p>
 </section>
 <section id="raisim-engine-scenes">
 <h2><a class="toc-backref" href="#id36" role="doc-backlink">RaiSim Engine scenes</a><a class="headerlink" href="#raisim-engine-scenes" title="Link to this heading"></a></h2>
-<p>When the server’s world was built from a <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> file (<a class="reference internal" href="RsceneFile.html"><span class="doc">.rscene File</span></a>),
-the viewer shows the whole scene, as
+<p>When the server’s world holds a <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> scene (<a class="reference internal" href="RsceneFile.html"><span class="doc">.rscene File</span></a>), built
+from the file or from an XML world file that includes it, the viewer shows the
+whole scene, as
 <a class="reference internal" href="examples/rayrai/rayrai_forest_from_rscene.html"><span class="doc">Rayrai Example: Forest From .rscene</span></a> does in one process. The
-server streams the physics bodies. The viewer applies the scene file with
-<code class="docutils literal notranslate"><span class="pre">raisin::applyRscene</span></code> for everything else: visual-only objects and the visual
+server streams the physics bodies. The viewer applies the scene file, as a
+<code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> does for its world’s scene, for everything else: visual-only objects and the visual
 meshes of <code class="docutils literal notranslate"><span class="pre">.rasset</span></code> objects, instanced visuals and terrain foliage, the
 terrain textures on the streamed height maps, lights, local fog, reflection
 probes, the sky or HDR background, the render quality settings and the first
@@ -1364,12 +1368,18 @@ scene file.</span><a class="headerlink" href="#id9" title="Link to this image">�
 <section id="finding-the-scene-s-files">
 <h3><a class="toc-backref" href="#id37" role="doc-backlink">Finding the scene’s files</a><a class="headerlink" href="#finding-the-scene-s-files" title="Link to this heading"></a></h3>
 <p>The server lists the scene file and every file it uses, with each file’s size
-and content hash (see <a class="reference internal" href="RaisimServer.html"><span class="doc">Raisim Server</span></a>). The viewer asks for consent on each
-connection before inspecting server-chosen paths, including on the server’s
-computer. After <strong>Download</strong> is pressed, it looks for matching files in order at:</p>
+and content hash (see <a class="reference internal" href="RaisimServer.html"><span class="doc">Raisim Server</span></a>). A server the viewer is connected
+to through a loopback address (<code class="docutils literal notranslate"><span class="pre">127.0.0.0/8</span></code> or <code class="docutils literal notranslate"><span class="pre">::1</span></code>), such as the child
+process that <code class="docutils literal notranslate"><span class="pre">--simulate</span></code> and drag and drop start, runs on the viewer’s
+computer, so the viewer looks for the files at the server’s own paths right
+away. The address of the connection decides this, not the host name typed in
+the viewer, which may resolve to another computer. For any other
+server, it inspects server-chosen paths only after <strong>Download</strong> is pressed.
+The viewer looks for matching files in order at:</p>
 <ol class="arabic simple">
-<li><p>the server’s own path. Matching files on the server’s computer are copied
-into the private scene cache after consent;</p></li>
+<li><p>the server’s own path: right away for a loopback server, after consent
+otherwise. When every file matches there, the scene loads from these files
+in place, without a copy;</p></li>
 <li><p>its copy of this version of the scene in the download cache;</p></li>
 <li><p>every resource directory (<code class="docutils literal notranslate"><span class="pre">--resource-dir</span></code> or the <strong>Options</strong> tab),
 joined with each tail of the file’s path below the scene’s top directory.
@@ -1387,8 +1397,13 @@ available.</p>
 <section id="download-prompt">
 <h3><a class="toc-backref" href="#id38" role="doc-backlink">Download prompt</a><a class="headerlink" href="#download-prompt" title="Link to this heading"></a></h3>
 <p>A prompt at the top of the pane names the offered scene, its file count, size
-and destination. Nothing is inspected or downloaded until <strong>Download</strong> is
-pressed. Accepting checks local candidates and downloads only missing files. <strong>Not now</strong> keeps only the streamed
+and destination. It appears when a file is not found in the cache or the
+resource directories, and for a loopback server only when a file is not at the
+server’s path either: a remote server reached through a local port (an SSH
+tunnel) still asks. A loopback server whose files are all on this computer
+shows no prompt. Nothing else is inspected, and nothing is downloaded, until
+<strong>Download</strong> is pressed. Accepting checks local candidates and downloads only
+missing files. <strong>Not now</strong> keeps only the streamed
 bodies and leaves a small bar with a <strong>Download</strong> button. Adding a resource
 directory that holds the files checks again. During the download a progress
 bar offers <strong>Cancel</strong>; files that are already complete are kept.</p>

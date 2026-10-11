@@ -17,8 +17,10 @@ numbers separated by whitespace or by commas, e.g. ``pos="0 0 1"`` or
 ``pos="0, 0, 1"``. The token ``[THIS_DIR]`` anywhere in the file is replaced by
 the directory that contains the file, so resource paths can be written relative
 to the file, e.g. ``urdf_path="[THIS_DIR]/../anymal/urdf/anymal.urdf"``.
-Relative paths without ``[THIS_DIR]`` are resolved against the process working
-directory.
+A relative ``urdf_path`` or ``include`` path names a file in the process working
+directory or, if there is none, a file relative to the folder of the XML file
+that names it. Other relative paths without ``[THIS_DIR]`` are resolved against
+the process working directory.
 
 1. ``raisim``: the root element.
 
@@ -53,7 +55,8 @@ directory.
 
    3. <child> (optional) ``gravity``
 
-      1. <attribute> ``value`` [Vec<3>]: default = ``0, 0, -9.81``
+      1. <attribute> ``value`` [Vec<3>]: default = ``0, 0, -9.81``, or the
+         gravity of an included file
 
    4. <child> (optional) ``timeStep``. Only this camelCase tag name is read.
 
@@ -276,7 +279,9 @@ link and its parent,
 (optional, default=0) ``convexify_meshes`` [int]: 1 treats the URDF collision
 meshes as convex shapes
 
-Use an absolute ``urdf_path`` or one that starts with ``[THIS_DIR]``.
+A relative ``urdf_path`` is looked up in the working directory first and then
+relative to the folder of the XML file, also when that file is included by
+another. A URDF found in neither place is a fatal error.
 
 1. <child> ``state``: <attribute> ``qpos`` [VecDyn], the generalized coordinate,
    (optional, default=zeros) ``qvel`` [VecDyn], the generalized velocity
@@ -295,7 +300,8 @@ attributes ``xx``, ``xy``, ``xz``, ``yy``, ``yz``, and ``zz``.
 Primitive classes use the child ``dimension`` with the same shape parameters as
 ``dim``. Mesh classes use the child ``file`` with the attribute ``name`` and the
 child ``scale`` with the attributes ``x``, ``y``, and ``z`` (only ``x`` is used).
-Articulated-system classes use the attributes ``urdf_path`` and optional
+Articulated-system classes use the attributes ``urdf_path``, resolved like an
+articulated system's against the file that defines the class, and optional
 ``res_dir``. Compound classes use the child ``children``; each child element is
 named after a primitive type or another compound class and uses the attributes
 ``object_param`` [VecDyn] (the shape parameters: radius; radius and height; or
@@ -375,7 +381,36 @@ and the ``xml_templated_world`` example, which loads it.
 
 **Includes.** ``<include value="[THIS_DIR]/terrain.xml"/>`` loads another world
 file into the same world before the including file's own content. Use it to
-combine sub-worlds.
+combine sub-worlds. Included files load in document order, and the settings of
+the including file (``material``, ``gravity``, ``timeStep``, ``erp``,
+``simulation``) override theirs; a setting it does not name keeps the included
+file's value. The ``value`` may contain ``@@`` parameters. A relative path
+names a file in the working directory or, if there is none, a file relative to
+the folder of the including file, also inside a nested include. A missing
+file is a fatal error.
+
+An include whose path ends in ``.rscene`` (in any letter case) builds a RaiSim
+Engine scene into the world, as ``World("scene.rscene")`` does, so a robot and
+the scene it runs in can live in separate files:
+
+.. code-block:: xml
+
+   <raisim>
+       <include value="[THIS_DIR]/../city/rayrai_city.rscene"/>
+       <objects>
+           <articulated_system name="anymal" urdf_path="[THIS_DIR]/../anymal_c/urdf/anymal.urdf">
+               <state qpos="..." qvel="..."/>
+           </articulated_system>
+       </objects>
+   </raisim>
+
+The scene sets its solver settings and contact materials, and adds its terrain,
+bodies and wires, before the robot. ``World::getRscene()`` returns the scene,
+so a rayrai ``RayraiWindow`` and the TCP viewer show its lights, sky, foliage
+and visual-only objects. A world holds at most one scene: a second ``.rscene``
+include, also through an included XML file, is a fatal error. See
+:ref:`sections/RsceneFile:A robot in a scene` and
+`anymal_in_city.xml <https://github.com/raisimTech/raisim2Lib/blob/main/rsc/xmlScripts/rscene/anymal_in_city.xml>`__.
 
 **Parameters.** A token ``@@name`` is replaced by the value of the parameter
 ``name``. Define values in the file:

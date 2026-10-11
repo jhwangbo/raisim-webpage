@@ -23,7 +23,7 @@ Target
 CMake target: ``rscene_server``. The source is
 ``examples/src/server/visualization/rscene_server.cpp``. The target is skipped when the
 installed raisim cannot share scene files (``raisim/server/SceneFileServer.hpp``, new
-in v2.7.1).
+in v2.8.0).
 
 Run
 ===

@@ -6,15 +6,16 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rayrai Example: Forest From .rscene &mdash; raisim 2.8.1 documentation</title>
+  <title>Rayrai Example: Forest From .rscene &mdash; raisim 2.9.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=7e9bdaad" />
 
   
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=cd87aae0"></script>
+      <script src="../../../_static/documentation_options.js?v=182a64a0"></script>
       <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -63,7 +64,6 @@
 <li class="toctree-l3"><a class="reference internal" href="rayrai_blender_scene_import.html">Rayrai Workflow: Blender Scene Import</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_rgb_camera.html">Rayrai Example: RGB Camera</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_depth_camera.html">Rayrai Example: Depth Camera</a></li>
-<li class="toctree-l3"><a class="reference internal" href="rayrai_heightmap_replacement.html">Rayrai Example: Heightmap Replacement</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_lidar_pointcloud.html">Rayrai Example: LiDAR Pointcloud</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_aruco_marker.html">Rayrai Example: Aruco Marker</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_custom_visuals.html">Rayrai Example: Custom Visuals</a></li>
@@ -89,7 +89,9 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_city.html">Rayrai Example: City</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_city_from_xml.html">Rayrai Example: City From XML</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_warehouse.html">Rayrai Example: Warehouse</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_offroad_buggy.html">Rayrai Example: Off-Road Buggy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_tcp_viewer.html">Rayrai Example: TCP Viewer</a></li>
 </ul>
 </li>
@@ -99,6 +101,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../FeatureMap.html">Feature Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DebugTools.html">Regression and Debug Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ProjectLayout.html">Project Layout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Performance.html">Performance</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Benchmark.html">Benchmark</a></li>
@@ -129,6 +132,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DeformableTerrain.html">Deformable terrain</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Constraints.html">Constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../RayTest.html">Ray Test</a></li>
@@ -179,14 +183,12 @@
 rock in C++. The whole example is a few lines:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">world</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">&gt;</span><span class="p">(</span>
 <span class="w">  </span><span class="n">exampleRscPath</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="s">&quot;forest/rayrai_forest.rscene&quot;</span><span class="p">));</span>
-<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="w"> </span><span class="nf">viewer</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">1280</span><span class="p">,</span><span class="w"> </span><span class="mi">800</span><span class="p">);</span>
-<span class="n">viewer</span><span class="p">.</span><span class="n">setAsyncMeshLoadingEnabled</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
-<span class="n">raisin</span><span class="o">::</span><span class="n">applyRscene</span><span class="p">(</span><span class="o">*</span><span class="n">world</span><span class="o">-&gt;</span><span class="n">getRscene</span><span class="p">(),</span><span class="w"> </span><span class="n">viewer</span><span class="p">);</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="w"> </span><span class="nf">viewer</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">1280</span><span class="p">,</span><span class="w"> </span><span class="mi">800</span><span class="p">);</span><span class="w">  </span><span class="c1">// applies the scene</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">raisim::World(path)</span></code> reads the solver settings, the 161 × 161 heightmap,
 the 2,068 hidden <code class="docutils literal notranslate"><span class="pre">.rasset</span></code> tree and rock collision bodies and the 100
-dynamic props. <code class="docutils literal notranslate"><span class="pre">raisin::applyRscene</span></code> applies the render settings, sky and
+dynamic props. The <code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> applies the scene’s render settings, sky and
 weather, sun, ground texture, the 16 instanced vegetation and rock batches,
 and the saved camera. The result simulates exactly like <code class="docutils literal notranslate"><span class="pre">rayrai_forest</span></code>.</p>
 </section>
@@ -194,11 +196,9 @@ and the saved camera. The result simulates exactly like <code class="docutils li
 <h2>Target<a class="headerlink" href="#target" title="Link to this heading"></a></h2>
 <p>CMake target: <code class="docutils literal notranslate"><span class="pre">rayrai_forest_from_rscene</span></code> (C++20). Source:
 <code class="docutils literal notranslate"><span class="pre">examples/src/rayrai/worlds/rayrai_forest_from_rscene.cpp</span></code>.</p>
-<p>The example needs the <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> support in <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> and
-<code class="docutils literal notranslate"><span class="pre">rayrai/RsceneVisuals.hpp</span></code>, which are new in RaiSim and rayrai v2.7.1 (not
-yet released). The 2.7.0 package does not include them, so this target does
-not compile against it; build the other targets explicitly instead, for example
-<code class="docutils literal notranslate"><span class="pre">cmake</span> <span class="pre">--build</span> <span class="pre">build-examples</span> <span class="pre">--target</span> <span class="pre">rayrai_forest</span></code>.</p>
+<p>The example needs the <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> support in <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> and a rayrai
+whose <code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> applies its world’s scene, which are not in a released
+package yet. CMake skips this target when the installed rayrai lacks them.</p>
 </section>
 <section id="run">
 <h2>Run<a class="headerlink" href="#run" title="Link to this heading"></a></h2>
@@ -218,17 +218,19 @@ described in <a class="reference internal" href="rayrai_forest.html"><span class
 <p>The scene file stores the rendering parameters: the quality preset and custom
 renderer settings (MSAA, shadow resolution and cascades, exposure, tone
 mapping and post effects), the environment (color mode, fog, bloom, SSAO) and
-the weather. Change them in C++ before applying the scene:</p>
+the weather. To change them in C++, pass them to
+<code class="docutils literal notranslate"><span class="pre">setRsceneRenderSettings</span></code>, which applies the scene again with them in place
+of the viewer’s constructor:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">render</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">rsceneRenderSettings</span><span class="p">(</span><span class="o">*</span><span class="n">world</span><span class="o">-&gt;</span><span class="n">getRscene</span><span class="p">());</span>
 <span class="n">render</span><span class="p">.</span><span class="n">quality</span><span class="p">.</span><span class="n">viewerMsaaSamples</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span><span class="p">;</span>
 <span class="n">render</span><span class="p">.</span><span class="n">weather</span><span class="p">.</span><span class="n">timeOfDayHours</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">18</span><span class="p">;</span>
-<span class="n">raisin</span><span class="o">::</span><span class="n">applyRscene</span><span class="p">(</span><span class="o">*</span><span class="n">world</span><span class="o">-&gt;</span><span class="n">getRscene</span><span class="p">(),</span><span class="w"> </span><span class="n">viewer</span><span class="p">,</span><span class="w"> </span><span class="n">render</span><span class="p">);</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">setRsceneRenderSettings</span><span class="p">(</span><span class="n">viewer</span><span class="p">,</span><span class="w"> </span><span class="n">render</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>With weather enabled, rayrai derives exposure, environment intensity, fog and
 shadow strength from these base settings and the sky, so overriding them here
-keeps that relationship. After <code class="docutils literal notranslate"><span class="pre">applyRscene</span></code>, the viewer’s own setters still
-change anything.</p>
+keeps that relationship. The viewer’s own setters still change anything
+afterwards.</p>
 </section>
 <section id="supported-scene-content">
 <h2>Supported scene content<a class="headerlink" href="#supported-scene-content" title="Link to this heading"></a></h2>

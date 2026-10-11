@@ -47,8 +47,8 @@ Blender's USD exporter. Prefer it over hand-written XML when the asset is
 authored by such a tool or exchanged with other USD-based pipelines.
 
 The same constructor still accepts a RaiSim ``.xml`` :doc:`world configuration
-file <WorldConfigurationFile>`, a MuJoCo MJCF file, or, from v2.7.1 (not yet
-released), a ``.rscene`` file (see :doc:`RsceneFile`). The
+file <WorldConfigurationFile>`, a MuJoCo MJCF file, or, from v2.8.0, a
+``.rscene`` file (see :doc:`RsceneFile`). The
 extension selects the USD and ``.rscene`` loaders; for other files, the
 content (a ``<raisim>`` or ``<mujoco>`` element) selects the loader. XML stays
 available for hand-edited and template-driven worlds.

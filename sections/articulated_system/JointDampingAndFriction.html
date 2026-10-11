@@ -6,15 +6,16 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Joint Damping and Friction &mdash; raisim 2.8.1 documentation</title>
+  <title>Joint Damping and Friction &mdash; raisim 2.9.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
 
   
+    <link rel="shortcut icon" href="../../_static/favicon.png"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=cd87aae0"></script>
+      <script src="../../_static/documentation_options.js?v=182a64a0"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -53,6 +54,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../FeatureMap.html">Feature Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DebugTools.html">Regression and Debug Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ProjectLayout.html">Project Layout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Performance.html">Performance</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Benchmark.html">Benchmark</a></li>
@@ -89,6 +91,7 @@
 <li class="toctree-l2"><a class="reference internal" href="ModifyingTheModel.html">Modifying the Model in Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ClosedLoopSystems.html">Closed-Loop Systems</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MimicJoints.html">Mimic Joints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tracks.html">Tracks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="API.html">ArticulatedSystem API</a></li>
 </ul>
 </li>
@@ -99,6 +102,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DeformableTerrain.html">Deformable terrain</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
@@ -198,6 +202,12 @@ accelerates as</p>
 damping stable at any time step. The d gain of the PD controller is integrated the same way. The
 difference is that damping pulls the velocity to zero, while the d gain pulls it to the velocity
 target.</p>
+<p>To read the current joint damping, call <code class="docutils literal notranslate"><span class="pre">getJointDamping()</span></code>. It returns a const
+<code class="docutils literal notranslate"><span class="pre">raisim::VecDyn</span></code> reference in generalized velocity order, with <code class="docutils literal notranslate"><span class="pre">getDOF()</span></code>
+entries. These are the values loaded from the model or last supplied to
+<code class="docutils literal notranslate"><span class="pre">setJointDamping()</span></code>; actuator output damping and PD gains are separate.
+Copy <code class="docutils literal notranslate"><span class="pre">getJointDamping().e()</span></code> into an <code class="docutils literal notranslate"><span class="pre">Eigen::VectorXd</span></code> to preserve a baseline
+before adding temporary damping, such as wheel braking.</p>
 <p>To change the damping at runtime, call <code class="docutils literal notranslate"><span class="pre">setJointDamping()</span></code> with one coefficient per degree of
 freedom (<code class="docutils literal notranslate"><span class="pre">getDOF()</span></code> entries). The new values act from the next step. Leave the six entries of a
 floating base at zero: they are not joints, and their damping would not be integrated implicitly.</p>

@@ -6,22 +6,23 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ArticulatedSystem API &mdash; raisim 2.8.1 documentation</title>
+  <title>ArticulatedSystem API &mdash; raisim 2.9.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
 
   
+    <link rel="shortcut icon" href="../../_static/favicon.png"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=cd87aae0"></script>
+      <script src="../../_static/documentation_options.js?v=182a64a0"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Single-Body Objects" href="../SingleBodyObjects.html" />
-    <link rel="prev" title="Mimic Joints" href="MimicJoints.html" /> 
+    <link rel="prev" title="Tracks" href="Tracks.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -52,6 +53,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../FeatureMap.html">Feature Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DebugTools.html">Regression and Debug Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ProjectLayout.html">Project Layout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Performance.html">Performance</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Benchmark.html">Benchmark</a></li>
@@ -84,6 +86,7 @@
 <li class="toctree-l2"><a class="reference internal" href="ModifyingTheModel.html">Modifying the Model in Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ClosedLoopSystems.html">Closed-Loop Systems</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MimicJoints.html">Mimic Joints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tracks.html">Tracks</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">ArticulatedSystem API</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6raisim17ArticulatedSystemE"><code class="docutils literal notranslate"><span class="pre">raisim::ArticulatedSystem</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim17ArticulatedSystem5FrameE"><code class="docutils literal notranslate"><span class="pre">Frame</span></code></a></li>
@@ -236,6 +239,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim17ArticulatedSystem10setPdGainsERKN6raisim6VecDynERKN6raisim6VecDynE"><code class="docutils literal notranslate"><span class="pre">setPdGains()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0EN6raisim17ArticulatedSystem9setPGainsEvRK1T"><code class="docutils literal notranslate"><span class="pre">setPGains()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0EN6raisim17ArticulatedSystem9setDGainsEvRK1T"><code class="docutils literal notranslate"><span class="pre">setDGains()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisim17ArticulatedSystem15getJointDampingEv"><code class="docutils literal notranslate"><span class="pre">getJointDamping()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim17ArticulatedSystem15setJointDampingERKN5Eigen8VectorXdE"><code class="docutils literal notranslate"><span class="pre">setJointDamping()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim17ArticulatedSystem15setJointDampingERKN6raisim6VecDynE"><code class="docutils literal notranslate"><span class="pre">setJointDamping()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim17ArticulatedSystem20computeSparseInverseERK6MatDynR6MatDyn"><code class="docutils literal notranslate"><span class="pre">computeSparseInverse()</span></code></a></li>
@@ -272,6 +276,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisim17ArticulatedSystem16getActuatorNamesEv"><code class="docutils literal notranslate"><span class="pre">getActuatorNames()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisim17ArticulatedSystem12getActuatorsEv"><code class="docutils literal notranslate"><span class="pre">getActuators()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisim17ArticulatedSystem16getActuatorIndexERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getActuatorIndex()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisim17ArticulatedSystem9getTracksEv"><code class="docutils literal notranslate"><span class="pre">getTracks()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisim17ArticulatedSystem13getTrackIndexERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getTrackIndex()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6raisim17ArticulatedSystem13getTrackSpeedE6size_t"><code class="docutils literal notranslate"><span class="pre">getTrackSpeed()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim17ArticulatedSystem18setActuatorTorquesERKN5Eigen8VectorXdE"><code class="docutils literal notranslate"><span class="pre">setActuatorTorques()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim17ArticulatedSystem17setActuatorTorqueERKNSt6stringEd"><code class="docutils literal notranslate"><span class="pre">setActuatorTorque()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim17ArticulatedSystem17setActuatorTorqueE6size_td"><code class="docutils literal notranslate"><span class="pre">setActuatorTorque()</span></code></a></li>
@@ -348,6 +355,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DeformableTerrain.html">Deformable terrain</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
@@ -2322,6 +2330,16 @@
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim17ArticulatedSystem15getJointDampingEv">
+<span id="_CPPv3NK6raisim17ArticulatedSystem15getJointDampingEv"></span><span id="_CPPv2NK6raisim17ArticulatedSystem15getJointDampingEv"></span><span id="raisim::ArticulatedSystem::getJointDampingC"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1ac04a06d639bfa12675c390a0c59011cb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">VecDyn</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getJointDamping</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim17ArticulatedSystem15getJointDampingEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the current passive joint damping coefficients in generalized velocity order (size <a class="reference internal" href="#classraisim_1_1ArticulatedSystem_1a2f5cc1b5da070fa0677b5f1190e911ba"><span class="std std-ref">getDOF()</span></a>). Initially loaded from the model, then replaced by <a class="reference internal" href="#classraisim_1_1ArticulatedSystem_1add8ca397558bffd640f4e1406cf5af26"><span class="std std-ref">setJointDamping()</span></a>. Excludes actuator output damping and PD gains. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim17ArticulatedSystem15setJointDampingERKN5Eigen8VectorXdE">
 <span id="_CPPv3N6raisim17ArticulatedSystem15setJointDampingERKN5Eigen8VectorXdE"></span><span id="_CPPv2N6raisim17ArticulatedSystem15setJointDampingERKN5Eigen8VectorXdE"></span><span id="raisim::ArticulatedSystem::setJointDamping__Eigen::VectorXdCR"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1add8ca397558bffd640f4e1406cf5af26"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setJointDamping</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">VectorXd</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">dampingCoefficient</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim17ArticulatedSystem15setJointDampingERKN5Eigen8VectorXdE" title="Link to this definition"></a><br /></dt>
 <dd><p>passive elements at the joints. They can be specified in the URDF file as well. Check Object/ArticulatedSystem/URDF convention in the manual </p>
@@ -2715,6 +2733,44 @@
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the actuator index, or size_t(-1) if there is no actuator with the name </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim17ArticulatedSystem9getTracksEv">
+<span id="_CPPv3NK6raisim17ArticulatedSystem9getTracksEv"></span><span id="_CPPv2NK6raisim17ArticulatedSystem9getTracksEv"></span><span id="raisim::ArticulatedSystem::getTracksC"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1a93a1a761e861d2eee7bcc660a1080e0a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Track</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getTracks</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim17ArticulatedSystem9getTracksEv" title="Link to this definition"></a><br /></dt>
+<dd><p>The tracks (continuous belts) defined by the URDF &lt;track&gt; elements, in their order there. A track’s belt moves with its drive joints, so it is controlled through those joints (PD targets, torques or actuators). See Track. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the tracks </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim17ArticulatedSystem13getTrackIndexERKNSt6stringE">
+<span id="_CPPv3NK6raisim17ArticulatedSystem13getTrackIndexERKNSt6stringE"></span><span id="_CPPv2NK6raisim17ArticulatedSystem13getTrackIndexERKNSt6stringE"></span><span id="raisim::ArticulatedSystem::getTrackIndex__ssCRC"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1afd9e705e15b7bd71406ca436bce1561c"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getTrackIndex</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim17ArticulatedSystem13getTrackIndexERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> track name </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the track index, or size_t(-1) if there is no track with the name </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim17ArticulatedSystem13getTrackSpeedE6size_t">
+<span id="_CPPv3NK6raisim17ArticulatedSystem13getTrackSpeedE6size_t"></span><span id="_CPPv2NK6raisim17ArticulatedSystem13getTrackSpeedE6size_t"></span><span id="raisim::ArticulatedSystem::getTrackSpeed__sC"></span><span class="target" id="classraisim_1_1ArticulatedSystem_1a5aca2907664af49b5d60292281b664cf"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getTrackSpeed</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">trackIndex</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim17ArticulatedSystem13getTrackSpeedE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>The belt speed of a track: sum(gain * joint velocity) over its drives. A positive speed moves the belt counter-clockwise seen from the track axis, so with the axis along the body’s +y, the bottom of the belt moves backwards and the robot forwards. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>trackIndex</strong> – <strong>[in]</strong> track index (<a class="reference internal" href="#classraisim_1_1ArticulatedSystem_1a93a1a761e861d2eee7bcc660a1080e0a"><span class="std std-ref">getTracks()</span></a> order) </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the belt speed [m/s] </p>
 </dd>
 </dl>
 </dd></dl>
@@ -3959,7 +4015,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="MimicJoints.html" class="btn btn-neutral float-left" title="Mimic Joints" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Tracks.html" class="btn btn-neutral float-left" title="Tracks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../SingleBodyObjects.html" class="btn btn-neutral float-right" title="Single-Body Objects" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

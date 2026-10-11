@@ -36,6 +36,9 @@ Common CMake options
    * - ``RAISIM_FOREST_COLLISION_BENCHMARK``
      - Also build the ``forest_collision_benchmark`` example tool. Disabled by
        default.
+   * - ``RAISIM_DEBUG_TOOLS``
+     - Build manual regression and debug tools with the examples project
+       (``RAISIM_EXAMPLE=ON``). Disabled by default; see :doc:`DebugTools`.
 
 The RaiSim version is pinned by the checkout (``RAISIM_VERSION`` in the
 top-level ``CMakeLists.txt``). Configuring with a different
@@ -117,6 +120,9 @@ workloads in a downstream application.
 Tests
 =====
 
+For manual object lifecycle and rendering regression checks, see
+:doc:`DebugTools`.
+
 The public workspace has no CTest suite; the engine's own test suite is not
 shipped. The examples double as smoke tests, and ``raisimPy`` includes a
 ``unittest`` module for its tendon bindings. Run it after building with
@@ -139,14 +145,15 @@ Sphinx:
 
     cmake -S /path/to/raisim2Lib/docs -B /tmp/raisim2lib-docs \
       -DCMAKE_PREFIX_PATH="/path/to/raisim2Lib/raisim;/path/to/raisim2Lib/rayrai" \
-      -DRAISIM_DOCS_BUILD_RAYRAI_IMAGES=OFF \
       -DRAISIM_DOCS_RAISIM_INCLUDE_DIR=/path/to/raisim2Lib/raisim/include/raisim \
       -DRAISIM_DOCS_RAYRAI_INCLUDE_DIR=/path/to/raisim2Lib/rayrai/include/rayrai
     cmake --build /tmp/raisim2lib-docs --parallel 12
 
 This generates API references from the distributed headers and reuses the
-checked-in documentation images. Enable ``RAISIM_DOCS_BUILD_RAYRAI_IMAGES``
-when you have a working OpenGL context and want to regenerate those images.
+checked-in documentation images. To regenerate those images, configure with
+``-DRAISIM_DOCS_BUILD_RAYRAI_IMAGES=ON``. The image generators need a working
+OpenGL context and overwrite the images in ``rsc/docs/image/rayrai``. The option
+is cached, so set it back to ``OFF`` to stop regenerating them.
 
 For prose and link checks, the documentation can also be built directly with
 Sphinx. When it cannot find Sphinx, the CMake docs configure creates

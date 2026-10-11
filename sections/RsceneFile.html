@@ -6,15 +6,16 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>.rscene File &mdash; raisim 2.8.1 documentation</title>
+  <title>.rscene File &mdash; raisim 2.9.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
 
   
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=cd87aae0"></script>
+      <script src="../_static/documentation_options.js?v=182a64a0"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -52,6 +53,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="FeatureMap.html">Feature Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DebugTools.html">Regression and Debug Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ProjectLayout.html">Project Layout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Benchmark.html">Benchmark</a></li>
@@ -76,6 +78,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#physics-only">Physics only</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#physics-and-rayrai-rendering">Physics and rayrai rendering</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#physics-on-a-server-rendering-in-the-tcp-viewer">Physics on a server, rendering in the TCP viewer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#a-robot-in-a-scene">A robot in a scene</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#file-syntax">File syntax</a><ul>
@@ -156,8 +159,8 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6raisin20rsceneRenderSettingsERKN6raisim6rscene5SceneE"><code class="docutils literal notranslate"><span class="pre">rsceneRenderSettings()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6raisin11applyRsceneERKN6raisim6rscene5SceneER12RayraiWindow"><code class="docutils literal notranslate"><span class="pre">applyRscene()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6raisin11applyRsceneERKN6raisim6rscene5SceneER12RayraiWindowRK20RsceneRenderSettings"><code class="docutils literal notranslate"><span class="pre">applyRscene()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6raisin23setRsceneRenderSettingsER12RayraiWindowRK20RsceneRenderSettings"><code class="docutils literal notranslate"><span class="pre">setRsceneRenderSettings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6raisin13rsceneVisualsERK12RayraiWindow"><code class="docutils literal notranslate"><span class="pre">rsceneVisuals()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6raisin20RsceneRenderSettingsE"><code class="docutils literal notranslate"><span class="pre">raisin::RsceneRenderSettings</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisin20RsceneRenderSettings6presetE"><code class="docutils literal notranslate"><span class="pre">preset</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisin20RsceneRenderSettings7qualityE"><code class="docutils literal notranslate"><span class="pre">quality</span></code></a></li>
@@ -186,6 +189,7 @@
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableTerrain.html">Deformable terrain</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
@@ -236,18 +240,24 @@ the syntax, every record and field they read, how references to other files
 are resolved, and what they reject or ignore.</p>
 <section id="availability">
 <h2>Availability<a class="headerlink" href="#availability" title="Link to this heading"></a></h2>
-<p>The reader is new in v2.7.1, which is not released yet (see
-<a class="reference internal" href="changelog/v2.7.html"><span class="doc">Changelog: v2.7</span></a>). It is part of the RaiSim and rayrai libraries:</p>
+<p>The reader is new in v2.8.0. XML includes, a <code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> that shows its
+world’s scene by itself, <code class="docutils literal notranslate"><span class="pre">raisin::setRsceneRenderSettings</span></code> and
+<code class="docutils literal notranslate"><span class="pre">raisin::rsceneVisuals</span></code> are new in v2.8.2, which is not released yet; v2.8.0
+and v2.8.1 show a scene with <code class="docutils literal notranslate"><span class="pre">raisin::applyRscene</span></code> (see
+<a class="reference internal" href="changelog/v2.8.html"><span class="doc">Changelog: v2.8</span></a>). It is part of the RaiSim and rayrai libraries:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">raisim/Rscene.hpp</span></code> (RaiSim): <code class="docutils literal notranslate"><span class="pre">raisim::World(path)</span></code> for a path that ends
-in <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> (in any letter case), <code class="docutils literal notranslate"><span class="pre">World::getRscene()</span></code>, and the
+in <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> (in any letter case), <code class="docutils literal notranslate"><span class="pre">&lt;include</span> <span class="pre">value=&quot;scene.rscene&quot;/&gt;</span></code> in
+a RaiSim XML world configuration file, <code class="docutils literal notranslate"><span class="pre">World::getRscene()</span></code>, and the
 lower-level <code class="docutils literal notranslate"><span class="pre">raisim::rscene::load</span></code>, <code class="docutils literal notranslate"><span class="pre">rscene::applyPhysics</span></code> and
 <code class="docutils literal notranslate"><span class="pre">rscene::addToWorld</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rayrai/RsceneVisuals.hpp</span></code> (rayrai): <code class="docutils literal notranslate"><span class="pre">raisin::applyRscene</span></code> and
-<code class="docutils literal notranslate"><span class="pre">raisin::rsceneRenderSettings</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rayrai/RayraiWindow.hpp</span></code> (rayrai): a <code class="docutils literal notranslate"><span class="pre">raisin::RayraiWindow</span></code> on such a
+world shows the scene. <code class="docutils literal notranslate"><span class="pre">rayrai/RsceneVisuals.hpp</span></code>:
+<code class="docutils literal notranslate"><span class="pre">raisin::rsceneRenderSettings</span></code>, <code class="docutils literal notranslate"><span class="pre">raisin::setRsceneRenderSettings</span></code> and
+<code class="docutils literal notranslate"><span class="pre">raisin::rsceneVisuals</span></code>.</p></li>
 </ul>
-<p>The v2.7.0 package ships neither header, so code that uses them does not
-compile against it. Its <code class="docutils literal notranslate"><span class="pre">World(path)</span></code> constructor does not recognize the
+<p>The v2.7.0 package has neither the reader nor <code class="docutils literal notranslate"><span class="pre">rayrai/RsceneVisuals.hpp</span></code>,
+so code that uses them does not compile against it. Its <code class="docutils literal notranslate"><span class="pre">World(path)</span></code> constructor does not recognize the
 extension either: it searches the file for a <code class="docutils literal notranslate"><span class="pre">&lt;raisim&gt;</span></code> or <code class="docutils literal notranslate"><span class="pre">&lt;mujoco&gt;</span></code>
 element, finds neither, and returns an empty world without an error.</p>
 <p>Engine 2 itself is not public, so scenes reach you as files, for example
@@ -269,7 +279,8 @@ that loads.</p>
 <p><code class="docutils literal notranslate"><span class="pre">World(path)</span></code> parses and checks the whole file first, then applies the solver
 settings and contact materials and adds the terrain, the bodies and the wires.
 The parsed scene stays available through <code class="docutils literal notranslate"><span class="pre">world.getRscene()</span></code>, which returns
-<code class="docutils literal notranslate"><span class="pre">nullptr</span></code> for a world built any other way. A file that the reader rejects is
+<code class="docutils literal notranslate"><span class="pre">nullptr</span></code> for a world built any other way, except from a RaiSim XML world
+configuration file that includes the scene (see <a class="reference internal" href="#a-robot-in-a-scene">A robot in a scene</a>). A file that the reader rejects is
 a RaiSim fatal error, which exits the process unless you install a fatal
 callback (see <a class="reference internal" href="LoggingSystem.html"><span class="doc">Logging System</span></a>). If the callback returns instead of
 throwing, the world keeps the bodies added before the error and
@@ -304,15 +315,9 @@ also want to render it.</p>
 <h3>Physics and rayrai rendering<a class="headerlink" href="#physics-and-rayrai-rendering" title="Link to this heading"></a></h3>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;raisim/World.hpp&quot;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;rayrai/RayraiWindow.hpp&quot;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;rayrai/RsceneVisuals.hpp&quot;</span>
 
 <span class="k">auto</span><span class="w"> </span><span class="n">world</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;scene.rscene&quot;</span><span class="p">);</span>
-<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="w"> </span><span class="nf">viewer</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">1280</span><span class="p">,</span><span class="w"> </span><span class="mi">800</span><span class="p">);</span>
-
-<span class="c1">// The file&#39;s render settings, optionally changed in C++ before they are applied.</span>
-<span class="k">auto</span><span class="w"> </span><span class="n">render</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">rsceneRenderSettings</span><span class="p">(</span><span class="o">*</span><span class="n">world</span><span class="o">-&gt;</span><span class="n">getRscene</span><span class="p">());</span>
-<span class="n">render</span><span class="p">.</span><span class="n">quality</span><span class="p">.</span><span class="n">addViewerFillLights</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
-<span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">visuals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">applyRscene</span><span class="p">(</span><span class="o">*</span><span class="n">world</span><span class="o">-&gt;</span><span class="n">getRscene</span><span class="p">(),</span><span class="w"> </span><span class="n">viewer</span><span class="p">,</span><span class="w"> </span><span class="n">render</span><span class="p">);</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="w"> </span><span class="nf">viewer</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">1280</span><span class="p">,</span><span class="w"> </span><span class="mi">800</span><span class="p">);</span><span class="w">  </span><span class="c1">// shows the whole scene</span>
 
 <span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">running</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="n">world</span><span class="o">-&gt;</span><span class="n">integrate</span><span class="p">();</span>
@@ -320,43 +325,57 @@ also want to render it.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">applyRscene(scene,</span> <span class="pre">viewer)</span></code> without the third argument applies
-<code class="docutils literal notranslate"><span class="pre">rsceneRenderSettings(scene)</span></code> unchanged. Either form applies, in this order,
-the quality preset and render settings (<code class="docutils literal notranslate"><span class="pre">rayrai_render</span></code> and
-<code class="docutils literal notranslate"><span class="pre">environment</span></code>), the background (a plain color, an HDR image, or the rayrai
-sky configured by <code class="docutils literal notranslate"><span class="pre">weather</span></code>), the objects the RaiSim world does not draw
-(visual-only objects and the visual meshes of visible <code class="docutils literal notranslate"><span class="pre">.rasset</span></code> objects,
-returned in <code class="docutils literal notranslate"><span class="pre">visuals.objects</span></code>), the lights, the local fog volumes, the
-reflection probes, one <code class="docutils literal notranslate"><span class="pre">InstancedVisuals</span></code> batch per enabled
-<code class="docutils literal notranslate"><span class="pre">instanced_visual</span></code> record (<code class="docutils literal notranslate"><span class="pre">visuals.instancedVisuals</span></code>, in file order), the
-terrain foliage (<code class="docutils literal notranslate"><span class="pre">visuals.foliage</span></code>), the terrain textures and the first
-enabled camera. Bodies and height maps are drawn from the world like any other
-RaiSim object; the hidden <code class="docutils literal notranslate"><span class="pre">.rasset</span></code> colliders are not drawn.</p>
+<p>A <code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> whose world holds a scene (<code class="docutils literal notranslate"><span class="pre">world-&gt;getRscene()</span></code>) applies
+it when it is constructed, and again when <code class="docutils literal notranslate"><span class="pre">swapWorld</span></code> gives it a new world;
+no call is needed. It applies, in this order, the quality preset and render settings
+(<code class="docutils literal notranslate"><span class="pre">rayrai_render</span></code> and <code class="docutils literal notranslate"><span class="pre">environment</span></code>), the background (a plain color, an
+HDR image, or the rayrai sky configured by <code class="docutils literal notranslate"><span class="pre">weather</span></code>), the objects the RaiSim
+world does not draw (visual-only objects and the visual meshes of visible
+<code class="docutils literal notranslate"><span class="pre">.rasset</span></code> objects), the lights, the local fog volumes, the reflection probes,
+one <code class="docutils literal notranslate"><span class="pre">InstancedVisuals</span></code> batch per enabled <code class="docutils literal notranslate"><span class="pre">instanced_visual</span></code> record (in file
+order), the terrain foliage, the terrain textures and the first enabled
+camera. Bodies and height maps are drawn from the world like any other RaiSim
+object; the hidden <code class="docutils literal notranslate"><span class="pre">.rasset</span></code> colliders are not drawn.
+<code class="docutils literal notranslate"><span class="pre">raisin::rsceneVisuals(viewer)</span></code> returns the visuals and batches it created
+(<code class="docutils literal notranslate"><span class="pre">objects</span></code>, <code class="docutils literal notranslate"><span class="pre">instancedVisuals</span></code> and <code class="docutils literal notranslate"><span class="pre">foliage</span></code>).</p>
 <ul class="simple">
-<li><p>A render record the file omits, and every key it omits, takes Engine 2’s
-default, so a file without <code class="docutils literal notranslate"><span class="pre">environment</span></code>, <code class="docutils literal notranslate"><span class="pre">weather</span></code> or
-<code class="docutils literal notranslate"><span class="pre">rayrai_render</span></code> records still applies.</p></li>
-<li><p>RaiSim stores <code class="docutils literal notranslate"><span class="pre">environment</span></code>, <code class="docutils literal notranslate"><span class="pre">weather</span></code> and <code class="docutils literal notranslate"><span class="pre">rayrai_render</span></code> without
+<li><p>Meshes load asynchronously, as for any other visual. A visual appears once
+its mesh is ready; <code class="docutils literal notranslate"><span class="pre">viewer.pendingAsyncMeshLoadCount()</span></code> counts the rest,
+for example to show a loading bar. <code class="docutils literal notranslate"><span class="pre">viewer.setAsyncMeshLoadingEnabled(false)</span></code>
+loads the remaining meshes before it returns, for example before rendering a
+sensor image, and loads later meshes synchronously.</p></li>
+<li><p>Settings changed after construction (<code class="docutils literal notranslate"><span class="pre">setRenderQualitySettings</span></code>,
+<code class="docutils literal notranslate"><span class="pre">getLight</span></code>, <code class="docutils literal notranslate"><span class="pre">getCamera</span></code>) override the scene’s.</p></li>
+<li><p>A scene rayrai cannot show, for example one with a missing texture, mesh or
+HDR file (see <a class="reference internal" href="#rejected-content">Rejected content</a>), is a RaiSim fatal error in the
+constructor. A render record the file omits, and every key it omits, takes
+Engine 2’s default, so a file without <code class="docutils literal notranslate"><span class="pre">environment</span></code>, <code class="docutils literal notranslate"><span class="pre">weather</span></code> or
+<code class="docutils literal notranslate"><span class="pre">rayrai_render</span></code> records still applies. RaiSim stores these records without
 interpreting them, so rayrai is the first to check their keys.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">applyRscene</span></code> calls <code class="docutils literal notranslate"><span class="pre">setRenderQualitySettings</span></code> and replaces the viewer’s
-additional lights, local fog volumes, projected decals and irradiance
-volumes, so add your own afterwards. Call it once per viewer: batch and
-visual names must be unique, so applying a scene to the same viewer twice is
-a fatal error.</p></li>
-<li><p>With weather enabled, rayrai derives exposure, environment intensity, fog and
-shadow strength from the base settings and the sky. Change the base values in
-<code class="docutils literal notranslate"><span class="pre">render.quality</span></code> and <code class="docutils literal notranslate"><span class="pre">render.weather</span></code> before <code class="docutils literal notranslate"><span class="pre">applyRscene</span></code> instead of
-reading them back from the viewer afterwards. After <code class="docutils literal notranslate"><span class="pre">applyRscene</span></code>, the
-viewer’s own setters (<code class="docutils literal notranslate"><span class="pre">setRenderQualitySettings</span></code>, <code class="docutils literal notranslate"><span class="pre">getLight</span></code>,
-<code class="docutils literal notranslate"><span class="pre">getCamera</span></code>) still change anything.</p></li>
-<li><p>Both functions throw <code class="docutils literal notranslate"><span class="pre">std::runtime_error</span></code> for a malformed render record, a
-missing texture, mesh or HDR file, or content that rayrai cannot reproduce
-(see <a class="reference internal" href="#rejected-content">Rejected content</a>).</p></li>
 </ul>
+<p>To change the file’s render settings in C++, start from the file’s own and pass
+them to <code class="docutils literal notranslate"><span class="pre">setRsceneRenderSettings</span></code> (<code class="docutils literal notranslate"><span class="pre">rayrai/RsceneVisuals.hpp</span></code>). The viewer
+applies the scene again with them, in place of the constructor’s application:
+the previous visuals, batches and reflection probes are removed, and their
+meshes are reused. It is a fatal error when the viewer’s world holds no scene.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;rayrai/RsceneVisuals.hpp&quot;</span>
+
+<span class="k">auto</span><span class="w"> </span><span class="n">render</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">rsceneRenderSettings</span><span class="p">(</span><span class="o">*</span><span class="n">world</span><span class="o">-&gt;</span><span class="n">getRscene</span><span class="p">());</span>
+<span class="n">render</span><span class="p">.</span><span class="n">quality</span><span class="p">.</span><span class="n">addViewerFillLights</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="n">render</span><span class="p">.</span><span class="n">weather</span><span class="p">.</span><span class="n">timeOfDayHours</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">18</span><span class="p">;</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">setRsceneRenderSettings</span><span class="p">(</span><span class="n">viewer</span><span class="p">,</span><span class="w"> </span><span class="n">render</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>With weather enabled, rayrai derives exposure, environment intensity, fog and
+shadow strength from the base settings and the sky. Change the base values in
+<code class="docutils literal notranslate"><span class="pre">render.quality</span></code> and <code class="docutils literal notranslate"><span class="pre">render.weather</span></code> this way instead of reading them back
+from the viewer and setting them again. Applying the scene replaces the
+viewer’s additional lights, local fog volumes, projected decals and irradiance
+volumes, so add your own afterwards.</p>
 <p><a class="reference internal" href="examples/rayrai/rayrai_forest_from_rscene.html"><span class="doc">Rayrai Example: Forest From .rscene</span></a> loads the shipped forest scene
 this way. Every <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> file in the RaiSim and <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> repositories
-loads both ways, and the image matches Engine 2’s viewport; only two Engine 2
-test inputs, which are deliberately not loadable, are excluded.</p>
+loads, and the image matches Engine 2’s viewport; only two Engine 2 test
+inputs, which are deliberately not loadable, are excluded.</p>
 </section>
 <section id="physics-on-a-server-rendering-in-the-tcp-viewer">
 <h3>Physics on a server, rendering in the TCP viewer<a class="headerlink" href="#physics-on-a-server-rendering-in-the-tcp-viewer" title="Link to this heading"></a></h3>
@@ -369,12 +388,61 @@ test inputs, which are deliberately not loadable, are excluded.</p>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> draws the bodies the server streams. It also applies the
-scene with <code class="docutils literal notranslate"><span class="pre">applyRscene</span></code>, from the same file on the server’s computer or from
-a copy elsewhere, so it shows what the in-process viewer above shows. A viewer
+scene, from the same file on the server’s computer or from a copy elsewhere, so
+it shows what the in-process viewer above shows. A viewer
 on another computer that lacks the scene’s files asks its user, then
 downloads them from the server (see <a class="reference internal" href="RaisimServer.html"><span class="doc">Raisim Server</span></a> and
 <a class="reference internal" href="RayraiTcpViewer.html#raisim-engine-scenes"><span class="std std-ref">RaiSim Engine scenes</span></a>).
 <a class="reference internal" href="examples/server/rscene_server.html"><span class="doc">Server Example: Rscene Server</span></a> serves the forest scene.</p>
+</section>
+<section id="a-robot-in-a-scene">
+<h3>A robot in a scene<a class="headerlink" href="#a-robot-in-a-scene" title="Link to this heading"></a></h3>
+<p>A RaiSim world configuration file (<a class="reference internal" href="WorldConfigurationFile.html"><span class="doc">World Configuration File</span></a>) can include
+a scene. The robot, its initial state and its controller gains stay in the XML
+file, and the scene it runs in stays in the <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> file, so either can be
+swapped without editing the other:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;raisim&gt;</span>
+<span class="w">    </span><span class="nt">&lt;include</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;[THIS_DIR]/../../city/rayrai_city.rscene&quot;</span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;objects&gt;</span>
+<span class="w">        </span><span class="nt">&lt;articulated_system</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;anymal&quot;</span><span class="w"> </span><span class="na">urdf_path=</span><span class="s">&quot;[THIS_DIR]/../../anymal_c/urdf/anymal.urdf&quot;</span><span class="nt">&gt;</span>
+<span class="w">            </span><span class="nt">&lt;state</span><span class="w"> </span><span class="na">qpos=</span><span class="s">&quot;-36, -1.6, 0.56, 0.2675, 0, 0, 0.9636, 0.03, 0.4, -0.8, -0.03, 0.4, -0.8, 0.03, -0.4, 0.8, -0.03, -0.4, 0.8&quot;</span>
+<span class="w">                   </span><span class="na">qvel=</span><span class="s">&quot;0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0&quot;</span><span class="nt">/&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/articulated_system&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/objects&gt;</span>
+<span class="nt">&lt;/raisim&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">world</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;anymal_in_city.xml&quot;</span><span class="p">);</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="w"> </span><span class="nf">viewer</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">1280</span><span class="p">,</span><span class="w"> </span><span class="mi">800</span><span class="p">);</span><span class="w">  </span><span class="c1">// the robot and the whole scene</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="https://github.com/raisimTech/raisim2Lib/blob/main/rsc/xmlScripts/rscene/anymal_in_city.xml">anymal_in_city.xml</a>
+is this file with joint PD gains. <a class="reference internal" href="examples/rayrai/rayrai_city_from_xml.html"><span class="doc">Rayrai Example: City From XML</span></a>
+loads it in process, and <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span> <span class="pre">--simulate</span> <span class="pre">anymal_in_city.xml</span></code>
+runs and shows it, the scene included.</p>
+<ul class="simple">
+<li><p>An <code class="docutils literal notranslate"><span class="pre">&lt;include&gt;</span></code> whose path ends in <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> (in any letter case) loads
+the scene with the same checks as <code class="docutils literal notranslate"><span class="pre">World(path)</span></code>. Like any include, it loads
+before the including file’s own content, so the scene’s bodies precede the
+robot in the world’s object list. A relative path names a file in the
+working directory or, if there is none, a file relative to the folder of
+the including XML file. <code class="docutils literal notranslate"><span class="pre">[THIS_DIR]</span></code> in front of the path selects the
+folder explicitly.</p></li>
+<li><p>The scene’s solver settings and contact materials apply first. Elements in
+the XML file (<code class="docutils literal notranslate"><span class="pre">timeStep</span></code>, <code class="docutils literal notranslate"><span class="pre">gravity</span></code>, <code class="docutils literal notranslate"><span class="pre">erp</span></code>, <code class="docutils literal notranslate"><span class="pre">simulation</span></code>,
+<code class="docutils literal notranslate"><span class="pre">material</span></code>) override them; the settings the XML file does not name stay as
+the scene set them.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">world.getRscene()</span></code> returns the included scene, so a <code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> and
+the TCP viewer show its render records as for a scene loaded directly.</p></li>
+<li><p>A world holds at most one scene. A second <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> include, also one in a
+nested XML include, is a fatal error.</p></li>
+<li><p>The path can be a template parameter: with <code class="docutils literal notranslate"><span class="pre">&lt;include</span> <span class="pre">value=&quot;&#64;&#64;scene&quot;/&gt;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">raisim::World</span> <span class="pre">world(&quot;robot.xml&quot;,</span> <span class="pre">{{&quot;scene&quot;,</span> <span class="pre">&quot;/path/to/forest.rscene&quot;}})</span></code>
+puts the same robot in another scene.</p></li>
+</ul>
+<p>The world is the one the scene and C++ code build together: loading the scene
+with <code class="docutils literal notranslate"><span class="pre">World(path)</span></code> and adding the robot with <code class="docutils literal notranslate"><span class="pre">addArticulatedSystem</span></code> gives
+the same objects, settings and trajectories.</p>
 </section>
 </section>
 <section id="file-syntax">
@@ -724,7 +792,7 @@ visual-only.</p></td>
 </table>
 <p>Every other record tag is an error (see <a class="reference internal" href="#rejected-content">Rejected content</a>). In the tables
 below, <strong>RaiSim</strong> means the field is applied by <code class="docutils literal notranslate"><span class="pre">World(path)</span></code> or
-<code class="docutils literal notranslate"><span class="pre">rscene::addToWorld</span></code>, <strong>rayrai</strong> that it is applied by <code class="docutils literal notranslate"><span class="pre">applyRscene</span></code>,
+<code class="docutils literal notranslate"><span class="pre">rscene::addToWorld</span></code>, <strong>rayrai</strong> that a <code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> applies it,
 <strong>check</strong> that the value is checked but not applied, and <strong>ignored</strong> that
 Engine 2 writes it but neither reader uses it. The default column lists the
 value of an absent key.</p>
@@ -1820,7 +1888,7 @@ reflection probe (<strong>rayrai</strong>, <code class="docutils literal notrans
 <code class="docutils literal notranslate"><span class="pre">strength</span></code> (default <code class="docutils literal notranslate"><span class="pre">1</span></code>) and box projection (<code class="docutils literal notranslate"><span class="pre">boxProjection</span></code>,
 <code class="docutils literal notranslate"><span class="pre">boxMin</span></code>, <code class="docutils literal notranslate"><span class="pre">boxMax</span></code>; default off, <code class="docutils literal notranslate"><span class="pre">-5,-5,-5</span></code>, <code class="docutils literal notranslate"><span class="pre">5,5,5</span></code>).
 <code class="docutils literal notranslate"><span class="pre">enabled=false</span></code> skips the record.</p>
-<p>With <code class="docutils literal notranslate"><span class="pre">captureOnApply=true</span></code>, <code class="docutils literal notranslate"><span class="pre">applyRscene</span></code> captures the scene into the
+<p>With <code class="docutils literal notranslate"><span class="pre">captureOnApply=true</span></code>, rayrai captures the scene into the
 probe, after the objects and lights and before the instanced visuals and
 foliage, as Engine 2 does: <code class="docutils literal notranslate"><span class="pre">captureCached</span></code> (default <code class="docutils literal notranslate"><span class="pre">true</span></code>) uses rayrai’s
 capture cache, <code class="docutils literal notranslate"><span class="pre">cubemapSize</span></code> (<code class="docutils literal notranslate"><span class="pre">256</span></code>) the cube face size,
@@ -2166,7 +2234,7 @@ descriptor that cannot be read or is invalid, or a rotation that is not a
 unit quaternion;</p></li>
 <li><p>a wire whose body has no physics body, or whose tendon RaiSim rejects.</p></li>
 </ul>
-<p>While applying to rayrai (<code class="docutils literal notranslate"><span class="pre">rsceneRenderSettings</span></code> and <code class="docutils literal notranslate"><span class="pre">applyRscene</span></code>):</p>
+<p>While applying to rayrai (<code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> and <code class="docutils literal notranslate"><span class="pre">rsceneRenderSettings</span></code>):</p>
 <ul class="simple">
 <li><p>an unknown preset, color mode, background mode, weather preset or weather
 quality, or a malformed key in these records;</p></li>
@@ -2487,15 +2555,15 @@ in <a class="reference internal" href="#physics-and-rayrai-rendering">Physics an
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin11applyRsceneERKN6raisim6rscene5SceneER12RayraiWindow">
-<span id="_CPPv3N6raisin11applyRsceneERKN6raisim6rscene5SceneER12RayraiWindow"></span><span id="_CPPv2N6raisin11applyRsceneERKN6raisim6rscene5SceneER12RayraiWindow"></span><span id="raisin::applyRscene__raisim::rscene::SceneCR.RayraiWindowR"></span><span class="target" id="namespaceraisin_1ae2c7e5d75e6a27d9ff4aa40270e54655"></span><a class="reference internal" href="#_CPPv4N6raisin13RsceneVisualsE" title="raisin::RsceneVisuals"><span class="n"><span class="pre">RsceneVisuals</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">raisin</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">applyRscene</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">rscene</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6raisim6rscene5SceneE" title="raisim::rscene::Scene"><span class="n"><span class="pre">Scene</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">scene</span></span>, <a class="reference internal" href="rayrai/Performance.html#_CPPv4N6raisin12RayraiWindowE" title="raisin::RayraiWindow"><span class="n"><span class="pre">RayraiWindow</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">viewer</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin11applyRsceneERKN6raisim6rscene5SceneER12RayraiWindow" title="Link to this definition"></a><br /></dt>
-<dd><p>Applies the scene with its own render settings. </p>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin23setRsceneRenderSettingsER12RayraiWindowRK20RsceneRenderSettings">
+<span id="_CPPv3N6raisin23setRsceneRenderSettingsER12RayraiWindowRK20RsceneRenderSettings"></span><span id="_CPPv2N6raisin23setRsceneRenderSettingsER12RayraiWindowRK20RsceneRenderSettings"></span><span id="raisin::setRsceneRenderSettings__RayraiWindowR.RsceneRenderSettingsCR"></span><span class="target" id="namespaceraisin_1a9ee646fbbeea61d45a95ae34937ef188"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">raisin</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">setRsceneRenderSettings</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="rayrai/Performance.html#_CPPv4N6raisin12RayraiWindowE" title="raisin::RayraiWindow"><span class="n"><span class="pre">RayraiWindow</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">viewer</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisin20RsceneRenderSettingsE" title="raisin::RsceneRenderSettings"><span class="n"><span class="pre">RsceneRenderSettings</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">render</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin23setRsceneRenderSettingsER12RayraiWindowRK20RsceneRenderSettings" title="Link to this definition"></a><br /></dt>
+<dd><p>Shows the viewer’s world scene with these render settings instead of the file’s, usually the file’s own (<a class="reference internal" href="#namespaceraisin_1aa34fdd3e611a0eb85b9ecbab7f4cc4a2"><span class="std std-ref">rsceneRenderSettings()</span></a>) after C++ changes. The scene is applied again in place of the constructor’s application; its meshes are reused. Fatal when the viewer’s world holds no scene. </p>
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin11applyRsceneERKN6raisim6rscene5SceneER12RayraiWindowRK20RsceneRenderSettings">
-<span id="_CPPv3N6raisin11applyRsceneERKN6raisim6rscene5SceneER12RayraiWindowRK20RsceneRenderSettings"></span><span id="_CPPv2N6raisin11applyRsceneERKN6raisim6rscene5SceneER12RayraiWindowRK20RsceneRenderSettings"></span><span id="raisin::applyRscene__raisim::rscene::SceneCR.RayraiWindowR.RsceneRenderSettingsCR"></span><span class="target" id="namespaceraisin_1ab28f9b1a3ef38dc8e4bbeddcd3dacce4"></span><a class="reference internal" href="#_CPPv4N6raisin13RsceneVisualsE" title="raisin::RsceneVisuals"><span class="n"><span class="pre">RsceneVisuals</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">raisin</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">applyRscene</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">rscene</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6raisim6rscene5SceneE" title="raisim::rscene::Scene"><span class="n"><span class="pre">Scene</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">scene</span></span>, <a class="reference internal" href="rayrai/Performance.html#_CPPv4N6raisin12RayraiWindowE" title="raisin::RayraiWindow"><span class="n"><span class="pre">RayraiWindow</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">viewer</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisin20RsceneRenderSettingsE" title="raisin::RsceneRenderSettings"><span class="n"><span class="pre">RsceneRenderSettings</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">render</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin11applyRsceneERKN6raisim6rscene5SceneER12RayraiWindowRK20RsceneRenderSettings" title="Link to this definition"></a><br /></dt>
-<dd><p>Applies the scene with the given render settings, usually the scene’s own (rsceneRenderSettings) after C++ changes. Throws std::runtime_error when a referenced file is missing or the scene needs a feature Rayrai cannot reproduce from it; the visuals and batches created before the error are removed again. </p>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin13rsceneVisualsERK12RayraiWindow">
+<span id="_CPPv3N6raisin13rsceneVisualsERK12RayraiWindow"></span><span id="_CPPv2N6raisin13rsceneVisualsERK12RayraiWindow"></span><span id="raisin::rsceneVisuals__RayraiWindowCR"></span><span class="target" id="namespaceraisin_1af297df0939cdcb12d2cdbb5e0dab7b8e"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisin13RsceneVisualsE" title="raisin::RsceneVisuals"><span class="n"><span class="pre">RsceneVisuals</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-prename descclassname"><span class="n"><span class="pre">raisin</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">rsceneVisuals</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="rayrai/Performance.html#_CPPv4N6raisin12RayraiWindowE" title="raisin::RayraiWindow"><span class="n"><span class="pre">RayraiWindow</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">viewer</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin13rsceneVisualsERK12RayraiWindow" title="Link to this definition"></a><br /></dt>
+<dd><p>The visuals and batches the viewer created for its world’s scene. Empty when the viewer’s world holds no scene. </p>
 </dd></dl>
 
 <dl class="cpp struct">
@@ -2528,7 +2596,7 @@ in <a class="reference internal" href="#physics-and-rayrai-rendering">Physics an
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin13RsceneVisualsE">
 <span id="_CPPv3N6raisin13RsceneVisualsE"></span><span id="_CPPv2N6raisin13RsceneVisualsE"></span><span id="raisin::RsceneVisuals"></span><span class="target" id="structraisin_1_1RsceneVisuals"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RsceneVisuals</span></span></span><a class="headerlink" href="#_CPPv4N6raisin13RsceneVisualsE" title="Link to this definition"></a><br /></dt>
-<dd><p>Viewer objects created by <a class="reference internal" href="#namespaceraisin_1ae2c7e5d75e6a27d9ff4aa40270e54655"><span class="std std-ref">applyRscene()</span></a>. </p>
+<dd><p>Viewer objects created for a scene (see <a class="reference internal" href="#namespaceraisin_1af297df0939cdcb12d2cdbb5e0dab7b8e"><span class="std std-ref">rsceneVisuals()</span></a>). </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">

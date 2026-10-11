@@ -83,15 +83,15 @@ Streamed scene notes
 
 Sharing a RaiSim Engine scene
 =============================
-A world built from a ``.rscene`` file (``raisim::World("scene.rscene")``) streams its
-physics bodies like any other world. The rest of the scene (visual-only objects, foliage,
+A world built from a ``.rscene`` file (``raisim::World("scene.rscene")``), or from an XML
+world file that includes one, streams its physics bodies like any other world. The rest of the scene (visual-only objects, foliage,
 lights, sky, terrain textures and the saved camera) lives only in the file. So the server
 also offers the viewer the scene file and every file it uses: meshes, ``.rasset``
 descriptors and their parts, textures, HDR images, and the buffers and images that glTF,
 OBJ and COLLADA meshes reference. ``raisim::rscene::referencedFiles()`` returns that list.
 
-The viewer looks for each file on its own computer first and asks its user before
-downloading anything; see :ref:`sections/RayraiTcpViewer:RaiSim Engine scenes`. Sharing is
+The viewer looks for each file on its own computer first (at the server's paths when the
+server is at a loopback address) and asks its user before downloading anything; see :ref:`sections/RayraiTcpViewer:RaiSim Engine scenes`. Sharing is
 on by default:
 
 .. code-block:: cpp

@@ -19,9 +19,7 @@ example only loads it and adds the robot:
      exampleRscPath(argv[0], "warehouse/rayrai_warehouse.rscene"));
    // The .rscene reader creates no articulated systems, so the robot is added here.
    addStandingAnymal(*world, exampleRscPath(argv[0], "anymal_c/urdf/anymal.urdf"));
-   raisin::RayraiWindow viewer(world, 1280, 800);
-   viewer.setAsyncMeshLoadingEnabled(true);
-   raisin::applyRscene(*world->getRscene(), viewer);
+   raisin::RayraiWindow viewer(world, 1280, 800);  // applies the scene
 
 .. image:: ../../../../rsc/docs/image/warehouse_dock.png
    :alt: Forklift, traffic cones and staged pallet loads in front of the dock doors

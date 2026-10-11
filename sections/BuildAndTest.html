@@ -6,21 +6,22 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Build, Test, and Benchmark &mdash; raisim 2.8.1 documentation</title>
+  <title>Build, Test, and Benchmark &mdash; raisim 2.9.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
 
   
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=cd87aae0"></script>
+      <script src="../_static/documentation_options.js?v=182a64a0"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Project Layout" href="ProjectLayout.html" />
+    <link rel="next" title="Regression and Debug Tools" href="DebugTools.html" />
     <link rel="prev" title="Feature Map" href="FeatureMap.html" /> 
 </head>
 
@@ -60,6 +61,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#build-the-documentation">Build the documentation</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="DebugTools.html">Regression and Debug Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ProjectLayout.html">Project Layout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Benchmark.html">Benchmark</a></li>
@@ -90,6 +92,7 @@
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableTerrain.html">Deformable terrain</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
@@ -174,6 +177,10 @@ by default; see <a class="reference internal" href="RayraiTcpViewer.html"><span 
 <td><p>Also build the <code class="docutils literal notranslate"><span class="pre">forest_collision_benchmark</span></code> example tool. Disabled by
 default.</p></td>
 </tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RAISIM_DEBUG_TOOLS</span></code></p></td>
+<td><p>Build manual regression and debug tools with the examples project
+(<code class="docutils literal notranslate"><span class="pre">RAISIM_EXAMPLE=ON</span></code>). Disabled by default; see <a class="reference internal" href="DebugTools.html"><span class="doc">Regression and Debug Tools</span></a>.</p></td>
+</tr>
 </tbody>
 </table>
 <p>The RaiSim version is pinned by the checkout (<code class="docutils literal notranslate"><span class="pre">RAISIM_VERSION</span></code> in the
@@ -244,6 +251,8 @@ workloads in a downstream application.</p>
 </section>
 <section id="tests">
 <h2>Tests<a class="headerlink" href="#tests" title="Link to this heading"></a></h2>
+<p>For manual object lifecycle and rendering regression checks, see
+<a class="reference internal" href="DebugTools.html"><span class="doc">Regression and Debug Tools</span></a>.</p>
 <p>The public workspace has no CTest suite; the engine’s own test suite is not
 shipped. The examples double as smoke tests, and <code class="docutils literal notranslate"><span class="pre">raisimPy</span></code> includes a
 <code class="docutils literal notranslate"><span class="pre">unittest</span></code> module for its tendon bindings. Run it after building with
@@ -261,15 +270,16 @@ because CMake can generate Doxygen XML and pass the Breathe project path to
 Sphinx:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-S<span class="w"> </span>/path/to/raisim2Lib/docs<span class="w"> </span>-B<span class="w"> </span>/tmp/raisim2lib-docs<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-DCMAKE_PREFIX_PATH<span class="o">=</span><span class="s2">&quot;/path/to/raisim2Lib/raisim;/path/to/raisim2Lib/rayrai&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-DRAISIM_DOCS_BUILD_RAYRAI_IMAGES<span class="o">=</span>OFF<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-DRAISIM_DOCS_RAISIM_INCLUDE_DIR<span class="o">=</span>/path/to/raisim2Lib/raisim/include/raisim<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-DRAISIM_DOCS_RAYRAI_INCLUDE_DIR<span class="o">=</span>/path/to/raisim2Lib/rayrai/include/rayrai
 cmake<span class="w"> </span>--build<span class="w"> </span>/tmp/raisim2lib-docs<span class="w"> </span>--parallel<span class="w"> </span><span class="m">12</span>
 </pre></div>
 </div>
 <p>This generates API references from the distributed headers and reuses the
-checked-in documentation images. Enable <code class="docutils literal notranslate"><span class="pre">RAISIM_DOCS_BUILD_RAYRAI_IMAGES</span></code>
-when you have a working OpenGL context and want to regenerate those images.</p>
+checked-in documentation images. To regenerate those images, configure with
+<code class="docutils literal notranslate"><span class="pre">-DRAISIM_DOCS_BUILD_RAYRAI_IMAGES=ON</span></code>. The image generators need a working
+OpenGL context and overwrite the images in <code class="docutils literal notranslate"><span class="pre">rsc/docs/image/rayrai</span></code>. The option
+is cached, so set it back to <code class="docutils literal notranslate"><span class="pre">OFF</span></code> to stop regenerating them.</p>
 <p>For prose and link checks, the documentation can also be built directly with
 Sphinx. When it cannot find Sphinx, the CMake docs configure creates
 <code class="docutils literal notranslate"><span class="pre">docs/.venv</span></code> with the packages from <code class="docutils literal notranslate"><span class="pre">docs/requirements.txt</span></code>
@@ -291,7 +301,7 @@ See <a class="reference internal" href="Troubleshooting.html"><span class="doc">
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="FeatureMap.html" class="btn btn-neutral float-left" title="Feature Map" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="ProjectLayout.html" class="btn btn-neutral float-right" title="Project Layout" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="DebugTools.html" class="btn btn-neutral float-right" title="Regression and Debug Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

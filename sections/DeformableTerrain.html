@@ -1,0 +1,683 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deformable terrain &mdash; raisim 2.9.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=182a64a0"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Constraints" href="Constraints.html" />
+    <link rel="prev" title="Height Map Using a Text File" href="HeightMap_example_txt.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FeatureMap.html">Feature Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DebugTools.html">Regression and Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ProjectLayout.html">Project Layout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Benchmark.html">Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RsceneFile.html">.rscene File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="OpenUSD.html">OpenUSD Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GranularMedia.html">Granular Media</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Deformable terrain</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#creating-a-bed">Creating a bed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#constitutive-model">Constitutive model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#material-parameters">Material parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#normal-loading-bekkerkc-bekkerkphi-and-sinkageexponent">Normal loading: <code class="docutils literal notranslate"><span class="pre">bekkerKc</span></code>, <code class="docutils literal notranslate"><span class="pre">bekkerKphi</span></code> and <code class="docutils literal notranslate"><span class="pre">sinkageExponent</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#elastic-recovery-elasticstiffness">Elastic recovery: <code class="docutils literal notranslate"><span class="pre">elasticStiffness</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#loading-rate-damping">Loading rate: <code class="docutils literal notranslate"><span class="pre">damping</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#shear-strength-cohesion-and-frictioncoefficient">Shear strength: <code class="docutils literal notranslate"><span class="pre">cohesion</span></code> and <code class="docutils literal notranslate"><span class="pre">frictionCoefficient</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#traction-buildup-sheardisplacement">Traction buildup: <code class="docutils literal notranslate"><span class="pre">shearDisplacement</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#calibrating-a-material">Calibrating a material</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#terrain-state-and-saving">Terrain state and saving</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#model-scope">Model scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#vehicle-example">Vehicle example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RaiSimMatlab.html">RaisimMatlab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Deformable terrain</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="deformable-terrain">
+<h1>Deformable terrain<a class="headerlink" href="#deformable-terrain" title="Link to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">World::addDeformableTerrain</span></code> creates a soil bed that deforms under rigid
+bodies and articulated systems. Distributed normal pressure supports their
+weight, while shear resistance provides traction. The model describes
+pressure-dependent sinkage, elastic recovery, permanent ruts, and traction
+buildup with slip.</p>
+<figure class="align-default" id="id1">
+<a class="reference internal image-reference" href="../_images/deformable_terrain_car.png"><img alt="A four-wheel car driving across a deformable soil mesh and leaving wheel tracks in Rayrai." src="../_images/deformable_terrain_car.png" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The example’s 896 kg buggy driving across the bed.
+Rear-wheel drive supplies torque through the wheel joints; soil traction
+moves the chassis and the wheels leave ruts in the surface.</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+<div class="legend">
+<p>Car visuals are based on
+<a class="reference external" href="https://sketchfab.com/3d-models/sci-fi-buggy-085bd97876a64eacbc041299ac945e9c">Sci - Fi Buggy</a>
+by <a class="reference external" href="https://sketchfab.com/tiyamakes">TiyaMakes</a>, licensed under
+<a class="reference external" href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. The meshes
+and textures are modified; the <a class="reference download internal" download="" href="../_downloads/d4e090db4a46faedf32c4512847f9507/ATTRIBUTION.md"><code class="xref download docutils literal notranslate"><span class="pre">buggy</span> <span class="pre">asset</span> <span class="pre">credits</span></code></a>
+describe the changes and redistribution requirements.</p>
+</div>
+</figcaption>
+</figure>
+<figure class="align-default" id="id2">
+<a class="reference internal image-reference" href="../_images/deformable_terrain_suspension.png"><img alt="Close view of the buggy's double wishbones, coil spring, damper and rear drive shaft on deformable soil." src="../_images/deformable_terrain_suspension.png" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The buggy’s double-wishbone suspension distributes the vehicle load
+between the wheels. Springs and dampers respond as the wheels sink into
+the soil.</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<figure class="align-default" id="id3">
+<a class="reference internal image-reference" href="../_images/deformable_terrain_ruts.png"><img alt="Two permanent wheel tracks after removing the car and allowing elastic recovery." src="../_images/deformable_terrain_ruts.png" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The same bed after removing the car. Elastic displacement recovers and
+permanent ruts remain; surface heights are shown without vertical exaggeration.</span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<section id="creating-a-bed">
+<h2>Creating a bed<a class="headerlink" href="#creating-a-bed" title="Link to this heading"></a></h2>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">DeformableTerrain</span><span class="o">::</span><span class="n">Material</span><span class="w"> </span><span class="n">soil</span><span class="p">;</span>
+<span class="n">soil</span><span class="p">.</span><span class="n">bekkerKc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span>
+<span class="n">soil</span><span class="p">.</span><span class="n">bekkerKphi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">4.0e4</span><span class="p">;</span>
+<span class="n">soil</span><span class="p">.</span><span class="n">sinkageExponent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.1</span><span class="p">;</span>
+<span class="n">soil</span><span class="p">.</span><span class="n">elasticStiffness</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.0e6</span><span class="p">;</span>
+<span class="n">soil</span><span class="p">.</span><span class="n">damping</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2000.0</span><span class="p">;</span>
+<span class="n">soil</span><span class="p">.</span><span class="n">cohesion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">100.0</span><span class="p">;</span>
+<span class="n">soil</span><span class="p">.</span><span class="n">frictionCoefficient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.6</span><span class="p">;</span>
+<span class="n">soil</span><span class="p">.</span><span class="n">shearDisplacement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.01</span><span class="p">;</span>
+
+<span class="k">const</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">nx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">201</span><span class="p">,</span><span class="w"> </span><span class="n">ny</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">101</span><span class="p">;</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">bed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addDeformableTerrain</span><span class="p">(</span>
+<span class="w">    </span><span class="n">nx</span><span class="p">,</span><span class="w"> </span><span class="n">ny</span><span class="p">,</span><span class="w"> </span><span class="mf">8.0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">(</span><span class="n">nx</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">ny</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">),</span><span class="w"> </span><span class="n">soil</span><span class="p">);</span>
+<span class="n">bed</span><span class="o">-&gt;</span><span class="n">setName</span><span class="p">(</span><span class="s">&quot;soil&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Heights use <code class="docutils literal notranslate"><span class="pre">height[y</span> <span class="pre">*</span> <span class="pre">nx</span> <span class="pre">+</span> <span class="pre">x]</span></code>. The bed covers the same local coordinate
+range as <a class="reference internal" href="HeightMap.html"><span class="doc">Height Map</span></a>. You may place the bed with <code class="docutils literal notranslate"><span class="pre">setPosition</span></code> and <code class="docutils literal notranslate"><span class="pre">setOrientation</span></code> between steps. Deformation
+and normal pressure act along the bed’s local Z axis. The bed is static;
+dynamic and kinematic body types are rejected.</p>
+<p>The default values are illustrative parameters, not a calibrated material.
+Choose the mesh spacing to resolve the footprint and the desired rut width;
+2–5 cm is a useful starting point for robot feet and wheels of comparable size.
+Finer spacing represents curved footprints and rut boundaries in more detail.</p>
+</section>
+<section id="constitutive-model">
+<h2>Constitutive model<a class="headerlink" href="#constitutive-model" title="Link to this heading"></a></h2>
+<p>For total downward displacement <span class="math notranslate nohighlight">\(s\)</span>, permanent displacement <span class="math notranslate nohighlight">\(s_p\)</span>,
+and projected contact width <span class="math notranslate nohighlight">\(b\)</span>, the normal pressure is</p>
+<div class="math notranslate nohighlight">
+\[p(s,s_p,b) = \max\left(0,\min\left[
+   K_e(s-s_p),\left(k_c/b+k_\phi\right)s^n\right]\right).\]</div>
+<p>The effective width <span class="math notranslate nohighlight">\(b\)</span> is the narrowest width of the collider’s
+footprint projected onto the bed plane: the shorter side of a flat box, the
+tread width of a wheel whose axle lies in the bed plane, and the diameter of a
+sphere or capsule. Mesh colliders use the footprint of their bounding box.
+The width turns with the collider, so a body’s heading does not change its
+soil stiffness. This approximates contact width for general shapes; calibrate
+the width-dependent term for the intended wheel or foot geometry.</p>
+<p>The elastic branch <span class="math notranslate nohighlight">\(K_e(s-s_p)\)</span> describes recoverable deformation, while
+the Bekker envelope <span class="math notranslate nohighlight">\((k_c/b+k_\phi)s^n\)</span> limits the pressure before further
+permanent compaction. Permanent sinkage never decreases: after loading,
+<span class="math notranslate nohighlight">\(s_p\)</span> retains at least <span class="math notranslate nohighlight">\(s-p/K_e\)</span>. Removing the load recovers the
+elastic displacement and leaves a rut of depth <span class="math notranslate nohighlight">\(s_p\)</span>.</p>
+<p>Penetration adds loading-only viscosity:</p>
+<div class="math notranslate nohighlight">
+\[p_n = p + D\max(\dot{s},0).\]</div>
+<p>Here <span class="math notranslate nohighlight">\(\dot{s}\)</span> is the rate at which the body pushes the soil surface
+down. A body above the surface, or above the floor of an existing rut, meets
+no resistance until it reaches it; only its travel into the soil is damped.
+The normal response is compressive; the soil supplies no suction when the
+body lifts away.
+Impact loading can produce deeper ruts than slow loading at the same final
+weight.</p>
+<p>Shear strength follows Mohr–Coulomb and Janosi–Hanamoto:</p>
+<div class="math notranslate nohighlight">
+\[\tau_{\max} = (c+\mu p_n)(1-\exp[-j/K_j]).\]</div>
+<p>Here <span class="math notranslate nohighlight">\(j\)</span> is accumulated tangential slip while the surface is loaded.
+Shear resistance opposes slip, with the same strength limit in every tangent
+direction. <code class="docutils literal notranslate"><span class="pre">shearDisplacement</span> <span class="pre">=</span> <span class="pre">0</span></code> selects fully mobilized friction immediately.
+The normal pressure <span class="math notranslate nohighlight">\(p_n\)</span> includes loading viscosity, while <span class="math notranslate nohighlight">\(p\)</span>
+denotes the non-viscous elastic/plastic part.</p>
+</section>
+<section id="material-parameters">
+<h2>Material parameters<a class="headerlink" href="#material-parameters" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">DeformableTerrain::Material</span></code> defines the soil response for the entire bed.
+These parameters use SI units: metres, seconds, and pascals (N/m<sup>2</sup>).
+They describe pressure and shear stress per unit area. Total contact forces
+are the corresponding stresses integrated over the loaded footprint. The
+parameters describe the material and do not need rescaling with mesh spacing
+or timestep.</p>
+<table class="docutils align-default" id="id4">
+<caption><span class="caption-text">Defaults and valid values</span><a class="headerlink" href="#id4" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 22.0%" />
+<col style="width: 16.0%" />
+<col style="width: 32.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>C++ member</p></th>
+<th class="head"><p>Units</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Valid values</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">bekkerKc</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathrm{Pa}\,\mathrm{m}^{1-n}\)</span></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.0</span></code></p></td>
+<td><p>Finite, nonnegative</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">bekkerKphi</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathrm{Pa}/\mathrm{m}^{n}\)</span></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2.0e5</span></code></p></td>
+<td><p>Finite, nonnegative</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sinkageExponent</span></code></p></td>
+<td><p>Dimensionless</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1.1</span></code></p></td>
+<td><p>Finite, strictly positive</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">elasticStiffness</span></code></p></td>
+<td><p>Pa/m</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2.0e6</span></code></p></td>
+<td><p>Finite, strictly positive</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">damping</span></code></p></td>
+<td><p>Pa s/m</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1000.0</span></code></p></td>
+<td><p>Finite, nonnegative; zero disables viscosity</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cohesion</span></code></p></td>
+<td><p>Pa</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.0</span></code></p></td>
+<td><p>Finite, nonnegative</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">frictionCoefficient</span></code></p></td>
+<td><p>Dimensionless</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.6</span></code></p></td>
+<td><p>Finite, nonnegative</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">shearDisplacement</span></code></p></td>
+<td><p>m</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.01</span></code></p></td>
+<td><p>Finite, nonnegative; zero gives full mobilization</p></td>
+</tr>
+</tbody>
+</table>
+<p>At least one of <code class="docutils literal notranslate"><span class="pre">bekkerKc</span></code> and <code class="docutils literal notranslate"><span class="pre">bekkerKphi</span></code> must be positive. Invalid
+materials throw <code class="docutils literal notranslate"><span class="pre">std::invalid_argument</span></code> at construction. The API imposes no
+upper bound on finite coefficients; acceptance does not establish that a
+value represents a particular soil. The defaults and the softer example bed
+above are illustrative rather than measured material presets.</p>
+<section id="normal-loading-bekkerkc-bekkerkphi-and-sinkageexponent">
+<h3>Normal loading: <code class="docutils literal notranslate"><span class="pre">bekkerKc</span></code>, <code class="docutils literal notranslate"><span class="pre">bekkerKphi</span></code> and <code class="docutils literal notranslate"><span class="pre">sinkageExponent</span></code><a class="headerlink" href="#normal-loading-bekkerkc-bekkerkphi-and-sinkageexponent" title="Link to this heading"></a></h3>
+<p>The Bekker loading envelope is <span class="math notranslate nohighlight">\(p_y=(k_c/b+k_\phi)s^n\)</span>.
+Increasing either coefficient at a fixed exponent and footprint raises the
+pressure at a given sinkage and reduces the equilibrium sinkage under the
+same load, provided the elastic branch is not the limiting response.
+<code class="docutils literal notranslate"><span class="pre">bekkerKc</span></code> supplies the width dependence: its contribution increases as
+<span class="math notranslate nohighlight">\(b\)</span> decreases. <code class="docutils literal notranslate"><span class="pre">bekkerKphi</span></code> supplies the width-independent contribution.
+Setting <code class="docutils literal notranslate"><span class="pre">bekkerKc</span> <span class="pre">=</span> <span class="pre">0</span></code> removes this explicit width dependence, although the
+footprint’s area still affects force and its shape affects the pressure distribution.
+Despite its name, <code class="docutils literal notranslate"><span class="pre">bekkerKc</span></code> is a normal pressure coefficient; it is distinct
+from the tangential <code class="docutils literal notranslate"><span class="pre">cohesion</span></code> parameter.</p>
+<p>For a flat plate with uniform pressure <span class="math notranslate nohighlight">\(p_{\mathrm{load}}=mg/A\)</span> resting
+on the yielding envelope, a useful analytical check is</p>
+<div class="math notranslate nohighlight">
+\[s_{\mathrm{eq}} = \left(\frac{mg}{A(k_c/b+k_\phi)}\right)^{1/n}.\]</div>
+<p>For example, a 20 kg, 0.4 by 0.6 m plate has <span class="math notranslate nohighlight">\(A=0.24\)</span> m<sup>2</sup>,
+<span class="math notranslate nohighlight">\(b=0.4\)</span> m, and <span class="math notranslate nohighlight">\(p_{\mathrm{load}}=817.5\)</span> Pa at
+<span class="math notranslate nohighlight">\(g=9.81\)</span> m/s<sup>2</sup>. With <span class="math notranslate nohighlight">\(k_c=0\)</span>, <span class="math notranslate nohighlight">\(k_\phi=10^5\)</span>, and
+<span class="math notranslate nohighlight">\(n=1\)</span>, the yielding-envelope sinkage is 8.175 mm. This is a quasistatic
+reference for a uniform plate, not a prediction of transient impact depth or
+of loading into an existing uneven rut. The elastic branch and accumulated
+plastic state can determine the response instead.</p>
+<p><code class="docutils literal notranslate"><span class="pre">sinkageExponent</span></code> controls the curvature of the loading envelope. Its
+incremental stiffness is <span class="math notranslate nohighlight">\(n(k_c/b+k_\phi)s^{n-1}\)</span>. With <span class="math notranslate nohighlight">\(n=1\)</span>,
+pressure is linear in sinkage. With <span class="math notranslate nohighlight">\(n&gt;1\)</span>, the incremental stiffness
+increases with sinkage; with <span class="math notranslate nohighlight">\(0&lt;n&lt;1\)</span>, it decreases. Changing <span class="math notranslate nohighlight">\(n\)</span>
+also changes the units of both Bekker coefficients. Comparing materials by
+changing only <span class="math notranslate nohighlight">\(n\)</span> while retaining the same numerical coefficients is
+therefore misleading. To hold a reference pressure fixed with <span class="math notranslate nohighlight">\(k_c=0\)</span>,
+choose <span class="math notranslate nohighlight">\(k_\phi=p_{\mathrm{ref}}/s_{\mathrm{ref}}^n\)</span> for each exponent.</p>
+</section>
+<section id="elastic-recovery-elasticstiffness">
+<h3>Elastic recovery: <code class="docutils literal notranslate"><span class="pre">elasticStiffness</span></code><a class="headerlink" href="#elastic-recovery-elasticstiffness" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">elasticStiffness</span></code> is the pressure slope during elastic unloading and
+reloading: <span class="math notranslate nohighlight">\(p_e=K_e(s-s_p)\)</span>. It is a foundation stiffness per area,
+not a Young’s modulus in Pa or a spring constant in N/m. A uniform area
+<span class="math notranslate nohighlight">\(A\)</span> has elastic force stiffness <span class="math notranslate nohighlight">\(A K_e\)</span> in N/m. At pressure
+<span class="math notranslate nohighlight">\(p\)</span>, the recoverable displacement on this branch is <span class="math notranslate nohighlight">\(p/K_e\)</span>.</p>
+<p>For example, 1000 Pa with <span class="math notranslate nohighlight">\(K_e=2\times10^6\)</span> Pa/m gives 0.5 mm of
+recoverable sinkage. Increasing <span class="math notranslate nohighlight">\(K_e\)</span> reduces this recovery and steepens
+the unloading/reloading slope. It does not raise the Bekker yield envelope:
+normal pressure remains the smaller of the elastic and yielding pressures.
+At a fixed peak sinkage on the envelope, a larger <span class="math notranslate nohighlight">\(K_e\)</span> leaves a larger
+permanent fraction through <span class="math notranslate nohighlight">\(s_p=s-p_y/K_e\)</span>. If the elastic stiffness is
+too low relative to the desired loading envelope, the response can remain
+mostly elastic and produce much less permanent rutting. Fit this parameter
+from unloading/reloading data rather than treating it as a general hardness
+control. Completely unloaded soil recovers to its permanent depth; the model
+has no independent delayed relaxation.</p>
+</section>
+<section id="loading-rate-damping">
+<h3>Loading rate: <code class="docutils literal notranslate"><span class="pre">damping</span></code><a class="headerlink" href="#loading-rate-damping" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">damping</span></code> adds pressure <span class="math notranslate nohighlight">\(p_v=D\max(\dot{s},0)\)</span> during penetration.
+For example, <span class="math notranslate nohighlight">\(D=2000\)</span> Pa s/m and a loading speed of 0.1 m/s add
+200 Pa. Increasing it raises transient resistance and dissipation during
+loading; it does not alter the equilibrium pressure when the loading speed
+is zero. It supplies no viscous suction or tensile force during unloading.
+Zero removes the viscous term while retaining the elastic/plastic response.</p>
+<p>The total normal pressure <span class="math notranslate nohighlight">\(p_n=p+p_v\)</span> also enters the frictional strength,
+so increasing damping can raise transient shear resistance as well as normal
+resistance. Calibrate rate effects separately from the Bekker envelope and
+check the intended impact speeds. This local viscosity does not represent
+soil mass, wave propagation, or a volumetric viscoelastic continuum.</p>
+</section>
+<section id="shear-strength-cohesion-and-frictioncoefficient">
+<h3>Shear strength: <code class="docutils literal notranslate"><span class="pre">cohesion</span></code> and <code class="docutils literal notranslate"><span class="pre">frictionCoefficient</span></code><a class="headerlink" href="#shear-strength-cohesion-and-frictioncoefficient" title="Link to this heading"></a></h3>
+<p>The fully mobilized shear stress is <span class="math notranslate nohighlight">\(\tau_f=c+\mu p_n\)</span>.
+<code class="docutils literal notranslate"><span class="pre">cohesion</span></code> sets its pressure-independent intercept. For example,
+<span class="math notranslate nohighlight">\(c=100\)</span> Pa contributes 10 N over a loaded 0.1 m<sup>2</sup> patch when
+fully mobilized. <code class="docutils literal notranslate"><span class="pre">frictionCoefficient</span></code> sets the pressure-dependent slope;
+<span class="math notranslate nohighlight">\(\mu=\tan\phi\)</span> if expressing it as a friction angle <span class="math notranslate nohighlight">\(\phi\)</span>.
+At <span class="math notranslate nohighlight">\(p_n=1000\)</span> Pa, <span class="math notranslate nohighlight">\(c=100\)</span> Pa and <span class="math notranslate nohighlight">\(\mu=0.6\)</span>, the fully
+mobilized stress is 700 Pa. The displacement law below can reduce the
+available stress before mobilization.</p>
+<p>Increasing either parameter raises available traction at the same normal
+pressure and shear history. With <code class="docutils literal notranslate"><span class="pre">frictionCoefficient</span> <span class="pre">=</span> <span class="pre">0</span></code>, nonzero
+<code class="docutils literal notranslate"><span class="pre">cohesion</span></code> can still resist slip while contact is loaded. Setting both to
+zero removes tangential resistance. Cohesion does not bond a body to the
+surface or create a tensile normal force when it lifts away.</p>
+<p>These soil parameters govern the distributed terrain contact law. The rigid
+material-pair friction and restitution settings in <a class="reference internal" href="MaterialSystem.html"><span class="doc">Material System</span></a> do
+not tune this constitutive response. Use the soil’s <code class="docutils literal notranslate"><span class="pre">Material</span></code> for its
+traction and loading response, and material pairs for ordinary rigid contacts.</p>
+</section>
+<section id="traction-buildup-sheardisplacement">
+<h3>Traction buildup: <code class="docutils literal notranslate"><span class="pre">shearDisplacement</span></code><a class="headerlink" href="#traction-buildup-sheardisplacement" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">shearDisplacement</span></code> is the Janosi–Hanamoto displacement scale <span class="math notranslate nohighlight">\(K_j\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\frac{\tau_{\max}}{c+\mu p_n}=1-\exp(-j/K_j).\]</div>
+<p>For positive <span class="math notranslate nohighlight">\(K_j\)</span>, the strength reaches approximately 63.2% at
+<span class="math notranslate nohighlight">\(j=K_j\)</span>, 95% at <span class="math notranslate nohighlight">\(j=3K_j\)</span>, and 99% at <span class="math notranslate nohighlight">\(j=4.605K_j\)</span>.
+With the default 0.01 m scale, those displacements are 10, 30, and 46.05 mm.
+A smaller scale builds traction over less slip; a larger scale produces
+slower buildup and more creep before reaching the same strength. Setting
+zero selects fully mobilized friction immediately, including any cohesion.</p>
+<p>The history is accumulated slip displacement at a loaded soil patch,
+not elapsed time, commanded wheel travel, or body displacement in free flight.
+It grows while a patch is loaded and resets when that patch unloads. Permanent
+sinkage survives unloading separately. A new footprint therefore does not
+inherit the shear history of an unloaded rut. Fit <span class="math notranslate nohighlight">\(K_j\)</span> as a physical
+slip displacement scale, independently of the terrain mesh spacing.</p>
+<figure class="align-default" id="id5">
+<a class="reference internal image-reference" href="../_images/deformable_terrain_material_response.png"><img alt="Loading envelopes with a shared reference pressure, elastic recovery, and shear mobilization curves." src="../_images/deformable_terrain_material_response.png" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Constitutive curves for the dynamics model. The loading
+curves share 1000 Pa at 20 mm; the recovery example unloads with
+<span class="math notranslate nohighlight">\(K_e=2\times10^6\)</span> Pa/m. The shear plot shows different displacement
+scales and the fully mobilized zero-scale case. These are illustrative
+responses rather than measured soil data.</span><a class="headerlink" href="#id5" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+</section>
+<section id="calibrating-a-material">
+<h3>Calibrating a material<a class="headerlink" href="#calibrating-a-material" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p>Measure slow plate-loading curves at several widths and loads. Fit
+<span class="math notranslate nohighlight">\(n\)</span> and the two Bekker coefficients together. At a fixed <span class="math notranslate nohighlight">\(n\)</span>,
+plotting <span class="math notranslate nohighlight">\(p/s^n\)</span> against <span class="math notranslate nohighlight">\(1/b\)</span> gives slope <span class="math notranslate nohighlight">\(k_c\)</span> and
+intercept <span class="math notranslate nohighlight">\(k_\phi\)</span>. A single width identifies only their sum
+<span class="math notranslate nohighlight">\(k_c/b+k_\phi\)</span>; it cannot identify both coefficients separately.
+Use the same projected-width convention as the colliders being simulated.</p></li>
+<li><p>Measure unloading/reloading slopes to fit <span class="math notranslate nohighlight">\(K_e\)</span>, including recovered
+depth and the remaining rut. Fit the loading envelope and elastic branch
+consistently; the normal pressure is their minimum.</p></li>
+<li><p>Repeat indentation at different speeds to fit <span class="math notranslate nohighlight">\(D\)</span> from the extra
+loading pressure, after accounting for quasistatic pressure. Recheck impact
+compaction rather than fitting only the final resting depth.</p></li>
+<li><p>Measure shear stress versus displacement at several normal pressures.
+Fit <span class="math notranslate nohighlight">\(c\)</span> and <span class="math notranslate nohighlight">\(\mu\)</span> to the fully mobilized stresses, then fit
+<span class="math notranslate nohighlight">\(K_j\)</span> to the buildup curves. Include low-speed slip if creep matters.</p></li>
+<li><p>Validate with the intended feet or wheels, loads, speeds, mesh spacing and
+timestep, including unloading and repeated passes. Compare sinkage,
+recovered depth, force and traction histories as well as final poses.
+Agreement with an analytical plate case alone does not establish accuracy
+for a particular soil or for phenomena outside the supported model.</p></li>
+</ol>
+</section>
+</section>
+<section id="terrain-state-and-saving">
+<h2>Terrain state and saving<a class="headerlink" href="#terrain-state-and-saving" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">getSoilState()</span></code> returns three arrays with one value per vertex:
+<code class="docutils literal notranslate"><span class="pre">sinkage</span></code>, <code class="docutils literal notranslate"><span class="pre">plasticSinkage</span></code>, and <code class="docutils literal notranslate"><span class="pre">shear</span></code>. They represent total downward
+displacement, permanent downward displacement, and accumulated loaded slip,
+respectively. <code class="docutils literal notranslate"><span class="pre">setSoilState</span></code> restores these arrays. <code class="docutils literal notranslate"><span class="pre">resetSoil</span></code>
+returns to the undeformed mesh. Call state setters between complete steps.
+HeightMap height-edit APIs are rejected for this subclass because they bypass
+soil history. <code class="docutils literal notranslate"><span class="pre">getUndeformedHeights</span></code> returns the original surface.</p>
+<p><code class="docutils literal notranslate"><span class="pre">getSoilStepStats()</span></code> describes the last step. <code class="docutils literal notranslate"><span class="pre">contacts</span></code> counts the
+quadrature contacts near bodies, including those a body approaches but has
+not yet loaded. <code class="docutils literal notranslate"><span class="pre">contactArea</span></code> and <code class="docutils literal notranslate"><span class="pre">normalForce</span></code> are the area and total
+normal force of the loaded contacts. A soil contact’s <code class="docutils literal notranslate"><span class="pre">getDepth()</span></code> is its
+separation from the floor of the current rut: positive while the body
+approaches, negative while it compresses the soil.</p>
+<p>World checkpoints capture the soil history and support deterministic replay.
+XML export saves original heights and the complete state. To author a soil
+bed in a world XML file, use explicit height samples and a <code class="docutils literal notranslate"><span class="pre">soil</span></code> child:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;heightmap</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;soil&quot;</span><span class="w"> </span><span class="na">x_size=</span><span class="s">&quot;2&quot;</span><span class="w"> </span><span class="na">y_size=</span><span class="s">&quot;2&quot;</span><span class="w"> </span><span class="na">x_sample=</span><span class="s">&quot;3&quot;</span><span class="w"> </span><span class="na">y_sample=</span><span class="s">&quot;3&quot;</span>
+<span class="w">           </span><span class="na">height=</span><span class="s">&quot;0 0 0 0 0 0 0 0 0&quot;</span><span class="nt">&gt;</span>
+<span class="w">  </span><span class="nt">&lt;soil</span><span class="w"> </span><span class="na">bekker_kc=</span><span class="s">&quot;0&quot;</span><span class="w"> </span><span class="na">bekker_kphi=</span><span class="s">&quot;40000&quot;</span><span class="w"> </span><span class="na">sinkage_exponent=</span><span class="s">&quot;1.1&quot;</span>
+<span class="w">        </span><span class="na">elastic_stiffness=</span><span class="s">&quot;2000000&quot;</span><span class="w"> </span><span class="na">damping=</span><span class="s">&quot;2000&quot;</span><span class="w"> </span><span class="na">cohesion=</span><span class="s">&quot;100&quot;</span>
+<span class="w">        </span><span class="na">friction_coefficient=</span><span class="s">&quot;0.6&quot;</span><span class="w"> </span><span class="na">shear_displacement=</span><span class="s">&quot;0.01&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/heightmap&gt;</span>
+</pre></div>
+</div>
+<p>Soil XML currently requires <code class="docutils literal notranslate"><span class="pre">height</span></code>; generate or load a height array in C++
+when starting from PNG, text, or procedural terrain. Exported soil elements
+also contain <code class="docutils literal notranslate"><span class="pre">sinkage</span></code>, <code class="docutils literal notranslate"><span class="pre">plastic_sinkage</span></code>, and <code class="docutils literal notranslate"><span class="pre">shear</span></code> arrays.</p>
+<p>For terrain-only contacts on articulated systems, the solver packs the fixed
+impulse-response matrices once per physics step and uses vectorized updates
+of the generalized velocities. When a second sweep is needed, it packs padded
+Jacobian columns once so all three contact-velocity components can use vector instructions,
+while retaining each component’s original summation order. The responses include
+the suspension’s eliminated pin and equality constraints. Contact order, quadrature samples,
+material equations, and convergence tolerances remain the same.</p>
+<p>When an articulated terrain solve needs more than four sweeps, sufficiently
+large contact groups can use six-component velocity and force/torque coordinates
+for each contacting link. Setup is attempted only when the residual after four
+sweeps still exceeds 1,000 times the existing stopping threshold, so solves near
+convergence retain the cheaper full-coordinate updates. Each quadrature point still receives its own normal
+and shear solve, with its original apparent inertia, material history, and
+residual tolerances. While consecutive points on one link are visited, changes
+to other links accumulate as force and torque. Their coupled velocity is updated
+before the next contact on another link is read. The Gauss-Seidel contact order
+and stopping criteria are retained; contacts are never merged.</p>
+<p>The six-direction basis is rebuilt from well-separated points in the current
+step. Every original sparse Jacobian and every full generalized impulse response
+must pass reconstruction checks at double-precision roundoff before this path
+is enabled. The responses include eliminated pin and equality constraints.
+Small groups and poorly conditioned geometry continue through the full
+articulated update. At the end of the solve, the original point responses update
+all generalized velocities, including passive joints absent from the contact
+Jacobians. This reduction can change floating-point summation order; it changes
+neither the mesh resolution, timestep, constitutive equations, nor solver
+accuracy settings.</p>
+<p>The solver also seeds mesh-soil contacts with the last converged traction on
+the same bed and body link. The cache sorts contact positions by X to limit
+nearest-point searches to the contact matching radius. It keeps them apart
+from the same body’s rigid contacts, so the search cost stays linear when a
+body rests on soil and on a rigid support at once. Quadrature points are
+matched one to one; the cached traction is scaled by the current contact
+area and timestep and projected into the current soil strength bound. Impacts, unmatched points,
+and stale or non-converged cache entries receive a cold start. Current soil
+history and material forces are still solved each step at the existing
+convergence tolerances. Normal and shear updates continue iterating until
+their coupled force converges, including an isolated contact.</p>
+<p>Warm starting changes the numerical iteration path, so a cold-start trajectory
+need not be bit-for-bit identical. Set
+<code class="docutils literal notranslate"><span class="pre">world.getContactSolver().getConfig().terrainWarmStart</span> <span class="pre">=</span> <span class="pre">false</span></code> to disable
+cached traction guesses while keeping the same mesh, timestep, material equations,
+and tolerances. World checkpoints include this configuration and cache for
+deterministic replay.</p>
+<p>Within each coupled solve, shear updates also reuse the previous scalar root
+as an initial guess inside the current analytic bracket, in both compliance
+and shift coordinates. The current slip, normal load, and shear strength are
+evaluated again before a root is accepted, using the same constitutive residual
+tolerance. A valid seed avoids evaluating unused bracket endpoints; the solver
+verifies a feasible endpoint if its safeguarded iterations exhaust their limit.
+It retains the impulse already evaluated at the accepted root. These guesses
+reset at the start of each physics step.</p>
+<p>The scalar shear roots use Newton for small corrections and safeguarded Halley
+updates for larger corrections, including the curvature of the
+displacement-dependent shear strength. This reduces repeated
+constitutive evaluations without changing the force equations. An update is
+accepted only after re-evaluating the current residual on the feasible side of
+the original tolerance. Poorly scaled curvature uses Newton, and proposals
+outside the current bracket use bisection. The fixed tangential matrix from
+that residual evaluation is reused in the derivative calculations.</p>
+<p>Normal warm seeds also reuse the reciprocals of the fixed elastic loading and
+unloading slopes. These are separate because loading includes the material’s
+viscous term. Yield branches retain their nonlinear slope calculation. Each
+nonzero warm residual still receives a correction before acceptance, and the
+updated pressure and depth must pass the same normal residual tolerance.
+For nonlinear warm seeds, a conservative tangent below the convex Bekker
+pressure envelope can certify an interval where the elastic branch wins.
+The interval is constructed only when an elastic warm seed needs it, and a
+new ordinary pressure anchor invalidates it.
+Inside that interval, one exact elastic correction replaces the general Newton
+loop when loading or unloading does not change. The updated pressure is still
+checked against the original normal residual tolerance. An envelope crossing,
+a viscous loading transition, an unsupported exponent, or a poorly scaled
+interval retains the safeguarded solve.</p>
+<p>When the sinkage exponent is one, both pressure branches are affine. The solver
+computes the four elastic/yield and loading/unloading depth candidates from
+coefficients fixed for the current physics step. Taking the minimum of each
+branch’s loading/unloading candidates and then the maximum of the two pressure
+candidates solves the same piecewise pressure equation directly. It evaluates
+the current pressure and residual before acceptance; poorly scaled coefficients
+and candidates that fail the existing tolerance use the iterative solve.</p>
+<p>Warm shear visits can also use a fixed compliance cap from the tangential
+mobility matrix. A conservative bound using the current normal load, shear
+history, and tangential velocity components proves the cap feasible before it
+replaces the more expensive analytic bracket calculation. If that proof fails,
+the original analytic bracket is calculated. Both paths evaluate the current
+slip-dependent force at the same tolerance.</p>
+<p>All of these scalar caches reset each physics step.</p>
+<p>For bodies with many terrain quadrature points, dense pin elimination projects
+six spatial impulse directions once per body. Each point’s response and pin
+coupling are recovered from those directions and its lever arm. This uses the
+linearity of the current mass-weighted projection; it retains every contact
+point and recomputes the mass response and constraint factorization each step.
+Smaller constraint or contact groups, tracked bodies, and the structured pin factorization
+use the existing per-contact projection.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">deformable_terrain</span></code> benchmark accepts <code class="docutils literal notranslate"><span class="pre">--body=articulated</span></code> to measure
+a 60-DOF plate with the same analytical load and sinkage checks as its default
+rigid plate. <code class="docutils literal notranslate"><span class="pre">--body=pinned</span></code> adds eight independent joint relations to
+exercise the shared suspension projection with the same analytical load.
+<code class="docutils literal notranslate"><span class="pre">--body=multilink</span></code> uses a 64-DOF body supported by four separate articulated
+pads with horizontal sliders, retaining the same total 20 kg load and
+0.24 square metre footprint. This exercises coupling between contacting links
+and checks sinkage against the same analytical pressure law.
+Compare <code class="docutils literal notranslate"><span class="pre">--start=warm</span></code> (default) and <code class="docutils literal notranslate"><span class="pre">--start=cold</span></code> to measure
+warm starting at the same accuracy settings; each case reports solver sweeps
+and analytical sinkage error. Use one CPU thread for timing comparisons.</p>
+<p>Add <code class="docutils literal notranslate"><span class="pre">--contact-law</span></code> to time the normal and shear updates independently of
+collision detection and articulated-body calculations. This workload visits
+32 anisotropic point contacts with changing loads and slip speeds, covering
+fresh, partially mobilized, and fully mobilized shear histories. It verifies
+normal pressure, shear feasibility, tangential alignment, and dissipation after
+each timed run. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">benchmarks</span> <span class="o">--</span><span class="n">bench</span> <span class="n">deformable_terrain</span> <span class="o">--</span><span class="n">raisim</span> <span class="o">--</span> <span class="o">--</span><span class="n">contact</span><span class="o">-</span><span class="n">law</span> <span class="o">--</span><span class="n">start</span><span class="o">=</span><span class="n">warm</span> <span class="o">--</span><span class="n">steps</span><span class="o">=</span><span class="mi">10000</span> <span class="o">--</span><span class="n">repeats</span><span class="o">=</span><span class="mi">3</span>
+</pre></div>
+</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">--start=cold</span></code> for the same inputs with fresh scalar solve state at every
+visit. Add <code class="docutils literal notranslate"><span class="pre">--material=linear</span></code> to isolate the piecewise affine pressure solve;
+the default is <code class="docutils literal notranslate"><span class="pre">--material=nonlinear</span></code> with exponent 1.1. Both material options
+retain displacement-dependent shear and the same force checks. This microbenchmark complements the full mesh and vehicle workloads;
+its timing does not include mesh updates, collision queries, or suspension
+constraints.</p>
+</section>
+<section id="model-scope">
+<h2>Model scope<a class="headerlink" href="#model-scope" title="Link to this heading"></a></h2>
+<p>This is a surface terramechanics model for a supported bed. The surface deforms
+only along the bed’s local Z axis. It represents distributed support,
+permanent compaction, elastic recovery, loading viscosity, and slip-dependent
+traction for rigid bodies and articulated systems.</p>
+<p>The model does not include soil inertia, lateral soil transport,
+displaced-volume berms, excavation, overhangs, or failure planes. It is not a
+volumetric continuum model.</p>
+<p>The soil has no contact model for granular media or deformable objects
+(cloth and volumes), so a world cannot hold a deformable terrain together with
+either. Adding the second of them is a fatal error (<code class="docutils literal notranslate"><span class="pre">RSFATAL</span></code>), whichever is
+added first and also while a world XML file loads, so the combination fails
+before any simulation step.</p>
+</section>
+<section id="vehicle-example">
+<h2>Vehicle example<a class="headerlink" href="#vehicle-example" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">rayrai_deformable_terrain</span></code> example drives an 896 kg off-road buggy over
+a 16 m by 6 m soil bed. It uses the same vehicle model as
+<a class="reference internal" href="examples/rayrai/rayrai_offroad_buggy.html"><span class="doc">Rayrai Example: Off-Road Buggy</span></a>: double-wishbone suspension,
+coil springs and dampers, rack-and-pinion steering, and tyre compliance.
+The cylindrical wheel colliders have radius 0.3611 m and contact widths
+of 0.126 m in front and 0.1562 m at the rear.</p>
+<p>While meshes load, the example shows the same loading bar as the forest
+example. Its gradient and deep-purple label use the colors from the RaiSim
+logo. Physics stays paused until the assets are ready, then driving starts
+without a settling phase.</p>
+<figure class="align-default" id="id6">
+<a class="reference internal image-reference" href="../_images/deformable_terrain_loading.png"><img alt="A loading bar in the RaiSim logo colors above the terrain viewer while buggy meshes load." src="../_images/deformable_terrain_loading.png" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The shared loading bar stays above the viewer while the simulation clock
+remains at zero.</span><a class="headerlink" href="#id6" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>The bed uses <code class="docutils literal notranslate"><span class="pre">bekkerKphi</span> <span class="pre">=</span> <span class="pre">2.0e6</span></code>, <code class="docutils literal notranslate"><span class="pre">elasticStiffness</span> <span class="pre">=</span> <span class="pre">2.0e7</span></code>,
+<code class="docutils literal notranslate"><span class="pre">damping</span> <span class="pre">=</span> <span class="pre">4.0e4</span></code>, <code class="docutils literal notranslate"><span class="pre">sinkageExponent</span> <span class="pre">=</span> <span class="pre">1.1</span></code>, and <code class="docutils literal notranslate"><span class="pre">cohesion</span> <span class="pre">=</span> <span class="pre">100</span></code>.
+Other material fields retain their defaults. These parameters demonstrate
+wheel sinkage, permanent ruts, and traction; they are not measurements of a
+particular soil. Rear-wheel drive requests about 0.8 m/s, with the actual speed
+determined by sinkage, slip, and soil resistance.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="HeightMap_example_txt.html" class="btn btn-neutral float-left" title="Height Map Using a Text File" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Constraints.html" class="btn btn-neutral float-right" title="Constraints" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

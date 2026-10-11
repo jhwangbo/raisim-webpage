@@ -2,7 +2,7 @@
 Changelog
 #########
 
-Brief per-version notes for RaiSim, newest first. v2.7.1 is not released yet.
+Brief per-version notes for RaiSim, newest first. v2.8.2 is not released yet.
 Package metadata changes only when a release is published, so the newest entry
 can be one version ahead of ``RAISIM_VERSION``.
 
@@ -10,6 +10,7 @@ can be one version ahead of ``RAISIM_VERSION``.
    :maxdepth: 1
    :caption: Versions
 
+   changelog/v2.8
    changelog/v2.7
    changelog/v2.6
    changelog/v2.5

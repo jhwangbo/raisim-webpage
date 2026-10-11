@@ -6,21 +6,22 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rayrai Example: City &mdash; raisim 2.8.1 documentation</title>
+  <title>Rayrai Example: City &mdash; raisim 2.9.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=7e9bdaad" />
 
   
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=cd87aae0"></script>
+      <script src="../../../_static/documentation_options.js?v=182a64a0"></script>
       <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Rayrai Example: Warehouse" href="rayrai_warehouse.html" />
+    <link rel="next" title="Rayrai Example: City From XML" href="rayrai_city_from_xml.html" />
     <link rel="prev" title="Rayrai Example: Forest From .rscene" href="rayrai_forest_from_rscene.html" /> 
 </head>
 
@@ -63,7 +64,6 @@
 <li class="toctree-l3"><a class="reference internal" href="rayrai_blender_scene_import.html">Rayrai Workflow: Blender Scene Import</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_rgb_camera.html">Rayrai Example: RGB Camera</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_depth_camera.html">Rayrai Example: Depth Camera</a></li>
-<li class="toctree-l3"><a class="reference internal" href="rayrai_heightmap_replacement.html">Rayrai Example: Heightmap Replacement</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_lidar_pointcloud.html">Rayrai Example: LiDAR Pointcloud</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_aruco_marker.html">Rayrai Example: Aruco Marker</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_custom_visuals.html">Rayrai Example: Custom Visuals</a></li>
@@ -89,7 +89,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#assets">Assets</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_city_from_xml.html">Rayrai Example: City From XML</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_warehouse.html">Rayrai Example: Warehouse</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rayrai_offroad_buggy.html">Rayrai Example: Off-Road Buggy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rayrai_tcp_viewer.html">Rayrai Example: TCP Viewer</a></li>
 </ul>
 </li>
@@ -99,6 +101,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../FeatureMap.html">Feature Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DebugTools.html">Regression and Debug Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ProjectLayout.html">Project Layout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Performance.html">Performance</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Benchmark.html">Benchmark</a></li>
@@ -129,6 +132,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DeformableTerrain.html">Deformable terrain</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Constraints.html">Constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../RayTest.html">Ray Test</a></li>
@@ -182,15 +186,13 @@ control. The example is short:</p>
 <span class="w">  </span><span class="n">exampleRscPath</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="s">&quot;city/rayrai_city.rscene&quot;</span><span class="p">));</span>
 <span class="c1">// The .rscene reader creates no articulated systems, so the robot is added here.</span>
 <span class="n">addStandingAnymal</span><span class="p">(</span><span class="o">*</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="n">exampleRscPath</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="s">&quot;anymal_c/urdf/anymal.urdf&quot;</span><span class="p">));</span>
-<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="w"> </span><span class="nf">viewer</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">1280</span><span class="p">,</span><span class="w"> </span><span class="mi">800</span><span class="p">);</span>
-<span class="n">viewer</span><span class="p">.</span><span class="n">setAsyncMeshLoadingEnabled</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
-<span class="n">raisin</span><span class="o">::</span><span class="n">applyRscene</span><span class="p">(</span><span class="o">*</span><span class="n">world</span><span class="o">-&gt;</span><span class="n">getRscene</span><span class="p">(),</span><span class="w"> </span><span class="n">viewer</span><span class="p">);</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="w"> </span><span class="nf">viewer</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">1280</span><span class="p">,</span><span class="w"> </span><span class="mi">800</span><span class="p">);</span><span class="w">  </span><span class="c1">// applies the scene</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">raisim::World(path)</span></code> creates the ground, sidewalk and building colliders,
 hidden <code class="docutils literal notranslate"><span class="pre">.rasset</span></code> colliders for lamps, trees, hydrants, bins, benches,
 utility boxes, barriers and cars, and eleven dynamic traffic cones.
-<code class="docutils literal notranslate"><span class="pre">raisin::applyRscene</span></code> applies the HDR sky, the sun with two shadow
+The viewer applies the scene’s HDR sky, the sun with two shadow
 cascades, the render settings, 86 instanced batches (78 facade modules and 8
 kinds of street furniture), the 159 parked cars, the baked street and building-shell
 meshes, and the street-level camera.</p>
@@ -202,8 +204,8 @@ meshes, and the street-level camera.</p>
 <p>CMake target: <code class="docutils literal notranslate"><span class="pre">rayrai_city</span></code> (C++20). Source:
 <code class="docutils literal notranslate"><span class="pre">examples/src/rayrai/worlds/rayrai_city.cpp</span></code>. Like
 <a class="reference internal" href="rayrai_forest_from_rscene.html"><span class="doc">Rayrai Example: Forest From .rscene</span></a>, it needs the <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> support of
-<code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> and <code class="docutils literal notranslate"><span class="pre">rayrai/RsceneVisuals.hpp</span></code>; CMake skips the target
-when the installed rayrai lacks it.</p>
+<code class="docutils literal notranslate"><span class="pre">raisim::World</span></code> and a rayrai whose <code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> applies its world’s
+scene; CMake skips the target when the installed rayrai lacks it.</p>
 </section>
 <section id="run">
 <h2>Run<a class="headerlink" href="#run" title="Link to this heading"></a></h2>
@@ -288,7 +290,7 @@ LOD cache and asynchronous loading.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="rayrai_forest_from_rscene.html" class="btn btn-neutral float-left" title="Rayrai Example: Forest From .rscene" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="rayrai_warehouse.html" class="btn btn-neutral float-right" title="Rayrai Example: Warehouse" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="rayrai_city_from_xml.html" class="btn btn-neutral float-right" title="Rayrai Example: City From XML" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

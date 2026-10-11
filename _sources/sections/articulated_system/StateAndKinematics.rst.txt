@@ -163,6 +163,9 @@ Joint limits can be defined in a URDF file **per joint** as follows:
 The ``lower`` and ``upper`` are joint position limits and the ``velocity`` is the joint velocity limit.
 The joint limits are implemented as if there is a hard stop at the limits.
 This means that there is a hard collision (with a restitution coefficient of 0) when the joint hits a limit.
+A spherical joint has a single limit: ``lower`` is the largest total rotation angle :math:`2\arccos|q_w|` (twist included) away from the zero configuration, and ``upper`` is ignored.
+The joint stops at that angle like at any other hard stop; torque that pushes it outward is resisted, while motion along or back from the limit is free.
+Velocity limits do not apply to spherical joints.
 The ``effort`` is not a joint limit but the actuation limit of the joint: it bounds the feedforward generalized force plus the built-in PD torque (see :doc:`DynamicsAndControl`).
 It does not bound actuator torques, which are limited by the operating regions of their motors (see :doc:`../Actuators`).
 

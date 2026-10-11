@@ -1,0 +1,236 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Debug Tool: Heightmap Replacement &mdash; raisim 2.9.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=182a64a0"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Project Layout" href="../ProjectLayout.html" />
+    <link rel="prev" title="Debug Tool: Object Lifecycle Stress" href="object_lifecycle_stress.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../FeatureMap.html">Feature Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../DebugTools.html">Regression and Debug Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../DebugTools.html#build">Build</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../DebugTools.html#tools">Tools</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="object_lifecycle_stress.html">Debug Tool: Object Lifecycle Stress</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Debug Tool: Heightmap Replacement</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#target">Target</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#run">Run</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#how-to-reproduce">How to reproduce</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#details">Details</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ProjectLayout.html">Project Layout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Performance.html">Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Benchmark.html">Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RsceneFile.html">.rscene File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../OpenUSD.html">OpenUSD Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../GranularMedia.html">Granular Media</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DeformableTerrain.html">Deformable terrain</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Tendons.html">Tendons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Rayrai.html">rayrai Visualizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimMatlab.html">RaisimMatlab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../DebugTools.html">Regression and Debug Tools</a></li>
+      <li class="breadcrumb-item active">Debug Tool: Heightmap Replacement</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="debug-tool-heightmap-replacement">
+<h1>Debug Tool: Heightmap Replacement<a class="headerlink" href="#debug-tool-heightmap-replacement" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>Checks rayrai depth images for stale geometry after removing heightmaps and
+primitives. The scene
+places a PD-controlled ANYmal on a flat terrain patch and renders its front and
+rear depth cameras into separate ImGui panels, and draws the pixels of each
+camera projected into the world as small instanced cubes. Press Space to create a visibly
+different heightmap with broad mounds that shift across both camera frames, then
+replace randomized populations of simple primitives and delete the old scene.</p>
+</section>
+<section id="target">
+<h2>Target<a class="headerlink" href="#target" title="Link to this heading"></a></h2>
+<p>CMake target: <code class="docutils literal notranslate"><span class="pre">rayrai_heightmap_replacement</span></code>.
+Source: <code class="docutils literal notranslate"><span class="pre">examples/tools/debug/rayrai_heightmap_replacement.cpp</span></code>.</p>
+</section>
+<section id="run">
+<h2>Run<a class="headerlink" href="#run" title="Link to this heading"></a></h2>
+<p>Build with <code class="docutils literal notranslate"><span class="pre">RAISIM_DEBUG_TOOLS=ON</span></code> as described in <a class="reference internal" href="../DebugTools.html"><span class="doc">Regression and Debug Tools</span></a>,
+then run the build-tree executable:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build-debug/examples/rayrai_heightmap_replacement
+</pre></div>
+</div>
+<p>On Windows, run <code class="docutils literal notranslate"><span class="pre">build-debug\bin\rayrai_heightmap_replacement.exe</span></code> instead.
+This tool renders in process with rayrai and does not need <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code>.</p>
+</section>
+<section id="how-to-reproduce">
+<h2>How to reproduce<a class="headerlink" href="#how-to-reproduce" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Watch the mounds in the front and rear depth images shown at the upper left.</p></li>
+<li><p>Tap Space several times. Each press removes the current heightmap and creates
+a new generation with a random number of boxes, spheres, and cylinders in each
+camera frame.</p></li>
+<li><p>Compare the depth image with the current colored terrain in the main view. A
+mound or primitive from an earlier generation indicates stale deleted geometry
+in the depth pass.</p></li>
+<li><p>The projected pixel cubes must lie on the current terrain and primitives. Cubes
+floating in the air or buried in the ground show that the depth image does not
+match the scene.</p></li>
+</ol>
+</section>
+<section id="details">
+<h2>Details<a class="headerlink" href="#details" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Loads the sensored ANYmal used by <code class="docutils literal notranslate"><span class="pre">sensor_suite</span></code> and selects its front and
+rear depth cameras.</p></li>
+<li><p>Uses PD gains and a nominal standing target to hold the twelve leg joints.</p></li>
+<li><p>Keeps a radius of 1.15 m around the robot exactly flat, with a smooth transition
+to rolling terrain.</p></li>
+<li><p>Moves broad near-field mounds left and right across both camera views on every
+terrain generation.</p></li>
+<li><p>Places two to nine deterministic pseudo-random static boxes, spheres, and
+cylinders in each camera’s near field.</p></li>
+<li><p>Projects each depth image into world-frame points with
+<code class="docutils literal notranslate"><span class="pre">DepthCamera::depthToPointCloud</span></code> and draws every sixth pixel in each
+direction as a small cube, one <code class="docutils literal notranslate"><span class="pre">InstancedVisuals</span></code> batch per camera in the
+color of its frustum (orange front, blue rear), darker with distance. The
+batches are not detectable, so the cameras never see the cubes.</p></li>
+<li><p>Allocates the new heightmap and primitives before calling
+<code class="docutils literal notranslate"><span class="pre">World::removeObject</span></code> on the old scene, guaranteeing distinct object
+addresses while still exercising deletion.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="object_lifecycle_stress.html" class="btn btn-neutral float-left" title="Debug Tool: Object Lifecycle Stress" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../ProjectLayout.html" class="btn btn-neutral float-right" title="Project Layout" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

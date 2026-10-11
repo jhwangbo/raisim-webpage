@@ -19,14 +19,12 @@ control. The example is short:
      exampleRscPath(argv[0], "city/rayrai_city.rscene"));
    // The .rscene reader creates no articulated systems, so the robot is added here.
    addStandingAnymal(*world, exampleRscPath(argv[0], "anymal_c/urdf/anymal.urdf"));
-   raisin::RayraiWindow viewer(world, 1280, 800);
-   viewer.setAsyncMeshLoadingEnabled(true);
-   raisin::applyRscene(*world->getRscene(), viewer);
+   raisin::RayraiWindow viewer(world, 1280, 800);  // applies the scene
 
 ``raisim::World(path)`` creates the ground, sidewalk and building colliders,
 hidden ``.rasset`` colliders for lamps, trees, hydrants, bins, benches,
 utility boxes, barriers and cars, and eleven dynamic traffic cones.
-``raisin::applyRscene`` applies the HDR sky, the sun with two shadow
+The viewer applies the scene's HDR sky, the sun with two shadow
 cascades, the render settings, 86 instanced batches (78 facade modules and 8
 kinds of street furniture), the 159 parked cars, the baked street and building-shell
 meshes, and the street-level camera.
@@ -40,8 +38,8 @@ Target
 CMake target: ``rayrai_city`` (C++20). Source:
 ``examples/src/rayrai/worlds/rayrai_city.cpp``. Like
 :doc:`rayrai_forest_from_rscene`, it needs the ``.rscene`` support of
-``raisim::World`` and ``rayrai/RsceneVisuals.hpp``; CMake skips the target
-when the installed rayrai lacks it.
+``raisim::World`` and a rayrai whose ``RayraiWindow`` applies its world's
+scene; CMake skips the target when the installed rayrai lacks it.
 
 Run
 ===

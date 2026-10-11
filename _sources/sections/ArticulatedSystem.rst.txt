@@ -36,6 +36,7 @@ Here, a "body" denotes a rigid body composed of one or more "links" that are rig
    articulated_system/ModifyingTheModel
    articulated_system/ClosedLoopSystems
    articulated_system/MimicJoints
+   articulated_system/Tracks
    articulated_system/API
 
 .. rubric:: TL;DR

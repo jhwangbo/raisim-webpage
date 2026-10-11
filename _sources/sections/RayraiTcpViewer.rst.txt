@@ -1001,11 +1001,12 @@ or generalized-coordinate requests.
 
 RaiSim Engine scenes
 ====================
-When the server's world was built from a ``.rscene`` file (:doc:`RsceneFile`),
-the viewer shows the whole scene, as
+When the server's world holds a ``.rscene`` scene (:doc:`RsceneFile`), built
+from the file or from an XML world file that includes it, the viewer shows the
+whole scene, as
 :doc:`examples/rayrai/rayrai_forest_from_rscene` does in one process. The
-server streams the physics bodies. The viewer applies the scene file with
-``raisin::applyRscene`` for everything else: visual-only objects and the visual
+server streams the physics bodies. The viewer applies the scene file, as a
+``RayraiWindow`` does for its world's scene, for everything else: visual-only objects and the visual
 meshes of ``.rasset`` objects, instanced visuals and terrain foliage, the
 terrain textures on the streamed height maps, lights, local fog, reflection
 probes, the sky or HDR background, the render quality settings and the first
@@ -1024,12 +1025,18 @@ apply. :doc:`examples/server/rscene_server` serves the forest scene.
 Finding the scene's files
 -------------------------
 The server lists the scene file and every file it uses, with each file's size
-and content hash (see :doc:`RaisimServer`). The viewer asks for consent on each
-connection before inspecting server-chosen paths, including on the server's
-computer. After **Download** is pressed, it looks for matching files in order at:
+and content hash (see :doc:`RaisimServer`). A server the viewer is connected
+to through a loopback address (``127.0.0.0/8`` or ``::1``), such as the child
+process that ``--simulate`` and drag and drop start, runs on the viewer's
+computer, so the viewer looks for the files at the server's own paths right
+away. The address of the connection decides this, not the host name typed in
+the viewer, which may resolve to another computer. For any other
+server, it inspects server-chosen paths only after **Download** is pressed.
+The viewer looks for matching files in order at:
 
-#. the server's own path. Matching files on the server's computer are copied
-   into the private scene cache after consent;
+#. the server's own path: right away for a loopback server, after consent
+   otherwise. When every file matches there, the scene loads from these files
+   in place, without a copy;
 #. its copy of this version of the scene in the download cache;
 #. every resource directory (``--resource-dir`` or the **Options** tab),
    joined with each tail of the file's path below the scene's top directory.
@@ -1047,8 +1054,13 @@ available.
 Download prompt
 ---------------
 A prompt at the top of the pane names the offered scene, its file count, size
-and destination. Nothing is inspected or downloaded until **Download** is
-pressed. Accepting checks local candidates and downloads only missing files. **Not now** keeps only the streamed
+and destination. It appears when a file is not found in the cache or the
+resource directories, and for a loopback server only when a file is not at the
+server's path either: a remote server reached through a local port (an SSH
+tunnel) still asks. A loopback server whose files are all on this computer
+shows no prompt. Nothing else is inspected, and nothing is downloaded, until
+**Download** is pressed. Accepting checks local candidates and downloads only
+missing files. **Not now** keeps only the streamed
 bodies and leaves a small bar with a **Download** button. Adding a resource
 directory that holds the files checks again. During the download a progress
 bar offers **Cancel**; files that are already complete are kept.

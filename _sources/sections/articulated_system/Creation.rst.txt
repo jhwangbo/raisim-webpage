@@ -36,6 +36,8 @@ The modifications are as follows:
 
 * A ``<robot>`` can have ``<actuator>`` elements. They attach actuators (motors with their gears, possibly coupled through a transmission) to joints. The torques commanded with ``setActuatorTorques()`` are limited to the operating regions of their motors (see :doc:`../Actuators`).
 
+* A ``<robot>`` can have ``<track>`` elements. Each wraps a belt around wheels of a link and moves it with joints, for tracked robots (see :doc:`Tracks`).
+
 Here is an example joint with the RaiSim tags:
 
 .. code-block:: xml
@@ -174,3 +176,5 @@ The URDF loader used by :code:`ArticulatedSystem` has a few behaviors worth noti
 * **Mimic joints:** A ``<mimic joint="..." multiplier="..." offset="..."/>`` element in a
   revolute, continuous or prismatic ``<joint>`` makes that joint follow another
   (see :doc:`MimicJoints`).
+* **Tracks:** ``<track>`` elements directly under ``<robot>`` add a belt (collision and visual
+  geometry) to a link; contacts on the belt move the joints listed as its drives (see :doc:`Tracks`).

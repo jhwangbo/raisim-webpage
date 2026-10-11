@@ -6,15 +6,16 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Creating an Articulated System &mdash; raisim 2.8.1 documentation</title>
+  <title>Creating an Articulated System &mdash; raisim 2.9.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
 
   
+    <link rel="shortcut icon" href="../../_static/favicon.png"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=cd87aae0"></script>
+      <script src="../../_static/documentation_options.js?v=182a64a0"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -52,6 +53,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../FeatureMap.html">Feature Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DebugTools.html">Regression and Debug Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ProjectLayout.html">Project Layout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Performance.html">Performance</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Benchmark.html">Benchmark</a></li>
@@ -94,6 +96,7 @@
 <li class="toctree-l2"><a class="reference internal" href="ModifyingTheModel.html">Modifying the Model in Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ClosedLoopSystems.html">Closed-Loop Systems</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MimicJoints.html">Mimic Joints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tracks.html">Tracks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="API.html">ArticulatedSystem API</a></li>
 </ul>
 </li>
@@ -104,6 +107,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DeformableTerrain.html">Deformable terrain</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
@@ -174,6 +178,7 @@ However, since RaiSim offers more features, a RaiSim URDF might not be read by o
 <li><p>A <code class="docutils literal notranslate"><span class="pre">&lt;joint&gt;/&lt;dynamics&gt;</span></code> element can have three more attributes: <em>rotor_inertia</em>, <em>spring_mount</em> and <em>stiffness</em>.
 Its standard <em>damping</em> and <em>friction</em> attributes are described in <a class="reference internal" href="JointDampingAndFriction.html"><span class="doc">Joint Damping and Friction</span></a>.</p></li>
 <li><p>A <code class="docutils literal notranslate"><span class="pre">&lt;robot&gt;</span></code> can have <code class="docutils literal notranslate"><span class="pre">&lt;actuator&gt;</span></code> elements. They attach actuators (motors with their gears, possibly coupled through a transmission) to joints. The torques commanded with <code class="docutils literal notranslate"><span class="pre">setActuatorTorques()</span></code> are limited to the operating regions of their motors (see <a class="reference internal" href="../Actuators.html"><span class="doc">Actuators</span></a>).</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">&lt;robot&gt;</span></code> can have <code class="docutils literal notranslate"><span class="pre">&lt;track&gt;</span></code> elements. Each wraps a belt around wheels of a link and moves it with joints, for tracked robots (see <a class="reference internal" href="Tracks.html"><span class="doc">Tracks</span></a>).</p></li>
 </ul>
 <p>Here is an example joint with the RaiSim tags:</p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;joint</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;link1Tolink2&quot;</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;spherical&quot;</span><span class="nt">&gt;</span>
@@ -297,6 +302,8 @@ entries and a <code class="docutils literal notranslate"><span class="pre">nomin
 <li><p><strong>Mimic joints:</strong> A <code class="docutils literal notranslate"><span class="pre">&lt;mimic</span> <span class="pre">joint=&quot;...&quot;</span> <span class="pre">multiplier=&quot;...&quot;</span> <span class="pre">offset=&quot;...&quot;/&gt;</span></code> element in a
 revolute, continuous or prismatic <code class="docutils literal notranslate"><span class="pre">&lt;joint&gt;</span></code> makes that joint follow another
 (see <a class="reference internal" href="MimicJoints.html"><span class="doc">Mimic Joints</span></a>).</p></li>
+<li><p><strong>Tracks:</strong> <code class="docutils literal notranslate"><span class="pre">&lt;track&gt;</span></code> elements directly under <code class="docutils literal notranslate"><span class="pre">&lt;robot&gt;</span></code> add a belt (collision and visual
+geometry) to a link; contacts on the belt move the joints listed as its drives (see <a class="reference internal" href="Tracks.html"><span class="doc">Tracks</span></a>).</p></li>
 </ul>
 </section>
 </section>

@@ -6,15 +6,16 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>World Configuration File &mdash; raisim 2.8.1 documentation</title>
+  <title>World Configuration File &mdash; raisim 2.9.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
 
   
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=cd87aae0"></script>
+      <script src="../_static/documentation_options.js?v=182a64a0"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -52,6 +53,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="FeatureMap.html">Feature Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DebugTools.html">Regression and Debug Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ProjectLayout.html">Project Layout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Benchmark.html">Benchmark</a></li>
@@ -100,6 +102,7 @@
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableTerrain.html">Deformable terrain</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
@@ -153,8 +156,10 @@ numbers separated by whitespace or by commas, e.g. <code class="docutils literal
 <code class="docutils literal notranslate"><span class="pre">pos=&quot;0,</span> <span class="pre">0,</span> <span class="pre">1&quot;</span></code>. The token <code class="docutils literal notranslate"><span class="pre">[THIS_DIR]</span></code> anywhere in the file is replaced by
 the directory that contains the file, so resource paths can be written relative
 to the file, e.g. <code class="docutils literal notranslate"><span class="pre">urdf_path=&quot;[THIS_DIR]/../anymal/urdf/anymal.urdf&quot;</span></code>.
-Relative paths without <code class="docutils literal notranslate"><span class="pre">[THIS_DIR]</span></code> are resolved against the process working
-directory.</p>
+A relative <code class="docutils literal notranslate"><span class="pre">urdf_path</span></code> or <code class="docutils literal notranslate"><span class="pre">include</span></code> path names a file in the process working
+directory or, if there is none, a file relative to the folder of the XML file
+that names it. Other relative paths without <code class="docutils literal notranslate"><span class="pre">[THIS_DIR]</span></code> are resolved against
+the process working directory.</p>
 <ol class="arabic simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">raisim</span></code>: the root element.</p>
 <ol class="arabic simple">
@@ -193,7 +198,8 @@ without a <code class="docutils literal notranslate"><span class="pre">pair_prop
 </li>
 <li><p>&lt;child&gt; (optional) <code class="docutils literal notranslate"><span class="pre">gravity</span></code></p>
 <ol class="arabic simple">
-<li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">value</span></code> [Vec&lt;3&gt;]: default = <code class="docutils literal notranslate"><span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">-9.81</span></code></p></li>
+<li><p>&lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">value</span></code> [Vec&lt;3&gt;]: default = <code class="docutils literal notranslate"><span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">-9.81</span></code>, or the
+gravity of an included file</p></li>
 </ol>
 </li>
 <li><p>&lt;child&gt; (optional) <code class="docutils literal notranslate"><span class="pre">timeStep</span></code>. Only this camelCase tag name is read.</p>
@@ -410,7 +416,9 @@ order (a child joint cannot precede its parent),
 link and its parent,
 (optional, default=0) <code class="docutils literal notranslate"><span class="pre">convexify_meshes</span></code> [int]: 1 treats the URDF collision
 meshes as convex shapes</p>
-<p>Use an absolute <code class="docutils literal notranslate"><span class="pre">urdf_path</span></code> or one that starts with <code class="docutils literal notranslate"><span class="pre">[THIS_DIR]</span></code>.</p>
+<p>A relative <code class="docutils literal notranslate"><span class="pre">urdf_path</span></code> is looked up in the working directory first and then
+relative to the folder of the XML file, also when that file is included by
+another. A URDF found in neither place is a fatal error.</p>
 <ol class="arabic simple">
 <li><p>&lt;child&gt; <code class="docutils literal notranslate"><span class="pre">state</span></code>: &lt;attribute&gt; <code class="docutils literal notranslate"><span class="pre">qpos</span></code> [VecDyn], the generalized coordinate,
 (optional, default=zeros) <code class="docutils literal notranslate"><span class="pre">qvel</span></code> [VecDyn], the generalized velocity</p></li>
@@ -427,7 +435,8 @@ attributes <code class="docutils literal notranslate"><span class="pre">xx</span
 <p>Primitive classes use the child <code class="docutils literal notranslate"><span class="pre">dimension</span></code> with the same shape parameters as
 <code class="docutils literal notranslate"><span class="pre">dim</span></code>. Mesh classes use the child <code class="docutils literal notranslate"><span class="pre">file</span></code> with the attribute <code class="docutils literal notranslate"><span class="pre">name</span></code> and the
 child <code class="docutils literal notranslate"><span class="pre">scale</span></code> with the attributes <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>, and <code class="docutils literal notranslate"><span class="pre">z</span></code> (only <code class="docutils literal notranslate"><span class="pre">x</span></code> is used).
-Articulated-system classes use the attributes <code class="docutils literal notranslate"><span class="pre">urdf_path</span></code> and optional
+Articulated-system classes use the attributes <code class="docutils literal notranslate"><span class="pre">urdf_path</span></code>, resolved like an
+articulated system’s against the file that defines the class, and optional
 <code class="docutils literal notranslate"><span class="pre">res_dir</span></code>. Compound classes use the child <code class="docutils literal notranslate"><span class="pre">children</span></code>; each child element is
 named after a primitive type or another compound class and uses the attributes
 <code class="docutils literal notranslate"><span class="pre">object_param</span></code> [VecDyn] (the shape parameters: radius; radius and height; or
@@ -518,7 +527,33 @@ reusable files. See
 and the <code class="docutils literal notranslate"><span class="pre">xml_templated_world</span></code> example, which loads it.</p>
 <p><strong>Includes.</strong> <code class="docutils literal notranslate"><span class="pre">&lt;include</span> <span class="pre">value=&quot;[THIS_DIR]/terrain.xml&quot;/&gt;</span></code> loads another world
 file into the same world before the including file’s own content. Use it to
-combine sub-worlds.</p>
+combine sub-worlds. Included files load in document order, and the settings of
+the including file (<code class="docutils literal notranslate"><span class="pre">material</span></code>, <code class="docutils literal notranslate"><span class="pre">gravity</span></code>, <code class="docutils literal notranslate"><span class="pre">timeStep</span></code>, <code class="docutils literal notranslate"><span class="pre">erp</span></code>,
+<code class="docutils literal notranslate"><span class="pre">simulation</span></code>) override theirs; a setting it does not name keeps the included
+file’s value. The <code class="docutils literal notranslate"><span class="pre">value</span></code> may contain <code class="docutils literal notranslate"><span class="pre">&#64;&#64;</span></code> parameters. A relative path
+names a file in the working directory or, if there is none, a file relative to
+the folder of the including file, also inside a nested include. A missing
+file is a fatal error.</p>
+<p>An include whose path ends in <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> (in any letter case) builds a RaiSim
+Engine scene into the world, as <code class="docutils literal notranslate"><span class="pre">World(&quot;scene.rscene&quot;)</span></code> does, so a robot and
+the scene it runs in can live in separate files:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;raisim&gt;</span>
+<span class="w">    </span><span class="nt">&lt;include</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;[THIS_DIR]/../city/rayrai_city.rscene&quot;</span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;objects&gt;</span>
+<span class="w">        </span><span class="nt">&lt;articulated_system</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;anymal&quot;</span><span class="w"> </span><span class="na">urdf_path=</span><span class="s">&quot;[THIS_DIR]/../anymal_c/urdf/anymal.urdf&quot;</span><span class="nt">&gt;</span>
+<span class="w">            </span><span class="nt">&lt;state</span><span class="w"> </span><span class="na">qpos=</span><span class="s">&quot;...&quot;</span><span class="w"> </span><span class="na">qvel=</span><span class="s">&quot;...&quot;</span><span class="nt">/&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/articulated_system&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/objects&gt;</span>
+<span class="nt">&lt;/raisim&gt;</span>
+</pre></div>
+</div>
+<p>The scene sets its solver settings and contact materials, and adds its terrain,
+bodies and wires, before the robot. <code class="docutils literal notranslate"><span class="pre">World::getRscene()</span></code> returns the scene,
+so a rayrai <code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> and the TCP viewer show its lights, sky, foliage
+and visual-only objects. A world holds at most one scene: a second <code class="docutils literal notranslate"><span class="pre">.rscene</span></code>
+include, also through an included XML file, is a fatal error. See
+<a class="reference internal" href="RsceneFile.html#a-robot-in-a-scene"><span class="std std-ref">A robot in a scene</span></a> and
+<a class="reference external" href="https://github.com/raisimTech/raisim2Lib/blob/main/rsc/xmlScripts/rscene/anymal_in_city.xml">anymal_in_city.xml</a>.</p>
 <p><strong>Parameters.</strong> A token <code class="docutils literal notranslate"><span class="pre">&#64;&#64;name</span></code> is replaced by the value of the parameter
 <code class="docutils literal notranslate"><span class="pre">name</span></code>. Define values in the file:</p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;params&gt;</span>

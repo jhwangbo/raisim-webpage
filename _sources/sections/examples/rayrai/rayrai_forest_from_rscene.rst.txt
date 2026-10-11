@@ -16,13 +16,11 @@ rock in C++. The whole example is a few lines:
 
    auto world = std::make_shared<raisim::World>(
      exampleRscPath(argv[0], "forest/rayrai_forest.rscene"));
-   raisin::RayraiWindow viewer(world, 1280, 800);
-   viewer.setAsyncMeshLoadingEnabled(true);
-   raisin::applyRscene(*world->getRscene(), viewer);
+   raisin::RayraiWindow viewer(world, 1280, 800);  // applies the scene
 
 ``raisim::World(path)`` reads the solver settings, the 161 × 161 heightmap,
 the 2,068 hidden ``.rasset`` tree and rock collision bodies and the 100
-dynamic props. ``raisin::applyRscene`` applies the render settings, sky and
+dynamic props. The ``RayraiWindow`` applies the scene's render settings, sky and
 weather, sun, ground texture, the 16 instanced vegetation and rock batches,
 and the saved camera. The result simulates exactly like ``rayrai_forest``.
 
@@ -31,11 +29,9 @@ Target
 CMake target: ``rayrai_forest_from_rscene`` (C++20). Source:
 ``examples/src/rayrai/worlds/rayrai_forest_from_rscene.cpp``.
 
-The example needs the ``.rscene`` support in ``raisim::World`` and
-``rayrai/RsceneVisuals.hpp``, which are new in RaiSim and rayrai v2.7.1 (not
-yet released). The 2.7.0 package does not include them, so this target does
-not compile against it; build the other targets explicitly instead, for example
-``cmake --build build-examples --target rayrai_forest``.
+The example needs the ``.rscene`` support in ``raisim::World`` and a rayrai
+whose ``RayraiWindow`` applies its world's scene, which are not in a released
+package yet. CMake skips this target when the installed rayrai lacks them.
 
 Run
 ===
@@ -57,19 +53,21 @@ Changing the render settings
 The scene file stores the rendering parameters: the quality preset and custom
 renderer settings (MSAA, shadow resolution and cascades, exposure, tone
 mapping and post effects), the environment (color mode, fog, bloom, SSAO) and
-the weather. Change them in C++ before applying the scene:
+the weather. To change them in C++, pass them to
+``setRsceneRenderSettings``, which applies the scene again with them in place
+of the viewer's constructor:
 
 .. code-block:: cpp
 
    auto render = raisin::rsceneRenderSettings(*world->getRscene());
    render.quality.viewerMsaaSamples = 8;
    render.weather.timeOfDayHours = 18;
-   raisin::applyRscene(*world->getRscene(), viewer, render);
+   raisin::setRsceneRenderSettings(viewer, render);
 
 With weather enabled, rayrai derives exposure, environment intensity, fog and
 shadow strength from these base settings and the sky, so overriding them here
-keeps that relationship. After ``applyRscene``, the viewer's own setters still
-change anything.
+keeps that relationship. The viewer's own setters still change anything
+afterwards.
 
 Supported scene content
 =======================

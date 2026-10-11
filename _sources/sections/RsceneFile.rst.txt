@@ -14,18 +14,24 @@ are resolved, and what they reject or ignore.
 Availability
 ============
 
-The reader is new in v2.7.1, which is not released yet (see
-:doc:`changelog/v2.7`). It is part of the RaiSim and rayrai libraries:
+The reader is new in v2.8.0. XML includes, a ``RayraiWindow`` that shows its
+world's scene by itself, ``raisin::setRsceneRenderSettings`` and
+``raisin::rsceneVisuals`` are new in v2.8.2, which is not released yet; v2.8.0
+and v2.8.1 show a scene with ``raisin::applyRscene`` (see
+:doc:`changelog/v2.8`). It is part of the RaiSim and rayrai libraries:
 
 * ``raisim/Rscene.hpp`` (RaiSim): ``raisim::World(path)`` for a path that ends
-  in ``.rscene`` (in any letter case), ``World::getRscene()``, and the
+  in ``.rscene`` (in any letter case), ``<include value="scene.rscene"/>`` in
+  a RaiSim XML world configuration file, ``World::getRscene()``, and the
   lower-level ``raisim::rscene::load``, ``rscene::applyPhysics`` and
   ``rscene::addToWorld``.
-* ``rayrai/RsceneVisuals.hpp`` (rayrai): ``raisin::applyRscene`` and
-  ``raisin::rsceneRenderSettings``.
+* ``rayrai/RayraiWindow.hpp`` (rayrai): a ``raisin::RayraiWindow`` on such a
+  world shows the scene. ``rayrai/RsceneVisuals.hpp``:
+  ``raisin::rsceneRenderSettings``, ``raisin::setRsceneRenderSettings`` and
+  ``raisin::rsceneVisuals``.
 
-The v2.7.0 package ships neither header, so code that uses them does not
-compile against it. Its ``World(path)`` constructor does not recognize the
+The v2.7.0 package has neither the reader nor ``rayrai/RsceneVisuals.hpp``,
+so code that uses them does not compile against it. Its ``World(path)`` constructor does not recognize the
 extension either: it searches the file for a ``<raisim>`` or ``<mujoco>``
 element, finds neither, and returns an empty world without an error.
 
@@ -51,7 +57,8 @@ Physics only
 ``World(path)`` parses and checks the whole file first, then applies the solver
 settings and contact materials and adds the terrain, the bodies and the wires.
 The parsed scene stays available through ``world.getRscene()``, which returns
-``nullptr`` for a world built any other way. A file that the reader rejects is
+``nullptr`` for a world built any other way, except from a RaiSim XML world
+configuration file that includes the scene (see `A robot in a scene`_). A file that the reader rejects is
 a RaiSim fatal error, which exits the process unless you install a fatal
 callback (see :doc:`LoggingSystem`). If the callback returns instead of
 throwing, the world keeps the bodies added before the error and
@@ -92,58 +99,69 @@ Physics and rayrai rendering
 
    #include "raisim/World.hpp"
    #include "rayrai/RayraiWindow.hpp"
-   #include "rayrai/RsceneVisuals.hpp"
 
    auto world = std::make_shared<raisim::World>("scene.rscene");
-   raisin::RayraiWindow viewer(world, 1280, 800);
-
-   // The file's render settings, optionally changed in C++ before they are applied.
-   auto render = raisin::rsceneRenderSettings(*world->getRscene());
-   render.quality.addViewerFillLights = false;
-   const auto visuals = raisin::applyRscene(*world->getRscene(), viewer, render);
+   raisin::RayraiWindow viewer(world, 1280, 800);  // shows the whole scene
 
    while (running) {
      world->integrate();
      viewer.update(1280, 800, false, 0, 0, false);
    }
 
-``applyRscene(scene, viewer)`` without the third argument applies
-``rsceneRenderSettings(scene)`` unchanged. Either form applies, in this order,
-the quality preset and render settings (``rayrai_render`` and
-``environment``), the background (a plain color, an HDR image, or the rayrai
-sky configured by ``weather``), the objects the RaiSim world does not draw
-(visual-only objects and the visual meshes of visible ``.rasset`` objects,
-returned in ``visuals.objects``), the lights, the local fog volumes, the
-reflection probes, one ``InstancedVisuals`` batch per enabled
-``instanced_visual`` record (``visuals.instancedVisuals``, in file order), the
-terrain foliage (``visuals.foliage``), the terrain textures and the first
-enabled camera. Bodies and height maps are drawn from the world like any other
-RaiSim object; the hidden ``.rasset`` colliders are not drawn.
+A ``RayraiWindow`` whose world holds a scene (``world->getRscene()``) applies
+it when it is constructed, and again when ``swapWorld`` gives it a new world;
+no call is needed. It applies, in this order, the quality preset and render settings
+(``rayrai_render`` and ``environment``), the background (a plain color, an
+HDR image, or the rayrai sky configured by ``weather``), the objects the RaiSim
+world does not draw (visual-only objects and the visual meshes of visible
+``.rasset`` objects), the lights, the local fog volumes, the reflection probes,
+one ``InstancedVisuals`` batch per enabled ``instanced_visual`` record (in file
+order), the terrain foliage, the terrain textures and the first enabled
+camera. Bodies and height maps are drawn from the world like any other RaiSim
+object; the hidden ``.rasset`` colliders are not drawn.
+``raisin::rsceneVisuals(viewer)`` returns the visuals and batches it created
+(``objects``, ``instancedVisuals`` and ``foliage``).
 
-* A render record the file omits, and every key it omits, takes Engine 2's
-  default, so a file without ``environment``, ``weather`` or
-  ``rayrai_render`` records still applies.
-* RaiSim stores ``environment``, ``weather`` and ``rayrai_render`` without
+* Meshes load asynchronously, as for any other visual. A visual appears once
+  its mesh is ready; ``viewer.pendingAsyncMeshLoadCount()`` counts the rest,
+  for example to show a loading bar. ``viewer.setAsyncMeshLoadingEnabled(false)``
+  loads the remaining meshes before it returns, for example before rendering a
+  sensor image, and loads later meshes synchronously.
+* Settings changed after construction (``setRenderQualitySettings``,
+  ``getLight``, ``getCamera``) override the scene's.
+* A scene rayrai cannot show, for example one with a missing texture, mesh or
+  HDR file (see `Rejected content`_), is a RaiSim fatal error in the
+  constructor. A render record the file omits, and every key it omits, takes
+  Engine 2's default, so a file without ``environment``, ``weather`` or
+  ``rayrai_render`` records still applies. RaiSim stores these records without
   interpreting them, so rayrai is the first to check their keys.
-* ``applyRscene`` calls ``setRenderQualitySettings`` and replaces the viewer's
-  additional lights, local fog volumes, projected decals and irradiance
-  volumes, so add your own afterwards. Call it once per viewer: batch and
-  visual names must be unique, so applying a scene to the same viewer twice is
-  a fatal error.
-* With weather enabled, rayrai derives exposure, environment intensity, fog and
-  shadow strength from the base settings and the sky. Change the base values in
-  ``render.quality`` and ``render.weather`` before ``applyRscene`` instead of
-  reading them back from the viewer afterwards. After ``applyRscene``, the
-  viewer's own setters (``setRenderQualitySettings``, ``getLight``,
-  ``getCamera``) still change anything.
-* Both functions throw ``std::runtime_error`` for a malformed render record, a
-  missing texture, mesh or HDR file, or content that rayrai cannot reproduce
-  (see `Rejected content`_).
+
+To change the file's render settings in C++, start from the file's own and pass
+them to ``setRsceneRenderSettings`` (``rayrai/RsceneVisuals.hpp``). The viewer
+applies the scene again with them, in place of the constructor's application:
+the previous visuals, batches and reflection probes are removed, and their
+meshes are reused. It is a fatal error when the viewer's world holds no scene.
+
+.. code-block:: cpp
+
+   #include "rayrai/RsceneVisuals.hpp"
+
+   auto render = raisin::rsceneRenderSettings(*world->getRscene());
+   render.quality.addViewerFillLights = false;
+   render.weather.timeOfDayHours = 18;
+   raisin::setRsceneRenderSettings(viewer, render);
+
+With weather enabled, rayrai derives exposure, environment intensity, fog and
+shadow strength from the base settings and the sky. Change the base values in
+``render.quality`` and ``render.weather`` this way instead of reading them back
+from the viewer and setting them again. Applying the scene replaces the
+viewer's additional lights, local fog volumes, projected decals and irradiance
+volumes, so add your own afterwards.
 
 :doc:`examples/rayrai/rayrai_forest_from_rscene` loads the shipped forest scene
 this way. Every ``.rscene`` file in the RaiSim and ``raisim2Lib`` repositories
-loads both ways, and the image matches Engine 2's viewport; only two Engine 2
-test inputs, which are deliberately not loadable, are excluded.
+loads, and the image matches Engine 2's viewport; only two Engine 2 test
+inputs, which are deliberately not loadable, are excluded.
 
 Physics on a server, rendering in the TCP viewer
 ------------------------------------------------
@@ -158,12 +176,65 @@ Physics on a server, rendering in the TCP viewer
    while (running) server.integrateWorldThreadSafe();
 
 ``rayrai_tcp_viewer`` draws the bodies the server streams. It also applies the
-scene with ``applyRscene``, from the same file on the server's computer or from
-a copy elsewhere, so it shows what the in-process viewer above shows. A viewer
+scene, from the same file on the server's computer or from a copy elsewhere, so
+it shows what the in-process viewer above shows. A viewer
 on another computer that lacks the scene's files asks its user, then
 downloads them from the server (see :doc:`RaisimServer` and
 :ref:`sections/RayraiTcpViewer:RaiSim Engine scenes`).
 :doc:`examples/server/rscene_server` serves the forest scene.
+
+A robot in a scene
+------------------
+
+A RaiSim world configuration file (:doc:`WorldConfigurationFile`) can include
+a scene. The robot, its initial state and its controller gains stay in the XML
+file, and the scene it runs in stays in the ``.rscene`` file, so either can be
+swapped without editing the other:
+
+.. code-block:: xml
+
+   <raisim>
+       <include value="[THIS_DIR]/../../city/rayrai_city.rscene"/>
+       <objects>
+           <articulated_system name="anymal" urdf_path="[THIS_DIR]/../../anymal_c/urdf/anymal.urdf">
+               <state qpos="-36, -1.6, 0.56, 0.2675, 0, 0, 0.9636, 0.03, 0.4, -0.8, -0.03, 0.4, -0.8, 0.03, -0.4, 0.8, -0.03, -0.4, 0.8"
+                      qvel="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
+           </articulated_system>
+       </objects>
+   </raisim>
+
+.. code-block:: cpp
+
+   auto world = std::make_shared<raisim::World>("anymal_in_city.xml");
+   raisin::RayraiWindow viewer(world, 1280, 800);  // the robot and the whole scene
+
+`anymal_in_city.xml <https://github.com/raisimTech/raisim2Lib/blob/main/rsc/xmlScripts/rscene/anymal_in_city.xml>`__
+is this file with joint PD gains. :doc:`examples/rayrai/rayrai_city_from_xml`
+loads it in process, and ``rayrai_tcp_viewer --simulate anymal_in_city.xml``
+runs and shows it, the scene included.
+
+* An ``<include>`` whose path ends in ``.rscene`` (in any letter case) loads
+  the scene with the same checks as ``World(path)``. Like any include, it loads
+  before the including file's own content, so the scene's bodies precede the
+  robot in the world's object list. A relative path names a file in the
+  working directory or, if there is none, a file relative to the folder of
+  the including XML file. ``[THIS_DIR]`` in front of the path selects the
+  folder explicitly.
+* The scene's solver settings and contact materials apply first. Elements in
+  the XML file (``timeStep``, ``gravity``, ``erp``, ``simulation``,
+  ``material``) override them; the settings the XML file does not name stay as
+  the scene set them.
+* ``world.getRscene()`` returns the included scene, so a ``RayraiWindow`` and
+  the TCP viewer show its render records as for a scene loaded directly.
+* A world holds at most one scene. A second ``.rscene`` include, also one in a
+  nested XML include, is a fatal error.
+* The path can be a template parameter: with ``<include value="@@scene"/>``,
+  ``raisim::World world("robot.xml", {{"scene", "/path/to/forest.rscene"}})``
+  puts the same robot in another scene.
+
+The world is the one the scene and C++ code build together: loading the scene
+with ``World(path)`` and adding the robot with ``addArticulatedSystem`` gives
+the same objects, settings and trajectories.
 
 File syntax
 ===========
@@ -475,7 +546,7 @@ Records
 
 Every other record tag is an error (see `Rejected content`_). In the tables
 below, **RaiSim** means the field is applied by ``World(path)`` or
-``rscene::addToWorld``, **rayrai** that it is applied by ``applyRscene``,
+``rscene::addToWorld``, **rayrai** that a ``RayraiWindow`` applies it,
 **check** that the value is checked but not applied, and **ignored** that
 Engine 2 writes it but neither reader uses it. The default column lists the
 value of an absent key.
@@ -1414,7 +1485,7 @@ reflection probe (**rayrai**, ``RayraiWindow::addReflectionProbe``) with
 ``boxMin``, ``boxMax``; default off, ``-5,-5,-5``, ``5,5,5``).
 ``enabled=false`` skips the record.
 
-With ``captureOnApply=true``, ``applyRscene`` captures the scene into the
+With ``captureOnApply=true``, rayrai captures the scene into the
 probe, after the objects and lights and before the instanced visuals and
 foliage, as Engine 2 does: ``captureCached`` (default ``true``) uses rayrai's
 capture cache, ``cubemapSize`` (``256``) the cube face size,
@@ -1710,7 +1781,7 @@ While adding bodies (``rscene::addToWorld``):
   unit quaternion;
 * a wire whose body has no physics body, or whose tendon RaiSim rejects.
 
-While applying to rayrai (``rsceneRenderSettings`` and ``applyRscene``):
+While applying to rayrai (``RayraiWindow`` and ``rsceneRenderSettings``):
 
 * an unknown preset, color mode, background mode, weather preset or weather
   quality, or a malformed key in these records;
@@ -1798,9 +1869,9 @@ API reference
 
 .. doxygenfunction:: raisin::rsceneRenderSettings
 
-.. doxygenfunction:: raisin::applyRscene(const raisim::rscene::Scene&, RayraiWindow&)
+.. doxygenfunction:: raisin::setRsceneRenderSettings
 
-.. doxygenfunction:: raisin::applyRscene(const raisim::rscene::Scene&, RayraiWindow&, const RsceneRenderSettings&)
+.. doxygenfunction:: raisin::rsceneVisuals
 
 .. doxygenstruct:: raisin::RsceneRenderSettings
    :members:

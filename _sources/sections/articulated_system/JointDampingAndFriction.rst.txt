@@ -62,6 +62,13 @@ damping stable at any time step. The d gain of the PD controller is integrated t
 difference is that damping pulls the velocity to zero, while the d gain pulls it to the velocity
 target.
 
+To read the current joint damping, call ``getJointDamping()``. It returns a const
+``raisim::VecDyn`` reference in generalized velocity order, with ``getDOF()``
+entries. These are the values loaded from the model or last supplied to
+``setJointDamping()``; actuator output damping and PD gains are separate.
+Copy ``getJointDamping().e()`` into an ``Eigen::VectorXd`` to preserve a baseline
+before adding temporary damping, such as wheel braking.
+
 To change the damping at runtime, call ``setJointDamping()`` with one coefficient per degree of
 freedom (``getDOF()`` entries). The new values act from the next step. Leave the six entries of a
 floating base at zero: they are not joints, and their damping would not be integrated implicitly.

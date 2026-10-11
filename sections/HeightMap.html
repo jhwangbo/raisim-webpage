@@ -6,15 +6,16 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Height Map &mdash; raisim 2.8.1 documentation</title>
+  <title>Height Map &mdash; raisim 2.9.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
 
   
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=cd87aae0"></script>
+      <script src="../_static/documentation_options.js?v=182a64a0"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -53,6 +54,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="FeatureMap.html">Feature Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DebugTools.html">Regression and Debug Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ProjectLayout.html">Project Layout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Benchmark.html">Benchmark</a></li>
@@ -106,6 +108,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableTerrain.html">Deformable terrain</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
@@ -190,8 +193,7 @@ moves like the same scene on the unrotated map, with every body and gravity
 rotated along with it; the two agree to rounding error. A height map is one-sided whatever its
 orientation: everything below the surface, along the local -z axis, is inside
 the terrain, and a body that ends up there is pushed back out through the
-surface. The <code class="docutils literal notranslate"><span class="pre">rotated_blocky_heightmap_drop</span></code> example (see <a class="reference internal" href="Examples.html"><span class="doc">Examples</span></a>) tilts a map by
-15 degrees.</p>
+surface.</p>
 </section>
 <section id="querying-the-surface">
 <h2>Querying the surface<a class="headerlink" href="#querying-the-surface" title="Link to this heading"></a></h2>
@@ -280,6 +282,7 @@ range.</p>
 <dd><p>A static terrain defined by a regular grid of heights (create it with <a class="reference internal" href="WorldSystem.html#classraisim_1_1World_1a54061aae9f815014622cba1bdb13ca12"><span class="std std-ref">World::addHeightMap()</span></a>). The grid lies in the heightmap’s own frame. It covers [centerX - xSize/2, centerX + xSize/2] x [centerY - ySize/2, centerY + ySize/2] there, and the heights are z coordinates in that frame; sample (x, y) is stored at index y * xSamples + x, with index 0 at the minimum x and y. Height samples may be NaN or infinity and are stored without filtering. Heights are interpolated over two triangles per cell.</p>
 <p>Like every other object, the heightmap is placed by the pose of its frame: <a class="reference internal" href="#classraisim_1_1HeightMap_1acef70a45075b4fccd4d65be2cb78d499"><span class="std std-ref">setPosition()</span></a> moves the frame origin and <a class="reference internal" href="#classraisim_1_1HeightMap_1a1c6df249ae8a4ea416315dc38f9132af"><span class="std std-ref">setOrientation()</span></a> rotates the frame about that origin, so a point p of the frame lies at position + R p in the world. A new heightmap has the identity pose, so its grid is centered at (centerX, centerY) in the world. Collision (including granular media and swept CCD), ray tests and rendering follow the full pose.</p>
 <p>The point queries <a class="reference internal" href="#classraisim_1_1HeightMap_1a5036590f8600ea5f5523fd3d0ba54141"><span class="std std-ref">getHeight()</span></a>, <a class="reference internal" href="#classraisim_1_1HeightMap_1a56739ca9eb7d5be2653dfd76ea96c4da"><span class="std std-ref">getContactHeight()</span></a>, <a class="reference internal" href="#classraisim_1_1HeightMap_1a4f3782f78c2b453c78e0ee5ecc9602b9"><span class="std std-ref">getNormal()</span></a> and <a class="reference internal" href="#classraisim_1_1HeightMap_1ad5d6b6872c3754b566b81acb9290cd24"><span class="std std-ref">getColor()</span></a> ignore the orientation by design: they read the height field as if only the translation were applied, so a world-frame (x, y) addresses the grid directly. To evaluate a rotated map, query its unrotated coordinates and rotate the result about the position t: the surface point above (x, y) of the unrotated map is t + R ((x, y, getHeight(x, y)) - t), and its normal is R getNormal(x, y). For a world point w, the unrotated coordinates are t + R^T (w - t). </p>
+<p>Subclassed by raisim::DeformableTerrain</p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">

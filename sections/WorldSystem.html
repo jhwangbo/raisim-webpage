@@ -6,15 +6,16 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>World &mdash; raisim 2.8.1 documentation</title>
+  <title>World &mdash; raisim 2.9.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7e9bdaad" />
 
   
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=cd87aae0"></script>
+      <script src="../_static/documentation_options.js?v=182a64a0"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -52,6 +53,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="FeatureMap.html">Feature Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DebugTools.html">Regression and Debug Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ProjectLayout.html">Project Layout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Benchmark.html">Benchmark</a></li>
@@ -96,6 +98,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim5World10addCapsuleEdddRKNSt6stringE14CollisionGroup14CollisionGroup"><code class="docutils literal notranslate"><span class="pre">addCapsule()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim5World9addGroundEdRKNSt6stringE14CollisionGroup"><code class="docutils literal notranslate"><span class="pre">addGround()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim5World12addHeightMapE6size_t6size_tddddRKNSt6vectorIdEERKNSt6stringE14CollisionGroup14CollisionGroup"><code class="docutils literal notranslate"><span class="pre">addHeightMap()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim5World20addDeformableTerrainE6size_t6size_tddddRKNSt6vectorIdEERKN17DeformableTerrain8MaterialERKNSt6stringE14CollisionGroup14CollisionGroup"><code class="docutils literal notranslate"><span class="pre">addDeformableTerrain()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim5World12addHeightMapERKNSt6stringEddRKNSt6stringE14CollisionGroup14CollisionGroup"><code class="docutils literal notranslate"><span class="pre">addHeightMap()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim5World12addHeightMapERKNSt6stringEddddddRKNSt6stringE14CollisionGroup14CollisionGroup"><code class="docutils literal notranslate"><span class="pre">addHeightMap()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6raisim5World12addHeightMapEddR17TerrainPropertiesRKNSt6stringE14CollisionGroup14CollisionGroup"><code class="docutils literal notranslate"><span class="pre">addHeightMap()</span></code></a></li>
@@ -235,6 +238,7 @@
 <li class="toctree-l1"><a class="reference internal" href="CollisionDetection.html">Collision Detection and Colliders</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MaterialSystem.html">Material System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeformableTerrain.html">Deformable terrain</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Constraints.html">Constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Tendons.html">Tendons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RayTest.html">Ray Test</a></li>
@@ -306,24 +310,24 @@ element, selects the loader; the extension does not matter. Use this when
 the scene is hand-edited, template-driven, or already lives in one of those
 formats. See <a class="reference internal" href="WorldConfigurationFile.html"><span class="doc">World Configuration File</span></a> for the RaiSim XML schema and
 the MJCF notes below.</p></li>
-<li><p><strong>From a RaiSim Engine scene file</strong> (from v2.7.1, not yet released; the
-v2.7.0 package does not include the reader). Pass a <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> path to the
+<li><p><strong>From a RaiSim Engine scene file</strong> (from v2.8.0; earlier packages do not
+include the reader). Pass a <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> path to the
 same constructor. RaiSim reads the solver settings and contact materials,
 sampled terrain, primitive, mesh and <code class="docutils literal notranslate"><span class="pre">.rasset</span></code> bodies, and wires;
 <a class="reference internal" href="RsceneFile.html"><span class="doc">.rscene File</span></a> documents the format. The parsed scene stays available
 through <code class="docutils literal notranslate"><span class="pre">World::getRscene()</span></code>, so rayrai can apply the rest of the scene,
 as RaiSim Engine 2’s viewport shows it (render settings, sky, lights, fog,
 visual-only objects, instanced visuals, terrain foliage and textures, and
-the camera), in one call:</p>
+the camera). From v2.8.2 (not yet released), a <code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> applies it
+when it is constructed:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">world</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;forest.rscene&quot;</span><span class="p">);</span>
-<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="w"> </span><span class="nf">viewer</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">1280</span><span class="p">,</span><span class="w"> </span><span class="mi">800</span><span class="p">);</span>
-<span class="n">raisin</span><span class="o">::</span><span class="n">applyRscene</span><span class="p">(</span><span class="o">*</span><span class="n">world</span><span class="o">-&gt;</span><span class="n">getRscene</span><span class="p">(),</span><span class="w"> </span><span class="n">viewer</span><span class="p">);</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="w"> </span><span class="nf">viewer</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="mi">1280</span><span class="p">,</span><span class="w"> </span><span class="mi">800</span><span class="p">);</span><span class="w">  </span><span class="c1">// shows the whole scene</span>
 </pre></div>
 </div>
-<p>Change the file’s render settings in C++ before applying them:</p>
+<p>To change the file’s render settings in C++:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">render</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">rsceneRenderSettings</span><span class="p">(</span><span class="o">*</span><span class="n">world</span><span class="o">-&gt;</span><span class="n">getRscene</span><span class="p">());</span>
 <span class="n">render</span><span class="p">.</span><span class="n">quality</span><span class="p">.</span><span class="n">viewerMsaaSamples</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span><span class="p">;</span>
-<span class="n">raisin</span><span class="o">::</span><span class="n">applyRscene</span><span class="p">(</span><span class="o">*</span><span class="n">world</span><span class="o">-&gt;</span><span class="n">getRscene</span><span class="p">(),</span><span class="w"> </span><span class="n">viewer</span><span class="p">,</span><span class="w"> </span><span class="n">render</span><span class="p">);</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">setRsceneRenderSettings</span><span class="p">(</span><span class="n">viewer</span><span class="p">,</span><span class="w"> </span><span class="n">render</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>Content the reader cannot reproduce exactly, such as articulated systems,
@@ -331,7 +335,10 @@ compounds or nodes that inherit another node’s transform, is a fatal error
 naming the line rather than being dropped. The scene’s solver settings replace the
 world’s defaults; Engine 2’s defaults differ from <code class="docutils literal notranslate"><span class="pre">raisim::World</span></code>’s (see
 <a class="reference internal" href="RsceneFile.html#solver-defaults"><span class="std std-ref">Solver defaults</span></a>). See
-<a class="reference internal" href="examples/rayrai/rayrai_forest_from_rscene.html"><span class="doc">Rayrai Example: Forest From .rscene</span></a> for a complete example.</p>
+<a class="reference internal" href="examples/rayrai/rayrai_forest_from_rscene.html"><span class="doc">Rayrai Example: Forest From .rscene</span></a> for a complete example.
+An XML world configuration file can include a scene
+(<code class="docutils literal notranslate"><span class="pre">&lt;include</span> <span class="pre">value=&quot;[THIS_DIR]/scene.rscene&quot;/&gt;</span></code>) and add a robot to it; see
+<a class="reference internal" href="RsceneFile.html#a-robot-in-a-scene"><span class="std std-ref">A robot in a scene</span></a>.</p>
 </li>
 <li><p><strong>Programmatically.</strong> Default-construct an empty world and add objects
 in code:</p>
@@ -678,7 +685,7 @@ on the next step.</p></li>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim5World5WorldERKNSt6stringERKNSt6vectorI18ParameterContainerEE">
 <span id="_CPPv3N6raisim5World5WorldERKNSt6stringERKNSt6vectorI18ParameterContainerEE"></span><span id="_CPPv2N6raisim5World5WorldERKNSt6stringERKNSt6vectorI18ParameterContainerEE"></span><span id="raisim::World::World__ssCR.std::vector:ParameterContainer:CR"></span><span class="target" id="classraisim_1_1World_1ab463e889ebb129ce3f57a2f0b2bdbd0d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">World</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">configFile</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6raisim5World18ParameterContainerE" title="raisim::World::ParameterContainer"><span class="n"><span class="pre">ParameterContainer</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">params</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim5World5WorldERKNSt6stringERKNSt6vectorI18ParameterContainerEE" title="Link to this definition"></a><br /></dt>
-<dd><p>Create a world from a file. The format is chosen from the extension and content: .usd/.usda/.usdc/.usdz (USD articulation, see <a class="reference internal" href="#classraisim_1_1World_1aa8f04457b7adc0927f779e833daacea2"><span class="std std-ref">addUsdArticulatedSystem()</span></a>), .rscene (RaiSim Engine scene, see <a class="reference internal" href="#classraisim_1_1World_1a57d7615688487e6d2749871d0c09bab5"><span class="std std-ref">getRscene()</span></a>), otherwise an XML file whose content contains a &lt;mujoco&gt; (MJCF) or &lt;raisim&gt; (RaiSim world config) element. </p>
+<dd><p>Create a world from a file. The format is chosen from the extension and content: .usd/.usda/.usdc/.usdz (USD articulation, see <a class="reference internal" href="#classraisim_1_1World_1aa8f04457b7adc0927f779e833daacea2"><span class="std std-ref">addUsdArticulatedSystem()</span></a>), .rscene (RaiSim Engine scene, see <a class="reference internal" href="#classraisim_1_1World_1a57d7615688487e6d2749871d0c09bab5"><span class="std std-ref">getRscene()</span></a>), otherwise an XML file whose content contains a &lt;mujoco&gt; (MJCF) or &lt;raisim&gt; (RaiSim world config) element. A RaiSim world config can include one .rscene scene with &lt;include value=”scene.rscene”/&gt;, e.g. to keep a robot separate from the scene it runs in. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -877,6 +884,12 @@ on the next step.</p></li>
 <dd class="field-even"><p>pointer to the created height map, owned by the world </p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim5World20addDeformableTerrainE6size_t6size_tddddRKNSt6vectorIdEERKN17DeformableTerrain8MaterialERKNSt6stringE14CollisionGroup14CollisionGroup">
+<span id="_CPPv3N6raisim5World20addDeformableTerrainE6size_t6size_tddddRKNSt6vectorIdEERKN17DeformableTerrain8MaterialERKNSt6stringE14CollisionGroup14CollisionGroup"></span><span id="_CPPv2N6raisim5World20addDeformableTerrainE6size_t6size_tddddRKNSt6vectorIdEERKN17DeformableTerrain8MaterialERKNSt6stringE14CollisionGroup14CollisionGroup"></span><span id="raisim::World::addDeformableTerrain__s.s.double.double.double.double.std::vector:double:CR.DeformableTerrain::MaterialCR.ssCR.CollisionGroup.CollisionGroup"></span><span class="target" id="classraisim_1_1World_1af947627b76e05f782e7c624152daebe5"></span><span class="n"><span class="pre">DeformableTerrain</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">addDeformableTerrain</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">xSamples</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ySamples</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">xSize</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ySize</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">centerX</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">centerY</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">heights</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">DeformableTerrain</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Material</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">soil</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">DeformableTerrain</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Material</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">material</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;default&quot;</span></span>, <span class="n"><span class="pre">CollisionGroup</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">collisionGroup</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">CollisionGroup</span></span><span class="p"><span class="pre">(</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">)</span></span><span class="w"> </span><span class="o"><span class="pre">&lt;&lt;</span></span><span class="w"> </span><span class="m"><span class="pre">63</span></span><span class="p"><span class="pre">)</span></span>, <span class="n"><span class="pre">CollisionGroup</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">collisionMask</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">CollisionGroup</span></span><span class="p"><span class="pre">(</span></span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim5World20addDeformableTerrainE6size_t6size_tddddRKNSt6vectorIdEERKN17DeformableTerrain8MaterialERKNSt6stringE14CollisionGroup14CollisionGroup" title="Link to this definition"></a><br /></dt>
+<dd><p>Create a triangulated deformable soil surface. See DeformableTerrain for the material model, units and spatial accuracy. The world owns it; it is a HEIGHTMAP for rendering. Heights must be finite. The terrain is static in pose and deforms along its local Z axis. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -2431,10 +2444,10 @@ on the next step.</p></li>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim5World9getRsceneEv">
 <span id="_CPPv3NK6raisim5World9getRsceneEv"></span><span id="_CPPv2NK6raisim5World9getRsceneEv"></span><span id="raisim::World::getRsceneC"></span><span class="target" id="classraisim_1_1World_1a57d7615688487e6d2749871d0c09bab5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">rscene</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="RsceneFile.html#_CPPv4N6raisim6rscene5SceneE" title="raisim::rscene::Scene"><span class="n"><span class="pre">Scene</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">getRscene</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim5World9getRsceneEv" title="Link to this definition"></a><br /></dt>
-<dd><p>The scene read by World(path) from a RaiSim Engine .rscene file, or null. It carries the render settings and instanced visuals a viewer applies (rayrai: <a class="reference internal" href="RsceneFile.html#namespaceraisin_1ae2c7e5d75e6a27d9ff4aa40270e54655"><span class="std std-ref">raisin::applyRscene</span></a>); the physics bodies are already in the world. </p>
+<dd><p>The scene read by World(path) from a RaiSim Engine .rscene file, or included by a RaiSim world config (&lt;include value=”scene.rscene”/&gt;), or null. It carries the render settings and instanced visuals a viewer applies (rayrai: a <a class="reference internal" href="rayrai/Performance.html#classraisin_1_1RayraiWindow"><span class="std std-ref">raisin::RayraiWindow</span></a> on this world shows them by itself); the physics bodies are already in the world. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the parsed scene, owned by the world, or nullptr if the world was not built from a .rscene file </p>
+<dd class="field-odd"><p>the parsed scene, owned by the world, or nullptr if the world has no .rscene scene </p>
 </dd>
 </dl>
 </dd></dl>
