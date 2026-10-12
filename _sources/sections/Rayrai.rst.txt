@@ -182,6 +182,17 @@ SDL windows on the main thread. A context created there with
 untextured mesh geometry; textures and textured models are uploaded separately
 for each context.
 
+In either mode, rendering reads the world. A render call refreshes the object
+lists and reads every body's pose from the world while it issues its draw calls,
+for the shadow maps and again for the image; ``updateObjectLists`` does not take
+a snapshot. If another thread steps or edits the world, keep it out for the
+whole render call, for example by holding the world's mutex
+(``std::lock_guard<raisim::World>``). A step in the middle of a call draws the
+shadow maps and the image from different states, which shows as bodies shadowed
+by moved copies of themselves. Reading the image back into your own buffer
+(``Camera::getRawImage`` with ``SensorStorageMode::CUSTOM_BUFFER``) does not read
+the world and can follow after you release the lock.
+
 Do not mix threading modes inside one process; all renderers, including shader
 prewarmers, must use the same mode. A threading-mode mismatch at construction
 is reported through RaiSim's fatal handler (``RSFATAL``), which exits the

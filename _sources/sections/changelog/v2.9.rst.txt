@@ -1,7 +1,15 @@
 Changelog: v2.9
 ===============
 
-v2.9.2 (unreleased)
+v2.9.3 (unreleased)
+-------------------
+
+**rayrai**
+
+* Fix: with more than one directional shadow cascade (``directionalShadowCascadeCount``), a camera synced to a RaiSim sensor could show a straight-edged, unshadowed wedge in a bottom corner of its image, near the camera, at some headings. ``syncRaisimCameraPose`` left ``Camera::right`` as the camera was constructed, and the cascades were fitted to the frustum it spanned. ``syncRaisimCameraPose`` now sets ``right`` as well, and the cascades are fitted to the view matrix's own axes (``front`` and ``up``), so a camera whose ``right`` was set by hand and left stale is covered too. Cameras whose ``right`` already matched render as before; the feature showcase's cascaded shadow scene (``11_shadow_cutout_atlas``), whose camera helper left ``right`` stale, changes at shadow edges (0.9% of pixels, PSNR 62 dB).
+* Documentation: the threading contract now states that rendering reads the world. Render calls read the bodies' poses while they issue draw calls (``updateObjectLists`` takes no snapshot), so an application that steps the world on another thread must keep it out for the whole render call, for example by holding the world's mutex; reading the image back can follow after releasing it.
+
+v2.9.2 (2026-10-12)
 -------------------
 
 Rebuild applications after updating (``Camera``, ``RayraiWindow`` and ``RayraiWindow::SynchronousMeshLoadingScope`` ABI changes).

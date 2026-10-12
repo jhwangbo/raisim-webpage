@@ -20,7 +20,7 @@ visuals, point clouds, coordinate frames, and other viewer-only helpers are
 excluded from RGB, depth, and LiDAR data-generation passes. Use generic
 external-camera rendering only when you intentionally want a viewer render that
 includes visualization objects.
-Note: ``syncRaisimCameraPose`` updates ``Camera::position/front/up`` directly;
+Note: ``syncRaisimCameraPose`` updates ``Camera::position/front/up/right`` directly;
 avoid calling ``Camera::update()`` immediately afterward unless you also update
 ``yaw``/``pitch``.
 

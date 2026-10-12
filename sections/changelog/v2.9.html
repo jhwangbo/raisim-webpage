@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Changelog: v2.9 &mdash; raisim 2.9.2 documentation</title>
+  <title>Changelog: v2.9 &mdash; raisim 2.9.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../../_static/favicon.png"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=8baa6ad3"></script>
+      <script src="../../_static/documentation_options.js?v=2fd2eeca"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -60,7 +60,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../Troubleshooting.html">Troubleshooting</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../Changelog.html">Changelog</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Changelog: v2.9</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#v2-9-2-unreleased">v2.9.2 (unreleased)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-9-3-unreleased">v2.9.3 (unreleased)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-9-2-2026-10-12">v2.9.2 (2026-10-12)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#v2-9-1-2026-10-12">v2.9.1 (2026-10-12)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#v2-9-0-2026-10-11">v2.9.0 (2026-10-11)</a></li>
 </ul>
@@ -142,8 +143,16 @@
              
   <section id="changelog-v2-9">
 <h1>Changelog: v2.9<a class="headerlink" href="#changelog-v2-9" title="Link to this heading"></a></h1>
-<section id="v2-9-2-unreleased">
-<h2>v2.9.2 (unreleased)<a class="headerlink" href="#v2-9-2-unreleased" title="Link to this heading"></a></h2>
+<section id="v2-9-3-unreleased">
+<h2>v2.9.3 (unreleased)<a class="headerlink" href="#v2-9-3-unreleased" title="Link to this heading"></a></h2>
+<p><strong>rayrai</strong></p>
+<ul class="simple">
+<li><p>Fix: with more than one directional shadow cascade (<code class="docutils literal notranslate"><span class="pre">directionalShadowCascadeCount</span></code>), a camera synced to a RaiSim sensor could show a straight-edged, unshadowed wedge in a bottom corner of its image, near the camera, at some headings. <code class="docutils literal notranslate"><span class="pre">syncRaisimCameraPose</span></code> left <code class="docutils literal notranslate"><span class="pre">Camera::right</span></code> as the camera was constructed, and the cascades were fitted to the frustum it spanned. <code class="docutils literal notranslate"><span class="pre">syncRaisimCameraPose</span></code> now sets <code class="docutils literal notranslate"><span class="pre">right</span></code> as well, and the cascades are fitted to the view matrix’s own axes (<code class="docutils literal notranslate"><span class="pre">front</span></code> and <code class="docutils literal notranslate"><span class="pre">up</span></code>), so a camera whose <code class="docutils literal notranslate"><span class="pre">right</span></code> was set by hand and left stale is covered too. Cameras whose <code class="docutils literal notranslate"><span class="pre">right</span></code> already matched render as before; the feature showcase’s cascaded shadow scene (<code class="docutils literal notranslate"><span class="pre">11_shadow_cutout_atlas</span></code>), whose camera helper left <code class="docutils literal notranslate"><span class="pre">right</span></code> stale, changes at shadow edges (0.9% of pixels, PSNR 62 dB).</p></li>
+<li><p>Documentation: the threading contract now states that rendering reads the world. Render calls read the bodies’ poses while they issue draw calls (<code class="docutils literal notranslate"><span class="pre">updateObjectLists</span></code> takes no snapshot), so an application that steps the world on another thread must keep it out for the whole render call, for example by holding the world’s mutex; reading the image back can follow after releasing it.</p></li>
+</ul>
+</section>
+<section id="v2-9-2-2026-10-12">
+<h2>v2.9.2 (2026-10-12)<a class="headerlink" href="#v2-9-2-2026-10-12" title="Link to this heading"></a></h2>
 <p>Rebuild applications after updating (<code class="docutils literal notranslate"><span class="pre">Camera</span></code>, <code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> and <code class="docutils literal notranslate"><span class="pre">RayraiWindow::SynchronousMeshLoadingScope</span></code> ABI changes).</p>
 <p><strong>rayrai</strong></p>
 <ul class="simple">
