@@ -41,11 +41,13 @@ On Windows, run ``rscene_server.exe`` instead.
 
 Scene files on another computer
 ===============================
-On every connection, the viewer asks before inspecting scene paths or
-downloading files, including on the server's computer. After consent, matching
-files at the server's paths or in resource directories are copied into its
-private download cache (``~/.rayrai/scene_cache``); immutable cached files can
-be reused. Only missing files are downloaded from the server. The forest scene's files total about 430 MB.
+A viewer that reaches the server through a non-loopback address asks before
+inspecting the server's paths or downloading files, even on the server's
+computer, unless it already has the scene's files. After consent, matching
+files at the server's paths or in resource directories are copied into the
+scene directory (``~/.raisim/scenes``), so later connections find them without
+asking; immutable cached files can be reused. Only missing files are downloaded
+from the server. The forest scene's files total about 430 MB.
 :ref:`sections/RayraiTcpViewer:RaiSim Engine scenes` describes the lookup and the
 prompt.
 

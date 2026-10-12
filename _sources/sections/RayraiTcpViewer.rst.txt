@@ -1034,27 +1034,32 @@ the viewer, which may resolve to another computer. For any other
 server, it inspects server-chosen paths only after **Download** is pressed.
 The viewer looks for matching files in order at:
 
-#. the server's own path: right away for a loopback server, after consent
-   otherwise. When every file matches there, the scene loads from these files
-   in place, without a copy;
-#. its copy of this version of the scene in the download cache;
+#. the server's own path, for a loopback server. When every file matches there,
+   the scene loads from these files in place, without a copy;
+#. its copy of this version of the scene in the scene directory;
+#. the copies of other versions of scenes in the scene directory;
 #. every resource directory (``--resource-dir`` or the **Options** tab),
    joined with each tail of the file's path below the scene's top directory.
    For ``assets/tree/model.gltf`` these are ``<dir>/assets/tree/model.gltf``,
    ``<dir>/tree/model.gltf`` and ``<dir>/model.gltf``;
-#. the copies of other versions of scenes in the download cache.
+#. the scene directory itself, joined with each tail in the same way, so scene
+   files placed there, such as an unpacked set of scenes, are found;
+#. the server's own path for any other server, once **Download** is pressed.
+   The files found there are copied into the scene directory like downloaded
+   ones, so the next connection finds them without asking.
 
 A candidate counts only if its size and hash match the server's file. The
-download cache is the ``scene_cache`` folder next to the viewer settings:
-``~/.rayrai/scene_cache``, or ``%APPDATA%\rayrai\scene_cache`` on Windows when
-``HOME`` is not set. Completed manifests are published atomically and reused on reconnect. Recent
+scene directory, where downloaded scenes are kept, is ``~/.raisim/scenes``, or
+``%USERPROFILE%\.raisim\scenes`` on Windows when ``HOME`` is not set.
+Completed manifests are published atomically and reused on reconnect. Recent
 unused versions are pruned, while versions retained by an active viewer remain
 available.
 
 Download prompt
 ---------------
 A prompt at the top of the pane names the offered scene, its file count, size
-and destination. It appears when a file is not found in the cache or the
+and destination. It and the progress bars below stay to the right of the left
+panel when they would otherwise overlap it. It appears when a file is not found in the scene directory or the
 resource directories, and for a loopback server only when a file is not at the
 server's path either: a remote server reached through a local port (an SSH
 tunnel) still asks. A loopback server whose files are all on this computer
@@ -1065,9 +1070,17 @@ bodies and leaves a small bar with a **Download** button. Adding a resource
 directory that holds the files checks again. During the download a progress
 bar offers **Cancel**; files that are already complete are kept.
 
-The viewer then assembles the scene in the cache, in the server's layout.
-Files found in user resource directories or server paths are copied. Immutable
-files already owned by the download cache may be hard-linked or copied.
+Once the scene is applied, its meshes load in the background while a second
+progress bar shows how many of them are done, and the pane keeps drawing; the
+viewer otherwise loads meshes synchronously, so that a streamed body is drawn
+with its mesh in the frame it appears, and it still does for streamed bodies
+during this time. The first load of a scene builds its level-of-detail meshes
+and takes longest; they are cached next to the scene's files for later loads.
+
+The viewer then assembles the scene in the scene directory, in the server's
+layout. Files found in user resource directories or server paths are copied.
+Immutable files already owned by the scene directory may be hard-linked or
+copied.
 Downloaded files are published after their hash is checked. Relative references, in the scene and inside meshes, therefore
 resolve as they do on the server, and absolute references are pointed at the
 copies. Mesh bodies that the server streams by their server path use the
@@ -1075,7 +1088,7 @@ copies too.
 
 * The server addresses files by their index in its list, so the viewer receives
   only files the scene uses. The viewer refuses a file name that could leave
-  the cache folder (``..``, an absolute path, a drive letter or a device name).
+  the scene directory (``..``, an absolute path, a drive letter or a device name).
 * A file that changes on the server during the download stops it with an
   error. Reconnect to start again.
 * If applying the scene fails, for example on a record rayrai cannot
