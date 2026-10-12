@@ -123,15 +123,16 @@ Interactions
 Example
 =======
 
-:doc:`../examples/server/robotiq_gripper_mimic`: a Robotiq 2F-85 gripper whose five passive finger
-joints follow one actuated knuckle picks up a box.
+:doc:`../examples/server/robotiq_gripper_mimic`: a Kinova arm with a wrist-mounted Robotiq 2F-85,
+whose five passive finger joints follow one actuated knuckle, picks up a cube and places it on
+another marker.
 
 .. figure:: ../../../rsc/docs/image/rayrai/constraints_gripper.png
    :width: 60%
    :align: center
 
-   The Robotiq 2F-85 holding a box it has lifted. One knuckle is actuated; the other five finger
-   joints mimic it (multipliers 1 and -1), which keeps the pads parallel.
+   The standalone Robotiq 2F-85 model holding a box it has lifted. One knuckle is actuated; the
+   other five finger joints mimic it (multipliers 1 and -1), which keeps the pads parallel.
 
 Mimic constraints versus tendon couplings
 =========================================

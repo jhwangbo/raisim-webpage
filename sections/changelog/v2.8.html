@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Changelog: v2.8 &mdash; raisim 2.9.1 documentation</title>
+  <title>Changelog: v2.8 &mdash; raisim 2.9.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
@@ -15,14 +15,14 @@
     <link rel="shortcut icon" href="../../_static/favicon.png"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=bc52e0b9"></script>
+      <script src="../../_static/documentation_options.js?v=8baa6ad3"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Changelog: v2.7" href="v2.7.html" />
-    <link rel="prev" title="Changelog" href="../Changelog.html" /> 
+    <link rel="prev" title="Changelog: v2.9" href="v2.9.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -59,8 +59,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../Benchmark.html">Benchmark</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Troubleshooting.html">Troubleshooting</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../Changelog.html">Changelog</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="v2.9.html">Changelog: v2.9</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Changelog: v2.8</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#v2-8-2-unreleased">v2.8.2 (unreleased)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#v2-8-1-2026-10-09">v2.8.1 (2026-10-09)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#v2-8-0-2026-10-05">v2.8.0 (2026-10-05)</a></li>
 </ul>
@@ -141,28 +141,6 @@
              
   <section id="changelog-v2-8">
 <h1>Changelog: v2.8<a class="headerlink" href="#changelog-v2-8" title="Link to this heading"></a></h1>
-<section id="v2-8-2-unreleased">
-<h2>v2.8.2 (unreleased)<a class="headerlink" href="#v2-8-2-unreleased" title="Link to this heading"></a></h2>
-<p>Rebuild applications after updating (<code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> and <code class="docutils literal notranslate"><span class="pre">World</span></code> ABI changes).</p>
-<p><strong>World loading</strong></p>
-<ul class="simple">
-<li><p>RaiSim XML world configs include a scene with <code class="docutils literal notranslate"><span class="pre">&lt;include</span> <span class="pre">value=&quot;[THIS_DIR]/scene.rscene&quot;/&gt;</span></code>, so a robot and the scene it runs in live in separate files. The scene’s settings apply first and the XML file’s own settings override them; <code class="docutils literal notranslate"><span class="pre">getRscene()</span></code> returns the scene, so rayrai and the TCP viewer (<code class="docutils literal notranslate"><span class="pre">--simulate</span> <span class="pre">robot.xml</span></code>) show it. At most one scene per world. See <a class="reference internal" href="../RsceneFile.html#a-robot-in-a-scene"><span class="std std-ref">A robot in a scene</span></a> and the <code class="docutils literal notranslate"><span class="pre">rayrai_city_from_xml</span></code> example (<code class="docutils literal notranslate"><span class="pre">rsc/xmlScripts/rscene/anymal_in_city.xml</span></code>).</p></li>
-<li><p>World XML <code class="docutils literal notranslate"><span class="pre">&lt;include&gt;</span></code> paths take <code class="docutils literal notranslate"><span class="pre">&#64;&#64;</span></code> parameters (e.g. <code class="docutils literal notranslate"><span class="pre">&lt;include</span> <span class="pre">value=&quot;&#64;&#64;scene&quot;/&gt;</span></code>).</p></li>
-<li><p>A <code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> shows its world’s scene (<code class="docutils literal notranslate"><span class="pre">World::getRscene()</span></code>) by itself, when it is constructed or given a new world with <code class="docutils literal notranslate"><span class="pre">swapWorld</span></code>; <code class="docutils literal notranslate"><span class="pre">raisin::rsceneVisuals(viewer)</span></code> returns the visuals it created, and <code class="docutils literal notranslate"><span class="pre">raisin::setRsceneRenderSettings(viewer,</span> <span class="pre">render)</span></code> shows the scene with C++ render-setting overrides. A scene rayrai cannot show is a fatal error in the constructor. <code class="docutils literal notranslate"><span class="pre">RayraiWindow::setAsyncMeshLoadingEnabled(false)</span></code> now also finishes the meshes still loading. Rebuild applications (<code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> ABI change).</p></li>
-<li><p><strong>Behaviour change:</strong> <code class="docutils literal notranslate"><span class="pre">raisin::applyRscene</span></code> is removed; a <code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> on the scene’s world applies it, and <code class="docutils literal notranslate"><span class="pre">setRsceneRenderSettings</span></code> replaces <code class="docutils literal notranslate"><span class="pre">applyRscene(scene,</span> <span class="pre">viewer,</span> <span class="pre">render)</span></code>.</p></li>
-<li><p>TCP viewer: a scene served over a loopback connection (<code class="docutils literal notranslate"><span class="pre">--simulate</span></code>, drag and drop, or a server on the same computer; judged by the connected address, not the host name) loads from the server’s files without the download prompt. Files that are not on this computer, as behind an SSH tunnel, still wait for <strong>Download</strong>.</p></li>
-<li><p><strong>Behaviour change:</strong> A world XML file without a <code class="docutils literal notranslate"><span class="pre">&lt;gravity&gt;</span></code> element keeps the gravity of the files it includes; it used to reset it to <code class="docutils literal notranslate"><span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">-9.81</span></code>.</p></li>
-</ul>
-<p><strong>rayrai</strong></p>
-<ul class="simple">
-<li><p>Faster rendering with unchanged images (verified bit-identical): directional shadow cascades skip visual, object and instanced-batch casters whose shadows cannot reach a receiver of the cascade (<code class="docutils literal notranslate"><span class="pre">Visuals</span></code>/<code class="docutils literal notranslate"><span class="pre">InstancedVisuals</span></code>/<code class="docutils literal notranslate"><span class="pre">RaisimObject::shadowGeometryWithinBounds()</span></code>); foliage instances that their distance fade hides entirely are not drawn, and shadow maps draw the ones it cannot touch without the fade’s fragment test; foliage instance culling tests spatial groups before instances; mesh draws resolve their uniform locations once per shader; an animated visual no longer rebuilds and re-sorts the instanced-visual candidates; per-frame mesh vertex updates generate tangents with less work. The off-road buggy example: 15.9 → 14.7 ms per frame, rayrai CPU 8.0 → 6.9 ms, shadow pass 4.4 → 3.6 ms GPU (RTX 2070 SUPER). Rebuild applications (<code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> ABI change).</p></li>
-</ul>
-<p><strong>Fixes and build</strong></p>
-<ul class="simple">
-<li><p>Faster sleeping-island bookkeeping with unchanged simulation results (verified bit-identical): each step reads the objects’ body types again only after a body type changed, and visits only the dynamic objects and their contact bodies. The off-road buggy example’s world (2,153 objects, most of them static): 262 → 205 µs per step. Rebuild applications (<code class="docutils literal notranslate"><span class="pre">World</span></code> ABI change).</p></li>
-<li><p>Documentation builds reuse the checked-in images. <code class="docutils literal notranslate"><span class="pre">RAISIM_DOCS_BUILD_RAYRAI_IMAGES</span></code> is now <code class="docutils literal notranslate"><span class="pre">OFF</span></code> by default; set it to <code class="docutils literal notranslate"><span class="pre">ON</span></code> to run the image generators.</p></li>
-</ul>
-</section>
 <section id="v2-8-1-2026-10-09">
 <h2>v2.8.1 (2026-10-09)<a class="headerlink" href="#v2-8-1-2026-10-09" title="Link to this heading"></a></h2>
 <p><strong>Closed loops and mimic joints</strong></p>
@@ -283,7 +261,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../Changelog.html" class="btn btn-neutral float-left" title="Changelog" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="v2.9.html" class="btn btn-neutral float-left" title="Changelog: v2.9" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="v2.7.html" class="btn btn-neutral float-right" title="Changelog: v2.7" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

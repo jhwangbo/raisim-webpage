@@ -1,29 +1,6 @@
 Changelog: v2.8
 ===============
 
-v2.8.2 (unreleased)
--------------------
-
-Rebuild applications after updating (``RayraiWindow`` and ``World`` ABI changes).
-
-**World loading**
-
-* RaiSim XML world configs include a scene with ``<include value="[THIS_DIR]/scene.rscene"/>``, so a robot and the scene it runs in live in separate files. The scene's settings apply first and the XML file's own settings override them; ``getRscene()`` returns the scene, so rayrai and the TCP viewer (``--simulate robot.xml``) show it. At most one scene per world. See :ref:`sections/RsceneFile:A robot in a scene` and the ``rayrai_city_from_xml`` example (``rsc/xmlScripts/rscene/anymal_in_city.xml``).
-* World XML ``<include>`` paths take ``@@`` parameters (e.g. ``<include value="@@scene"/>``).
-* A ``RayraiWindow`` shows its world's scene (``World::getRscene()``) by itself, when it is constructed or given a new world with ``swapWorld``; ``raisin::rsceneVisuals(viewer)`` returns the visuals it created, and ``raisin::setRsceneRenderSettings(viewer, render)`` shows the scene with C++ render-setting overrides. A scene rayrai cannot show is a fatal error in the constructor. ``RayraiWindow::setAsyncMeshLoadingEnabled(false)`` now also finishes the meshes still loading. Rebuild applications (``RayraiWindow`` ABI change).
-* **Behaviour change:** ``raisin::applyRscene`` is removed; a ``RayraiWindow`` on the scene's world applies it, and ``setRsceneRenderSettings`` replaces ``applyRscene(scene, viewer, render)``.
-* TCP viewer: a scene served over a loopback connection (``--simulate``, drag and drop, or a server on the same computer; judged by the connected address, not the host name) loads from the server's files without the download prompt. Files that are not on this computer, as behind an SSH tunnel, still wait for **Download**.
-* **Behaviour change:** A world XML file without a ``<gravity>`` element keeps the gravity of the files it includes; it used to reset it to ``0, 0, -9.81``.
-
-**rayrai**
-
-* Faster rendering with unchanged images (verified bit-identical): directional shadow cascades skip visual, object and instanced-batch casters whose shadows cannot reach a receiver of the cascade (``Visuals``/``InstancedVisuals``/``RaisimObject::shadowGeometryWithinBounds()``); foliage instances that their distance fade hides entirely are not drawn, and shadow maps draw the ones it cannot touch without the fade's fragment test; foliage instance culling tests spatial groups before instances; mesh draws resolve their uniform locations once per shader; an animated visual no longer rebuilds and re-sorts the instanced-visual candidates; per-frame mesh vertex updates generate tangents with less work. The off-road buggy example: 15.9 → 14.7 ms per frame, rayrai CPU 8.0 → 6.9 ms, shadow pass 4.4 → 3.6 ms GPU (RTX 2070 SUPER). Rebuild applications (``RayraiWindow`` ABI change).
-
-**Fixes and build**
-
-* Faster sleeping-island bookkeeping with unchanged simulation results (verified bit-identical): each step reads the objects' body types again only after a body type changed, and visits only the dynamic objects and their contact bodies. The off-road buggy example's world (2,153 objects, most of them static): 262 → 205 µs per step. Rebuild applications (``World`` ABI change).
-* Documentation builds reuse the checked-in images. ``RAISIM_DOCS_BUILD_RAYRAI_IMAGES`` is now ``OFF`` by default; set it to ``ON`` to run the image generators.
-
 v2.8.1 (2026-10-09)
 -------------------
 

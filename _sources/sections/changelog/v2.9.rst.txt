@@ -1,0 +1,86 @@
+Changelog: v2.9
+===============
+
+v2.9.2 (unreleased)
+-------------------
+
+Rebuild applications after updating (``Camera``, ``RayraiWindow`` and ``RayraiWindow::SynchronousMeshLoadingScope`` ABI changes).
+
+**rayrai**
+
+* Faster sensor readback with unchanged images (verified byte-identical on NVIDIA). ``Camera::getRawImage`` and ``readSceneColorRgbaAsync`` now convert the scene colour to 8 bits on the GPU; before, the driver converted every pixel on the CPU. ``getRawImage`` also flips depth rows on the GPU, and ``SensorStorageMode::SENSOR_SETTER`` reads straight into the sensor's image instead of copying it. Render and readback at 640×480: RGB 1.20 → 0.14 ms, depth 0.27 → 0.17 ms, ``readSceneColorRgbaAsync`` 1.030 → 0.161 ms; an ANYmal RGB-D frame 2.04 → 0.87 ms with the Fast preset and 2.42 → 1.32 ms with Ultra (Core Ultra 7 265K, RTX 5070). A camera allocates a staging target the size of its image on its first readback (listed in ``renderTargetDiagnostics()``).
+* Faster Ultra preset. With legacy temporal AA (``TemporalAaMethod::Legacy``, which Ultra uses), screen-space AO is evaluated once per pixel and cached in the alpha channel of the TAA history, as it already was without TAA, instead of once per denoiser tap. Ultra frame 2.90 → 1.52 ms at 1080p and 1.56 → 0.95 ms at 720p (``rayrai_frame_overhead_benchmark``; Core Ultra 7 265K, RTX 5070). Ultra images change slightly at silhouettes (0.25% of pixels at 1080p, PSNR 71 dB); Fast, Balanced and High images are byte-identical.
+* **Behaviour change:** ``Camera::getRawImage`` for an ``RGBCamera`` is a fatal error on a camera without a scene colour target, such as one constructed from a ``DepthCamera`` and never used for a colour render, and ``readSceneColorRgbaAsync`` returns ``false`` there. Both used to read the default framebuffer.
+
+**Sensors**
+
+* ``RGBCamera::getImageBuffer()`` has a non-const overload, like ``DepthCamera::getDepthArray()``, for writing ``MANUAL`` images in place; keep its size at ``width * height * 4`` bytes.
+
+**TCP viewer and server**
+
+* The TCP viewer renders a server's RGB and depth sensors faster, with unchanged images and depth previews (verified byte-identical on NVIDIA with glibc). It uses the faster readback, keeps one RaiSim camera per sensor stream instead of constructing one per request (a ``DepthCamera`` computes a ray per pixel), and shades depth previews from a table instead of a logarithm per pixel. One RGB and one depth request at 640×480: 4.1 → 0.73 ms, or 5.9 → 1.1 ms when every depth pixel is valid (Core Ultra 7 265K, RTX 5070).
+* Fix: closing a pane, or the viewer, while the meshes of the server's scene were still loading wrote into the closed pane's destroyed mesh assets, a heap use-after-free once nothing else kept them allocated. A ``RayraiWindow::SynchronousMeshLoadingScope`` may now outlive its window; it then ends without touching the window's mesh assets.
+
+**Fixes and build**
+
+* Windows: building ``libraisim`` from source no longer fails with LNK1189. Its DLL exports leave out ``std::`` and ``Eigen::`` template instantiations, which pushed it past the 65,535 symbols a DLL can export.
+
+v2.9.1 (2026-10-12)
+-------------------
+
+Rebuild applications after updating (``RayraiWindow`` and ``InstancedVisuals`` ABI changes).
+
+**rayrai**
+
+* Depth cameras: ``RayraiWindow::renderDepthPlaneDistance()``, which renders the linear depth of depth sensors, now draws visual objects and instanced visuals for its camera the way the color pass does. It used to draw every instance of every batch at full detail with no culling, so the depth image of a large scene took longer than its color image. Instanced batches are now culled per instance (on the GPU for large batches) and pick their mesh LOD for the depth camera. New ``InstancedVisuals::drawLinearDepth()``.
+* **Behaviour change:** in depth images, visual objects and non-foliage instanced visuals now have the same geometry as in the color image: the automatic mesh LOD for the depth camera (``setAutomaticMeshLodEnabled(false)`` keeps full detail), ``setProjectedLodPolicy`` thinning and ``Visuals::setVisibilityRange``, so a visual outside its range is no longer in the depth image. Foliage keeps its source meshes and every instance in depth, with no simplified LODs, impostors or thinning, because those would drop leaves whose depth a sensor still measures.
+* Faster rendering with unchanged images. Instanced batches too small for GPU culling skip, in every pass, the instances whose bounds miss the view frustum or, in a shadow cascade, cannot shadow a visible receiver. Directional shadow cascades refreshed every frame draw only the shadow-map texels their receivers sample. External cameras, such as simulated RGB sensors, now also cull cascade casters to their receivers; before, only the viewer's own camera did. A camera that moves every frame renders each cascade in one pass instead of rebuilding the static-caster layer and copying the whole map each frame; the layer is built once a frame repeats its static signature. A camera without MSAA, such as a sensor, now skips foliage instances hidden behind its depth prepass, which only MSAA views did before (4×4-pixel tiles by default; ``RAYRAI_FOLIAGE_OCCLUSION_TILE_SIZE`` now also takes ``8`` and ``4``).
+
+**TCP viewer and server**
+
+* The meshes of a server's ``.rscene`` scene load in the background. The pane keeps drawing and shows a "Loading the meshes of <scene>" progress bar (share done and elapsed seconds) at the top while ready meshes are finished for up to 8 ms per frame. Before, the pane drew nothing until every mesh was loaded (seconds for a large scene). A streamed body's mesh still loads in the frame the body appears. The scene's download prompt and progress move to the right of the left panel when they would overlap it, and their bars use the theme's accent colour instead of red.
+* **Behaviour change:** the viewer keeps downloaded and copied scenes in the scene directory ``~/.raisim/scenes`` instead of ``~/.rayrai/scene_cache``, which is no longer read, so a scene cached there asks for **Download** again. ``raisin::tcp_viewer::defaultSceneDirectory()`` gives the location: under ``HOME``, or ``USERPROFILE`` on Windows, else ``raisim/scenes`` in the temporary directory. Scene files placed in the scene directory are found like those in a resource directory, so such a scene loads without the download prompt (``SceneSync::sceneDirectory()``).
+* When you accept **Download** from a server reached by a non-loopback address (for example this computer by its network address) and its files exist at the server's paths on this computer, the scene is now copied into the scene directory instead of loaded in place. Later connections then load it without asking.
+
+v2.9.0 (2026-10-11)
+-------------------
+
+Rebuild applications after updating (``World``, ``ArticulatedSystem``, ``CollisionBodyHandle``, ``Single3DContactProblem`` and ``RayraiWindow`` ABI changes). The ``World`` ABI guard now also covers ``ArticulatedSystem``, ``CollisionBodyHandle`` and ``Single3DContactProblem``, so an application built against older headers stops with a fatal error when it creates a ``World``.
+
+**Deformable terrain**
+
+* ``World::addDeformableTerrain(xSamples, ySamples, xSize, ySize, centerX, centerY, heights, soil)`` adds a ``DeformableTerrain``: a height-map soil bed that rigid bodies and articulated systems sink into and drive on. Its surface terramechanics model (``DeformableTerrain::Material``: ``bekkerKc``, ``bekkerKphi``, ``sinkageExponent``, ``elasticStiffness``, ``damping``, ``cohesion``, ``frictionCoefficient``, ``shearDisplacement``; SI units) combines Bekker pressure–sinkage loading, elastic unloading that leaves permanent ruts, loading-only viscosity, and Mohr–Coulomb/Janosi–Hanamoto traction that builds up with slip. Contacts are area-quadrature samples solved implicitly with the bodies' dynamics, so forces do not depend on the number of contact rows and the mesh spacing sets the spatial accuracy; rendering and ray queries use the deformed mesh. See :doc:`../DeformableTerrain`.
+* ``getSoilState()``/``setSoilState()`` (per-vertex ``sinkage``, ``plasticSinkage``, ``shear``), ``resetSoil()``, ``getUndeformedHeights()``, ``getSoilStepStats()`` and ``pressure()``. World checkpoints save the soil history; ``exportToXml`` writes the undeformed heights and the state. World XML: a ``<soil bekker_kc="..." .../>`` child makes a ``<heightmap>`` with explicit ``height`` samples deformable. ``BisectionContactSolver::Config::terrainWarmStart`` (on by default) seeds soil contacts with the last converged traction.
+* The bed is static and deforms only along its local z axis. It can be placed with ``setPosition``/``setOrientation`` between steps, and ``setBodyType`` accepts only ``STATIC``. ``HeightMap::update``, ``updateVisualHeight``, ``updateVisualHeightPatch`` and ``init`` throw ``std::logic_error`` on it. A world cannot hold a deformable terrain together with a ``DeformableObject`` or ``GranularSystem``; adding the second is a fatal error. Bodies resting on the soil do not fall asleep, and material pairs do not tune the soil response. It is a surface model: no soil inertia, berms or excavation.
+* New ``rayrai_deformable_terrain`` example: the off-road buggy drives over a soil bed and leaves permanent wheel ruts (``--headless``, ``--steps=N``, ``--export=DIR``).
+
+**Tracks**
+
+* URDF ``<track>`` (a child of ``<robot>``) wraps a rigid belt around the convex hull of a link's ``<wheel>`` elements and moves its surface with the ``<drive joint gain>`` joints. Contacts on the belt pull on the drive joints, so sprocket PD targets, torques or actuators drive the robot through friction, a blocked robot stalls its drives, and a track on a fixed base is a conveyor. The belt's collision bodies (a cylinder per wrapped wheel, a box per straight run) are also its visual (``color``, ``visual="false"``); contacts of one belt that coincide are solved once. ``ArticulatedSystem::getTracks()`` (``raisim::Track``, ``TrackDrive``), ``getTrackIndex()``, ``getTrackSpeed()``; with ``setComputeInverseDynamics(true)`` a drive joint's torque includes the belt's pull. Belt sag and tension are not simulated. The ``templated_tracked_robot`` example now models its four belts with ``<track>``. See :doc:`../articulated_system/Tracks`.
+
+**Motors and joints**
+
+* Fix: spherical joint angle limits now hold against large torques; the limit row used a contact basis that was never set for it.
+* ``ArticulatedSystem::getJointDamping()`` returns the passive joint damping coefficients, excluding actuator output damping and PD gains.
+
+**World loading**
+
+* RaiSim XML world configs include a scene with ``<include value="[THIS_DIR]/scene.rscene"/>``, so a robot and the scene it runs in live in separate files. The scene's settings apply first and the XML file's own settings override them; ``getRscene()`` returns the scene, so rayrai and the TCP viewer (``--simulate robot.xml``) show it. At most one scene per world. See :ref:`sections/RsceneFile:A robot in a scene` and the ``rayrai_city_from_xml`` example (``rsc/xmlScripts/rscene/anymal_in_city.xml``).
+* World XML ``<include>`` paths take ``@@`` parameters (e.g. ``<include value="@@scene"/>``).
+* A ``RayraiWindow`` shows its world's scene (``World::getRscene()``) by itself, when it is constructed or given a new world with ``swapWorld``; ``raisin::rsceneVisuals(viewer)`` returns the visuals it created, and ``raisin::setRsceneRenderSettings(viewer, render)`` shows the scene with C++ render-setting overrides. A scene rayrai cannot show is a fatal error in the constructor. ``RayraiWindow::setAsyncMeshLoadingEnabled(false)`` now also finishes the meshes still loading. Rebuild applications (``RayraiWindow`` ABI change).
+* **Behaviour change:** ``raisin::applyRscene`` is removed; a ``RayraiWindow`` on the scene's world applies it, and ``setRsceneRenderSettings`` replaces ``applyRscene(scene, viewer, render)``.
+* TCP viewer: a scene served over a loopback connection (``--simulate``, drag and drop, or a server on the same computer; judged by the connected address, not the host name) loads from the server's files without the download prompt. Files that are not on this computer, as behind an SSH tunnel, still wait for **Download**.
+* **Behaviour change:** A world XML file without a ``<gravity>`` element keeps the gravity of the files it includes; it used to reset it to ``0, 0, -9.81``.
+* World XML ``<include>`` files and object-class ``urdf_path`` are also looked up relative to the folder of the XML file that names them; a file found neither as given nor there is a fatal error naming both paths.
+
+**rayrai**
+
+* Faster rendering with unchanged images (verified bit-identical): directional shadow cascades skip visual, object and instanced-batch casters whose shadows cannot reach a receiver of the cascade (``Visuals``/``InstancedVisuals``/``RaisimObject::shadowGeometryWithinBounds()``); foliage instances that their distance fade hides entirely are not drawn, and shadow maps draw the ones it cannot touch without the fade's fragment test; foliage instance culling tests spatial groups before instances; mesh draws resolve their uniform locations once per shader; an animated visual no longer rebuilds and re-sorts the instanced-visual candidates; per-frame mesh vertex updates generate tangents with less work. The off-road buggy example: 15.9 → 14.7 ms per frame, rayrai CPU 8.0 → 6.9 ms, shadow pass 4.4 → 3.6 ms GPU (RTX 2070 SUPER). Rebuild applications (``RayraiWindow`` ABI change).
+* ``RayraiWindow::SynchronousMeshLoadingScope``: while it lives, the meshes requested load synchronously, and other pending loads, such as a scene's, continue in the background.
+* Fix: an articulated system's mesh visual is drawn and culled with its current ``visShapeParam``, so changing it at run time takes effect; rayrai kept the scale from when the visual was created.
+* Fix: ``captureSupersampledRgba`` keeps the camera's gamma.
+
+**Fixes and build**
+
+* Faster sleeping-island bookkeeping with unchanged simulation results (verified bit-identical): each step reads the objects' body types again only after a body type changed, and visits only the dynamic objects and their contact bodies. The off-road buggy example's world (2,153 objects, most of them static): 262 → 205 µs per step. Rebuild applications (``World`` ABI change).
+* Documentation builds reuse the checked-in images. ``RAISIM_DOCS_BUILD_RAYRAI_IMAGES`` is now ``OFF`` by default; set it to ``ON`` to run the image generators.

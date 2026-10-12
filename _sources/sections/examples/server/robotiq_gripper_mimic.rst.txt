@@ -16,7 +16,7 @@ passive and follow through URDF ``<mimic>`` constraints
 
 Screenshot
 ==========
-.. image:: ../../../../rsc/docs/image/rayrai/constraints_gripper.png
+.. image:: ../../../../rsc/docs/image/robotiq_gripper_mimic.png
    :alt: Kinova arm carrying a cube with its wrist-mounted Robotiq 2F-85
    :width: 80%
 
@@ -36,34 +36,15 @@ On Windows, run ``build-examples/bin/robotiq_gripper_mimic.exe`` instead.
 The example discovers its resource folder relative to the executable or
 working directory. Normal RaiSim license discovery applies; use
 ``--activation-key /path/to/activation.raisim`` for an explicit license.
-``--port N`` changes the server port, and ``--cycles N`` stops after N cycles.
-Without ``--cycles``, the visual example repeats until interrupted.
-
-Headless checks and benchmark
-=============================
-These commands create no server or graphics context:
-
-.. code-block:: bash
-
-   ./build-examples/examples/robotiq_gripper_mimic --headless --cycles 3
-   ./build-examples/examples/robotiq_gripper_mimic --benchmark --cycles 10
-
-Headless mode verifies a bilateral finger grasp, lift, transfer, settled release,
-and the mimic relation on every cycle. A failed cycle returns a nonzero exit
-status. Benchmark mode runs the same task without real-time pacing on one
-physics thread and reports time per step and simulated seconds per wall second.
-Timing includes control and diagnostics, and excludes initial loading/settling.
-
-The adjacent RaiSim source repository registers additional integration checks
-with ``RAISIM_ROBOTIQ_EXAMPLE_TESTS=ON``. They independently inspect physical
-transport and support contacts, the fixed wrist mount, identical trajectories
-after reset, loss of grip without pad friction, and viewer pause/single-step.
+``--port N`` changes the server port. The example repeats until interrupted;
+``--cycles N`` stops it after N cycles.
 
 Details
 =======
 - Loads ``rsc/robotiq_2f85/kinova_robotiq.urdf``. The combined model reuses the
   bundled BSD-licensed Kinova arm and Robotiq descriptions and meshes. A fixed
-  flange replaces the Kinova three-finger hand and the old Robotiq lift.
+  flange replaces the Kinova three-finger hand and the vertical ``lift`` joint
+  of the standalone gripper model (``rsc/robotiq_2f85/robotiq_2f85_mimic.urdf``).
 - Only the six arm joints and ``robotiq_85_left_knuckle_joint`` have PD gains.
   The five mimic followers have zero gains; the fingertips counter-rotate so
   the pads remain parallel.

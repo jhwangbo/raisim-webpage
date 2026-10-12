@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Server Example: Robotiq Gripper Mimic &mdash; raisim 2.9.1 documentation</title>
+  <title>Server Example: Robotiq Gripper Mimic &mdash; raisim 2.9.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=7e9bdaad" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../../../_static/favicon.png"/>
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=bc52e0b9"></script>
+      <script src="../../../_static/documentation_options.js?v=8baa6ad3"></script>
       <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -88,7 +88,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#screenshot">Screenshot</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#target">Target</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#run">Run</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#headless-checks-and-benchmark">Headless checks and benchmark</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#details">Details</a></li>
 </ul>
 </li>
@@ -197,7 +196,7 @@ passive and follow through URDF <code class="docutils literal notranslate"><span
 </section>
 <section id="screenshot">
 <h2>Screenshot<a class="headerlink" href="#screenshot" title="Link to this heading"></a></h2>
-<a class="reference internal image-reference" href="../../../_images/constraints_gripper.png"><img alt="Kinova arm carrying a cube with its wrist-mounted Robotiq 2F-85" src="../../../_images/constraints_gripper.png" style="width: 80%;" />
+<a class="reference internal image-reference" href="../../../_images/robotiq_gripper_mimic.png"><img alt="Kinova arm carrying a cube with its wrist-mounted Robotiq 2F-85" src="../../../_images/robotiq_gripper_mimic.png" style="width: 80%;" />
 </a>
 </section>
 <section id="target">
@@ -214,32 +213,16 @@ passive and follow through URDF <code class="docutils literal notranslate"><span
 The example discovers its resource folder relative to the executable or
 working directory. Normal RaiSim license discovery applies; use
 <code class="docutils literal notranslate"><span class="pre">--activation-key</span> <span class="pre">/path/to/activation.raisim</span></code> for an explicit license.
-<code class="docutils literal notranslate"><span class="pre">--port</span> <span class="pre">N</span></code> changes the server port, and <code class="docutils literal notranslate"><span class="pre">--cycles</span> <span class="pre">N</span></code> stops after N cycles.
-Without <code class="docutils literal notranslate"><span class="pre">--cycles</span></code>, the visual example repeats until interrupted.</p>
-</section>
-<section id="headless-checks-and-benchmark">
-<h2>Headless checks and benchmark<a class="headerlink" href="#headless-checks-and-benchmark" title="Link to this heading"></a></h2>
-<p>These commands create no server or graphics context:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build-examples/examples/robotiq_gripper_mimic<span class="w"> </span>--headless<span class="w"> </span>--cycles<span class="w"> </span><span class="m">3</span>
-./build-examples/examples/robotiq_gripper_mimic<span class="w"> </span>--benchmark<span class="w"> </span>--cycles<span class="w"> </span><span class="m">10</span>
-</pre></div>
-</div>
-<p>Headless mode verifies a bilateral finger grasp, lift, transfer, settled release,
-and the mimic relation on every cycle. A failed cycle returns a nonzero exit
-status. Benchmark mode runs the same task without real-time pacing on one
-physics thread and reports time per step and simulated seconds per wall second.
-Timing includes control and diagnostics, and excludes initial loading/settling.</p>
-<p>The adjacent RaiSim source repository registers additional integration checks
-with <code class="docutils literal notranslate"><span class="pre">RAISIM_ROBOTIQ_EXAMPLE_TESTS=ON</span></code>. They independently inspect physical
-transport and support contacts, the fixed wrist mount, identical trajectories
-after reset, loss of grip without pad friction, and viewer pause/single-step.</p>
+<code class="docutils literal notranslate"><span class="pre">--port</span> <span class="pre">N</span></code> changes the server port. The example repeats until interrupted;
+<code class="docutils literal notranslate"><span class="pre">--cycles</span> <span class="pre">N</span></code> stops it after N cycles.</p>
 </section>
 <section id="details">
 <h2>Details<a class="headerlink" href="#details" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Loads <code class="docutils literal notranslate"><span class="pre">rsc/robotiq_2f85/kinova_robotiq.urdf</span></code>. The combined model reuses the
 bundled BSD-licensed Kinova arm and Robotiq descriptions and meshes. A fixed
-flange replaces the Kinova three-finger hand and the old Robotiq lift.</p></li>
+flange replaces the Kinova three-finger hand and the vertical <code class="docutils literal notranslate"><span class="pre">lift</span></code> joint
+of the standalone gripper model (<code class="docutils literal notranslate"><span class="pre">rsc/robotiq_2f85/robotiq_2f85_mimic.urdf</span></code>).</p></li>
 <li><p>Only the six arm joints and <code class="docutils literal notranslate"><span class="pre">robotiq_85_left_knuckle_joint</span></code> have PD gains.
 The five mimic followers have zero gains; the fingertips counter-rotate so
 the pads remain parallel.</p></li>
