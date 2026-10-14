@@ -58,9 +58,13 @@ RGB/Depth camera workflow (manual source + external camera):
 the depth camera's color image only when you want to show it.
 
 You can read back the camera buffers on CPU. ``getRawImage`` reads the scene
-color target as 8-bit BGRA (``width * height * 4`` bytes); the sensor resolution
-must match the camera's render target. ``SensorStorageMode::SENSOR_SETTER``
-(the default) writes into the RaiSim sensor instead of a caller buffer:
+color target as 8-bit BGRA (``width * height * 4`` bytes), each channel clamped
+to [0, 1] and rounded to the nearest 8-bit value; the sensor resolution must
+match the camera's render target. The image is converted to 8 bits and, with
+``flipVertical``, put in top-to-bottom row order on the GPU, so the readback is
+a plain copy (about 0.12 ms for a 640x480 RGB or depth image on an RTX 5070).
+``SensorStorageMode::SENSOR_SETTER`` (the default) writes directly into the
+RaiSim sensor's image instead of a caller buffer:
 
 .. code-block:: cpp
 

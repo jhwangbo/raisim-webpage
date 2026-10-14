@@ -6,16 +6,16 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sensors and depth/LiDAR &mdash; raisim 2.9.3 documentation</title>
+  <title>Sensors and depth/LiDAR &mdash; raisim 2.9.4 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ba8b8cd0" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.png"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=2fd2eeca"></script>
+      <script src="../../_static/documentation_options.js?v=e45b7e07"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -207,9 +207,13 @@ the optional <a class="reference internal" href="../debug_tools/rayrai_heightmap
 <p><code class="docutils literal notranslate"><span class="pre">renderDepthPlaneDistance</span></code> does not need the color render before it; render
 the depth camera’s color image only when you want to show it.</p>
 <p>You can read back the camera buffers on CPU. <code class="docutils literal notranslate"><span class="pre">getRawImage</span></code> reads the scene
-color target as 8-bit BGRA (<code class="docutils literal notranslate"><span class="pre">width</span> <span class="pre">*</span> <span class="pre">height</span> <span class="pre">*</span> <span class="pre">4</span></code> bytes); the sensor resolution
-must match the camera’s render target. <code class="docutils literal notranslate"><span class="pre">SensorStorageMode::SENSOR_SETTER</span></code>
-(the default) writes into the RaiSim sensor instead of a caller buffer:</p>
+color target as 8-bit BGRA (<code class="docutils literal notranslate"><span class="pre">width</span> <span class="pre">*</span> <span class="pre">height</span> <span class="pre">*</span> <span class="pre">4</span></code> bytes), each channel clamped
+to [0, 1] and rounded to the nearest 8-bit value; the sensor resolution must
+match the camera’s render target. The image is converted to 8 bits and, with
+<code class="docutils literal notranslate"><span class="pre">flipVertical</span></code>, put in top-to-bottom row order on the GPU, so the readback is
+a plain copy (about 0.12 ms for a 640x480 RGB or depth image on an RTX 5070).
+<code class="docutils literal notranslate"><span class="pre">SensorStorageMode::SENSOR_SETTER</span></code> (the default) writes directly into the
+RaiSim sensor’s image instead of a caller buffer:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">prop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rgbCam</span><span class="o">-&gt;</span><span class="n">getProperties</span><span class="p">();</span>
 <span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">width</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">prop</span><span class="p">.</span><span class="n">width</span><span class="p">);</span>
 <span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">height</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">prop</span><span class="p">.</span><span class="n">height</span><span class="p">);</span>

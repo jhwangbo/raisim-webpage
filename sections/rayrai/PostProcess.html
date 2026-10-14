@@ -6,16 +6,16 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Post-process effects &mdash; raisim 2.9.3 documentation</title>
+  <title>Post-process effects &mdash; raisim 2.9.4 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ba8b8cd0" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.png"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=2fd2eeca"></script>
+      <script src="../../_static/documentation_options.js?v=e45b7e07"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -321,11 +321,12 @@ corners, and tight contacts using <code class="docutils literal notranslate"><sp
 (<code class="docutils literal notranslate"><span class="pre">screenSpaceAoDenoiseEnabled</span></code>) is geometry-aware and preserves edges.
 <code class="docutils literal notranslate"><span class="pre">contactAoRadius</span></code> / <code class="docutils literal notranslate"><span class="pre">contactAoStrength</span></code> add a separate tight contact-AO
 pass on top of SSAO for surfaces that touch.</p>
-<p>With the denoiser on and temporal AA off (as in the High preset), AO is
-computed once per pixel in a prepass and the denoiser reuses it; results can
-differ from per-tap evaluation by a few 8-bit levels. With legacy temporal AA
-on (Ultra) each denoise tap evaluates AO again, which costs noticeably more. AO
-is stable from frame to frame at sky silhouettes, including on Apple GPUs.</p>
+<p>With the denoiser on, AO is computed once per pixel in a prepass and the
+denoiser reuses it; results can differ from per-tap evaluation by a few 8-bit
+levels at silhouettes. The prepass works with and without temporal AA: it keeps
+the AO in the alpha channel of the temporal history target, whose color the
+temporal AA reads from RGB. AO is stable from frame to frame at sky
+silhouettes, including on Apple GPUs.</p>
 <p>Screen-space indirect lighting (<code class="docutils literal notranslate"><span class="pre">screenSpaceIndirectLightingEnabled</span></code>)
 gathers one bounce of light from the colour buffer around each pixel to add
 coloured fill light from nearby diffuse surfaces; <code class="docutils literal notranslate"><span class="pre">Radius</span></code>, <code class="docutils literal notranslate"><span class="pre">Strength</span></code>,
@@ -334,7 +335,15 @@ quality and bias.</p>
 <p>Contact shadows (<code class="docutils literal notranslate"><span class="pre">contactShadowsEnabled</span></code>) ray-march short shadow rays toward
 the main light in screen space to recover fine occlusion near grazing geometry
 that a shadow map misses. <code class="docutils literal notranslate"><span class="pre">Length</span></code> (at most 0.5) and <code class="docutils literal notranslate"><span class="pre">Thickness</span></code> are in
-metres; <code class="docutils literal notranslate"><span class="pre">Strength</span></code> is the darkening, 0–1.</p>
+metres; <code class="docutils literal notranslate"><span class="pre">Strength</span></code> is the darkening, 0–1. Each pixel blurs nine rays: one
+from its centre, two 1.5 pixels away along each axis and four 3.5 pixels away
+along the diagonals, so neighbouring pixels share most of them. A pass of its
+own, with a program that holds only that effect, marches each shared ray once
+(four rays per pixel instead of nine) into a single-channel float texture at
+twice the image’s resolution (about 33 MB at 1920×1080), and the post program
+filters every pixel from it. When projected decals use every texture slot of
+the post program, the post program marches all nine rays itself; both give the
+same image.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">quality</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">defaultRenderQualitySettings</span><span class="p">(</span>
 <span class="w">  </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">RenderQualityPreset</span><span class="o">::</span><span class="n">High</span><span class="p">);</span>
 

@@ -394,15 +394,24 @@ each call in a loop like this one:
 
 Async mesh loading
 ==================
-Mesh files load asynchronously by default. The import runs on a worker
-thread, materials and textures are resolved on the render thread, geometry is
-optimized on a worker, and the prepared submeshes are uploaded to the GPU one
-per step on the render thread. Until an asset is ready, its visuals draw
-nothing; instanced batches also wait for their LOD chains (see :doc:`Visuals`).
-``update()`` and every external-camera render advance one step themselves.
+Mesh files load asynchronously by default. The import runs on one of
+rayrai's worker threads, which also decode its texture images; once they are
+decoded, the render thread resolves the materials, a worker converts and
+optimizes the geometry, and the prepared submeshes are uploaded to the GPU one
+per step on the render thread. With OpenGL 4.4 (or ``GL_ARB_buffer_storage``)
+the workers copy the images and vertex buffers into persistently mapped
+staging buffers first, so each upload is a GPU copy. The HDR background of a
+world's ``.rscene`` scene also loads this way: a worker decodes and resamples
+it, and a later render installs it.
+Until an asset is ready, its visuals draw nothing; instanced batches also wait
+for their LOD chains (see :doc:`Visuals`). ``update()`` and every
+external-camera render advance pending assets themselves, step after step,
+until about 8 ms of render-thread time is spent (at least one step).
 ``pollAsyncMeshLoads(n)`` advances up to ``n`` import or upload steps (``0``
-does nothing) and returns the number of assets that finished. OpenUSD files
-always load synchronously.
+does nothing) and returns the number of assets that finished;
+``RayraiGlobalAsset::pollAsyncLoadsUntil(deadline)`` advances every pending
+import until a ``std::chrono::steady_clock`` deadline. OpenUSD files always
+load synchronously.
 
 .. code-block:: cpp
 
@@ -414,14 +423,14 @@ always load synchronously.
       // continue rendering / updating the UI between polls
     }
 
-``pendingAsyncMeshLoadCount()`` includes unfinished GPU uploads and instanced
-LOD jobs. Call ``setAsyncMeshLoadingEnabled(false)`` before adding visuals when
+``pendingAsyncMeshLoadCount()`` includes unfinished GPU uploads, instanced
+LOD jobs and a scene's HDR background while it loads. Call ``setAsyncMeshLoadingEnabled(false)`` before adding visuals when
 assets must be complete as soon as ``addVisualMesh`` or ``importVisualScene``
 returns. Assets already held in memory are returned immediately either way.
 
 Mesh caches on disk
 ===================
-rayrai keeps two regenerable caches for imported meshes; deleting them only
+rayrai keeps regenerable caches for imported meshes; deleting them only
 costs regeneration time on the next load.
 
 * Mesh metadata and generated LOD chains are written to
@@ -434,10 +443,25 @@ costs regeneration time on the next load.
 * LOD chains that instanced batches prepare during asynchronous loading are
   stored next to each asset as ``rayrai_cache_<file name>.lods``. They are
   invalidated by a fingerprint of the imported geometry, so edits to external
-  glTF buffers are detected. ``RAYRAI_ASYNC_LOD_CACHE_DIR`` stores them in
-  another folder instead (if that folder is not writable, nothing is cached).
-  Without it, an unwritable asset folder falls back to the system temporary
-  directory.
+  glTF buffers are detected. A new cache format (as in v2.9.4) also invalidates
+  them, and the first launch builds them again.
+* Models of at least 65,536 vertices also keep their prepared geometry (the
+  optimized vertex order of foliage, tangents and UV statistics) next to the
+  asset as ``rayrai_cache_<file name>.rgeo``, invalidated by a fingerprint of
+  the arrays the import read, so a cached model's vertices are not converted
+  again. Both kinds also store each mesh's bounds, index range and content
+  digest. A large sidecar of either kind is read while its model still imports.
+* Such a model also keeps how it was imported as
+  ``rayrai_cache_<file name>.rimp``: its materials, embedded textures and what
+  the import measured of its meshes, with the content digest of every file the
+  import read and whether each file it looked for existed. While those files
+  are unchanged and the prepared geometry is stored, a later load restores both
+  and runs no import at all; any change (a buffer or material library edited in
+  place, a file that appears) imports the model again. A damaged ``.rgeo``
+  found after a restore makes the load import the model for its vertices.
+* ``RAYRAI_ASYNC_LOD_CACHE_DIR`` stores all three kinds in another folder instead
+  (if that folder is not writable, nothing is cached). Without it, an
+  unwritable asset folder falls back to the system temporary directory.
 
 Compressed texture storage
 ==========================

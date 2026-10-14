@@ -6,16 +6,16 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Performance notes and the C++ API reference &mdash; raisim 2.9.3 documentation</title>
+  <title>Performance notes and the C++ API reference &mdash; raisim 2.9.4 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ba8b8cd0" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.png"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=2fd2eeca"></script>
+      <script src="../../_static/documentation_options.js?v=e45b7e07"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -254,12 +254,24 @@ frame, tested in 8-pixel tiles that cover every sample.</p></li>
 that choice. When the main viewer refreshes cascaded shadows every frame,
 foliage that cannot shadow anything inside a cascade’s part of the view is
 skipped for that cascade.</p></li>
-<li><p>With asynchronous mesh loading (<a class="reference internal" href="Capture.html"><span class="doc">Capture, diagnostics, and headless rendering</span></a>), base geometry and instanced
-LOD chains are prepared on worker threads. Each <code class="docutils literal notranslate"><span class="pre">pollAsyncMeshLoads(n)</span></code> call
-advances at most <code class="docutils literal notranslate"><span class="pre">n</span></code> import/upload stages (<code class="docutils literal notranslate"><span class="pre">0</span></code> does nothing) and uploads
-at most one prepared submesh per pending instanced visual;
-<code class="docutils literal notranslate"><span class="pre">pendingAsyncMeshLoadCount()</span></code> includes these jobs. Prepared LOD chains are
-cached on disk (see <a class="reference internal" href="#on-disk-caches">On-disk caches</a>).</p></li>
+<li><p>With asynchronous mesh loading (<a class="reference internal" href="Capture.html"><span class="doc">Capture, diagnostics, and headless rendering</span></a>), file imports, texture
+decoding, base geometry and instanced LOD chains are prepared on worker
+threads: imports and texture decodes share up to eight, up to half the
+hardware threads prepare geometry and LOD chains of different assets at
+once, and a large LOD chain builds up to three of its levels at once. Larger
+models go first: their textures decode first and their stages run first on
+the render thread, which only builds materials and issues uploads. With
+OpenGL 4.4 (or <code class="docutils literal notranslate"><span class="pre">GL_ARB_buffer_storage</span></code>) the workers copy textures and
+vertex buffers into persistently mapped staging buffers, so an upload is a
+GPU copy; a context holds up to two 128 MiB blocks of them while it loads.
+Each <code class="docutils literal notranslate"><span class="pre">update()</span></code> and
+external-camera render spends up to 8 ms of render-thread time on loading
+(one stage runs even when it takes longer), so a scene of many assets loads
+in a few frames. Each
+<code class="docutils literal notranslate"><span class="pre">pollAsyncMeshLoads(n)</span></code> call advances at most <code class="docutils literal notranslate"><span class="pre">n</span></code> import/upload stages
+(<code class="docutils literal notranslate"><span class="pre">0</span></code> does nothing) and uploads at most one prepared submesh per pending
+instanced visual; <code class="docutils literal notranslate"><span class="pre">pendingAsyncMeshLoadCount()</span></code> includes these jobs.
+Prepared LOD chains are cached on disk (see <a class="reference internal" href="#on-disk-caches">On-disk caches</a>).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">rayrai/Bc7TextureStorage.hpp</span></code> provides an opt-in load-time helper,
 <code class="docutils literal notranslate"><span class="pre">raisin::compressRgbTextureBc7(texture)</span></code>, that re-stores an RGB8/SRGB8
 texture and all of its mip levels as BC7. It needs OpenGL 4.2 or
@@ -477,9 +489,11 @@ caches are also checked against their source and rebuilt when stale.</p>
 <td><p><code class="docutils literal notranslate"><span class="pre">&lt;temp&gt;/rayrai_mesh_preprocess_cache</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">RAYRAI_MESH_PREPROCESS_CACHE_DIR</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>LOD chains prepared by asynchronous loading of instanced meshes</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">rayrai_cache_&lt;file&gt;.lods</span></code> next to the source asset, else
-<code class="docutils literal notranslate"><span class="pre">&lt;temp&gt;/rayrai_async_lod_cache</span></code></p></td>
+<tr class="row-odd"><td><p>LOD chains prepared by asynchronous loading of instanced meshes, and
+the prepared geometry and import description of asynchronously loaded
+models of at least 65,536 vertices</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">rayrai_cache_&lt;file&gt;.lods</span></code>, <code class="docutils literal notranslate"><span class="pre">.rgeo</span></code> and <code class="docutils literal notranslate"><span class="pre">.rimp</span></code> next to the
+source asset, else <code class="docutils literal notranslate"><span class="pre">&lt;temp&gt;/rayrai_async_lod_cache</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">RAYRAI_ASYNC_LOD_CACHE_DIR</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>Procedural cloud noise textures</p></td>
@@ -489,8 +503,10 @@ caches are also checked against their source and rebuilt when stale.</p>
 </tr>
 </tbody>
 </table>
-<p><code class="docutils literal notranslate"><span class="pre">&lt;temp&gt;</span></code> is the system temporary directory. The asynchronous LOD sidecars
-store full vertex data and can be large for dense assets.</p>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;temp&gt;</span></code> is the system temporary directory. The asynchronous LOD and
+prepared-geometry sidecars store full vertex data and can be large for dense
+assets; an import description holds the model’s materials, its embedded
+textures and what the import measured of its meshes.</p>
 </section>
 <section id="environment-variables">
 <h2>Environment variables<a class="headerlink" href="#environment-variables" title="Link to this heading"></a></h2>
@@ -1570,7 +1586,7 @@ renderer’s object lists must be current before the next render.</p></li>
 <span id="_CPPv3N6raisin12RayraiWindow12RayraiWindowENSt10shared_ptrIN6raisim5WorldEEEii13ThreadingModejbNSt6stringEb"></span><span id="_CPPv2N6raisin12RayraiWindow12RayraiWindowENSt10shared_ptrIN6raisim5WorldEEEii13ThreadingModejbNSt6stringEb"></span><span id="raisin::RayraiWindow::RayraiWindow__std::shared_ptr:raisim::World:.i.i.ThreadingMode.unsigned-i.b.ss.b"></span><span class="target" id="classraisin_1_1RayraiWindow_1ab84977b9a6b7b2fab32ce358c40edff5"></span><span class="sig-name descname"><span class="n"><span class="pre">RayraiWindow</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../WorldSystem.html#_CPPv4N6raisim5WorldE" title="raisim::World"><span class="n"><span class="pre">World</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">world</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">width</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">300</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">height</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">300</span></span>, <a class="reference internal" href="#_CPPv4N6raisin12RayraiWindow13ThreadingModeE" title="raisin::RayraiWindow::ThreadingMode"><span class="n"><span class="pre">ThreadingMode</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">threadingMode</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisin12RayraiWindow13ThreadingModeE" title="raisin::RayraiWindow::ThreadingMode"><span class="n"><span class="pre">ThreadingMode</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6raisin12RayraiWindow13ThreadingMode12SingleThreadE" title="raisin::RayraiWindow::ThreadingMode::SingleThread"><span class="n"><span class="pre">SingleThread</span></span></a>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">shaderCompileThreadCount</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1u</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">shaderBinaryCacheEnabled</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">shaderBinaryCacheDirectory</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">logShaderBinaryCache</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow12RayraiWindowENSt10shared_ptrIN6raisim5WorldEEEii13ThreadingModejbNSt6stringEb" title="Link to this definition"></a><br /></dt>
 <dd><p>Construct an offscreen renderer tied to a raisim world. </p>
 <p>Requires a current OpenGL context on the calling thread (see <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a9807a8adc483bafb30eb759f2d3bc6ca"><span class="std std-ref">createOffscreenGlContext()</span></a>); built-in shaders are registered here and the viewer render targets are allocated lazily on first render.</p>
-<p>A world built from a RaiSim Engine scene (World::getRscene(): a .rscene file, or a RaiSim XML world file that includes one) is shown with that scene: the constructor applies it (see RsceneVisuals.hpp for the render settings and the created visuals). Its meshes load like any others, asynchronously by default (see <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a368a4549c2affecdef638f23f653c926"><span class="std std-ref">setAsyncMeshLoadingEnabled()</span></a> and <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8cbee8f66093a7bb3fa97b1d650268b3"><span class="std std-ref">pendingAsyncMeshLoadCount()</span></a>). Settings changed afterwards (camera, render quality) override the scene’s. A scene rayrai cannot show, for example one with a missing texture, is a RaiSim fatal error.</p>
+<p>A world built from a RaiSim Engine scene (World::getRscene(): a .rscene file, or a RaiSim XML world file that includes one) is shown with that scene: the constructor applies it (see RsceneVisuals.hpp for the render settings and the created visuals). Its meshes load like any others, asynchronously by default (see <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a368a4549c2affecdef638f23f653c926"><span class="std std-ref">setAsyncMeshLoadingEnabled()</span></a> and <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a8cbee8f66093a7bb3fa97b1d650268b3"><span class="std std-ref">pendingAsyncMeshLoadCount()</span></a>), and so does an HDR background: it appears once a decode worker has resampled it. Settings changed afterwards (camera, render quality) override the scene’s. A scene rayrai cannot show, for example one with a missing texture, is a RaiSim fatal error.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1703,7 +1719,7 @@ renderer’s object lists must be current before the next render.</p></li>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisin12RayraiWindow25pendingAsyncMeshLoadCountEv">
 <span id="_CPPv3NK6raisin12RayraiWindow25pendingAsyncMeshLoadCountEv"></span><span id="_CPPv2NK6raisin12RayraiWindow25pendingAsyncMeshLoadCountEv"></span><span id="raisin::RayraiWindow::pendingAsyncMeshLoadCountC"></span><span class="target" id="classraisin_1_1RayraiWindow_1a8cbee8f66093a7bb3fa97b1d650268b3"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pendingAsyncMeshLoadCount</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin12RayraiWindow25pendingAsyncMeshLoadCountEv" title="Link to this definition"></a><br /></dt>
-<dd><p>Pending imports plus instanced LOD jobs, including unfinished GPU uploads. </p>
+<dd><p>Pending imports plus instanced LOD jobs, including unfinished GPU uploads, and the HDR background of the world’s scene while it loads. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Number of pending jobs; 0 once everything has been finalized by <a class="reference internal" href="#classraisin_1_1RayraiWindow_1ac91e2ab3ed3ca5b2151424b5ba709399"><span class="std std-ref">pollAsyncMeshLoads()</span></a>. </p>
@@ -6946,6 +6962,12 @@ The texture gets GL_REPEAT wrapping, mipmaps, and the process-wide defaults from
 <dd><p>Shadow casters classified as dynamic. </p>
 </dd></dl>
 
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow22ShadowCacheDiagnostics25receiverDepthFilteredMapsE">
+<span id="_CPPv3N6raisin12RayraiWindow22ShadowCacheDiagnostics25receiverDepthFilteredMapsE"></span><span id="_CPPv2N6raisin12RayraiWindow22ShadowCacheDiagnostics25receiverDepthFilteredMapsE"></span><span id="raisin::RayraiWindow::ShadowCacheDiagnostics::receiverDepthFilteredMaps__s"></span><span class="target" id="structraisin_1_1RayraiWindow_1_1ShadowCacheDiagnostics_1ab670ac1ecc90bc14f52e384c9242b6c9"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">receiverDepthFilteredMaps</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow22ShadowCacheDiagnostics25receiverDepthFilteredMapsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Main shadow maps drawn after the camera’s depth prepass without the instanced casters whose shadows reach none of its visible surfaces. </p>
+</dd></dl>
+
 </div>
 </dd></dl>
 
@@ -9206,7 +9228,7 @@ The texture gets GL_REPEAT wrapping, mipmaps, and the process-wide defaults from
 <li><p><strong>postShader</strong> – Shader configured for DoF, FXAA, and bloom. </p></li>
 <li><p><strong>fxaaEnabled</strong> – True to apply FXAA even when DoF is disabled. </p></li>
 <li><p><strong>aoPrepassShader</strong> – Optional leaner post program that runs the AO prepass, which caches AO for the denoiser, in place of <code class="docutils literal notranslate"><span class="pre">postShader</span></code> (null: <code class="docutils literal notranslate"><span class="pre">postShader</span></code> runs it). </p></li>
-<li><p><strong>contactShadowShader</strong> – Post program that renders only the filtered contact shadows, into a texture <code class="docutils literal notranslate"><span class="pre">postShader</span></code> then reads (uContactShadowTexture). Required when <code class="docutils literal notranslate"><span class="pre">postShader</span></code> declares that sampler and contact shadows are enabled; ignored otherwise. That program’s decal map pool is one slot smaller. </p></li>
+<li><p><strong>contactShadowShader</strong> – Post program that renders only the unfiltered contact shadows of the filter taps, into a texture <code class="docutils literal notranslate"><span class="pre">postShader</span></code> then filters (uContactShadowTexture). Each tap is marched once although up to four pixels share it. Required when <code class="docutils literal notranslate"><span class="pre">postShader</span></code> declares that sampler and contact shadows are enabled; ignored otherwise. That program’s decal map pool is one slot smaller. </p></li>
 </ul>
 </dd>
 </dl>
@@ -10050,6 +10072,21 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>maxAssets</strong> – Maximum number of pending assets advanced in this call. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Number of assets finalized (successfully or not) in this call. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin17RayraiGlobalAsset19pollAsyncLoadsUntilENSt6chrono12steady_clock10time_pointE">
+<span id="_CPPv3N6raisin17RayraiGlobalAsset19pollAsyncLoadsUntilENSt6chrono12steady_clock10time_pointE"></span><span id="_CPPv2N6raisin17RayraiGlobalAsset19pollAsyncLoadsUntilENSt6chrono12steady_clock10time_pointE"></span><span id="raisin::RayraiGlobalAsset::pollAsyncLoadsUntil__std::chrono::steady_clock::time_point"></span><span class="target" id="classraisin_1_1RayraiGlobalAsset_1aafde1c3b9c30fc81e5a7084fdd301d62"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pollAsyncLoadsUntil</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">chrono</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">steady_clock</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">time_point</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">deadline</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin17RayraiGlobalAsset19pollAsyncLoadsUntilENSt6chrono12steady_clock10time_pointE" title="Link to this definition"></a><br /></dt>
+<dd><p>Advance every pending import as far as it can go before <code class="docutils literal notranslate"><span class="pre">deadline</span></code>. </p>
+<p>Like <a class="reference internal" href="#classraisin_1_1RayraiGlobalAsset_1a06be5276b1b683b001de328c6544d76f"><span class="std std-ref">pollAsyncLoads()</span></a>, on the OpenGL/render thread, but an asset keeps advancing (one submesh upload after another) until it waits for a worker or the deadline passes. Imports whose worker finished go first, so the next worker stages start early. With async loading enabled, an import is finished only once the background decodes of its textures are done, so the render thread decodes no image. At least one ready stage runs per call. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>deadline</strong> – Time after which no further stage starts. </p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Number of assets finalized (successfully or not) in this call. </p>
@@ -12963,6 +13000,20 @@ Tangents are recomputed and generated LODs are dropped. The mesh is edited in pl
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals24pollAsyncMeshPreparationENSt6chrono12steady_clock10time_pointE">
+<span id="_CPPv3N6raisin16InstancedVisuals24pollAsyncMeshPreparationENSt6chrono12steady_clock10time_pointE"></span><span id="_CPPv2N6raisin16InstancedVisuals24pollAsyncMeshPreparationENSt6chrono12steady_clock10time_pointE"></span><span id="raisin::InstancedVisuals::pollAsyncMeshPreparation__std::chrono::steady_clock::time_point"></span><span class="target" id="classraisin_1_1InstancedVisuals_1ac91bd2dc06236dbe88bceb012f33c029"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pollAsyncMeshPreparation</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">chrono</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">steady_clock</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">time_point</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">deadline</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals24pollAsyncMeshPreparationENSt6chrono12steady_clock10time_pointE" title="Link to this definition"></a><br /></dt>
+<dd><p>Like <a class="reference internal" href="#classraisin_1_1InstancedVisuals_1a30b24d17078f174bf6afd08965578dc0"><span class="std std-ref">pollAsyncMeshPreparation()</span></a>, but uploads prepared submeshes until <code class="docutils literal notranslate"><span class="pre">deadline</span></code> passes (at least one per call). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>deadline</strong> – Time after which no further upload starts. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True on the call that installs the finished LODs. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisin16InstancedVisuals30hasPendingAsyncMeshPreparationEv">
 <span id="_CPPv3NK6raisin16InstancedVisuals30hasPendingAsyncMeshPreparationEv"></span><span id="_CPPv2NK6raisin16InstancedVisuals30hasPendingAsyncMeshPreparationEv"></span><span id="raisin::InstancedVisuals::hasPendingAsyncMeshPreparationC"></span><span class="target" id="classraisin_1_1InstancedVisuals_1a1abc691cf53ae5a3007e64d39d0fc488"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hasPendingAsyncMeshPreparation</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin16InstancedVisuals30hasPendingAsyncMeshPreparationEv" title="Link to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
@@ -13457,7 +13508,7 @@ Tangents are recomputed and generated LODs are dropped. The mesh is edited in pl
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals24sortInstancesBackToFrontERKN3glm4vec3E">
 <span id="_CPPv3N6raisin16InstancedVisuals24sortInstancesBackToFrontERKN3glm4vec3E"></span><span id="_CPPv2N6raisin16InstancedVisuals24sortInstancesBackToFrontERKN3glm4vec3E"></span><span id="raisin::InstancedVisuals::sortInstancesBackToFront__glm::vec3CR"></span><span class="target" id="classraisin_1_1InstancedVisuals_1a47c4664f44d04868c4d0a1cc1797c1e6"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sortInstancesBackToFront</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec3</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">viewPos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals24sortInstancesBackToFrontERKN3glm4vec3E" title="Link to this definition"></a><br /></dt>
-<dd><p>Reorder the instances farthest-first by distance from <code class="docutils literal notranslate"><span class="pre">viewPos</span></code> (stable). No-op unless setSortTransparentInstances(true). Instance indices change. </p>
+<dd><p>Reorder the instances farthest-first by distance from <code class="docutils literal notranslate"><span class="pre">viewPos</span></code> (stable). No-op unless setSortTransparentInstances(true), or when the instances are already in that order. Instance indices change. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>viewPos</strong> – <a class="reference internal" href="#classraisin_1_1Camera"><span class="std std-ref">Camera</span></a> position in world coordinates. </p>
@@ -13633,6 +13684,18 @@ Tangents are recomputed and generated LODs are dropped. The mesh is edited in pl
 <dd class="field-odd"><p>Counter bumped whenever instance data changes (cache key). </p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisin16InstancedVisuals27occlusionCandidatesPossibleEv">
+<span id="_CPPv3NK6raisin16InstancedVisuals27occlusionCandidatesPossibleEv"></span><span id="_CPPv2NK6raisin16InstancedVisuals27occlusionCandidatesPossibleEv"></span><span id="raisin::InstancedVisuals::occlusionCandidatesPossibleC"></span><span class="target" id="classraisin_1_1InstancedVisuals_1a054dde5f7b14c7ab2b99c4b8e4b57b01"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">occlusionCandidatesPossible</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin16InstancedVisuals27occlusionCandidatesPossibleEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Internal: whether <a class="reference internal" href="#classraisin_1_1InstancedVisuals_1a13b21788d8d41863bd8302836316a3a7"><span class="std std-ref">addOcclusionCandidates()</span></a> can add this batch: its draws take the bounds-culled path with enough geometry, before any frustum test. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals22addOcclusionCandidatesERN15rayrai_internal18InstancedOcclusionE">
+<span id="_CPPv3N6raisin16InstancedVisuals22addOcclusionCandidatesERN15rayrai_internal18InstancedOcclusionE"></span><span id="_CPPv2N6raisin16InstancedVisuals22addOcclusionCandidatesERN15rayrai_internal18InstancedOcclusionE"></span><span id="raisin::InstancedVisuals::addOcclusionCandidates__rayrai_internal::InstancedOcclusionR"></span><span class="target" id="classraisin_1_1InstancedVisuals_1a13b21788d8d41863bd8302836316a3a7"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addOcclusionCandidates</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">rayrai_internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">InstancedOcclusion</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">occlusion</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals22addOcclusionCandidatesERN15rayrai_internal18InstancedOcclusionE" title="Link to this definition"></a><br /></dt>
+<dd><p>Internal: adds the instances a colour or transparent draw for <code class="docutils literal notranslate"><span class="pre">occlusion's</span></code> camera would draw to its GPU depth-tile test, when this batch draws them through the bounds-culled path. </p>
 </dd></dl>
 
 </div>
@@ -14318,12 +14381,81 @@ Missing tangents are generated and an empty TexCoords2 set is filled from TexCoo
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10OpenGLMesh18preparedAttributesEv">
+<span id="_CPPv3NK10OpenGLMesh18preparedAttributesEv"></span><span id="_CPPv2NK10OpenGLMesh18preparedAttributesEv"></span><span id="OpenGLMesh::preparedAttributesC"></span><span class="target" id="classOpenGLMesh_1a4378d9081d8bf7b1d52a0afb04b20b62"></span><a class="reference internal" href="#_CPPv4N10OpenGLMesh18PreparedAttributesE" title="OpenGLMesh::PreparedAttributes"><span class="n"><span class="pre">PreparedAttributes</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">preparedAttributes</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10OpenGLMesh18preparedAttributesEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The attributes the last <a class="reference internal" href="#classOpenGLMesh_1ace12c18be211f33d464ba33f8a3b8e2c"><span class="std std-ref">prepareGeometryAttributes()</span></a> derived. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh23restorePreparedGeometryERRNSt6vectorI6VertexEERRNSt6vectorIjEERK18PreparedAttributes">
+<span id="_CPPv3N10OpenGLMesh23restorePreparedGeometryERRNSt6vectorI6VertexEERRNSt6vectorIjEERK18PreparedAttributes"></span><span id="_CPPv2N10OpenGLMesh23restorePreparedGeometryERRNSt6vectorI6VertexEERRNSt6vectorIjEERK18PreparedAttributes"></span><span id="OpenGLMesh::restorePreparedGeometry__std::vector:Vertex:RR.std::vector:unsigned-i:RR.PreparedAttributesCR"></span><span class="target" id="classOpenGLMesh_1a4dcfc59dd4aecb68b65b6d34148b0ca2"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">restorePreparedGeometry</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Vertex</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">vertices</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">indices</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N10OpenGLMesh18PreparedAttributesE" title="OpenGLMesh::PreparedAttributes"><span class="n"><span class="pre">PreparedAttributes</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">attributes</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10OpenGLMesh23restorePreparedGeometryERRNSt6vectorI6VertexEERRNSt6vectorIjEERK18PreparedAttributes" title="Link to this definition"></a><br /></dt>
+<dd><p>Replace the CPU geometry with an already prepared copy, as <a class="reference internal" href="#classOpenGLMesh_1ace12c18be211f33d464ba33f8a3b8e2c"><span class="std std-ref">prepareGeometryAttributes()</span></a> would have left it. Internal: no GL calls; for caches of prepared meshes. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vertices</strong> – Prepared vertex array. </p></li>
+<li><p><strong>indices</strong> – Triangle index array. </p></li>
+<li><p><strong>attributes</strong> – The attributes prepared with them. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10OpenGLMesh25precomputeVertexSummariesEv">
+<span id="_CPPv3NK10OpenGLMesh25precomputeVertexSummariesEv"></span><span id="_CPPv2NK10OpenGLMesh25precomputeVertexSummariesEv"></span><span id="OpenGLMesh::precomputeVertexSummariesC"></span><span class="target" id="classOpenGLMesh_1ab777de405efbdf062d66eec2a551d5c1"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">precomputeVertexSummaries</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10OpenGLMesh25precomputeVertexSummariesEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Compute what the first draws would otherwise scan <a class="reference internal" href="#classOpenGLMesh_1aac037d91f198bd2a65d4b3ceb3750e8a"><span class="std std-ref">vertices</span></a> for: the local bounds and whether every vertex has the same color. Internal: no GL calls; workers call it before the render thread uses the mesh. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10OpenGLMesh15vertexSummariesEv">
+<span id="_CPPv3NK10OpenGLMesh15vertexSummariesEv"></span><span id="_CPPv2NK10OpenGLMesh15vertexSummariesEv"></span><span id="OpenGLMesh::vertexSummariesC"></span><span class="target" id="classOpenGLMesh_1a0cd0b7b2a533b3cdfb8358590b029be9"></span><a class="reference internal" href="#_CPPv4N10OpenGLMesh15VertexSummariesE" title="OpenGLMesh::VertexSummaries"><span class="n"><span class="pre">VertexSummaries</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">vertexSummaries</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10OpenGLMesh15vertexSummariesEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The summaries of the current vertices and indices. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10OpenGLMesh20adoptVertexSummariesERK15VertexSummaries">
+<span id="_CPPv3NK10OpenGLMesh20adoptVertexSummariesERK15VertexSummaries"></span><span id="_CPPv2NK10OpenGLMesh20adoptVertexSummariesERK15VertexSummaries"></span><span id="OpenGLMesh::adoptVertexSummaries__VertexSummariesCRC"></span><span class="target" id="classOpenGLMesh_1aa942c5d89c7d028a1b7cbcb1152d0288"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">adoptVertexSummaries</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N10OpenGLMesh15VertexSummariesE" title="OpenGLMesh::VertexSummaries"><span class="n"><span class="pre">VertexSummaries</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">summaries</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10OpenGLMesh20adoptVertexSummariesERK15VertexSummaries" title="Link to this definition"></a><br /></dt>
+<dd><p>Adopt summaries a cache stored for exactly these vertices and indices. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10OpenGLMesh13contentDigestEv">
+<span id="_CPPv3NK10OpenGLMesh13contentDigestEv"></span><span id="_CPPv2NK10OpenGLMesh13contentDigestEv"></span><span id="OpenGLMesh::contentDigestC"></span><span class="target" id="classOpenGLMesh_1a37a13cb638d67980e5a730259f4fdc28"></span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">contentDigest</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10OpenGLMesh13contentDigestEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Hash of <a class="reference internal" href="#classOpenGLMesh_1aac037d91f198bd2a65d4b3ceb3750e8a"><span class="std std-ref">vertices</span></a> and <a class="reference internal" href="#classOpenGLMesh_1a0b8d69fe1cf0261961cc39e22e0b4b86"><span class="std std-ref">indices</span></a>; for summaries adopted from a cache of prepared geometry (until a method of this class changes the geometry), the digest stored with them. Internal: keys caches derived from the geometry. </p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh22uploadPreparedGeometryEb">
 <span id="_CPPv3N10OpenGLMesh22uploadPreparedGeometryEb"></span><span id="_CPPv2N10OpenGLMesh22uploadPreparedGeometryEb"></span><span id="OpenGLMesh::uploadPreparedGeometry__b"></span><span class="target" id="classOpenGLMesh_1af6911bc39ccb4fcf36e8218c9be52b91"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uploadPreparedGeometry</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">compactIndices</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10OpenGLMesh22uploadPreparedGeometryEb" title="Link to this definition"></a><br /></dt>
 <dd><p>Upload an already-prepared CPU mesh on the context-owning thread. No-op if the mesh already has a VAO or borrows another mesh’s buffers. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>compactIndices</strong> – Allow 16-bit GPU indices when lossless. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh22uploadPreparedGeometryEbRK14StagedGeometry">
+<span id="_CPPv3N10OpenGLMesh22uploadPreparedGeometryEbRK14StagedGeometry"></span><span id="_CPPv2N10OpenGLMesh22uploadPreparedGeometryEbRK14StagedGeometry"></span><span id="OpenGLMesh::uploadPreparedGeometry__b.StagedGeometryCR"></span><span class="target" id="classOpenGLMesh_1a26d25d3879d124926ed0faa32d298fc6"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uploadPreparedGeometry</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">compactIndices</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N10OpenGLMesh14StagedGeometryE" title="OpenGLMesh::StagedGeometry"><span class="n"><span class="pre">StagedGeometry</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">staged</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10OpenGLMesh22uploadPreparedGeometryEbRK14StagedGeometry" title="Link to this definition"></a><br /></dt>
+<dd><p><a class="reference internal" href="#classOpenGLMesh_1af6911bc39ccb4fcf36e8218c9be52b91"><span class="std std-ref">uploadPreparedGeometry()</span></a> that copies the geometry on the GPU, from a staging buffer. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10OpenGLMesh21uploadsCompactIndicesEb">
+<span id="_CPPv3NK10OpenGLMesh21uploadsCompactIndicesEb"></span><span id="_CPPv2NK10OpenGLMesh21uploadsCompactIndicesEb"></span><span id="OpenGLMesh::uploadsCompactIndices__bC"></span><span class="target" id="classOpenGLMesh_1abc510b792c0b9472d39abcd615229148"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uploadsCompactIndices</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">compactIndices</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10OpenGLMesh21uploadsCompactIndicesEb" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether an upload allowed <code class="docutils literal notranslate"><span class="pre">compactIndices</span></code> stores 16-bit indices (triangles whose indices all fit). </p>
 </dd>
 </dl>
 </dd></dl>
@@ -14969,6 +15101,12 @@ Missing tangents are generated and an empty TexCoords2 set is filled from TexCoo
 <dd class="field-even"><p>New mesh with no GL objects. </p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh17createCpuGeometryERRNSt6vectorI6VertexEERRNSt6vectorIjEERKNSt6vectorI7TextureEERKN3glm4vec4Eb">
+<span id="_CPPv3N10OpenGLMesh17createCpuGeometryERRNSt6vectorI6VertexEERRNSt6vectorIjEERKNSt6vectorI7TextureEERKN3glm4vec4Eb"></span><span id="_CPPv2N10OpenGLMesh17createCpuGeometryERRNSt6vectorI6VertexEERRNSt6vectorIjEERKNSt6vectorI7TextureEERKN3glm4vec4Eb"></span><span id="OpenGLMesh::createCpuGeometry__std::vector:Vertex:RR.std::vector:unsigned-i:RR.std::vector:Texture:CR.glm::vec4CR.b"></span><span class="target" id="classOpenGLMesh_1adeed8108b1a237085e8f2554702c2177"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv410OpenGLMesh" title="OpenGLMesh"><span class="n"><span class="pre">OpenGLMesh</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">createCpuGeometry</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Vertex</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">vertices</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">indices</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Texture</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">textures</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec4</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">baseColor</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">prepareAttributes</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10OpenGLMesh17createCpuGeometryERRNSt6vectorI6VertexEERRNSt6vectorIjEERKNSt6vectorI7TextureEERKN3glm4vec4Eb" title="Link to this definition"></a><br /></dt>
+<dd><p><a class="reference internal" href="#classOpenGLMesh_1a06fb5e5b1d4a4a46d1d9dc810b2aa48f"><span class="std std-ref">createCpuGeometry()</span></a> that takes over the vertex and index arrays instead of copying them. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -15699,6 +15837,123 @@ Missing tangents are generated and an empty TexCoords2 set is filled from TexCoo
 </div>
 </dd></dl>
 
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh18PreparedAttributesE">
+<span id="_CPPv3N10OpenGLMesh18PreparedAttributesE"></span><span id="_CPPv2N10OpenGLMesh18PreparedAttributesE"></span><span id="OpenGLMesh::PreparedAttributes"></span><span class="target" id="structOpenGLMesh_1_1PreparedAttributes"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PreparedAttributes</span></span></span><a class="headerlink" href="#_CPPv4N10OpenGLMesh18PreparedAttributesE" title="Link to this definition"></a><br /></dt>
+<dd><p>What <a class="reference internal" href="#classOpenGLMesh_1ace12c18be211f33d464ba33f8a3b8e2c"><span class="std std-ref">prepareGeometryAttributes()</span></a> derives besides the vertex attributes. Internal: caches of prepared meshes store it. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh18PreparedAttributes13tangentSourceE">
+<span id="_CPPv3N10OpenGLMesh18PreparedAttributes13tangentSourceE"></span><span id="_CPPv2N10OpenGLMesh18PreparedAttributes13tangentSourceE"></span><span id="OpenGLMesh::PreparedAttributes::tangentSource__ss"></span><span class="target" id="structOpenGLMesh_1_1PreparedAttributes_1aa0f7a20acabd893d047901135b9339e4"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tangentSource</span></span></span><a class="headerlink" href="#_CPPv4N10OpenGLMesh18PreparedAttributes13tangentSourceE" title="Link to this definition"></a><br /></dt>
+<dd><p>How tangents were obtained. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh18PreparedAttributes17validTangentCountE">
+<span id="_CPPv3N10OpenGLMesh18PreparedAttributes17validTangentCountE"></span><span id="_CPPv2N10OpenGLMesh18PreparedAttributes17validTangentCountE"></span><span id="OpenGLMesh::PreparedAttributes::validTangentCount__s"></span><span class="target" id="structOpenGLMesh_1_1PreparedAttributes_1a741cee771b01a875aa778fcf6c8b81e6"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">validTangentCount</span></span></span><a class="headerlink" href="#_CPPv4N10OpenGLMesh18PreparedAttributes17validTangentCountE" title="Link to this definition"></a><br /></dt>
+<dd><p>Vertices with a usable tangent. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh18PreparedAttributes20fallbackTangentCountE">
+<span id="_CPPv3N10OpenGLMesh18PreparedAttributes20fallbackTangentCountE"></span><span id="_CPPv2N10OpenGLMesh18PreparedAttributes20fallbackTangentCountE"></span><span id="OpenGLMesh::PreparedAttributes::fallbackTangentCount__s"></span><span class="target" id="structOpenGLMesh_1_1PreparedAttributes_1a2c8df1e18b17e5f8b7ecfcdebab9d3dc"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fallbackTangentCount</span></span></span><a class="headerlink" href="#_CPPv4N10OpenGLMesh18PreparedAttributes20fallbackTangentCountE" title="Link to this definition"></a><br /></dt>
+<dd><p>Vertices that needed a fallback tangent. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh18PreparedAttributes9uvDensityE">
+<span id="_CPPv3N10OpenGLMesh18PreparedAttributes9uvDensityE"></span><span id="_CPPv2N10OpenGLMesh18PreparedAttributes9uvDensityE"></span><span id="OpenGLMesh::PreparedAttributes::uvDensity__glm::vec2"></span><span class="target" id="structOpenGLMesh_1_1PreparedAttributes_1aa866455e123444c976e2d24d8a14aae7"></span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec2</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uvDensity</span></span></span><a class="headerlink" href="#_CPPv4N10OpenGLMesh18PreparedAttributes9uvDensityE" title="Link to this definition"></a><br /></dt>
+<dd><p>See <a class="reference internal" href="#classOpenGLMesh_1a1bf845044c6192684d29f7acdb9162e8"><span class="std std-ref">vertexDisplacementUvStats()</span></a> (xy). </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh18PreparedAttributes12uvEdgeLengthE">
+<span id="_CPPv3N10OpenGLMesh18PreparedAttributes12uvEdgeLengthE"></span><span id="_CPPv2N10OpenGLMesh18PreparedAttributes12uvEdgeLengthE"></span><span id="OpenGLMesh::PreparedAttributes::uvEdgeLength__glm::vec2"></span><span class="target" id="structOpenGLMesh_1_1PreparedAttributes_1a78049fe7bd069058f78995e5d6974087"></span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec2</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uvEdgeLength</span></span></span><a class="headerlink" href="#_CPPv4N10OpenGLMesh18PreparedAttributes12uvEdgeLengthE" title="Link to this definition"></a><br /></dt>
+<dd><p>See <a class="reference internal" href="#classOpenGLMesh_1a1bf845044c6192684d29f7acdb9162e8"><span class="std std-ref">vertexDisplacementUvStats()</span></a> (zw). </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh15VertexSummariesE">
+<span id="_CPPv3N10OpenGLMesh15VertexSummariesE"></span><span id="_CPPv2N10OpenGLMesh15VertexSummariesE"></span><span id="OpenGLMesh::VertexSummaries"></span><span class="target" id="structOpenGLMesh_1_1VertexSummaries"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VertexSummaries</span></span></span><a class="headerlink" href="#_CPPv4N10OpenGLMesh15VertexSummariesE" title="Link to this definition"></a><br /></dt>
+<dd><p>What <a class="reference internal" href="#classOpenGLMesh_1ab777de405efbdf062d66eec2a551d5c1"><span class="std std-ref">precomputeVertexSummaries()</span></a> and <a class="reference internal" href="#structOpenGLMesh_1_1VertexSummaries_1a27e832f967253e9b067eb632dc59a24c"><span class="std std-ref">contentDigest()</span></a> find. Internal: for caches of prepared geometry, which store it with the vertices. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh15VertexSummaries6boundsE">
+<span id="_CPPv3N10OpenGLMesh15VertexSummaries6boundsE"></span><span id="_CPPv2N10OpenGLMesh15VertexSummaries6boundsE"></span><span id="OpenGLMesh::VertexSummaries::bounds__b"></span><span class="target" id="structOpenGLMesh_1_1VertexSummaries_1a5eeb4539f36b92f9e1bc58017dd32390"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bounds</span></span></span><a class="headerlink" href="#_CPPv4N10OpenGLMesh15VertexSummaries6boundsE" title="Link to this definition"></a><br /></dt>
+<dd><p><a class="reference internal" href="#classOpenGLMesh_1ad04c33f5ebc1def0590a1943ea428073"><span class="std std-ref">localBoundingSphere()</span></a> succeeds. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh15VertexSummaries6sphereE">
+<span id="_CPPv3N10OpenGLMesh15VertexSummaries6sphereE"></span><span id="_CPPv2N10OpenGLMesh15VertexSummaries6sphereE"></span><span id="OpenGLMesh::VertexSummaries::sphere__glm::vec4"></span><span class="target" id="structOpenGLMesh_1_1VertexSummaries_1a4f0645e17779283f96bc353b873a0034"></span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec4</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sphere</span></span></span><a class="headerlink" href="#_CPPv4N10OpenGLMesh15VertexSummaries6sphereE" title="Link to this definition"></a><br /></dt>
+<dd><p>Its center (xyz) and radius (w). </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh15VertexSummaries11halfExtentsE">
+<span id="_CPPv3N10OpenGLMesh15VertexSummaries11halfExtentsE"></span><span id="_CPPv2N10OpenGLMesh15VertexSummaries11halfExtentsE"></span><span id="OpenGLMesh::VertexSummaries::halfExtents__glm::vec3"></span><span class="target" id="structOpenGLMesh_1_1VertexSummaries_1a663e71f7605b2e0f4686678d7b6d76f3"></span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec3</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">halfExtents</span></span></span><a class="headerlink" href="#_CPPv4N10OpenGLMesh15VertexSummaries11halfExtentsE" title="Link to this definition"></a><br /></dt>
+<dd><p><a class="reference internal" href="#classOpenGLMesh_1a5c8f3ec3991949b817445abac201a3f8"><span class="std std-ref">localBoundingBox()</span></a> half extents. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh15VertexSummaries12uniformColorE">
+<span id="_CPPv3N10OpenGLMesh15VertexSummaries12uniformColorE"></span><span id="_CPPv2N10OpenGLMesh15VertexSummaries12uniformColorE"></span><span id="OpenGLMesh::VertexSummaries::uniformColor__b"></span><span class="target" id="structOpenGLMesh_1_1VertexSummaries_1aa7912b0e9a25af2847fe37d38a1baa7e"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uniformColor</span></span></span><a class="headerlink" href="#_CPPv4N10OpenGLMesh15VertexSummaries12uniformColorE" title="Link to this definition"></a><br /></dt>
+<dd><p>Every vertex has the first one’s color. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh15VertexSummaries13contentDigestE">
+<span id="_CPPv3N10OpenGLMesh15VertexSummaries13contentDigestE"></span><span id="_CPPv2N10OpenGLMesh15VertexSummaries13contentDigestE"></span><span id="OpenGLMesh::VertexSummaries::contentDigest__uint64_t"></span><span class="target" id="structOpenGLMesh_1_1VertexSummaries_1a27e832f967253e9b067eb632dc59a24c"></span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">contentDigest</span></span></span><a class="headerlink" href="#_CPPv4N10OpenGLMesh15VertexSummaries13contentDigestE" title="Link to this definition"></a><br /></dt>
+<dd><p><a class="reference internal" href="#structOpenGLMesh_1_1VertexSummaries_1a27e832f967253e9b067eb632dc59a24c"><span class="std std-ref">contentDigest()</span></a>. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh15VertexSummaries8maxIndexE">
+<span id="_CPPv3N10OpenGLMesh15VertexSummaries8maxIndexE"></span><span id="_CPPv2N10OpenGLMesh15VertexSummaries8maxIndexE"></span><span id="OpenGLMesh::VertexSummaries::maxIndex__uint32_t"></span><span class="target" id="structOpenGLMesh_1_1VertexSummaries_1a4d5dc5a50d72bca0ffc68e3a163dd1bd"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">maxIndex</span></span></span><a class="headerlink" href="#_CPPv4N10OpenGLMesh15VertexSummaries8maxIndexE" title="Link to this definition"></a><br /></dt>
+<dd><p>Largest of <a class="reference internal" href="#classOpenGLMesh_1a0b8d69fe1cf0261961cc39e22e0b4b86"><span class="std std-ref">indices</span></a> (0 without indices). </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh14StagedGeometryE">
+<span id="_CPPv3N10OpenGLMesh14StagedGeometryE"></span><span id="_CPPv2N10OpenGLMesh14StagedGeometryE"></span><span id="OpenGLMesh::StagedGeometry"></span><span class="target" id="structOpenGLMesh_1_1StagedGeometry"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StagedGeometry</span></span></span><a class="headerlink" href="#_CPPv4N10OpenGLMesh14StagedGeometryE" title="Link to this definition"></a><br /></dt>
+<dd><p>Where staging buffers (persistently mapped, OpenGL 4.4) hold this mesh’s <a class="reference internal" href="#classOpenGLMesh_1aac037d91f198bd2a65d4b3ceb3750e8a"><span class="std std-ref">vertices</span></a> and indices as <a class="reference internal" href="#classOpenGLMesh_1af6911bc39ccb4fcf36e8218c9be52b91"><span class="std std-ref">uploadPreparedGeometry()</span></a> stores them. Internal. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh14StagedGeometry12vertexBufferE">
+<span id="_CPPv3N10OpenGLMesh14StagedGeometry12vertexBufferE"></span><span id="_CPPv2N10OpenGLMesh14StagedGeometry12vertexBufferE"></span><span id="OpenGLMesh::StagedGeometry::vertexBuffer__unsigned-i"></span><span class="target" id="structOpenGLMesh_1_1StagedGeometry_1afe010ad529b0df277541688125ad165d"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">vertexBuffer</span></span></span><a class="headerlink" href="#_CPPv4N10OpenGLMesh14StagedGeometry12vertexBufferE" title="Link to this definition"></a><br /></dt>
+<dd><p>The staging buffer holding <a class="reference internal" href="#classOpenGLMesh_1aac037d91f198bd2a65d4b3ceb3750e8a"><span class="std std-ref">vertices</span></a>,. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh14StagedGeometry12vertexOffsetE">
+<span id="_CPPv3N10OpenGLMesh14StagedGeometry12vertexOffsetE"></span><span id="_CPPv2N10OpenGLMesh14StagedGeometry12vertexOffsetE"></span><span id="OpenGLMesh::StagedGeometry::vertexOffset__s"></span><span class="target" id="structOpenGLMesh_1_1StagedGeometry_1a4a628128d6fe58938edb7542a2c0ba9e"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">vertexOffset</span></span></span><a class="headerlink" href="#_CPPv4N10OpenGLMesh14StagedGeometry12vertexOffsetE" title="Link to this definition"></a><br /></dt>
+<dd><p>at this offset. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh14StagedGeometry11indexBufferE">
+<span id="_CPPv3N10OpenGLMesh14StagedGeometry11indexBufferE"></span><span id="_CPPv2N10OpenGLMesh14StagedGeometry11indexBufferE"></span><span id="OpenGLMesh::StagedGeometry::indexBuffer__unsigned-i"></span><span class="target" id="structOpenGLMesh_1_1StagedGeometry_1a3ed8440660e3a9300e010066ef461064"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">indexBuffer</span></span></span><a class="headerlink" href="#_CPPv4N10OpenGLMesh14StagedGeometry11indexBufferE" title="Link to this definition"></a><br /></dt>
+<dd><p>The staging buffer holding the indices. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10OpenGLMesh14StagedGeometry11indexOffsetE">
+<span id="_CPPv3N10OpenGLMesh14StagedGeometry11indexOffsetE"></span><span id="_CPPv2N10OpenGLMesh14StagedGeometry11indexOffsetE"></span><span id="OpenGLMesh::StagedGeometry::indexOffset__s"></span><span class="target" id="structOpenGLMesh_1_1StagedGeometry_1a2f3d773ba5532dff4c893783c4f3ee67"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">indexOffset</span></span></span><a class="headerlink" href="#_CPPv4N10OpenGLMesh14StagedGeometry11indexOffsetE" title="Link to this definition"></a><br /></dt>
+<dd><p>(16-bit when <a class="reference internal" href="#classOpenGLMesh_1abc510b792c0b9472d39abcd615229148"><span class="std std-ref">uploadsCompactIndices()</span></a>), at this offset. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="cpp type">
@@ -15720,6 +15975,12 @@ Missing tangents are generated and an empty TexCoords2 set is filled from TexCoo
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin6assimp19loadModelSceneAsyncERKNSt6stringE">
 <span id="_CPPv3N6raisin6assimp19loadModelSceneAsyncERKNSt6stringE"></span><span id="_CPPv2N6raisin6assimp19loadModelSceneAsyncERKNSt6stringE"></span><span id="raisin::assimp::loadModelSceneAsync__ssCR"></span><span class="target" id="namespaceraisin_1_1assimp_1a7797802585805214c91df08a89ba8c4e"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">future</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6raisin6assimp20AsyncModelLoadResultE" title="raisin::assimp::AsyncModelLoadResult"><span class="n"><span class="pre">AsyncModelLoadResult</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">loadModelSceneAsync</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">path</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin6assimp19loadModelSceneAsyncERKNSt6stringE" title="Link to this definition"></a><br /></dt>
 <dd><p>Run the Assimp import of <code class="docutils literal notranslate"><span class="pre">path</span></code> on a new thread (no GL calls). USD files are not handled here; use <a class="reference internal" href="#namespaceraisin_1_1assimp_1a5168b04182b098d51958fa947258e392"><span class="std std-ref">loadModel()</span></a> for them. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin6assimp23importedTexturesDecodedERK20AsyncModelLoadResult">
+<span id="_CPPv3N6raisin6assimp23importedTexturesDecodedERK20AsyncModelLoadResult"></span><span id="_CPPv2N6raisin6assimp23importedTexturesDecodedERK20AsyncModelLoadResult"></span><span id="raisin::assimp::importedTexturesDecoded__AsyncModelLoadResultCR"></span><span class="target" id="namespaceraisin_1_1assimp_1a5d95c2c9a84413ae39154bd0b928c0a7"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">importedTexturesDecoded</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisin6assimp20AsyncModelLoadResultE" title="raisin::assimp::AsyncModelLoadResult"><span class="n"><span class="pre">AsyncModelLoadResult</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">imported</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin6assimp23importedTexturesDecodedERK20AsyncModelLoadResult" title="Link to this definition"></a><br /></dt>
+<dd><p>True when the texture files an import queued for background decoding are all decoded (or were never queued), so finishing it decodes no image on the calling thread. Never waits. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -15951,6 +16212,12 @@ Missing tangents are generated and an empty TexCoords2 set is filled from TexCoo
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin6assimp20AsyncModelLoadResult15texturePrefetchE">
 <span id="_CPPv3N6raisin6assimp20AsyncModelLoadResult15texturePrefetchE"></span><span id="_CPPv2N6raisin6assimp20AsyncModelLoadResult15texturePrefetchE"></span><span id="raisin::assimp::AsyncModelLoadResult::texturePrefetch__std::shared_ptr:void:"></span><span class="target" id="structraisin_1_1assimp_1_1AsyncModelLoadResult_1ad9ca73b276a34645343dabbba7288148"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">texturePrefetch</span></span></span><a class="headerlink" href="#_CPPv4N6raisin6assimp20AsyncModelLoadResult15texturePrefetchE" title="Link to this definition"></a><br /></dt>
 <dd><p>Background decodes of the texture files the materials reference, started by the import; finishing the import uploads them, and this drops the rest. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin6assimp20AsyncModelLoadResult8geometryE">
+<span id="_CPPv3N6raisin6assimp20AsyncModelLoadResult8geometryE"></span><span id="_CPPv2N6raisin6assimp20AsyncModelLoadResult8geometryE"></span><span id="raisin::assimp::AsyncModelLoadResult::geometry__std::shared_ptr:ImportedGeometry:"></span><span class="target" id="structraisin_1_1assimp_1_1AsyncModelLoadResult_1a0e114dc7e0678a1b05dbe3a53e5fab02"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">ImportedGeometry</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">geometry</span></span></span><a class="headerlink" href="#_CPPv4N6raisin6assimp20AsyncModelLoadResult8geometryE" title="Link to this definition"></a><br /></dt>
+<dd><p>The meshes the scene’s nodes draw, in the order the model’s meshes are built, with what the import measured of their vertices. Internal. </p>
 </dd></dl>
 
 </div>

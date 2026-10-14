@@ -2,239 +2,266 @@
 Benchmark
 #############################
 
-This page reports timing comparisons between RaiSim and another widely used multi-body physics
-engine (MuJoCo) on seven workloads: articulated chains, the ANYmal quadruped standing, falling and
-standing on rough terrain, a pile of rigid primitives, and Theo Jansen's Strandbeest, whose 42
-closed kinematic loops make it a test of loop constraints. The measurements come from the private
-release-validation suite, with the machine and workload settings recorded below. For general
-tuning guidance, see :doc:`Performance`.
+Eleven workloads cover articulated dynamics, rigid contacts, closed loops, ray queries, and
+deformable objects. The tables compare RaiSim and MuJoCo on the same machine, with three runs per
+backend. For tuning guidance, see :doc:`Performance`.
 
-Environment
-===========
+.. container:: benchmark-page
 
-All numbers on this page were collected on a single machine with the following configuration.
+   .. tabs::
 
-.. container:: benchmark-table-block benchmark-table-environment
+      .. tab:: Results
+
+         **Median wall-clock seconds; lower is better.** The smaller range below each median is
+         the minimum–maximum of three runs. Speedup is MuJoCo's median divided by RaiSim's median.
+         All rows include scene construction and the benchmark loop; rendering is disabled.
+
+         .. include:: benchmark_results.inc
+
+         The eight-cube MuJoCo run reports numerical instability at 0.020 s. Its timing and speedup
+         are omitted. Cloth and cube-stack backends use different deformable models; their
+         parameters and comparison limits are in **Workloads**.
+
+         .. container:: benchmark-graph-block
+
+            .. figure:: ../../rsc/docs/image/benchmark_speedup.svg
+               :alt: Vertical bars showing MuJoCo time divided by RaiSim time for ten valid comparisons, on a logarithmic vertical axis.
+               :width: 100%
+
+         :download:`Download the recorded results and exact arguments <../_static/benchmark_results.json>`.
+         Absolute timings depend on the machine, compiler, and scene. These ratios describe the
+         recorded development build; use your application workload to evaluate the distributed
+         |raisim_version| package.
+
+      .. tab:: Workloads
+
+         DOF counts generalized velocity coordinates; a floating base contributes six.
+         A step count denotes simulation steps unless the row says queries or sensor updates.
+
+         .. container:: benchmark-table-block benchmark-table-scenes
+
+            .. list-table::
+               :header-rows: 1
+               :widths: 30 18 52
+
+               * - Benchmark ID
+                 - Run
+                 - Scene and settings
+               * - ``chain10_speed``
+                 - 100,000 steps
+
+                   Δt = 1 ms
+                 - Fixed-base chain, 10 spherical joints, **30 DOF**. Spring-dampers bend each
+                   link by 90°. No collision geometry or contacts; pure articulated dynamics.
+               * - ``chain20_speed``
+                 - 100,000 steps
+
+                   Δt = 1 ms
+                 - The same spring chain with 20 spherical joints and **60 DOF**.
+               * - ``anymal_standing``
+                 - 1,000,000 steps
+
+                   Δt = 2 ms
+                 - ANYmal: floating base and 12 revolute joints, **18 DOF**. PD control holds a
+                   stance on a plane, with about four persistent foot contacts. Primitive robot
+                   collision shapes; friction 0.8.
+               * - ``anymal_falling``
+                 - 100,000 steps
+
+                   Δt = 2 ms
+                 - ANYmal, **18 DOF**, falling freely with no ground or contacts.
+               * - ``heightmap_anymal_speed``
+                 - 200,000 steps
+
+                   Δt = 2 ms
+                 - ANYmal, **18 DOF**, on a 20 × 20 m fractal heightmap: 100 × 100 samples,
+                   three octaves. Tests robot–terrain contacts.
+               * - ``primitive_speed``
+                 - 100,000 steps
+
+                   Δt = 2 ms
+                 - **32 rigid bodies**: sixteen 0.4 m boxes and sixteen spheres of radius
+                   0.15 m, in a 4 × 4 grid at 0.6 m spacing. Spheres fall onto boxes above a
+                   ground plane; tests box–ground and sphere–box contacts.
+               * - ``strandbeest``
+                 - 3,000 steps
+
+                   Δt = 1 ms
+                 - Twelve-legged linkage, **79 DOF** and **42 hinge closures / 84 pin
+                   constraints**, driven by a crank at one revolution per second. RaiSim imports
+                   OpenUSD; MuJoCo loads converted MJCF with connect equalities. This row includes
+                   import, unlike the simulation-only timing in earlier versions of this page.
+               * - ``heightmap_lidar``
+                 - 2,000 updates
+
+                   Δt = 5 ms
+                 - Spinning LiDAR on ANYmal C over a **200 × 200 m heightmap, 400 × 400 samples**.
+                   Uses 512 yaw × 64 pitch samples per revolution at 10 Hz, ±16.6° pitch and
+                   0.8–40 m range. The robot settles for 200 steps, then stays fixed while
+                   sensor time advances. Both backends check hit ratio and terrain-surface error.
+               * - ``primitive_ray_scaling``
+                 - 10,000 queries
+
+                   256 warmup rays
+                 - **10,000 static primitives** on a 2.5 m grid: spheres, boxes, capsules, and
+                   cylinders. The deterministic ``mixed`` workload casts vertical rays in an
+                   incoherent order, with 50% hits. Initial queries verify hits and target IDs;
+                   the timed loop consumes hit results. This row is one point in the scaling
+                   workload; change ``--objects`` and ``--workload`` to measure others.
+               * - ``deformable_cloth``
+                 - 2,000 steps
+
+                   Δt = 1 ms
+                 - Unpinned **32 × 32 cloth grid: 1,024 particles, 1,922 triangles**, 0.035 m
+                   spacing, dropped from 0.85 m onto a static sphere of radius 0.25 m and a
+                   plane. Six solver iterations. RaiSim uses XPBD distance compliance 10⁻⁵
+                   with bending disabled; MuJoCo uses a 2D flex grid with edge equalities.
+               * - ``deformable_cube_stack``
+                 - 1,200 steps
+
+                   Δt = 1 ms
+                 - **Eight 0.3 m cubes**, stacked above a plane; six solver iterations.
+                   Explicit arguments request resolution 4 and collision radius 0.04 m; the
+                   shared spacing guard increases resolution to 5. RaiSim uses 784 surface
+                   particles with internal struts, compliance 7.5 × 10⁻⁵ and effective collision
+                   radius 0.06525 m. MuJoCo uses 1,000 volumetric flex particles, Young's modulus
+                   50 kPa and radius 0.005 m; that run becomes unstable.
+
+         Deformable rows compare these implementations and settings, without matching material
+         response or solver accuracy. In particular, the cube stack uses different particle
+         counts, masses, and collision radii. A timing ratio alone does not measure physical fidelity.
+
+      .. tab:: Method
+
+         .. container:: benchmark-table-block benchmark-table-environment
+
+            .. list-table::
+               :header-rows: 1
+               :widths: 24 76
+
+               * - Setting
+                 - Recorded configuration
+               * - Machine
+                 - AMD Ryzen 9 3950X, 16 cores / 32 threads, 64 GB RAM; x86-64.
+               * - System
+                 - Ubuntu 26.04.1 LTS, Linux 7.0.0-38-generic.
+               * - Run
+                 - October 14, 2026; private development revision ``ded44a528`` with local
+                   rendering fixes. Physics and benchmark sources match that revision.
+               * - Builds
+                 - Clang 20.1.8, C++20, ``Release``. RaiSim: ``-O3 -DNDEBUG -march=native
+                   -mtune=native``; MuJoCo 3.13.0 built from source with ``-O3 -DNDEBUG -mavx``.
+               * - Threading
+                 - One thread, pinned to CPU 8 with ``taskset``; ``OMP_NUM_THREADS``,
+                   ``OPENBLAS_NUM_THREADS``, ``MKL_NUM_THREADS``, and ``VECLIB_MAXIMUM_THREADS``
+                   all set to 1. Benchmarks run serially, without rendering.
+               * - Measurement
+                 - Three calls per workload and backend. Median, minimum, and maximum of the
+                   launcher's wall-clock duration, including construction, warmup, validation,
+                   and the benchmark loop. Separate query-only timings appear in the downloadable
+                   results for ``primitive_ray_scaling``. Speedups use unrounded medians.
+               * - Arguments
+                 - Default launcher arguments for ten workloads; explicit eight-cube arguments
+                   below replace the launcher's one-cube, 20-step quick check. Exact arguments
+                   for every row are in the downloadable JSON.
+
+         **Private comparison suite.** The launcher and MuJoCo backend are maintained in the
+         engine repository and are not targets in ``raisim2Lib``. The recorded commands are:
+
+         .. code-block:: bash
+
+            export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1
+            taskset -c 8 ./build-benchmark/benchmark/benchmarks --backend=both --repeat 3 \
+                -b chain10_speed -b chain20_speed -b anymal_standing -b anymal_falling \
+                -b heightmap_anymal_speed -b primitive_speed -b strandbeest \
+                -b heightmap_lidar -b primitive_ray_scaling -b deformable_cloth \
+                --report --report-dir /tmp/raisim-benchmark-report
+            taskset -c 8 ./build-benchmark/benchmark/benchmarks --backend=both --repeat 3 \
+                -b deformable_cube_stack --report --report-dir /tmp/raisim-cube-stack-report \
+                -- --cubes=8 --resolution=4 --steps=1200 --iterations=6 --collision-radius=0.04
+
+         **Measure the distributed package.** Build the public timing examples from
+         ``raisim2Lib`` and repeat your chosen run at least three times:
+
+         .. code-block:: bash
+
+            cmake -S . -B build-examples -DCMAKE_BUILD_TYPE=Release -DRAISIM_EXAMPLE=ON
+            cmake --build build-examples --target anymal_standing_benchmark \
+                articulated_system_benchmark --parallel 12
+            OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 \
+                ./build-examples/examples/anymal_standing_benchmark --steps=1000000
+
+         On Windows, build with ``--config Release`` and run
+         ``build-examples\bin\anymal_standing_benchmark.exe``. These public examples time RaiSim
+         only, using their own scenes; they do not reproduce the private comparisons. Keep the
+         package version, scene, timestep, step count, and machine fixed. See :doc:`BuildAndTest`
+         for other timing examples.
+
+Scene illustrations
+===================
+
+.. container:: benchmark-table-block benchmark-scene-gallery
 
    .. list-table::
-      :header-rows: 1
-      :widths: 26 74
+      :widths: 50 50
 
-      * - Component
-        - Detail
-      * - Machine
-        - Desktop with an AMD Ryzen 9 3950X (16 cores, 32 threads, Zen 2), 64 GB of memory.
-      * - Operating system
-        - Ubuntu 26.04.1 LTS, Linux 7.0, x86-64.
-      * - Compiler
-        - Clang 20.1.8, C++20.
-      * - Benchmark run
-        - October 5, 2026, from the RaiSim 2.7 development tree (revision ``b31a6ae6c`` with the
-          changes of this release cycle). The Strandbeest was re-measured, with both engines, on
-          October 7, 2026, at revision ``59241ca3f`` after a faster loop-constraint solve.
-      * - RaiSim build
-        - ``CMAKE_BUILD_TYPE=Release`` (``-O3 -DNDEBUG -march=native``).
-      * - MuJoCo build
-        - MuJoCo 3.13.0, compiled from source as part of the benchmark suite with the same compiler
-          and its own ``Release`` flags (``-O3 -DNDEBUG -mavx``).
-      * - Threading
-        - Single threaded, pinned to one core with ``taskset``. Neither engine uses
-          multi-threading or SIMD batching across bodies. ``OMP_NUM_THREADS``,
-          ``OPENBLAS_NUM_THREADS`` and ``MKL_NUM_THREADS`` were set to 1.
-      * - Metric
-        - Wall-clock seconds of each benchmark run, measured by the benchmark launcher. This includes
-          building the scene, which takes a few milliseconds. The Strandbeest is the exception: its
-          row reports the simulation loop alone (see `Results`_). Lower is better. ``Speedup`` is the median MuJoCo time divided by the median
-          RaiSim time, so values above 1 mean RaiSim was faster.
-      * - Settings
-        - Each benchmark and backend was run three times with its default arguments (the step
-          counts listed below). The table and the charts report the median; the table also shows the
-          minimum and maximum. The RaiSim and MuJoCo variants use matching scene parameters and the
-          same time step, so the two engines simulate equivalent scenes.
+      * - **Chain, 10 links**
 
-Measure the distributed package
-===============================
-
-The comparison runner and its MuJoCo backend are maintained in the private engine repository. They
-are not build targets in ``raisim2Lib``. The results below describe that recorded run, rather than
-a benchmark of the installed |raisim_version| package.
-
-To measure the binary package on your machine, build the public timing examples:
-
-.. code-block:: bash
-
-   cmake -S . -B build-examples -DCMAKE_BUILD_TYPE=Release -DRAISIM_EXAMPLE=ON
-   cmake --build build-examples --target anymal_standing_benchmark \
-       articulated_system_benchmark --parallel 12
-   OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 \
-       ./build-examples/examples/anymal_standing_benchmark --steps=1000000
-
-On Windows, build with ``--config Release`` and run
-``build-examples\bin\anymal_standing_benchmark.exe``. Repeat the same command at least three times,
-keeping the package version, scene, timestep, step count, and machine fixed. These examples measure
-RaiSim only and do not reproduce the private comparison scenes or the published ratios. See
-:doc:`BuildAndTest` for other available timing examples.
-
-What the benchmarks simulate
-============================
-
-Each scene is described below with its articulation (joint types and degrees of freedom), its
-collision and contact content, the integration time step, and the number of simulation steps. "DOF"
-is the number of generalized velocity coordinates the dynamics solves for. A floating base
-contributes 6 DOF (3 translation + 3 rotation). Scenes without a ground are shown above a floor
-for reference.
-
-.. container:: benchmark-table-block benchmark-table-scenes
-
-   .. list-table::
-      :header-rows: 1
-      :widths: 22 12 66
-
-      * - Benchmark (``id``)
-        - Steps
-        - Scene details
-      * - ``chain10_speed``
-        - 100,000
-        - .. image:: ../../rsc/docs/image/rayrai/benchmark_chain10.png
+          .. image:: ../../rsc/docs/image/rayrai/benchmark_chain10.png
              :width: 100%
-             :alt: A chain of ten spheres hanging from a fixed point, curling up.
+             :alt: Ten-link spring chain curling upward.
+        - **Chain, 20 links**
 
-          One articulated chain with a **fixed base** and 10 links joined by **10 spherical
-          joints** (3 DOF each) → **30 DOF**. Each joint has a spring-damper whose rest angle bends
-          it by 90°, so the hanging chain curls up and keeps moving. **No collision geometry**
-          (the spheres are visual only), so there is **no contact**: this is pure articulated
-          forward dynamics. Time step 0.001 s.
-      * - ``chain20_speed``
-        - 100,000
-        - .. image:: ../../rsc/docs/image/rayrai/benchmark_chain20.png
+          .. image:: ../../rsc/docs/image/rayrai/benchmark_chain20.png
              :width: 100%
-             :alt: A chain of twenty spheres hanging from a fixed point, curling up.
+             :alt: Twenty-link spring chain curling upward.
+      * - **ANYmal standing**
 
-          Same as ``chain10_speed`` but 20 links and **20 spherical joints** → **60 DOF**. No
-          collision, no contact. Time step 0.001 s.
-      * - ``anymal_standing``
-        - 1,000,000
-        - .. image:: ../../rsc/docs/image/rayrai/benchmark_anymal_standing.png
+          .. image:: ../../rsc/docs/image/rayrai/benchmark_anymal_standing.png
              :width: 100%
-             :alt: ANYmal standing on a flat ground.
+             :alt: ANYmal standing on flat ground.
+        - **ANYmal falling**
 
-          One ANYmal quadruped: **floating base + 12 revolute joints = 18 DOF**, under PD position
-          control. It stands on a flat ground plane. ANYmal's collision geometry is primitive
-          shapes (a trunk box plus cylinders and spheres on the legs); the four feet rest on the
-          ground, giving about four persistent contacts. Friction coefficient 0.8, time step
-          0.002 s.
-      * - ``anymal_falling``
-        - 100,000
-        - .. image:: ../../rsc/docs/image/rayrai/benchmark_anymal_falling.png
+          .. image:: ../../rsc/docs/image/rayrai/benchmark_anymal_falling.png
              :width: 100%
-             :alt: ANYmal in the air, falling.
+             :alt: ANYmal falling freely above a reference floor.
+      * - **ANYmal on terrain**
 
-          The same ANYmal (**18 DOF**), but **no ground is added**: the robot falls freely under
-          gravity. There is **no contact**, so this isolates floating-base articulated dynamics.
-          Time step 0.002 s.
-      * - ``heightmap_anymal_speed``
-        - 200,000
-        - .. image:: ../../rsc/docs/image/rayrai/benchmark_heightmap_anymal.png
+          .. image:: ../../rsc/docs/image/rayrai/benchmark_heightmap_anymal.png
              :width: 100%
-             :alt: ANYmal standing on rolling fractal terrain.
+             :alt: ANYmal standing on fractal terrain.
+        - **Rigid primitives**
 
-          One ANYmal (**18 DOF**) on a procedurally generated **fractal height-map terrain**
-          (20 m × 20 m, 100 × 100 samples, 3 fractal octaves). Contacts form between the feet and
-          the terrain cells. Time step 0.002 s.
-      * - ``primitive_speed``
-        - 100,000
-        - .. image:: ../../rsc/docs/image/rayrai/benchmark_primitive_speed.png
+          .. image:: ../../rsc/docs/image/rayrai/benchmark_primitive_speed.png
              :width: 100%
-             :alt: Sixteen boxes on a ground plane, each with a sphere resting on top.
+             :alt: Sixteen boxes and sixteen spheres on a ground plane.
+      * - **Strandbeest**
 
-          **No articulated system.** 32 rigid bodies, 16 boxes (0.4 m cubes) and 16 spheres
-          (radius 0.15 m), arranged in a 4 × 4 grid with 0.6 m spacing, each sphere dropped onto a
-          box, on a flat ground plane. Contacts are box–ground and sphere–box primitive pairs
-          (neighboring boxes are 0.2 m apart). Time step 0.002 s.
-      * - ``strandbeest``
-        - 3,000
-        - .. image:: ../../rsc/docs/image/rayrai/constraints_strandbeest.png
+          .. image:: ../../rsc/docs/image/rayrai/constraints_strandbeest.png
              :width: 100%
-             :alt: The Strandbeest walking on its twelve legs.
+             :alt: Twelve-legged Strandbeest walking linkage.
+        - **Heightmap LiDAR**
 
-          Theo Jansen's Strandbeest, a 12-legged walking linkage driven by one crank, imported from
-          OpenUSD: **floating base + 73 revolute joints = 79 DOF**. Its **42 closed loops** are
-          hinge closures, each two pins on the hinge axis: **84 pin constraints**, all coupled
-          through the crank. A velocity-controlled crank turns once per second, and the machine
-          walks about 3.8 m on its 12 feet in the 3 s. Time step 0.001 s. The MuJoCo variant is the
-          same model converted to MJCF, its loops as connect equalities, stiffened until they stay
-          as tightly closed as RaiSim's: the worst loop gap over the run is 25 µm in RaiSim and
-          28 µm in MuJoCo.
+          .. image:: ../../rsc/docs/image/rayrai/benchmark_heightmap_lidar.png
+             :width: 100%
+             :alt: ANYmal C on fractal terrain, with green LiDAR hit points and sample rays.
+      * - **Primitive ray scaling**
 
-Results
-=======
+          .. image:: ../../rsc/docs/image/rayrai/benchmark_primitive_ray_scaling.png
+             :width: 100%
+             :alt: A field of 10,000 spheres, boxes, capsules and cylinders, with green hit rays and red miss rays.
+        - **Deformable cloth**
 
-In the recorded runs, RaiSim was 2.50× to 6.21× faster than MuJoCo across these seven workloads. The
-charts below show both the median timings and the relative speedup.
+          .. image:: ../../rsc/docs/image/rayrai/benchmark_deformable_cloth.png
+             :width: 100%
+             :alt: A 32 by 32 particle cloth draping over a static sphere above a ground plane.
+      * - **Deformable cube stack**
 
-.. container:: benchmark-graph-block
+          .. image:: ../../rsc/docs/image/rayrai/benchmark_deformable_cube_stack.png
+             :width: 100%
+             :alt: Eight deformable cubes falling into contact on a ground plane.
+        -
 
-   .. figure:: ../../rsc/docs/image/benchmark_backend_times.svg
-      :alt: Bar chart comparing median RaiSim and MuJoCo wall-clock times for the benchmark suite.
-      :width: 100%
-
-.. container:: benchmark-graph-block
-
-   .. figure:: ../../rsc/docs/image/benchmark_speedup.svg
-      :alt: Bar chart showing MuJoCo time divided by RaiSim time for each benchmark.
-      :width: 100%
-
-.. container:: benchmark-table-block benchmark-table-results
-
-   .. list-table:: RaiSim vs MuJoCo (seconds; median with min–max in parentheses)
-      :header-rows: 1
-      :widths: 34 26 26 14
-
-      * - Benchmark
-        - RaiSim median (min–max)
-        - MuJoCo median (min–max)
-        - Speedup
-      * - Chain20 speed
-        - 0.569 (0.566–0.570)
-        - 3.535 (3.533–3.551)
-        - 6.21×
-      * - Heightmap ANYmal speed
-        - 1.152 (1.151–1.160)
-        - 5.519 (5.498–5.567)
-        - 4.79×
-      * - Chain10 speed
-        - 0.283 (0.283–0.286)
-        - 1.093 (1.092–1.096)
-        - 3.86×
-      * - Strandbeest (simulation loop)
-        - 0.155 (0.154–0.155)
-        - 0.470 (0.470–0.475)
-        - 3.03×
-      * - Primitive speed
-        - 3.376 (3.357–3.395)
-        - 8.804 (8.754–8.822)
-        - 2.61×
-      * - ANYmal falling
-        - 0.283 (0.283–0.287)
-        - 0.732 (0.731–0.733)
-        - 2.59×
-      * - ANYmal standing
-        - 5.519 (5.466–5.740)
-        - 13.819 (13.805–13.861)
-        - 2.50×
-
-The Strandbeest row times its 3,000 simulation steps alone: 52 µs per step in RaiSim and 157 µs in
-MuJoCo. Loading the scene is left out because the two engines do different work there: RaiSim
-imports the OpenUSD file (about 0.02 s), while MuJoCo loads the prepared MJCF. Including it, the
-whole runs take 0.178 s and 0.478 s, a ratio of 2.69.
-
-Absolute times depend on hardware, compiler, and scene configuration, so treat them as relative
-magnitudes rather than fixed specifications.
-
-Interpreting the comparison
-===========================
-
-These measurements describe the seven scenes and configurations above. They do not isolate the
-contribution of the dynamics algorithm, contact solver, or implementation details, and do not
-establish a speedup for other scenes or package versions. Use the public timing examples and your
-application workload when evaluating the current binary package.
+Images show the RaiSim setups. The chain, falling robot, and primitive ray field have a floor
+only for visual reference. Green LiDAR points are recorded terrain hits; colored ray segments
+illustrate hits and misses without changing the benchmark's collision geometry.

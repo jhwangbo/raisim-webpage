@@ -173,6 +173,43 @@ Shadow update cost is configurable. Dynamic scenes can update shadows every fram
 visual scenes can bake shadow maps at startup or refresh them only when light/object
 placement changes.
 
+Shadow maps updated every frame keep the static part of the scene. Once two consecutive
+frames share the light, the shadow region and the view, static world objects and static
+instanced visuals are drawn into a cached layer; later frames copy back the texels the moving
+casters covered and draw only those casters again. The result is bit-identical to a full
+shadow pass. The main light's single map is composed this way while the static casters
+include more than batched primitives (a heightmap or a mesh, for example) and the moving
+casters have known bounds and cover at most a quarter of the map. RaiSim objects and mesh
+visuals have known bounds; primitive visuals, deformables and wind-animated materials do not.
+``shadowCacheDiagnostics()`` counts the static layer renders and reuses. When every render
+draws the maps again (moving casters with foliage wind on, as in the High and Ultra presets),
+the main map and the directional additional-light maps hold only what the rendering camera
+samples: the texels its surfaces can reach and the casters whose shadows reach them. Planar
+reflections, reflection probes, orthographic or fisheye cameras, contact hardening and soft
+directional shadows keep whole maps.
+
+With OpenGL 4.3, cascaded maps that a render draws again for its camera (while the camera
+moves, for example) are drawn after that camera's opaque depth prepass instead of before its
+scene pass, and skip the instanced casters whose shadows reach no surface the camera can see.
+On the GPU, each instance's box, grown by the receivers' filter footprint, is swept along the
+light down to the lowest point the camera can see; an instance whose sweep lies behind the
+prepass depth wherever it projects, or outside the cascade's range of view depths, is dropped,
+and the cascade draws the others from indirect commands. Ordinary instanced visuals and
+collected foliage are filtered this way; the cached static layer still holds every caster. The
+images do not change. Single-cascade maps, cameras without a depth prepass, lights that do not
+shine downwards and the cases above that keep whole maps draw every caster, and renders that
+capture pass timings draw the maps in the shadow pass as before.
+``shadowCacheDiagnostics().receiverDepthFilteredMaps`` counts the cascades drawn this way, and
+``RAYRAI_DEBUG_DISABLE_SHADOW_RECEIVER_DEPTH_FILTER`` turns it off for comparisons.
+
+A visual (``Visuals``) that casts shadows joins the static layer once its pose, geometry and
+material have stayed unchanged for 30 consecutive shadow updates, and leaves it on its next
+change. Material fields edited in place are detected too. Wind-animated foliage joins the
+static layer the same way once the wind settings, including ``foliageWindTimeSeconds``, have
+stayed unchanged for 30 shadow updates, for example while the wind is paused. Cascaded maps
+also keep a static layer per cascade; after the first composed frame each cascade copies back
+only the texels the moving casters drew the frame before, not the whole layer.
+
 .. code-block:: cpp
 
     auto quality = raisin::RayraiWindow::defaultRenderQualitySettings(

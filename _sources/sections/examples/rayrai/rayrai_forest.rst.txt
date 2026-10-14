@@ -50,9 +50,11 @@ Loading and caches
 ==================
 Meshes load asynchronously while a progress bar across the top of the window
 counts the finished assets; physics starts once loading completes. The first
-launch builds mesh LODs for the high-detail plants and can take tens of
-seconds. Rayrai saves the prepared levels beside each model as
-``rayrai_cache_model.gltf.lods`` and reads them on later launches. When the
+launch builds mesh LODs for the high-detail plants and takes several seconds
+longer (about 10 s in total on a 20-thread desktop). Rayrai saves the prepared levels beside each model as
+``rayrai_cache_model.gltf.lods``, and the prepared geometry and import
+description of the three trees as ``.rgeo`` and ``.rimp`` files, and reads them
+on later launches, which then import no tree at all. When the
 asset directory is read-only, the cache goes to the system temporary directory
 instead. Set ``RAYRAI_ASYNC_LOD_CACHE_DIR`` to choose a cache directory. The
 cache files are ignored by Git and can be deleted at any time.

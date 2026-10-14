@@ -94,12 +94,24 @@ no extra API calls:
   that choice. When the main viewer refreshes cascaded shadows every frame,
   foliage that cannot shadow anything inside a cascade's part of the view is
   skipped for that cascade.
-* With asynchronous mesh loading (:doc:`Capture`), base geometry and instanced
-  LOD chains are prepared on worker threads. Each ``pollAsyncMeshLoads(n)`` call
-  advances at most ``n`` import/upload stages (``0`` does nothing) and uploads
-  at most one prepared submesh per pending instanced visual;
-  ``pendingAsyncMeshLoadCount()`` includes these jobs. Prepared LOD chains are
-  cached on disk (see `On-disk caches`_).
+* With asynchronous mesh loading (:doc:`Capture`), file imports, texture
+  decoding, base geometry and instanced LOD chains are prepared on worker
+  threads: imports and texture decodes share up to eight, up to half the
+  hardware threads prepare geometry and LOD chains of different assets at
+  once, and a large LOD chain builds up to three of its levels at once. Larger
+  models go first: their textures decode first and their stages run first on
+  the render thread, which only builds materials and issues uploads. With
+  OpenGL 4.4 (or ``GL_ARB_buffer_storage``) the workers copy textures and
+  vertex buffers into persistently mapped staging buffers, so an upload is a
+  GPU copy; a context holds up to two 128 MiB blocks of them while it loads.
+  Each ``update()`` and
+  external-camera render spends up to 8 ms of render-thread time on loading
+  (one stage runs even when it takes longer), so a scene of many assets loads
+  in a few frames. Each
+  ``pollAsyncMeshLoads(n)`` call advances at most ``n`` import/upload stages
+  (``0`` does nothing) and uploads at most one prepared submesh per pending
+  instanced visual; ``pendingAsyncMeshLoadCount()`` includes these jobs.
+  Prepared LOD chains are cached on disk (see `On-disk caches`_).
 * ``rayrai/Bc7TextureStorage.hpp`` provides an opt-in load-time helper,
   ``raisin::compressRgbTextureBc7(texture)``, that re-stores an RGB8/SRGB8
   texture and all of its mip levels as BC7. It needs OpenGL 4.2 or
@@ -328,17 +340,21 @@ caches are also checked against their source and rebuilt when stale.
    * - Imported-mesh metadata and generated LOD chains
      - ``<temp>/rayrai_mesh_preprocess_cache``
      - ``RAYRAI_MESH_PREPROCESS_CACHE_DIR``
-   * - LOD chains prepared by asynchronous loading of instanced meshes
-     - ``rayrai_cache_<file>.lods`` next to the source asset, else
-       ``<temp>/rayrai_async_lod_cache``
+   * - LOD chains prepared by asynchronous loading of instanced meshes, and
+       the prepared geometry and import description of asynchronously loaded
+       models of at least 65,536 vertices
+     - ``rayrai_cache_<file>.lods``, ``.rgeo`` and ``.rimp`` next to the
+       source asset, else ``<temp>/rayrai_async_lod_cache``
      - ``RAYRAI_ASYNC_LOD_CACHE_DIR``
    * - Procedural cloud noise textures
      - ``$HOME/.raisim/rayrai``, then ``%USERPROFILE%\.raisim\rayrai``
        (Windows), then ``<temp>/raisim/rayrai``
      - ``RAYRAI_CLOUD_TEXTURE_CACHE_DIR``
 
-``<temp>`` is the system temporary directory. The asynchronous LOD sidecars
-store full vertex data and can be large for dense assets.
+``<temp>`` is the system temporary directory. The asynchronous LOD and
+prepared-geometry sidecars store full vertex data and can be large for dense
+assets; an import description holds the model's materials, its embedded
+textures and what the import measured of its meshes.
 
 Environment variables
 =====================

@@ -199,15 +199,19 @@ Draws can be thinned without changing the authored instances:
   and picks a level from the projected size when drawing.
 * ``setDoubleBufferedInstanceUploads(true)`` helps when full instance-buffer
   rebuilds are frequent, and ``setSortTransparentInstances(true)`` sorts
-  transparent instances back to front. Both are off by default.
+  transparent instances back to front (it reorders and uploads them again only
+  when the camera changes their order). Both are off by default.
 
 With asynchronous mesh loading (the default, see :doc:`Capture`) and automatic
 mesh LOD enabled, a batch created while its mesh file is still importing builds
-its LOD chain on a worker thread and uploads it one submesh per poll. The batch
-is not drawn until that finishes. ``hasPendingAsyncMeshPreparation()`` reports
-this state, ``RayraiWindow::pendingAsyncMeshLoadCount()`` includes these jobs,
-and every ``update()``, external-camera render, or ``pollAsyncMeshLoads`` call
-advances them.
+its LOD chain on a worker thread and then uploads it: one submesh per
+``pollAsyncMeshLoads`` call, and as many as fit in the loading time of each
+``update()`` or external-camera render (see :doc:`Capture`). The batch is not
+drawn until that finishes. ``hasPendingAsyncMeshPreparation()`` reports this
+state, ``RayraiWindow::pendingAsyncMeshLoadCount()`` includes these jobs, and
+every ``update()``, external-camera render, or ``pollAsyncMeshLoads`` call
+advances them. ``InstancedVisuals::pollAsyncMeshPreparation(deadline)`` uploads
+until a ``std::chrono::steady_clock`` deadline passes.
 
 Meshes prepared off the render thread
 *************************************
@@ -283,6 +287,17 @@ values fall back to ``2.25``. Both are read once per process.
 GPU instance culling and indirect multi-draws need OpenGL 4.3. On older
 contexts, such as OpenGL 4.1 on macOS, rayrai uses its CPU paths and prints a
 one-time fallback warning. Hierarchical cluster culling always runs on the CPU.
+
+Batches below the GPU-culling size (4096 instances) skip the instances whose
+bounds lie outside a pass: the camera's view, in the colour and the transparent
+pass alike, or for a shadow cascade the volume its casters must reach. After a
+camera's opaque depth prepass, such batches (apart from foliage the renderer
+collects into shared draws) also test each remaining instance's box against that
+depth on the GPU, and the colour and transparent passes draw only the instances
+that can show (OpenGL 4.3). Both keep the instances' order, back to front for a
+sorted batch, and give the same image. For comparisons,
+``RAYRAI_DEBUG_DISABLE_INSTANCE_BOUNDS_CULLING`` turns both off and
+``RAYRAI_DEBUG_DISABLE_INSTANCE_OCCLUSION`` the depth test alone.
 
 The per-batch diagnostics ``shadowFoliageLodDiagnostics()``,
 ``foliageImpostorDiagnostics()``, and ``hierarchicalFoliageClusterDiagnostics()``

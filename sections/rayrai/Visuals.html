@@ -6,16 +6,16 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Custom visuals, instancing, and scene helpers &mdash; raisim 2.9.3 documentation</title>
+  <title>Custom visuals, instancing, and scene helpers &mdash; raisim 2.9.4 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ba8b8cd0" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.png"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=2fd2eeca"></script>
+      <script src="../../_static/documentation_options.js?v=e45b7e07"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -344,15 +344,19 @@ simplified meshes for triangle-mesh batches (cached for file-backed ones)
 and picks a level from the projected size when drawing.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">setDoubleBufferedInstanceUploads(true)</span></code> helps when full instance-buffer
 rebuilds are frequent, and <code class="docutils literal notranslate"><span class="pre">setSortTransparentInstances(true)</span></code> sorts
-transparent instances back to front. Both are off by default.</p></li>
+transparent instances back to front (it reorders and uploads them again only
+when the camera changes their order). Both are off by default.</p></li>
 </ul>
 <p>With asynchronous mesh loading (the default, see <a class="reference internal" href="Capture.html"><span class="doc">Capture, diagnostics, and headless rendering</span></a>) and automatic
 mesh LOD enabled, a batch created while its mesh file is still importing builds
-its LOD chain on a worker thread and uploads it one submesh per poll. The batch
-is not drawn until that finishes. <code class="docutils literal notranslate"><span class="pre">hasPendingAsyncMeshPreparation()</span></code> reports
-this state, <code class="docutils literal notranslate"><span class="pre">RayraiWindow::pendingAsyncMeshLoadCount()</span></code> includes these jobs,
-and every <code class="docutils literal notranslate"><span class="pre">update()</span></code>, external-camera render, or <code class="docutils literal notranslate"><span class="pre">pollAsyncMeshLoads</span></code> call
-advances them.</p>
+its LOD chain on a worker thread and then uploads it: one submesh per
+<code class="docutils literal notranslate"><span class="pre">pollAsyncMeshLoads</span></code> call, and as many as fit in the loading time of each
+<code class="docutils literal notranslate"><span class="pre">update()</span></code> or external-camera render (see <a class="reference internal" href="Capture.html"><span class="doc">Capture, diagnostics, and headless rendering</span></a>). The batch is not
+drawn until that finishes. <code class="docutils literal notranslate"><span class="pre">hasPendingAsyncMeshPreparation()</span></code> reports this
+state, <code class="docutils literal notranslate"><span class="pre">RayraiWindow::pendingAsyncMeshLoadCount()</span></code> includes these jobs, and
+every <code class="docutils literal notranslate"><span class="pre">update()</span></code>, external-camera render, or <code class="docutils literal notranslate"><span class="pre">pollAsyncMeshLoads</span></code> call
+advances them. <code class="docutils literal notranslate"><span class="pre">InstancedVisuals::pollAsyncMeshPreparation(deadline)</span></code> uploads
+until a <code class="docutils literal notranslate"><span class="pre">std::chrono::steady_clock</span></code> deadline passes.</p>
 </section>
 <section id="meshes-prepared-off-the-render-thread">
 <h3>Meshes prepared off the render thread<a class="headerlink" href="#meshes-prepared-off-the-render-thread" title="Link to this heading"></a></h3>
@@ -426,6 +430,16 @@ values fall back to <code class="docutils literal notranslate"><span class="pre"
 <p>GPU instance culling and indirect multi-draws need OpenGL 4.3. On older
 contexts, such as OpenGL 4.1 on macOS, rayrai uses its CPU paths and prints a
 one-time fallback warning. Hierarchical cluster culling always runs on the CPU.</p>
+<p>Batches below the GPU-culling size (4096 instances) skip the instances whose
+bounds lie outside a pass: the camera’s view, in the colour and the transparent
+pass alike, or for a shadow cascade the volume its casters must reach. After a
+camera’s opaque depth prepass, such batches (apart from foliage the renderer
+collects into shared draws) also test each remaining instance’s box against that
+depth on the GPU, and the colour and transparent passes draw only the instances
+that can show (OpenGL 4.3). Both keep the instances’ order, back to front for a
+sorted batch, and give the same image. For comparisons,
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_DEBUG_DISABLE_INSTANCE_BOUNDS_CULLING</span></code> turns both off and
+<code class="docutils literal notranslate"><span class="pre">RAYRAI_DEBUG_DISABLE_INSTANCE_OCCLUSION</span></code> the depth test alone.</p>
 <p>The per-batch diagnostics <code class="docutils literal notranslate"><span class="pre">shadowFoliageLodDiagnostics()</span></code>,
 <code class="docutils literal notranslate"><span class="pre">foliageImpostorDiagnostics()</span></code>, and <code class="docutils literal notranslate"><span class="pre">hierarchicalFoliageClusterDiagnostics()</span></code>
 and <code class="docutils literal notranslate"><span class="pre">RayraiWindow::foliageRenderDiagnostics()</span></code> describe the last rendered

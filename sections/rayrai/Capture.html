@@ -6,16 +6,16 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Capture, diagnostics, and headless rendering &mdash; raisim 2.9.3 documentation</title>
+  <title>Capture, diagnostics, and headless rendering &mdash; raisim 2.9.4 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7e9bdaad" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ba8b8cd0" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.png"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=2fd2eeca"></script>
+      <script src="../../_static/documentation_options.js?v=e45b7e07"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -523,15 +523,24 @@ each call in a loop like this one:</p>
 </section>
 <section id="async-mesh-loading">
 <h2>Async mesh loading<a class="headerlink" href="#async-mesh-loading" title="Link to this heading"></a></h2>
-<p>Mesh files load asynchronously by default. The import runs on a worker
-thread, materials and textures are resolved on the render thread, geometry is
-optimized on a worker, and the prepared submeshes are uploaded to the GPU one
-per step on the render thread. Until an asset is ready, its visuals draw
-nothing; instanced batches also wait for their LOD chains (see <a class="reference internal" href="Visuals.html"><span class="doc">Custom visuals, instancing, and scene helpers</span></a>).
-<code class="docutils literal notranslate"><span class="pre">update()</span></code> and every external-camera render advance one step themselves.
+<p>Mesh files load asynchronously by default. The import runs on one of
+rayrai’s worker threads, which also decode its texture images; once they are
+decoded, the render thread resolves the materials, a worker converts and
+optimizes the geometry, and the prepared submeshes are uploaded to the GPU one
+per step on the render thread. With OpenGL 4.4 (or <code class="docutils literal notranslate"><span class="pre">GL_ARB_buffer_storage</span></code>)
+the workers copy the images and vertex buffers into persistently mapped
+staging buffers first, so each upload is a GPU copy. The HDR background of a
+world’s <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> scene also loads this way: a worker decodes and resamples
+it, and a later render installs it.
+Until an asset is ready, its visuals draw nothing; instanced batches also wait
+for their LOD chains (see <a class="reference internal" href="Visuals.html"><span class="doc">Custom visuals, instancing, and scene helpers</span></a>). <code class="docutils literal notranslate"><span class="pre">update()</span></code> and every
+external-camera render advance pending assets themselves, step after step,
+until about 8 ms of render-thread time is spent (at least one step).
 <code class="docutils literal notranslate"><span class="pre">pollAsyncMeshLoads(n)</span></code> advances up to <code class="docutils literal notranslate"><span class="pre">n</span></code> import or upload steps (<code class="docutils literal notranslate"><span class="pre">0</span></code>
-does nothing) and returns the number of assets that finished. OpenUSD files
-always load synchronously.</p>
+does nothing) and returns the number of assets that finished;
+<code class="docutils literal notranslate"><span class="pre">RayraiGlobalAsset::pollAsyncLoadsUntil(deadline)</span></code> advances every pending
+import until a <code class="docutils literal notranslate"><span class="pre">std::chrono::steady_clock</span></code> deadline. OpenUSD files always
+load synchronously.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">visual</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="p">.</span><span class="n">addVisualMesh</span><span class="p">(</span><span class="s">&quot;shelf&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/path/to/large_scene.glb&quot;</span><span class="p">,</span>
 <span class="w">                                   </span><span class="n">glm</span><span class="o">::</span><span class="n">dvec3</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">));</span>
 
@@ -541,14 +550,14 @@ always load synchronously.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">pendingAsyncMeshLoadCount()</span></code> includes unfinished GPU uploads and instanced
-LOD jobs. Call <code class="docutils literal notranslate"><span class="pre">setAsyncMeshLoadingEnabled(false)</span></code> before adding visuals when
+<p><code class="docutils literal notranslate"><span class="pre">pendingAsyncMeshLoadCount()</span></code> includes unfinished GPU uploads, instanced
+LOD jobs and a scene’s HDR background while it loads. Call <code class="docutils literal notranslate"><span class="pre">setAsyncMeshLoadingEnabled(false)</span></code> before adding visuals when
 assets must be complete as soon as <code class="docutils literal notranslate"><span class="pre">addVisualMesh</span></code> or <code class="docutils literal notranslate"><span class="pre">importVisualScene</span></code>
 returns. Assets already held in memory are returned immediately either way.</p>
 </section>
 <section id="mesh-caches-on-disk">
 <h2>Mesh caches on disk<a class="headerlink" href="#mesh-caches-on-disk" title="Link to this heading"></a></h2>
-<p>rayrai keeps two regenerable caches for imported meshes; deleting them only
+<p>rayrai keeps regenerable caches for imported meshes; deleting them only
 costs regeneration time on the next load.</p>
 <ul class="simple">
 <li><p>Mesh metadata and generated LOD chains are written to
@@ -561,10 +570,25 @@ warnings printed when the cache cannot be used.</p></li>
 <li><p>LOD chains that instanced batches prepare during asynchronous loading are
 stored next to each asset as <code class="docutils literal notranslate"><span class="pre">rayrai_cache_&lt;file</span> <span class="pre">name&gt;.lods</span></code>. They are
 invalidated by a fingerprint of the imported geometry, so edits to external
-glTF buffers are detected. <code class="docutils literal notranslate"><span class="pre">RAYRAI_ASYNC_LOD_CACHE_DIR</span></code> stores them in
-another folder instead (if that folder is not writable, nothing is cached).
-Without it, an unwritable asset folder falls back to the system temporary
-directory.</p></li>
+glTF buffers are detected. A new cache format (as in v2.9.4) also invalidates
+them, and the first launch builds them again.</p></li>
+<li><p>Models of at least 65,536 vertices also keep their prepared geometry (the
+optimized vertex order of foliage, tangents and UV statistics) next to the
+asset as <code class="docutils literal notranslate"><span class="pre">rayrai_cache_&lt;file</span> <span class="pre">name&gt;.rgeo</span></code>, invalidated by a fingerprint of
+the arrays the import read, so a cached model’s vertices are not converted
+again. Both kinds also store each mesh’s bounds, index range and content
+digest. A large sidecar of either kind is read while its model still imports.</p></li>
+<li><p>Such a model also keeps how it was imported as
+<code class="docutils literal notranslate"><span class="pre">rayrai_cache_&lt;file</span> <span class="pre">name&gt;.rimp</span></code>: its materials, embedded textures and what
+the import measured of its meshes, with the content digest of every file the
+import read and whether each file it looked for existed. While those files
+are unchanged and the prepared geometry is stored, a later load restores both
+and runs no import at all; any change (a buffer or material library edited in
+place, a file that appears) imports the model again. A damaged <code class="docutils literal notranslate"><span class="pre">.rgeo</span></code>
+found after a restore makes the load import the model for its vertices.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RAYRAI_ASYNC_LOD_CACHE_DIR</span></code> stores all three kinds in another folder instead
+(if that folder is not writable, nothing is cached). Without it, an
+unwritable asset folder falls back to the system temporary directory.</p></li>
 </ul>
 </section>
 <section id="compressed-texture-storage">

@@ -182,11 +182,12 @@ corners, and tight contacts using ``screenSpaceAoRadius`` (with
 ``contactAoRadius`` / ``contactAoStrength`` add a separate tight contact-AO
 pass on top of SSAO for surfaces that touch.
 
-With the denoiser on and temporal AA off (as in the High preset), AO is
-computed once per pixel in a prepass and the denoiser reuses it; results can
-differ from per-tap evaluation by a few 8-bit levels. With legacy temporal AA
-on (Ultra) each denoise tap evaluates AO again, which costs noticeably more. AO
-is stable from frame to frame at sky silhouettes, including on Apple GPUs.
+With the denoiser on, AO is computed once per pixel in a prepass and the
+denoiser reuses it; results can differ from per-tap evaluation by a few 8-bit
+levels at silhouettes. The prepass works with and without temporal AA: it keeps
+the AO in the alpha channel of the temporal history target, whose color the
+temporal AA reads from RGB. AO is stable from frame to frame at sky
+silhouettes, including on Apple GPUs.
 
 Screen-space indirect lighting (``screenSpaceIndirectLightingEnabled``)
 gathers one bounce of light from the colour buffer around each pixel to add
@@ -197,7 +198,15 @@ quality and bias.
 Contact shadows (``contactShadowsEnabled``) ray-march short shadow rays toward
 the main light in screen space to recover fine occlusion near grazing geometry
 that a shadow map misses. ``Length`` (at most 0.5) and ``Thickness`` are in
-metres; ``Strength`` is the darkening, 0–1.
+metres; ``Strength`` is the darkening, 0–1. Each pixel blurs nine rays: one
+from its centre, two 1.5 pixels away along each axis and four 3.5 pixels away
+along the diagonals, so neighbouring pixels share most of them. A pass of its
+own, with a program that holds only that effect, marches each shared ray once
+(four rays per pixel instead of nine) into a single-channel float texture at
+twice the image's resolution (about 33 MB at 1920×1080), and the post program
+filters every pixel from it. When projected decals use every texture slot of
+the post program, the post program marches all nine rays itself; both give the
+same image.
 
 .. code-block:: cpp
 

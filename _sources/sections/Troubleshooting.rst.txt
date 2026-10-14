@@ -174,8 +174,10 @@ First Launch Of An Example Is Slow
 which can take a few minutes; Ctrl-C stops it during that phase. RaiSim caches
 the parts beside each mesh as ``raisim_coacd_*.obj`` files, so later runs load
 them directly. ``rayrai_forest`` builds mesh LODs on its first launch and saves
-them as ``rayrai_cache_*.lods`` files beside its assets. Delete these cache
-files to force regeneration.
+them as ``rayrai_cache_*.lods`` files beside its assets, with the prepared
+geometry of its largest models as ``rayrai_cache_*.rgeo`` and how they were
+imported as ``rayrai_cache_*.rimp``. Delete these cache files to force
+regeneration.
 
 Example Asset Missing
 =====================
