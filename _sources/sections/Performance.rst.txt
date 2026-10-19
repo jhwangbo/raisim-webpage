@@ -2,6 +2,96 @@
 Performance
 #############################
 
+**RaiSim uses the original triangle mesh for URDF collision meshes by default,
+while other physics engines use a convex hull or a convex approximation of each
+collision mesh by default.** Triangle-mesh collision keeps concave features, but
+it is slower and less robust than convex collision. A world XML ``mesh`` without
+``collision_mode`` also keeps the triangle mesh; ``World::addMesh`` in C++
+defaults to a convex decomposition. Switch to convex hulls as shown below for
+fast simulation and for fair comparisons with other engines.
+
+Using Convex Hull Collision
+===========================
+
+For a URDF robot, enable ``ArticulatedSystemOption::convexifyCollisionMeshes``
+when loading it. Each collision mesh then becomes one convex hull:
+
+.. code-block:: cpp
+
+  raisim::ArticulatedSystemOption options;
+  options.convexifyCollisionMeshes = true;
+  auto* robot = world.addArticulatedSystem(urdfPath, "", {},
+                                           raisim::CollisionGroup(1),
+                                           raisim::CollisionGroup(-1), options);
+
+In a world XML file, set ``convexify_meshes="1"``:
+
+.. code-block:: xml
+
+  <articulatedSystem name="robot" urdf_path="robot.urdf" convexify_meshes="1"/>
+
+URDF has no tag for the collision mode, so the option applies to every mesh
+collision body of the robot. A concave link such as a gripper finger then
+collides as its filled-in hull. To keep concave features at convex cost, split
+the mesh into convex pieces offline, list each piece as its own ``<collision>``
+element, and enable the option; without it, even convex pieces take the
+triangle-mesh path. See :doc:`articulated_system/Creation`.
+
+For a single-body mesh, pass ``MeshCollisionMode::CONVEX_HULL`` to
+``World::addMesh``, or set ``collision_mode="1"`` on a world XML ``mesh``:
+
+.. code-block:: cpp
+
+  auto* prop = world.addMesh(meshFile, mass, scale, "",
+                             raisim::MeshCollisionMode::CONVEX_HULL);
+
+.. code-block:: xml
+
+  <mesh name="prop" file_name="prop.obj" mass="1" com="0 0 0" scale="1 1 1"
+        collision_mode="1">
+    <inertia xx="0.01" xy="0" xz="0" yy="0.01" yz="0" zz="0.01"/>
+  </mesh>
+
+Mesh Collision Modes
+--------------------
+
+Every way of creating a mesh collider selects one of these representations:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 25 25 25
+
+   * - Where the mesh comes from
+     - Convex decomposition (CoACD)
+     - One convex hull
+     - Original triangle mesh
+   * - ``World::addMesh`` in C++
+     - ``MeshCollisionMode::CONVEXIFY`` (default)
+     - ``MeshCollisionMode::CONVEX_HULL``
+     - ``MeshCollisionMode::ORIGINAL_MESH``
+   * - ``mesh`` in a world XML file
+     - ``collision_mode="2"``
+     - ``collision_mode="1"``
+     - ``collision_mode="0"`` (default)
+   * - ``mesh`` object in a ``.rscene`` file
+     - ``collisionMode=convexify``
+     - ``collisionMode=convex_hull`` (default)
+     - ``collisionMode=original_mesh``
+   * - URDF collision mesh of an articulated system
+     - not available
+     - ``ArticulatedSystemOption::convexifyCollisionMeshes = true``, or
+       ``convexify_meshes="1"`` in a world XML file
+     - default
+
+A convex decomposition keeps more of a concave shape than one hull, at a higher
+build and contact cost; ``CoacdOptions`` trades part count against that cost
+(see :doc:`SingleBodyObjects`). When a mesh asset is added repeatedly, reuse the
+CoACD decomposition cache that ``World::addMesh`` writes and the normalized OBJ
+cache produced by ``Mesh::preprocessMesh``.
+
+General Tuning
+==============
+
 This page is a practical tuning guide for users of the ``raisim2Lib`` binary
 package workspace and for downstream applications linked against the downloaded
 RaiSim and rayrai packages. For commands that build and run package examples,
@@ -64,11 +154,10 @@ not automatically become collision meshes. Prefer this order:
 3. preprocessed convex collision assets for irregular objects;
 4. mesh collision only when the task really needs mesh-level contact.
 
-When a mesh collision asset is needed repeatedly, reuse the CoACD decomposition
-cache that ``World::addMesh`` writes and the normalized OBJ cache produced by
-``Mesh::preprocessMesh`` (see :doc:`SingleBodyObjects`). The default broadphase
-is ``contact::BroadphaseType::Sap3Axis``. For broadphase-heavy scenes, try
-``contact::BroadphaseType::MultiBoxPrune`` through
+See `Using Convex Hull Collision`_ for how to choose the mesh collision mode.
+
+The default broadphase is ``contact::BroadphaseType::Sap3Axis``. For
+broadphase-heavy scenes, try ``contact::BroadphaseType::MultiBoxPrune`` through
 ``World::setBroadphaseSettings``, with grid bounds and cell sizes
 (``mbpWorldMin``, ``mbpWorldMax``, ``mbpCellSize``) that match the active world
 volume, and measure both. Scenes with fewer than 35 collision bodies already use

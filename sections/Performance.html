@@ -56,6 +56,11 @@
 <li class="toctree-l1"><a class="reference internal" href="DebugTools.html">Regression and Debug Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ProjectLayout.html">Project Layout</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Performance</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#using-convex-hull-collision">Using Convex Hull Collision</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#mesh-collision-modes">Mesh Collision Modes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#general-tuning">General Tuning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#what-usually-costs-time">What Usually Costs Time</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#collision-modeling">Collision Modeling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#contacts-and-solver-work">Contacts and Solver Work</a></li>
@@ -134,6 +139,96 @@
              
   <section id="performance">
 <h1>Performance<a class="headerlink" href="#performance" title="Link to this heading"></a></h1>
+<p><strong>RaiSim uses the original triangle mesh for URDF collision meshes by default,
+while other physics engines use a convex hull or a convex approximation of each
+collision mesh by default.</strong> Triangle-mesh collision keeps concave features, but
+it is slower and less robust than convex collision. A world XML <code class="docutils literal notranslate"><span class="pre">mesh</span></code> without
+<code class="docutils literal notranslate"><span class="pre">collision_mode</span></code> also keeps the triangle mesh; <code class="docutils literal notranslate"><span class="pre">World::addMesh</span></code> in C++
+defaults to a convex decomposition. Switch to convex hulls as shown below for
+fast simulation and for fair comparisons with other engines.</p>
+<section id="using-convex-hull-collision">
+<h2>Using Convex Hull Collision<a class="headerlink" href="#using-convex-hull-collision" title="Link to this heading"></a></h2>
+<p>For a URDF robot, enable <code class="docutils literal notranslate"><span class="pre">ArticulatedSystemOption::convexifyCollisionMeshes</span></code>
+when loading it. Each collision mesh then becomes one convex hull:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisim</span><span class="o">::</span><span class="n">ArticulatedSystemOption</span><span class="w"> </span><span class="n">options</span><span class="p">;</span>
+<span class="n">options</span><span class="p">.</span><span class="n">convexifyCollisionMeshes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">robot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addArticulatedSystem</span><span class="p">(</span><span class="n">urdfPath</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">                                         </span><span class="n">raisim</span><span class="o">::</span><span class="n">CollisionGroup</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+<span class="w">                                         </span><span class="n">raisim</span><span class="o">::</span><span class="n">CollisionGroup</span><span class="p">(</span><span class="mi">-1</span><span class="p">),</span><span class="w"> </span><span class="n">options</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>In a world XML file, set <code class="docutils literal notranslate"><span class="pre">convexify_meshes=&quot;1&quot;</span></code>:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;articulatedSystem</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;robot&quot;</span><span class="w"> </span><span class="na">urdf_path=</span><span class="s">&quot;robot.urdf&quot;</span><span class="w"> </span><span class="na">convexify_meshes=</span><span class="s">&quot;1&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<p>URDF has no tag for the collision mode, so the option applies to every mesh
+collision body of the robot. A concave link such as a gripper finger then
+collides as its filled-in hull. To keep concave features at convex cost, split
+the mesh into convex pieces offline, list each piece as its own <code class="docutils literal notranslate"><span class="pre">&lt;collision&gt;</span></code>
+element, and enable the option; without it, even convex pieces take the
+triangle-mesh path. See <a class="reference internal" href="articulated_system/Creation.html"><span class="doc">Creating an Articulated System</span></a>.</p>
+<p>For a single-body mesh, pass <code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEX_HULL</span></code> to
+<code class="docutils literal notranslate"><span class="pre">World::addMesh</span></code>, or set <code class="docutils literal notranslate"><span class="pre">collision_mode=&quot;1&quot;</span></code> on a world XML <code class="docutils literal notranslate"><span class="pre">mesh</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">prop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">addMesh</span><span class="p">(</span><span class="n">meshFile</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="n">scale</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span>
+<span class="w">                           </span><span class="n">raisim</span><span class="o">::</span><span class="n">MeshCollisionMode</span><span class="o">::</span><span class="n">CONVEX_HULL</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;mesh</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;prop&quot;</span><span class="w"> </span><span class="na">file_name=</span><span class="s">&quot;prop.obj&quot;</span><span class="w"> </span><span class="na">mass=</span><span class="s">&quot;1&quot;</span><span class="w"> </span><span class="na">com=</span><span class="s">&quot;0 0 0&quot;</span><span class="w"> </span><span class="na">scale=</span><span class="s">&quot;1 1 1&quot;</span>
+<span class="w">      </span><span class="na">collision_mode=</span><span class="s">&quot;1&quot;</span><span class="nt">&gt;</span>
+<span class="w">  </span><span class="nt">&lt;inertia</span><span class="w"> </span><span class="na">xx=</span><span class="s">&quot;0.01&quot;</span><span class="w"> </span><span class="na">xy=</span><span class="s">&quot;0&quot;</span><span class="w"> </span><span class="na">xz=</span><span class="s">&quot;0&quot;</span><span class="w"> </span><span class="na">yy=</span><span class="s">&quot;0.01&quot;</span><span class="w"> </span><span class="na">yz=</span><span class="s">&quot;0&quot;</span><span class="w"> </span><span class="na">zz=</span><span class="s">&quot;0.01&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/mesh&gt;</span>
+</pre></div>
+</div>
+<section id="mesh-collision-modes">
+<h3>Mesh Collision Modes<a class="headerlink" href="#mesh-collision-modes" title="Link to this heading"></a></h3>
+<p>Every way of creating a mesh collider selects one of these representations:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Where the mesh comes from</p></th>
+<th class="head"><p>Convex decomposition (CoACD)</p></th>
+<th class="head"><p>One convex hull</p></th>
+<th class="head"><p>Original triangle mesh</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">World::addMesh</span></code> in C++</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEXIFY</span></code> (default)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::CONVEX_HULL</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">MeshCollisionMode::ORIGINAL_MESH</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mesh</span></code> in a world XML file</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">collision_mode=&quot;2&quot;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">collision_mode=&quot;1&quot;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">collision_mode=&quot;0&quot;</span></code> (default)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mesh</span></code> object in a <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> file</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">collisionMode=convexify</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">collisionMode=convex_hull</span></code> (default)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">collisionMode=original_mesh</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>URDF collision mesh of an articulated system</p></td>
+<td><p>not available</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ArticulatedSystemOption::convexifyCollisionMeshes</span> <span class="pre">=</span> <span class="pre">true</span></code>, or
+<code class="docutils literal notranslate"><span class="pre">convexify_meshes=&quot;1&quot;</span></code> in a world XML file</p></td>
+<td><p>default</p></td>
+</tr>
+</tbody>
+</table>
+<p>A convex decomposition keeps more of a concave shape than one hull, at a higher
+build and contact cost; <code class="docutils literal notranslate"><span class="pre">CoacdOptions</span></code> trades part count against that cost
+(see <a class="reference internal" href="SingleBodyObjects.html"><span class="doc">Single-Body Objects</span></a>). When a mesh asset is added repeatedly, reuse the
+CoACD decomposition cache that <code class="docutils literal notranslate"><span class="pre">World::addMesh</span></code> writes and the normalized OBJ
+cache produced by <code class="docutils literal notranslate"><span class="pre">Mesh::preprocessMesh</span></code>.</p>
+</section>
+</section>
+<section id="general-tuning">
+<h2>General Tuning<a class="headerlink" href="#general-tuning" title="Link to this heading"></a></h2>
 <p>This page is a practical tuning guide for users of the <code class="docutils literal notranslate"><span class="pre">raisim2Lib</span></code> binary
 package workspace and for downstream applications linked against the downloaded
 RaiSim and rayrai packages. For commands that build and run package examples,
@@ -145,6 +240,7 @@ see <a class="reference internal" href="BuildAndTest.html"><span class="doc">Bui
 <li><p>measure with timing-oriented package examples or your downstream workload on
 one thread before changing solver or modeling choices.</p></li>
 </ul>
+</section>
 <section id="what-usually-costs-time">
 <h2>What Usually Costs Time<a class="headerlink" href="#what-usually-costs-time" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
@@ -207,11 +303,9 @@ not automatically become collision meshes. Prefer this order:</p>
 <li><p>preprocessed convex collision assets for irregular objects;</p></li>
 <li><p>mesh collision only when the task really needs mesh-level contact.</p></li>
 </ol>
-<p>When a mesh collision asset is needed repeatedly, reuse the CoACD decomposition
-cache that <code class="docutils literal notranslate"><span class="pre">World::addMesh</span></code> writes and the normalized OBJ cache produced by
-<code class="docutils literal notranslate"><span class="pre">Mesh::preprocessMesh</span></code> (see <a class="reference internal" href="SingleBodyObjects.html"><span class="doc">Single-Body Objects</span></a>). The default broadphase
-is <code class="docutils literal notranslate"><span class="pre">contact::BroadphaseType::Sap3Axis</span></code>. For broadphase-heavy scenes, try
-<code class="docutils literal notranslate"><span class="pre">contact::BroadphaseType::MultiBoxPrune</span></code> through
+<p>See <a class="reference internal" href="#using-convex-hull-collision">Using Convex Hull Collision</a> for how to choose the mesh collision mode.</p>
+<p>The default broadphase is <code class="docutils literal notranslate"><span class="pre">contact::BroadphaseType::Sap3Axis</span></code>. For
+broadphase-heavy scenes, try <code class="docutils literal notranslate"><span class="pre">contact::BroadphaseType::MultiBoxPrune</span></code> through
 <code class="docutils literal notranslate"><span class="pre">World::setBroadphaseSettings</span></code>, with grid bounds and cell sizes
 (<code class="docutils literal notranslate"><span class="pre">mbpWorldMin</span></code>, <code class="docutils literal notranslate"><span class="pre">mbpWorldMax</span></code>, <code class="docutils literal notranslate"><span class="pre">mbpCellSize</span></code>) that match the active world
 volume, and measure both. Scenes with fewer than 35 collision bodies already use
