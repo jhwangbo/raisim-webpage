@@ -7,6 +7,13 @@ CPU readback, rendering depth and LiDAR data, and the TCP viewer protocol. For
 the general camera control and picking APIs (free-fly, orbit, picking from the
 viewer) see :doc:`Capture`.
 
+For physics and camera rendering on separate threads, use
+:doc:`PhysicsSnapshots`. It captures the physics scene under the World mutex
+and renders from shared frames with copied calibration and poses. Its
+Camera-only render and readback calls let physics advance during GPU work.
+The live-sensor overloads described below still read the sensor pose at render
+time and require the source World to be protected.
+
 Sensor alignment
 ================
 rayrai can align rendering to RaiSim camera sensors. Constructing a
@@ -57,14 +64,28 @@ RGB/Depth camera workflow (manual source + external camera):
 ``renderDepthPlaneDistance`` does not need the color render before it; render
 the depth camera's color image only when you want to show it.
 
+Synchronous and asynchronous CPU readbacks use tightly packed rows in native byte
+order, independently of caller pixel-pack settings or a bound pixel-pack buffer.
+They preserve those settings, read-color clamping and framebuffer read-buffer
+selection. GPU row flipping and color packing also preserve caller wireframe,
+rasterizer-discard and color-logic state.
+
 You can read back the camera buffers on CPU. ``getRawImage`` reads the scene
 color target as 8-bit BGRA (``width * height * 4`` bytes), each channel clamped
 to [0, 1] and rounded to the nearest 8-bit value; the sensor resolution must
-match the camera's render target. The image is converted to 8 bits and, with
-``flipVertical``, put in top-to-bottom row order on the GPU, so the readback is
-a plain copy (about 0.12 ms for a 640x480 RGB or depth image on an RTX 5070).
+match the camera's render target. Hardware and unrecognized renderers convert
+the image to 8 bits and, with ``flipVertical``, put it in top-to-bottom row order
+on the GPU, so the readback is a plain copy (about 0.12 ms for a 640x480 RGB or
+depth image on an RTX 5070).
+
+Software OpenGL readbacks preserve the same BGRA8 conversion and depth bytes as
+hardware readbacks, including row order, NaNs and infinities. Keep the camera
+alive between frames so capture storage can be reused.
+
 ``SensorStorageMode::SENSOR_SETTER`` (the default) writes directly into the
-RaiSim sensor's image instead of a caller buffer:
+RaiSim sensor's image instead of a caller buffer. Measurement noise is assigned
+to physical pixels in top-left order for either value of ``flipVertical``; the flag
+changes row storage, including when row noise or dropout is enabled:
 
 .. code-block:: cpp
 
@@ -88,6 +109,22 @@ quality preset. They do run the built-in postprocessing unless
 ``RenderOverrides::postProcess`` is ``false``, so enabling
 ``setLinearHdrRenderingEnabled(true)`` (see :doc:`Capture`) also changes RGB
 sensor images; pass ``postProcess = false`` to keep the previous output.
+
+Sensor noise
+================
+
+``Camera::getRawImage(sensor, ...)`` applies that sensor's configured noise to
+both sensor storage and custom buffers. CPU and GPU LiDAR use the same seeded
+range/angle model. Defaults keep clean output, and raw camera readback methods
+without a sensor keep their existing behavior. See :ref:`sensor-noise-models` for
+units, equations, XML configuration, reset/checkpoint behavior, and model limits.
+
+The :doc:`sensor noise example <../examples/rayrai/rayrai_sensor_noise>` renders
+clean and noisy captures of the same scene. TCP previews remain clean while
+RaiSim applies measurement noise to committed sensor buffers. Depth previews use
+the exact logarithmic shade mapping, with opaque black for invalid returns and
+finite positive depths included in the measured range. Preview updates preserve
+caller pixel-unpack state and texture bindings.
 
 Asynchronous readback
 =====================

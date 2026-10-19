@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RaisimGymTorch &mdash; raisim 2.9.4 documentation</title>
+  <title>RaisimGymTorch &mdash; raisim 2.10.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=ba8b8cd0" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../_static/favicon.png"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=e45b7e07"></script>
+      <script src="../_static/documentation_options.js?v=67920a36"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -104,6 +104,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#how-to-add-a-custom-environment">How to add a custom environment?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#code-structure-if-you-are-curious">Code structure (if you are curious)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#common-issues-and-solutions">Common issues and solutions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sensor-noise-seeds">Sensor noise seeds</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="RaiSimPy.html">RaisimPy</a></li>
@@ -286,6 +287,22 @@ for example with <code class="docutils literal notranslate"><span class="pre">co
 <li><p>Video recording in <code class="docutils literal notranslate"><span class="pre">rayrai_tcp_viewer</span></code> uses <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> from <code class="docutils literal notranslate"><span class="pre">PATH</span></code>
 (or <code class="docutils literal notranslate"><span class="pre">$RAYRAI_FFMPEG</span></code>); without it, the viewer writes a PNG sequence.</p></li>
 </ul>
+</section>
+<section id="sensor-noise-seeds">
+<h2>Sensor noise seeds<a class="headerlink" href="#sensor-noise-seeds" title="Link to this heading"></a></h2>
+<p>Each vectorized environment assigns a distinct World sensor seed after <code class="docutils literal notranslate"><span class="pre">init()</span></code>
+and before the initial <code class="docutils literal notranslate"><span class="pre">reset()</span></code>: environment index <code class="docutils literal notranslate"><span class="pre">i</span></code> uses <code class="docutils literal notranslate"><span class="pre">i</span> <span class="pre">+</span> <span class="pre">1</span></code>.
+<code class="docutils literal notranslate"><span class="pre">VectorizedEnvironment::setSeed(seed)</span></code> calls the user <code class="docutils literal notranslate"><span class="pre">setSeed(seed</span> <span class="pre">+</span> <span class="pre">i)</span></code> hook
+and then assigns World seed <code class="docutils literal notranslate"><span class="pre">uint64_t(uint32_t(seed))</span> <span class="pre">+</span> <span class="pre">i</span> <span class="pre">+</span> <span class="pre">1</span></code>. This works even
+when the derived hook does not call the base implementation. Seed assignment is
+independent of OpenMP scheduling, so cloned runs with the same environment order
+replay their streams. Negative user seeds use their unsigned 32-bit representation
+for the World seed; ranges whose final user seed exceeds <code class="docutils literal notranslate"><span class="pre">INT_MAX</span></code> are rejected
+before invoking any hooks.</p>
+<p>Reseeding restarts sensor random streams. It preserves delivered measurements,
+IMU filters and bias, and pending samples. When an episode should also restart
+the IMU model, call <code class="docutils literal notranslate"><span class="pre">imu-&gt;reset()</span></code> from the environment’s <code class="docutils literal notranslate"><span class="pre">reset()</span></code>
+implementation.</p>
 </section>
 </section>
 

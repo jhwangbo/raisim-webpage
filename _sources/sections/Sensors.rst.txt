@@ -16,11 +16,10 @@ RaiSim supports these sensor workflows:
   pose and returns depth, object segmentation, optional hit points, and a
   timestamp without requiring a renderer.
 
-The CPU ray-query paths are single-threaded and deterministic, but they are not
-the recommended RGB/depth image path when rayrai sensors are available. RaiSim
-itself does not support sensor measurement updates from the TCP visualizer.
-Renderer-produced images must be consumed in the rayrai process or copied into a
-sensor buffer by user code with ``MeasurementSource::MANUAL``.
+The CPU ray-query paths are single-threaded and deterministic. Use in-process
+rayrai rendering for RGB/depth images when it is available. A connected TCP
+visualizer can also render due ``MANUAL`` cameras and return their images to
+``RaisimServer``; the server applies the sensor noise when committing those buffers.
 
 
 Sensor frames and camera convention
@@ -79,9 +78,9 @@ The update method is selected with ``raisim::Sensor::setMeasurementSource``:
   depth cameras. Use it for in-process rayrai RGB/depth rendering or real
   hardware integration.
 
-There is no ``VISUALIZER`` measurement source in the RaiSim API. RaiSim does not
-request RGB or depth frames from a TCP visualizer and does not update sensor
-buffers from the visualizer.
+There is no ``VISUALIZER`` measurement source in the RaiSim API. TCP camera
+requests use ``MANUAL`` sensors: a connected visualizer renders requested frames,
+and ``RaisimServer`` writes the returned images and acquisition timestamps.
 
 Recommended RGB/depth usage with rayrai sets camera sensors to ``MANUAL`` and
 lets the renderer fill or read back the buffers. See `Using sensors with rayrai`_
@@ -116,7 +115,9 @@ Depth camera
 ====================================
 
 ``raisim::DepthCamera`` stores a float array with ``width * height`` entries.
-Finite values are plane depth in meters. Missing pixels are ``NaN``.
+Finite values are plane depth in meters. CPU ray captures use ``NaN`` for
+missing pixels; clean raw renderer captures may retain a different missing-return
+encoding. Active noise models normalize invalid depths to ``NaN``.
 
 CPU-only fallback update:
 
@@ -226,31 +227,560 @@ their world poses) and store the points with ``setScan()``. rayrai's GPU LiDAR
 does exactly this and returns the same points as ``update()``.
 
 
-IMU
+.. _sensor-noise-models:
+
+Sensor noise
 ====================================
 
-``raisim::InertialMeasurementUnit`` is intended for robot-attached sensor sets
-loaded from URDF sensor XML. With ``RAISIM``, the default, the owning articulated
-system writes the measurements during ``World::integrate()`` at the sensor's
-update rate; ``update()`` does nothing. This requires inverse dynamics, which the
-URDF and world-XML loaders enable when they create an IMU. Read the values after
-stepping the world:
+Robot-mounted RGB, depth, and spinning LiDAR sensors support optional measurement
+noise. Defaults preserve the clean measurements. Each sensor owns a random stream;
+``resetNoise()`` restarts it. Seed zero derives a deterministic stream from the
+sensor's full name and its owning object's stable World id, decorrelating sensors
+on one or several robots. An unnamed detached sensor has no identity to mix.
+Nonzero ``seed`` values select explicit streams, so matching explicit seeds and
+models replay the same draws, independently of sensor names.
+
+``World::setSensorNoiseSeed(uint64_t)`` mixes an environment seed into all attached
+sensor streams. Call it before adding robots, or between complete physics steps
+to restart existing random streams. Measurements, IMU bias and filters, the
+acquisition clock and delayed samples are preserved. Use ``imu->reset()`` when
+restarting the complete IMU model is intended. The default World seed is zero;
+cloned Worlds with the same seeds and object creation order deliberately replay. In parallel environments,
+set a distinct World seed from the environment index. All 64 seed bits participate;
+this does not alter individual sensor property seeds. World XML and checkpoints
+save the environment seed, and checkpoint restoration resumes the saved streams.
+Resetting properties also resets the stream; for depth, call
+``updateRayDirections()`` after editing properties. Repeatability is for the same
+build and sequence of captures; floating-point math can differ between platforms.
+
+.. list-table:: Measurement models
+   :header-rows: 1
+   :widths: 15 40 45
+
+   * - Sensor
+     - Properties
+     - Meaning
+   * - RGB
+     - ``noiseType``, ``mean``, ``std``
+     - Independent Gaussian or uniform read noise per color channel, in normalized
+       intensity units: 0 is black, 1 is full scale. Alpha is preserved.
+   * - RGB
+     - ``shotNoise``, ``rowNoiseStd``
+     - Independent signal-dependent Gaussian noise with variance
+       ``shotNoise * intensity``, plus a Gaussian offset shared across each row
+       and its three color channels.
+   * - Depth
+     - ``noiseType``, ``mean``, ``std``, ``stdDepthSquared``
+     - Bias in meters and Gaussian/uniform noise with standard deviation
+       ``std + stdDepthSquared * z * z``, where ``z`` is clean optical depth in meters.
+   * - Depth
+     - ``resolution``, ``dropoutProbability``
+     - Quantization step in meters and independent per-valid-pixel dropout
+       probability. Dropped or out-of-range measurements become NaN.
+   * - LiDAR
+     - ``rangeBias``, ``rangeNoiseStd``, ``angularNoiseStd``
+     - Range bias and Gaussian range noise in meters; independent Gaussian yaw
+       and pitch errors in radians, applied to the returned sensor-frame hits.
+   * - LiDAR
+     - ``resolution``, ``dropoutProbability``
+     - Range quantization in meters and independent per-hit dropout. Dropped and
+       out-of-range hits are omitted, preserving the order of surviving hits.
+
+The legacy ``World::captureDepthCamera`` has a separate, reseeded-per-capture
+noise API and uses a uniform half-range; see `Optional deterministic depth noise`_.
+For attached sensors, Gaussian and uniform ``std`` both mean standard deviation: the uniform interval
+has half-width ``sqrt(3) * std``. ``NO_NOISE`` ignores the additive ``mean``/``std``
+parameters; RGB shot/row effects and depth quantization/dropout remain independently
+configurable. RGB is rounded and clamped to byte values after all noise is added.
+Depth and LiDAR are quantized after noise, then checked against their configured
+range. Noisy depths outside the finite float32 storage range become NaN before
+conversion. Non-finite and missing returns never turn into valid hits. Noise does
+not change the acquisition timestamp, pose, scan sweep, or alpha channel.
+
+RGB ``shotNoise`` is a high photon-count Gaussian approximation in the **rendered
+intensity space**, rather than a calibrated photon/electron simulation. It does
+not model low-light Poisson statistics or an image signal processor. LiDAR angle
+noise perturbs a hit's reported direction; it does not widen the beam or cast a
+second ray. These models do not add rolling shutter, motion distortion, multipath,
+material-dependent return probabilities, or camera/LiDAR latency.
+
+Noise is reproducible on the same platform and build when the scene, capture
+order, properties and seed match. Floating-point Gaussian transforms may differ
+between platforms. LiDAR draws are assigned in retained-hit order: a missing or
+extra hit shifts the draws of subsequent hits, so CPU/GPU scans with different
+hit sets need not share per-ray errors.
+
+Shipped RealSense sensor definitions explicitly disable camera noise to preserve
+clean robot captures. Set ``type="gaussian"`` or ``type="uniform"`` with a nonzero
+``stddev`` to enable it. Third-party files with existing nonzero noise settings
+now activate those settings; use ``type="none"`` to retain clean captures.
+Unknown camera noise types raise ``std::invalid_argument``.
+
+Disabled depth models preserve raw input bytes, including the renderer's missing
+return encoding. Active models normalize non-positive and out-of-clip inputs to
+NaN. Depth ``resolution`` is a quantization step in meters, independent of image
+``width`` and ``height``.
+
+Configure a depth camera in C++:
 
 .. code-block:: cpp
 
-    auto* imu = anymal->getSensorSet("lidar_link")
-                  ->getSensor<raisim::InertialMeasurementUnit>("imu");
+    auto& p = depth->getProperties();
+    p.noiseType = decltype(p.noiseType)::GAUSSIAN;
+    p.std = 0.002;                 // 2 mm at zero distance
+    p.stdDepthSquared = 0.001;     // sigma is 18 mm at 4 m
+    p.resolution = 0.001;          // 1 mm depth steps
+    p.dropoutProbability = 0.01;
+    p.seed = 101;
+    depth->updateRayDirections();
 
+For RGB, copy the immutable properties and pass them to ``setProperties()``:
+
+.. code-block:: cpp
+
+    auto p = rgb->getProperties();
+    p.noiseType = decltype(p.noiseType)::GAUSSIAN;
+    p.std = 0.01;                 // about 2.55 byte levels
+    p.shotNoise = 0.0001;
+    p.rowNoiseStd = 0.002;
+    p.seed = 43;
+    rgb->setProperties(p);
+
+In URDF sensor XML, camera noise settings belong on an optional
+``<camera><noise>`` element; LiDAR takes an optional ``<noise>`` child of
+``<sensor>``. Omitted attributes retain their clean defaults, so effect-only
+settings such as ``<noise shot_noise="0.001"/>`` or
+``<noise dropout_probability="0.01"/>`` need no dummy read-noise fields.
+Read noise defaults to ``NO_NOISE``; set ``type="gaussian"`` or ``type="uniform"``
+when configuring additive read noise. Unknown noise types are rejected.
+
+.. code-block:: xml
+
+    <!-- Inside a depth sensor's <camera>: -->
+    <noise type="gaussian" mean="0" stddev="0.002"
+           std_depth_squared="0.001" resolution="0.001"
+           dropout_probability="0.01" seed="101"/>
+    <!-- Inside an RGB sensor's <camera>: -->
+    <noise type="gaussian" mean="0" stddev="0.01"
+           shot_noise="0.0001" row_noise_std="0.002" seed="43"/>
+    <!-- Inside a spinning_lidar sensor: -->
+    <noise range_bias="0.002" range_noise_std="0.01"
+           angular_noise_std="0.001" resolution="0.001"
+           dropout_probability="0.01" seed="987"/>
+
+Noise is assigned to physical pixels in top-left image order. For a raw
+bottom-left buffer, call ``applyNoise(data, size, false)``; Rayrai passes its
+``flipVertical`` choice automatically. Resetting the stream before captures in
+opposite layouts produces the same seeded measurements with reversed row storage.
+Depth point-cloud conversion expects top-left rows; fisheye rays with a nonpositive
+forward component have no valid positive optical depth and produce NaN points.
+
+CPU depth/LiDAR ``update()`` and Rayrai's sensor-aware ``getRawImage()`` / GPU
+LiDAR capture apply noise automatically, including custom output buffers. CPU
+``DepthCamera::get3DPoints()`` follows the noisy depth image, including its NaNs.
+For Rayrai, use ``depthToPointCloud()`` to reconstruct measured points; readback
+does not populate ``get3DPoints()``. The point conversion handles pinhole and
+fisheye optical depth.
+
+Manual setters such as ``setImageBuffer()``, ``setDepthArray()``, and ``setScan()``
+keep hardware/playback data unchanged. Call ``applyNoise()`` explicitly after a
+manual setter to synthesize one measurement. Do not call it again after an
+automatic capture. Raw ``Camera`` readbacks without a RaiSim sensor remain clean.
+Asynchronous raw readbacks can be processed explicitly with the sensor's
+``applyNoise(pointer, size)`` overload when the returned frame is consumed.
+
+For TCP cameras, the visualizer sends clean pixels and RaiSim applies the model
+when it commits the received image. The protocol is unchanged; the visualizer's
+preview remains clean while the sensor buffer contains the noisy measurement.
+There are no per-pixel allocations; all-disabled models return before processing
+pixels. Rendering resolution, materials, lighting, and shadow quality are unchanged.
+
+See :doc:`the sensor noise example <examples/rayrai/rayrai_sensor_noise>` for
+reproducible RGB/depth comparison images and the exact capture calls.
+
+.. _imu-sensor-model:
+
+IMU
+====================================
+
+``raisim::InertialMeasurementUnit`` produces accelerometer and gyroscope
+measurements for a frame attached to an articulated system. The default is an
+ideal sensor; bias, noise, bandwidth, quantization, saturation and delivery
+latency (0 to 60 seconds) are configurable. Sensor measurements do not require enabling inverse
+dynamics on the robot.
+
+Start with the runnable :doc:`examples/server/imu_sensor_model` example. It
+compares an ideal sensor and a modeled sensor at the same mounting point and
+writes CSV without a viewer. :doc:`examples/server/sensor_suite` demonstrates
+using an IMU alongside rendered cameras and LiDAR.
+
+Reading measurements
+------------------------------------
+
+With ``MeasurementSource::RAISIM`` (the default), read the IMU after
+``world.integrate()``. Getters hold the latest delivered sample between updates;
+a changed measurement value is not a reliable way to detect a new sample.
+
+.. code-block:: cpp
+
+    auto* imu = robot->getSensorSet("base")
+                    ->getSensor<raisim::InertialMeasurementUnit>("imu");
+    double lastAcquisition = -1.0;
+
+    // Inside the simulation loop:
     world.integrate();
+    const double acquired = imu->getUpdateTimeStamp();
+    if (acquired >= 0.0 && acquired != lastAcquisition) {
+      lastAcquisition = acquired;
+      const Eigen::Vector3d acc = imu->getLinearAcceleration(); // IMU frame, m/s^2
+      const Eigen::Vector3d gyro = imu->getAngularVelocity();   // IMU frame, rad/s
+      const double delivered = imu->getDeliveryTimeStamp();   // simulation seconds
+      // Consume acc/gyro with their acquisition timestamp, not the current world time.
+    }
 
-    const Eigen::Vector3d& acc = imu->getLinearAcceleration();  // specific force, IMU frame [m/s^2]
-    const Eigen::Vector3d& angVel = imu->getAngularVelocity();  // IMU frame [rad/s]
-    const raisim::Vec<4>& quat = imu->getOrientation();         // IMU frame in world, (w, x, y, z)
+With ``MANUAL``, RaiSim leaves the measurements unchanged. User code can write
+hardware data with ``setLinearAcceleration()``, ``setAngularVelocity()`` and
+``setOrientation()``, and manage its timestamps through ``setUpdateTimeStamp()``.
 
-Like a real accelerometer, the IMU reports the specific force (acceleration
-minus gravity): an IMU at rest reads the negated gravity vector in the IMU frame.
-With ``MANUAL``, set the values from hardware with ``setLinearAcceleration()``,
-``setAngularVelocity()`` and ``setOrientation()``.
+How the ideal reading is computed
+------------------------------------
+
+The IMU uses the completed physics step's pose and angular velocity. Generalized
+acceleration is obtained from the solver's velocity change over a physics step
+of duration :math:`h`:
+
+.. math::
+
+    \dot v \simeq \frac{v_{\mathrm{after}}-v_{\mathrm{before}}}{h}.
+
+A forward acceleration pass through the joint tree adds joint motion, rotational
+and Coriolis terms. For an IMU at world-frame offset :math:`r` from its body's
+reference point, the resulting acceleration is
+
+.. math::
+
+    a_{\mathrm{IMU}} = a_{\mathrm{body}}
+      + \alpha\times r + \omega\times(\omega\times r).
+
+The last two terms account for tangential and centripetal acceleration. A sensor
+away from a rotation axis therefore measures acceleration even when the body's
+reference point is stationary.
+
+Let :math:`R_{WS}` map sensor coordinates into world coordinates. The ideal
+accelerometer reports **specific force**, and the gyro reports angular velocity,
+both expressed in the IMU's own axes:
+
+.. math::
+
+    f = R_{WS}^{T}(a_{\mathrm{IMU}}-g), \qquad
+    \omega_S = R_{WS}^{T}\omega_W.
+
+For an aligned, upright sensor with gravity :math:`g=(0,0,-9.81)`:
+
+.. list-table:: Ideal accelerometer checks
+   :header-rows: 1
+
+   * - Motion
+     - Expected reading
+   * - Stationary and supported
+     - :math:`(0,0,9.81)` m/s²
+   * - Free fall without rotation
+     - :math:`(0,0,0)` m/s²
+   * - Constant rotation about +Z, zero gravity, sensor 0.1 m along the body's +X axis, :math:`\omega_Z=2` rad/s
+     - :math:`(-0.4,0,0)` m/s²; the gyro reads :math:`(0,0,2)` rad/s
+
+Rotating the sensor mount rotates these vectors into the sensor frame. The
+accelerometer is not a gravity-removed linear-acceleration output.
+
+``getOrientation()`` and ``getGroundTruthOrientation()`` return the same
+**ground-truth** sensor-to-world quaternion in ``(w, x, y, z)`` order. It belongs
+to the delivered sample's acquisition time, including when delivery is delayed.
+It is not an attitude estimate derived from noisy accelerometer and gyro data;
+adding channel noise does not make this quaternion noisy. Validate an attitude
+estimator using the raw accelerometer and gyro channels instead.
+
+Sampling and delivery
+------------------------------------
+
+The acquisition clock retains its phase when a deadline falls between physics
+steps. Acquisition takes place at the first completed step at or after the
+deadline; the next deadline advances from the original clock rather than the
+rounded acquisition time. There is at most one acquisition per physics step,
+so a requested rate above the physics rate cannot create additional motion data.
+
+For a simulation starting at time zero with 1 ms physics, a 400 Hz IMU and 3 ms
+latency, the first samples are:
+
+.. list-table:: Simulation times in milliseconds
+   :header-rows: 1
+
+   * - Acquisition
+     - Delivery
+   * - 1
+     - 4
+   * - 4
+     - 7
+   * - 6
+     - 9
+   * - 9
+     - 12
+   * - 11
+     - 14
+
+The acquisition intervals alternate between 2 ms and 3 ms. The mean rate remains
+400 Hz. ``getUpdateTimeStamp()`` is the **acquisition** time of the most recently
+delivered sample. ``getDeliveryTimeStamp()`` is when that sample became available.
+Both are simulation times, not wall-clock times.
+
+For latency :math:`L`, a sample acquired at :math:`t_s` becomes available at the
+first physics step with :math:`t\ge t_s+L`. Delivery is checked every physics
+step, including steps without a new acquisition. Latency is therefore rounded
+up to the available physics times. Acceleration, gyro and ground-truth orientation
+are queued together. Before the first delivery, timestamps are negative and the
+quaternion is the identity; do not treat those initial buffers as measurements.
+
+Queue storage grows with acquired samples, up to 65,536 pending measurements
+(about 6 MiB per IMU). If this capacity is exhausted, or growth cannot allocate
+memory, new samples are dropped until room becomes available. Existing queued
+samples keep their acquisition times and delivery latency. A warning is emitted
+on the first loss after ``reset()``; ``getDroppedMeasurementCount()`` reports the
+cumulative loss and is preserved by checkpoints. Reduce latency or update rate if
+this count is nonzero. The physics timestep continues normally.
+
+Sleeping and fixed bodies continue to produce samples, including specific force
+from gravity and the configured stochastic errors. With filtering enabled, the
+filter advances every physics step, even when no new output sample is due.
+
+Python RGB, LiDAR and IMU ``getProperties()`` return independent copies. Edit the
+copy and call ``setProperties()`` to validate and apply it; a rejected edit leaves
+the sensor unchanged. Depth retains mutable properties and requires
+``updateRayDirections()`` after edits.
+
+Configuring the sensor model
+------------------------------------
+
+Accelerometer and gyro settings are independent. Prefer const access when copying
+properties, then apply the complete configuration with ``setProperties()``:
+
+.. code-block:: cpp
+
+    #include <utility> // std::as_const
+
+    auto properties = std::as_const(*imu).getProperties();
+    properties.seed = 43;
+    properties.accelerometer.bias = Eigen::Vector3d(0.01, -0.02, 0.03);
+    properties.accelerometer.noiseDensity = 0.002;
+    properties.accelerometer.biasRandomWalk = 0.0001;
+    properties.accelerometer.cutoffFrequency = 30.0;
+    properties.accelerometer.resolution = 0.001;
+    properties.gyroscope.bias = Eigen::Vector3d(0.001, -0.002, 0.003);
+    properties.gyroscope.noiseDensity = 0.0002;
+    properties.gyroscope.biasRandomWalk = 0.00001;
+    properties.gyroscope.cutoffFrequency = 50.0;
+    properties.gyroscope.resolution = 0.0001;
+    properties.maxAcc = 16.0 * 9.81; // 16 g, independently on each axis
+    properties.maxAngVel = 34.906585; // approximately 2000 degrees/s, in rad/s
+    properties.latency = 0.003;
+    imu->setProperties(properties);
+    imu->setUpdateRate(400.0);
+
+These are illustrative settings, not a calibrated preset for a specific device.
+In the table below, a "channel unit" is m/s² for the accelerometer and rad/s for
+the gyro. All channel error settings default to zero (disabled).
+
+.. list-table:: Model parameters
+   :header-rows: 1
+   :widths: 25 25 50
+
+   * - Property
+     - Unit
+     - Meaning
+   * - ``bias``
+     - Channel units, three axes
+     - Initial offset in sensor coordinates.
+   * - ``noiseDensity``
+     - Channel units / sqrt(Hz)
+     - Continuous white-noise strength; not the per-sample standard deviation.
+   * - ``biasRandomWalk``
+     - Channel units / sqrt(s)
+     - Strength of the Brownian bias increments.
+   * - ``cutoffFrequency``
+     - Hz
+     - First-order low-pass cutoff; zero bypasses filtering.
+   * - ``resolution``
+     - Channel units
+     - Quantization step; zero disables quantization.
+   * - ``maxAcc``, ``maxAngVel``
+     - m/s², rad/s
+     - Positive symmetric per-axis clipping ranges. Defaults are effectively unlimited.
+   * - ``latency``
+     - Seconds
+     - Delay between acquisition and availability, from 0 to 60 seconds, shared by all reported channels.
+   * - ``seed``
+     - Unsigned 32-bit integer
+     - Zero derives a stream from sensor identity; nonzero selects an explicit stream. The World environment seed is mixed into both.
+
+Bias and unfiltered noise
+------------------------------------
+
+For each axis, the initial bias is the configured ``bias``. With bias random-walk
+strength :math:`\sigma_b`, a bias update over elapsed time :math:`\Delta t` is
+
+.. math::
+
+    b_{k+1}=b_k+\sigma_b\sqrt{\Delta t}\,\xi_k,
+    \qquad \xi_k\sim\mathcal N(0,1).
+
+Bias is stepped at physics rate for filtered channels and at acquisition times
+for unfiltered channels, using the corresponding elapsed time. Its uncertainty
+grows with elapsed time; it is not independent additive noise at each sample.
+``getAccelerometerBias()`` and ``getGyroscopeBias()`` expose the current simulated
+bias state for diagnostics. Those diagnostic states are not delayed to match a
+previously acquired measurement.
+
+When ``cutoffFrequency`` is zero, the ideal signal is sampled at acquisition and
+the output before quantization/clipping is
+
+.. math::
+
+    u_k=x_k+b_k+\frac{\sigma_n}{\sqrt{\Delta t_s}}\,\eta_k,
+    \qquad \eta_k\sim\mathcal N(0,1),
+
+where :math:`\sigma_n` is ``noiseDensity`` and :math:`\Delta t_s` is the actual
+acquisition interval. This noise-variance convention assumes ideal noise
+averaging/decimation, as in
+`Kalibr's IMU noise model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`_.
+It does not average the ideal motion signal over that interval. Enable a
+suitable cutoff when signal bandwidth and filtering before downsampling matter.
+
+For example, noise density 0.002 m/s²/sqrt(Hz) at a uniform 400 Hz acquisition
+rate gives a sample standard deviation of 0.04 m/s² without the explicit filter.
+With rounded acquisition intervals, the variance follows each actual interval.
+Accelerometer and gyro axes use independent random draws, with separate channel
+parameters.
+
+Low-pass filtering and filtered noise
+-------------------------------------
+
+For a positive cutoff :math:`f_c`, define :math:`\lambda=2\pi f_c` and
+:math:`a=\exp(-\lambda h)`, where :math:`h` is the physics step. The signal and
+bias are filtered together:
+
+.. math::
+
+    s_{k+1}=a\,s_k+(1-a)(x_{k+1}+b_{k+1}).
+
+This is the exact first-order response for a held input over the step. The signal
+filter initializes from the first input to avoid an artificial startup transient.
+White noise passing through the same bandwidth is advanced separately:
+
+.. math::
+
+    z_{k+1}=a\,z_k+
+      \sigma_n\sqrt{\frac{\lambda}{2}(1-a^2)}\,\eta_k.
+
+The filtered reading is :math:`u=s+z`. This is the exact discrete
+Ornstein–Uhlenbeck transition for that continuous white-noise model. Its
+steady-state variance is :math:`\sigma_n^2\pi f_c`, and its one-physics-step
+correlation is :math:`\exp(-2\pi f_c h)`. Unlike drawing independent output noise,
+it preserves the temporal correlation created by the sensor bandwidth. The noise
+state starts at zero and approaches this stationary distribution after reset.
+
+Filtering advances before output downsampling. Coefficients are cached for a
+constant physics timestep and recomputed when the step changes. "Exact" here
+refers to these filter transitions; the simulated motion and stepped bias remain
+limited by the physics resolution and the held-input assumption.
+
+Quantization and saturation
+------------------------------------
+
+At acquisition, each output axis is quantized to step :math:`q`, when configured,
+then independently clipped to range :math:`[-M,M]`:
+
+.. math::
+
+    y_i=\operatorname{clip}\left(q\operatorname{round}(u_i/q),-M,M\right).
+
+With ``resolution=0``, the rounding stage is skipped. ``maxAcc`` and ``maxAngVel``
+are axis limits, so saturation on one axis does not reduce another axis. This
+replaces the previous vector-norm scaling behavior.
+
+The legacy ``noiseType``, ``mean`` and ``std`` settings now add output sample noise
+to both channels after the explicit filter and before quantization. Uniform noise
+has half-width ``sqrt(3) * std``. Prefer the independent channel noise densities
+for new models; configuring both mechanisms adds both noise contributions.
+
+Reset, replay and XML
+------------------------------------
+
+``setProperties()`` rejects invalid model parameters before applying them and
+resets measurements, bias, filters, sampling clock, pending delivery queue and
+random stream. Sensor ``name`` and ``full_name`` are immutable after construction;
+changing them through ``setProperties()`` is rejected.
+``resetNoise()`` restarts only the random stream, preserving measurements and model
+history. ``reset()`` restarts the current model from its configured biases
+and seed; it does not rewind the robot or an application controller. Legacy
+mutable ``getProperties()`` access is supported: valid edits reset the model on
+the next update. Invalid edits, including identity changes, restore the last valid
+configuration and emit a warning, so they cannot interrupt a world step. Use
+``setProperties()`` for immediate validation and exceptions before stepping.
+Obtaining a mutable reference permanently enables property comparisons on each
+update, even when it was obtained only to copy the settings. References remain
+tracked after checkpoint restore. Prefer ``std::as_const(*imu).getProperties()``
+for reading, or call through a const reference.
+
+Repeated motion with the same seed on the same platform/build reproduces the
+stochastic output. Cross-platform floating-point results need not be bit-identical.
+The IMU uses the same full-width seeded stream and Gaussian sampler as the
+camera/LiDAR models, so high seed bits also select different streams. World
+checkpoints preserve the complete random state,
+bias, filter state, acquisition clock, pending delayed samples and delivery timestamps.
+For replay of a running simulation, restore a world checkpoint rather than merely
+reapplying the same seed. Application controller and random state still belong to
+the application.
+
+URDF declarations support the same configuration:
+
+.. code-block:: xml
+
+    <sensor name="imu" type="imu" update_rate="400" seed="43" latency="0.003">
+      <origin xyz="0.1 0 0" rpy="0 0 0"/>
+      <limit acc_limit="156.96" ang_vel_limit="34.906585"/>
+      <accelerometer bias="0.01 -0.02 0.03" noise_density="0.002"
+                     bias_random_walk="0.0001" cutoff_frequency="30" resolution="0.001"/>
+      <gyroscope bias="0.001 -0.002 0.003" noise_density="0.0002"
+                 bias_random_walk="0.00001" cutoff_frequency="50" resolution="0.0001"/>
+    </sensor>
+
+Use the channel child elements above as the canonical URDF form. Prefixed
+``acc_*``/``gyro_*`` attributes remain accepted for serialized world XML; avoid
+mixing those attributes with child elements in authored URDF. Legacy additive
+sample noise can be configured with a ``<noise type="gaussian" mean="0"
+stddev="0.01"/>`` child.
+
+World XML export preserves this configuration, not the evolving stochastic state.
+The model fields require matching RaiSim headers and binaries that provide
+``InertialMeasurementUnit::ChannelProperties``; older binary packages do not
+implement this API.
+
+Accuracy and performance limits
+------------------------------------
+
+* Contact impulses contribute acceleration averaged over one physics step.
+  Smaller timesteps may be required to resolve short impacts or vibration.
+* A first-order filter is a configurable sensor approximation. There is no
+  device-specific transfer function, temperature dependence, scale-factor error,
+  cross-axis calibration error or attitude-estimation algorithm in this model.
+* Delivery occurs only on physics steps. There is no wall-clock scheduling jitter
+  or packet-loss model.
+* The ideal path bypasses random draws and filtering. The zero-latency path needs
+  no delay buffer; positive latency uses reusable queue storage. Acceleration is
+  propagated once per articulated system when needed by its IMUs, without the
+  inverse-dynamics force sweep.
+
+For engine-side timing, the ``imu_sensor_benchmark`` target compares baseline
+integration, ideal IMUs and the full model on one thread:
+``build-benchmark/benchmark/imu_sensor_benchmark --steps=500000 --robots=16``.
 
 
 CPU depth camera fallback
@@ -381,8 +911,19 @@ generation.
 Optional deterministic depth noise
 ------------------------------------
 
-Depth noise is disabled by default. To add reproducible noise, set
-``depthNoiseType``, ``depthNoiseMean``, ``depthNoiseStd``, and
+Depth noise is disabled by default.
+
+This legacy world-level capture API is separate from the attached
+:ref:`sensor-noise-models` above. In this API, uniform ``depthNoiseStd`` is the
+**half-range**, while attached ``DepthCamera::DepthCameraProperties::std`` is a
+**standard deviation** (uniform half-range ``sqrt(3) * std``). Its generator is
+reseeded on each capture: repeat captures with the same input repeat the noise,
+rather than advancing an attached sensor's stream. The legacy standard-library
+distributions reproduce within a platform/build; their Gaussian samples can differ
+between C++ standard libraries. Use attached depth sensors for the shared model,
+quantization, dropout, environment seeds and an advancing stream.
+
+To enable it, set ``depthNoiseType``, ``depthNoiseMean``, ``depthNoiseStd``, and
 ``depthNoiseSeed``. The same world state, camera pose, properties, and seed
 produce the same noisy depth image.
 

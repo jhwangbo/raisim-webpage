@@ -178,3 +178,21 @@ Common issues and solutions
   for example with ``conda install -c nvidia cudnn``.
 * Video recording in ``rayrai_tcp_viewer`` uses ``ffmpeg`` from ``PATH``
   (or ``$RAYRAI_FFMPEG``); without it, the viewer writes a PNG sequence.
+
+Sensor noise seeds
+============================
+
+Each vectorized environment assigns a distinct World sensor seed after ``init()``
+and before the initial ``reset()``: environment index ``i`` uses ``i + 1``.
+``VectorizedEnvironment::setSeed(seed)`` calls the user ``setSeed(seed + i)`` hook
+and then assigns World seed ``uint64_t(uint32_t(seed)) + i + 1``. This works even
+when the derived hook does not call the base implementation. Seed assignment is
+independent of OpenMP scheduling, so cloned runs with the same environment order
+replay their streams. Negative user seeds use their unsigned 32-bit representation
+for the World seed; ranges whose final user seed exceeds ``INT_MAX`` are rejected
+before invoking any hooks.
+
+Reseeding restarts sensor random streams. It preserves delivered measurements,
+IMU filters and bias, and pending samples. When an episode should also restart
+the IMU model, call ``imu->reset()`` from the environment's ``reset()``
+implementation.

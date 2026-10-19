@@ -197,6 +197,54 @@ backend. For tuning guidance, see :doc:`Performance`.
          package version, scene, timestep, step count, and machine fixed. See :doc:`BuildAndTest`
          for other timing examples.
 
+Dense-mesh contact workloads
+============================
+
+Two additional source benchmarks exercise the Unitree G1's hand collision mesh:
+a closed half-sphere with 3,002 vertices and 6,000 triangles. They are separate
+from the eleven recorded comparisons above and require the engine source
+benchmark runner, which is not shipped in the public binary-package workspace.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - Benchmark ID
+     - Workload and measurements
+   * - ``mesh_primitive_proximity``
+     - The hand mesh is posed around a torso cylinder, pelvis box, limb
+       cylinder, capsule and sphere at deterministic random orientations.
+       Many poses overlap in their world AABBs while remaining separated.
+       Defaults: 512 poses per primitive, 20 timed rounds. Reports mean
+       narrowphase time, per-call median, 99th percentile and maximum,
+       overlapping/contact pose counts, and RaiSim contact signatures.
+   * - ``g1_hand_self_collision``
+     - A fixed-base, 29-DoF G1 follows joint PD targets that swing its hands
+       past the torso, pelvis and hips, with intermittent self-contact.
+       Defaults: 20,000 steps at 2.5 ms. Reports mean, 99th percentile and
+       maximum integration time, steps with self-contacts and hand contacts,
+       total contacts, and a RaiSim contact/final-state signature.
+
+Run from an engine source checkout after building the benchmark runner:
+
+.. code-block:: bash
+
+    OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 \
+      ./build-benchmark/benchmark/benchmarks \
+      --bench mesh_primitive_proximity --backend=both -- --poses 512 --rounds 20
+    OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 \
+      ./build-benchmark/benchmark/benchmarks \
+      --bench g1_hand_self_collision --backend=both -- --steps 20000
+
+For proximity, ``--shape torso|pelvis|limb|capsule|sphere`` selects one
+primitive. MuJoCo collides the hand as a convex hull and uses true cylinders;
+RaiSim tests mesh triangles and treats cylinders as capsules for this shape
+pair. Both G1 runs exclude contacts with the nearest ancestor that has
+collision geometry, but use their engines' own dynamics and contact solvers.
+Compare contact counts and, when RaiSim output is expected to match, signatures
+alongside timings. A timing ratio alone does not establish matching contact
+behavior.
+
 Scene illustrations
 ===================
 

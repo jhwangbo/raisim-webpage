@@ -304,6 +304,7 @@ Rayrai Tools And Examples
    examples/rayrai/rayrai_blender_scene_import
    examples/rayrai/rayrai_rgb_camera
    examples/rayrai/rayrai_depth_camera
+   examples/rayrai/rayrai_sensor_noise
    examples/rayrai/rayrai_lidar_pointcloud
    examples/rayrai/rayrai_aruco_marker
    examples/rayrai/rayrai_custom_visuals
@@ -340,6 +341,7 @@ Server Examples
    examples/server/dzhanibekov_effect
    examples/server/granular_media
    examples/server/heightmap_from_png
+   examples/server/imu_sensor_model
    examples/server/inverse_dynamics
    examples/server/kinematic_platform
    examples/server/length_constraints_newtons_cradle

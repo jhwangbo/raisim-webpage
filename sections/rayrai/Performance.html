@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Performance notes and the C++ API reference &mdash; raisim 2.9.4 documentation</title>
+  <title>Performance notes and the C++ API reference &mdash; raisim 2.10.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ba8b8cd0" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../../_static/favicon.png"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=e45b7e07"></script>
+      <script src="../../_static/documentation_options.js?v=67920a36"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -101,10 +101,12 @@
 <li class="toctree-l3"><a class="reference internal" href="PostProcess.html">Post-process effects</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Weather.html">Weather and atmospherics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Capture.html">Capture, diagnostics, and headless rendering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="PhysicsSnapshots.html">Physics snapshots</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Sensors.html">Sensors and depth/LiDAR</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Examples.html">Example targets</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Performance notes and the C++ API reference</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#performance-notes">Performance notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#physics-snapshots-for-independent-cameras">Physics snapshots for independent cameras</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#gpu-paths-and-opengl-requirements">GPU paths and OpenGL requirements</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#dense-foliage">Dense foliage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#frame-submission-and-measurement">Frame submission and measurement</a></li>
@@ -195,9 +197,11 @@ deformables, and heightmaps cull and frame from their rendered bounds rather
 than only from the object origin.</p></li>
 <li><p>Scenes with many local lights can give point, spot and area lights a finite
 range with <code class="docutils literal notranslate"><span class="pre">additionalLightContributionThreshold</span></code> (see <a class="reference internal" href="RenderQuality.html"><span class="doc">Render quality, tone mapping, color grading</span></a>).</p></li>
-<li><p>If the world topology is stable, repeated <code class="docutils literal notranslate"><span class="pre">updateObjectLists()</span></code> calls are cheap:
-rayrai refreshes appearances without rebuilding the object cache unless objects
-were added or removed.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">updateObjectLists()</span></code> copies only what changed in the bound World: an unchanged
+object costs a revision check, and the object cache is rebuilt only when objects
+are added or removed. A heightmap edit copies and uploads only the rows it
+changes. <code class="docutils literal notranslate"><span class="pre">rayrai_world_sync_benchmark</span></code> measures the copy and a small frame for
+moving boxes, robots, edited heightmaps and a deformable terrain.</p></li>
 <li><p>RGB/depth CPU readback supports an optional PBO-backed asynchronous path. The
 synchronous path remains the deterministic default for simple RL loops.</p></li>
 <li><p>Dynamic point clouds and instanced visuals support partial buffer updates for
@@ -205,6 +209,39 @@ streaming changes.</p></li>
 <li><p>Deformable TCP streaming sends topology/indices only during initialization or topology
 changes; normal frames send vertex positions only.</p></li>
 </ul>
+</section>
+<section id="physics-snapshots-for-independent-cameras">
+<h2>Physics snapshots for independent cameras<a class="headerlink" href="#physics-snapshots-for-independent-cameras" title="Link to this heading"></a></h2>
+<p>Use <a class="reference internal" href="PhysicsSnapshots.html"><span class="doc">Physics snapshots</span></a> to separate physics capture from camera rendering.
+Capture a shared immutable frame immediately after integration under the World
+mutex, then apply and render it on the owning GL thread after releasing that
+mutex. The capture pool reuses buffers only after consumers release them.
+Persistent shape descriptions are shared, articulated frames contain one pose
+per link, and geometry and appearance have separate revisions. Membership is
+reconciled only when it changes; dynamic mesh updates preserve unchanged
+indices and heightmap patch ranges.</p>
+<p>The source target <code class="docutils literal notranslate"><span class="pre">rayrai_physics_snapshot_benchmark</span></code> measures capture/apply
+for 1,000 unchanged and moving boxes after warmup, excluding rendering and
+readback. The dedicated guide includes API examples, the latest-frame mailbox
+pattern, copied RGB/depth camera state, and lifetime rules.</p>
+<p>Animated articulated visuals retain their loaded meshes when only scale,
+local pose, link attachment or color changes. Candidate bounds and shadows
+follow transform edits. Replacing a mesh file or resizing a capsule retains
+unrelated model assets while acquiring the new geometry; see
+<a class="reference internal" href="PhysicsSnapshots.html"><span class="doc">Physics snapshots</span></a> for the visual fields to edit.</p>
+<p>The engine source target <code class="docutils literal notranslate"><span class="pre">rayrai_animated_mesh_reuse_test</span> <span class="pre">--benchmark</span></code>
+measures capture/apply while a robot’s authored mesh scale changes over 1,000
+updates. It releases frame-scoped asset owners as rendering does and reports
+<code class="docutils literal notranslate"><span class="pre">animated_mesh_apply_us</span></code> and <code class="docutils literal notranslate"><span class="pre">model_reloads</span></code>. With unchanged model files,
+<code class="docutils literal notranslate"><span class="pre">model_reloads</span></code> should remain zero. Run with one thread and a working
+OpenGL context, for example from a standalone visualizer build:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">MKL_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">LP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>./build-visualizer/rayrai/rayrai_animated_mesh_reuse_test<span class="w"> </span>--benchmark
+</pre></div>
+</div>
+<p>The test without <code class="docutils literal notranslate"><span class="pre">--benchmark</span></code> checks synchronous and asynchronous loading,
+both applied snapshots and a bound World, rendered depth, capsule resizing,
+and mesh-file replacement.</p>
 </section>
 <section id="gpu-paths-and-opengl-requirements">
 <h2>GPU paths and OpenGL requirements<a class="headerlink" href="#gpu-paths-and-opengl-requirements" title="Link to this heading"></a></h2>
@@ -1561,7 +1598,7 @@ renderer’s object lists must be current before the next render.</p></li>
 <p><code class="docutils literal notranslate"><span class="pre">MultiThread</span></code> is for RL / batch-render setups that spawn one <a class="reference internal" href="#classraisin_1_1RayraiWindow"><span class="std std-ref">RayraiWindow</span></a> per worker thread, each with its own offscreen GL context. State that would otherwise need synchronization is owned by the object it describes — a resolved uniform location by its Shader, GL context state by the renderer driving that context — rather than kept per-thread, so handing a context between threads does not strand it. Shared resources (immutable mesh templates and shader compilation) are coordinated. File textures and mutable material state are local to each worker/context.</p>
 <p>This is instance confinement, not concurrent access to one window. Construct, render, read back, edit, and destroy a renderer on its owning worker with its GL context current. Do not integrate or mutate its World on another thread while rendering. Prefer an independent World per worker. Keep application supplied mutable materials, cameras, visuals and GPU objects worker-local. Create/destroy SDL windows on the main thread and hand their contexts to workers with makeOffscreenContextCurrent after detaching them on the main thread. All renderers in the process, including prewarmers, must use this mode.</p>
 <p>What workers share and what they duplicate: immutable mesh geometry is shared between contexts in one GL share group, so a model imported by one worker costs no second vertex/index upload. Textures are not: rayrai retunes filtering and anisotropy on the texture object itself, per material and per render-quality preset, so a shared texture would let one worker’s settings rewrite another’s. Each worker therefore decodes and uploads its own copy of every image, and a textured model’s geometry is not shared either. Lifting that needs filtering to move off the texture object onto GL sampler objects bound per texture unit.</p>
-<p>In either mode, rendering reads the World. A render call (<a class="reference internal" href="#classraisin_1_1RayraiWindow_1a08a0eaf7026ed37d7efd9a9010743c22"><span class="std std-ref">update()</span></a>, <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a059c84d685b1224287007b6a9712062b"><span class="std std-ref">renderWithExternalCamera()</span></a>, <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a735bbfb87d5147455054e9b8a4f56389"><span class="std std-ref">renderDepthPlaneDistance()</span></a>, …) refreshes the object lists and reads every body’s pose from the World while it issues its draw calls, for the shadow maps and again for the image; <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a0401849106e52f920f0f5cac04e6d30c"><span class="std std-ref">updateObjectLists()</span></a> does not take a snapshot. An application that steps or edits the World on another thread must keep that thread out for the whole call, for example by holding the World’s mutex (<a class="reference internal" href="../WorldSystem.html#classraisim_1_1World"><span class="std std-ref">raisim::World</span></a> is lockable). A step in the middle of a call draws the shadow maps and the image from different states, which shows as bodies shadowed by moved copies of themselves. Reading the image back into an application buffer (<a class="reference internal" href="#classraisin_1_1Camera_1acead2df2c2cae9dc42ed71d2fee5e4ab"><span class="std std-ref">Camera::getRawImage()</span></a> with SensorStorageMode::CUSTOM_BUFFER) does not read the World and can follow after the lock is released.</p>
+<p>Rendering draws a copy of the World’s render state (a PhysicsSnapshot), never the World itself. A render call (<a class="reference internal" href="#classraisin_1_1RayraiWindow_1a08a0eaf7026ed37d7efd9a9010743c22"><span class="std std-ref">update()</span></a>, <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a059c84d685b1224287007b6a9712062b"><span class="std std-ref">renderWithExternalCamera()</span></a>, <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a735bbfb87d5147455054e9b8a4f56389"><span class="std std-ref">renderDepthPlaneDistance()</span></a>, …) first copies the bound World (<a class="reference internal" href="#classraisin_1_1RayraiWindow_1a0401849106e52f920f0f5cac04e6d30c"><span class="std std-ref">updateObjectLists()</span></a>); the shadow maps and the image then come from that copy. An application that steps or edits the World on another thread must keep that thread out of the copy, for example by holding the World’s mutex (<a class="reference internal" href="../WorldSystem.html#classraisim_1_1World"><span class="std std-ref">raisim::World</span></a> is lockable) for the render call. Reading the image back into an application buffer (<a class="reference internal" href="#classraisin_1_1Camera_1acead2df2c2cae9dc42ed71d2fee5e4ab"><span class="std std-ref">Camera::getRawImage()</span></a> with SensorStorageMode::CUSTOM_BUFFER) does not read the World and can follow after the lock is released. For independent physics and camera threads, capture a PhysicsSnapshot on the physics thread immediately after integration, then <a class="reference internal" href="#classraisin_1_1RayraiWindow_1abcba986d38ce7127964ea99f83d3f6c3"><span class="std std-ref">applyPhysicsSnapshot()</span></a> on the render thread: render calls then never read a World. Snapshot capture performs no GL work and must not wait for a render mutex. The overloads that take a raisim sensor and the GPU lidar read the live World, so they are refused while an applied snapshot is shown.</p>
 <p>Mixing the two — for example, constructing several <code class="docutils literal notranslate"><span class="pre">SingleThread</span></code> windows on different threads — is unsupported. </p>
 <p><em>Values:</em></p>
 <dl class="cpp enumerator">
@@ -3228,8 +3265,26 @@ Identical to <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow17updateObjectListsEv">
 <span id="_CPPv3N6raisin12RayraiWindow17updateObjectListsEv"></span><span id="_CPPv2N6raisin12RayraiWindow17updateObjectListsEv"></span><span id="raisin::RayraiWindow::updateObjectLists"></span><span class="target" id="classraisin_1_1RayraiWindow_1a0401849106e52f920f0f5cac04e6d30c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">updateObjectLists</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow17updateObjectListsEv" title="Link to this definition"></a><br /></dt>
-<dd><p>Refresh internal lists of raisim objects. </p>
-<p>Picks up objects added to or removed from the world and updated tendons. Every render calls this automatically. It does not snapshot the bodies’ poses: renders read them from the World as they draw (see <a class="reference internal" href="#classraisin_1_1RayraiWindow_1ac60a9fed4737e2679b298f856c2f0625"><span class="std std-ref">ThreadingMode</span></a> for stepping the World on another thread). </p>
+<dd><p>Copy the bound World’s render state for the next renders. </p>
+<p>Captures the World’s objects, poses, appearance, terrain and deformable geometry, tendons and .rscene scene into a PhysicsSnapshot and applies it. Every render calls this automatically; renders draw the copy, not the World (see <a class="reference internal" href="#classraisin_1_1RayraiWindow_1ac60a9fed4737e2679b298f856c2f0625"><span class="std std-ref">ThreadingMode</span></a> for stepping the World on another thread). Does nothing while an <a class="reference internal" href="#classraisin_1_1RayraiWindow_1abcba986d38ce7127964ea99f83d3f6c3"><span class="std std-ref">applyPhysicsSnapshot()</span></a> snapshot is shown. Requires a current GL context. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow20applyPhysicsSnapshotENSt10shared_ptrIK15PhysicsSnapshotEE">
+<span id="_CPPv3N6raisin12RayraiWindow20applyPhysicsSnapshotENSt10shared_ptrIK15PhysicsSnapshotEE"></span><span id="_CPPv2N6raisin12RayraiWindow20applyPhysicsSnapshotENSt10shared_ptrIK15PhysicsSnapshotEE"></span><span id="raisin::RayraiWindow::applyPhysicsSnapshot__std::shared_ptr:PhysicsSnapshotC:"></span><span class="target" id="classraisin_1_1RayraiWindow_1abcba986d38ce7127964ea99f83d3f6c3"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">applyPhysicsSnapshot</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">PhysicsSnapshot</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">snapshot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow20applyPhysicsSnapshotENSt10shared_ptrIK15PhysicsSnapshotEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Show a physics snapshot instead of the bound World.</p>
+<p>Capture with PhysicsSnapshotCapture immediately after integrate2() while the World is protected, publish the immutable snapshot to the render thread without holding a render mutex on the physics thread, and apply it on the render thread with its GL context current. Later renders draw it, including shadow maps, until the next applied snapshot or <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a21210872d42889c2c2020a34d69f100a"><span class="std std-ref">clearPhysicsSnapshot()</span></a>; they never read a World. The snapshot can outlive removed physics objects. Scene files and materials must remain available. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>snapshot</strong> – Frame to show; must be non-null. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RayraiWindow20clearPhysicsSnapshotEv">
+<span id="_CPPv3N6raisin12RayraiWindow20clearPhysicsSnapshotEv"></span><span id="_CPPv2N6raisin12RayraiWindow20clearPhysicsSnapshotEv"></span><span id="raisin::RayraiWindow::clearPhysicsSnapshot"></span><span class="target" id="classraisin_1_1RayraiWindow_1a21210872d42889c2c2020a34d69f100a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clearPhysicsSnapshot</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RayraiWindow20clearPhysicsSnapshotEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Show the bound World again: copies it now, as <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a0401849106e52f920f0f5cac04e6d30c"><span class="std std-ref">updateObjectLists()</span></a> does, so protect it as for a render. Requires a current GL context. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -8811,6 +8866,12 @@ The texture gets GL_REPEAT wrapping, mipmaps, and the process-wide defaults from
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin6Camera6CameraERKN6raisim11DepthCamera21DepthCameraPropertiesE">
+<span id="_CPPv3N6raisin6Camera6CameraERKN6raisim11DepthCamera21DepthCameraPropertiesE"></span><span id="_CPPv2N6raisin6Camera6CameraERKN6raisim11DepthCamera21DepthCameraPropertiesE"></span><span id="raisin::Camera::Camera__raisim::DepthCamera::DepthCameraPropertiesCR"></span><span class="target" id="classraisin_1_1Camera_1a5d83a1ea98c4fb628b3d6f4f6048f0a2"></span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Camera</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../Sensors.html#_CPPv4N6raisim11DepthCameraE" title="raisim::DepthCamera"><span class="n"><span class="pre">DepthCamera</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../Sensors.html#_CPPv4N6raisim11DepthCamera21DepthCameraPropertiesE" title="raisim::DepthCamera::DepthCameraProperties"><span class="n"><span class="pre">DepthCameraProperties</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">properties</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin6Camera6CameraERKN6raisim11DepthCamera21DepthCameraPropertiesE" title="Link to this definition"></a><br /></dt>
+<dd><p>Build render targets from copied calibration; never accesses a live sensor. </p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisin6Camera10instanceIdEv">
 <span id="_CPPv3NK6raisin6Camera10instanceIdEv"></span><span id="_CPPv2NK6raisin6Camera10instanceIdEv"></span><span id="raisin::Camera::instanceIdC"></span><span class="target" id="classraisin_1_1Camera_1ae06fb2e2c09fd56657cc2acff0568c39"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">instanceId</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin6Camera10instanceIdEv" title="Link to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
@@ -8987,10 +9048,34 @@ The texture gets GL_REPEAT wrapping, mipmaps, and the process-wide defaults from
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin6Camera15setTargetObjectEPN6raisim6ObjectE">
 <span id="_CPPv3N6raisin6Camera15setTargetObjectEPN6raisim6ObjectE"></span><span id="_CPPv2N6raisin6Camera15setTargetObjectEPN6raisim6ObjectE"></span><span id="raisin::Camera::setTargetObject__raisim::ObjectP"></span><span class="target" id="classraisin_1_1Camera_1a008efae5a3c6178af4f64391c053f2dc"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setTargetObject</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../Object.html#_CPPv4N6raisim6ObjectE" title="raisim::Object"><span class="n"><span class="pre">Object</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin6Camera15setTargetObjectEPN6raisim6ObjectE" title="Link to this definition"></a><br /></dt>
 <dd><p>Set a raisim object to track as the camera target. </p>
-<p>A non-null object clears the fixed-target lock. The object is not owned and must outlive its use here. </p>
+<p>A non-null object clears the fixed-target lock. The camera never reads the object: the <a class="reference internal" href="#classraisin_1_1RayraiWindow"><span class="std std-ref">RayraiWindow</span></a> that renders with this camera follows its origin in the rendered physics frame (<a class="reference internal" href="#classraisin_1_1Camera_1a2e459620f6cb555a6c7679b2445d9202"><span class="std std-ref">followTargetObject()</span></a>), and releases the camera once the object is gone. A fixed distance locked before the first followed frame is measured on that frame. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>target</strong> – Raisim object to follow (its body-0 position), or nullptr to clear. </p>
+<dd class="field-odd"><p><strong>target</strong> – Raisim object to follow, or nullptr to clear. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin6Camera13releaseTargetEv">
+<span id="_CPPv3N6raisin6Camera13releaseTargetEv"></span><span id="_CPPv2N6raisin6Camera13releaseTargetEv"></span><span id="raisin::Camera::releaseTarget"></span><span class="target" id="classraisin_1_1Camera_1a41b642302f9a1e3d3ff4bd12d27f0e6f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">releaseTarget</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin6Camera13releaseTargetEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Stop following: clears the target object and the fixed-target and fixed-distance locks. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin6Camera18followTargetObjectE8uint64_tRKN3glm4vec3E">
+<span id="_CPPv3N6raisin6Camera18followTargetObjectE8uint64_tRKN3glm4vec3E"></span><span id="_CPPv2N6raisin6Camera18followTargetObjectE8uint64_tRKN3glm4vec3E"></span><span id="raisin::Camera::followTargetObject__uint64_t.glm::vec3CR"></span><span class="target" id="classraisin_1_1Camera_1a2e459620f6cb555a6c7679b2445d9202"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">followTargetObject</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">instance</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec3</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">position</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin6Camera18followTargetObjectE8uint64_tRKN3glm4vec3E" title="Link to this definition"></a><br /></dt>
+<dd><p>Internal: the followed <a class="reference internal" href="#classraisin_1_1Camera_1ac4a8b12ffc4278c4763c7930fba8a56a"><span class="std std-ref">targetObject</span></a> as rendered, set by <a class="reference internal" href="#classraisin_1_1RayraiWindow"><span class="std std-ref">RayraiWindow</span></a> whenever it renders; applications do not call this. </p>
+<p>A camera that <a class="reference internal" href="#classraisin_1_1Camera_1ada374b60d9662a9057fb3276d09b4ad6"><span class="std std-ref">update()</span></a> placed moves with the object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>instance</strong> – <a class="reference internal" href="#classraisin_1_1RaisimObject_1aa3daa39cdd7164ce3fc13d4fec159e8b"><span class="std std-ref">RaisimObject::instanceId()</span></a> of the object’s drawable. </p></li>
+<li><p><strong>position</strong> – World position of the object’s origin. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>False when another object now has the target’s address: the caller releases it. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -9432,7 +9517,7 @@ The texture gets GL_REPEAT wrapping, mipmaps, and the process-wide defaults from
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisin6Camera11getRawImageERN6raisim9RGBCameraE17SensorStorageModePc6size_tb">
 <span id="_CPPv3NK6raisin6Camera11getRawImageERN6raisim9RGBCameraE17SensorStorageModePc6size_tb"></span><span id="_CPPv2NK6raisin6Camera11getRawImageERN6raisim9RGBCameraE17SensorStorageModePc6size_tb"></span><span id="raisin::Camera::getRawImage__raisim::RGBCameraR.SensorStorageMode.cP.s.bC"></span><span class="target" id="classraisin_1_1Camera_1acead2df2c2cae9dc42ed71d2fee5e4ab"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getRawImage</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../Sensors.html#_CPPv4N6raisim9RGBCameraE" title="raisim::RGBCamera"><span class="n"><span class="pre">RGBCamera</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">sensor</span></span>, <a class="reference internal" href="#_CPPv4N6raisin6Camera17SensorStorageModeE" title="raisin::Camera::SensorStorageMode"><span class="n"><span class="pre">SensorStorageMode</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">mode</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisin6Camera17SensorStorageModeE" title="raisin::Camera::SensorStorageMode"><span class="n"><span class="pre">SensorStorageMode</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6raisin6Camera17SensorStorageMode13SENSOR_SETTERE" title="raisin::Camera::SensorStorageMode::SENSOR_SETTER"><span class="n"><span class="pre">SENSOR_SETTER</span></span></a>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">customBuffer</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">customBufferSize</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">flipVertical</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin6Camera11getRawImageERN6raisim9RGBCameraE17SensorStorageModePc6size_tb" title="Link to this definition"></a><br /></dt>
 <dd><p>Read the color buffer into a raisim RGB camera or custom buffer. </p>
-<p>Synchronously reads the scene color target (before post-processing) as 8-bit BGRA, width*height*4 bytes; each channel is clamped to [0, 1] and rounded to the nearest 8-bit value. The image is packed on the GPU first, so the readback is a plain copy. The sensor resolution must match the render target and the scene color target must exist (fatal otherwise). Requires a current GL context. </p>
+<p>Synchronously reads the scene color target (before post-processing) as 8-bit BGRA, width*height*4 bytes; each channel is clamped to [0, 1] and rounded to the nearest 8-bit value. Hardware renderers pack the image on the GPU; software renderers convert native half-float pixels with exact CPU arithmetic. The sensor resolution must match the render target and the scene color target must exist (fatal otherwise). Requires a current GL context. The sensor’s configured measurement noise is applied in place after readback, in either storage mode; each call advances that sensor’s random stream. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -9450,7 +9535,7 @@ The texture gets GL_REPEAT wrapping, mipmaps, and the process-wide defaults from
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisin6Camera11getRawImageERN6raisim11DepthCameraE17SensorStorageModePf6size_tb">
 <span id="_CPPv3NK6raisin6Camera11getRawImageERN6raisim11DepthCameraE17SensorStorageModePf6size_tb"></span><span id="_CPPv2NK6raisin6Camera11getRawImageERN6raisim11DepthCameraE17SensorStorageModePf6size_tb"></span><span id="raisin::Camera::getRawImage__raisim::DepthCameraR.SensorStorageMode.floatP.s.bC"></span><span class="target" id="classraisin_1_1Camera_1a019afd74daa7f7329835abb9dfa96cc5"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getRawImage</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../Sensors.html#_CPPv4N6raisim11DepthCameraE" title="raisim::DepthCamera"><span class="n"><span class="pre">DepthCamera</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">sensor</span></span>, <a class="reference internal" href="#_CPPv4N6raisin6Camera17SensorStorageModeE" title="raisin::Camera::SensorStorageMode"><span class="n"><span class="pre">SensorStorageMode</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">mode</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisin6Camera17SensorStorageModeE" title="raisin::Camera::SensorStorageMode"><span class="n"><span class="pre">SensorStorageMode</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6raisin6Camera17SensorStorageMode13SENSOR_SETTERE" title="raisin::Camera::SensorStorageMode::SENSOR_SETTER"><span class="n"><span class="pre">SENSOR_SETTER</span></span></a>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">customBuffer</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">customBufferLength</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">flipVertical</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin6Camera11getRawImageERN6raisim11DepthCameraE17SensorStorageModePf6size_tb" title="Link to this definition"></a><br /></dt>
 <dd><p>Read the linear depth buffer into a raisim depth camera or custom buffer. </p>
-<p>Synchronous read of the R32F linear-depth target. With <code class="docutils literal notranslate"><span class="pre">flipVertical</span></code> the rows are reversed on the GPU before the copy. The sensor resolution must match the render target and the linear-depth target must exist (fatal otherwise). </p>
+<p>Synchronous read of the R32F linear-depth target. With <code class="docutils literal notranslate"><span class="pre">flipVertical</span></code> the rows are reversed on the GPU for hardware renderers or in CPU memory for software renderers, preserving sample bytes. The sensor resolution must match the render target and the linear-depth target must exist (fatal otherwise). The sensor’s configured measurement noise, quantization and dropout are applied in place in either storage mode. Readback does not populate the sensor’s 3D points. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -9462,6 +9547,18 @@ The texture gets GL_REPEAT wrapping, mipmaps, and the process-wide defaults from
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisin6Camera18readSceneColorBgraEPc6size_tb">
+<span id="_CPPv3NK6raisin6Camera18readSceneColorBgraEPc6size_tb"></span><span id="_CPPv2NK6raisin6Camera18readSceneColorBgraEPc6size_tb"></span><span id="raisin::Camera::readSceneColorBgra__cP.s.bC"></span><span class="target" id="classraisin_1_1Camera_1a3eec42c4d8974c09d7e82620cfdc7bcd"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">readSceneColorBgra</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">destination</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bytes</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">flipVertical</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin6Camera18readSceneColorBgraEPc6size_tb" title="Link to this definition"></a><br /></dt>
+<dd><p>Synchronous BGRA8 readback into application-owned storage; no raisim sensor is accessed. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisin6Camera15readLinearDepthEPf6size_tb">
+<span id="_CPPv3NK6raisin6Camera15readLinearDepthEPf6size_tb"></span><span id="_CPPv2NK6raisin6Camera15readLinearDepthEPf6size_tb"></span><span id="raisin::Camera::readLinearDepth__floatP.s.bC"></span><span class="target" id="classraisin_1_1Camera_1af7381647b612f7c5db5e91022f15a0df"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">readLinearDepth</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">destination</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">samples</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">flipVertical</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin6Camera15readLinearDepthEPf6size_tb" title="Link to this definition"></a><br /></dt>
+<dd><p>Synchronous float32 plane-depth readback; no raisim sensor is accessed. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -9806,7 +9903,7 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin6Camera12targetObjectE">
 <span id="_CPPv3N6raisin6Camera12targetObjectE"></span><span id="_CPPv2N6raisin6Camera12targetObjectE"></span><span id="raisin::Camera::targetObject__raisim::ObjectP"></span><span class="target" id="classraisin_1_1Camera_1ac4a8b12ffc4278c4763c7930fba8a56a"></span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../Object.html#_CPPv4N6raisim6ObjectE" title="raisim::Object"><span class="n"><span class="pre">Object</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">targetObject</span></span></span><a class="headerlink" href="#_CPPv4N6raisin6Camera12targetObjectE" title="Link to this definition"></a><br /></dt>
-<dd><p>Current target raisim object (if any). </p>
+<dd><p>Current target raisim object (if any); an identity key, never dereferenced. </p>
 </dd></dl>
 
 </div>
@@ -23913,8 +24010,61 @@ points and the fast-path boundaries for those APIs.</p>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin12RaisimObjectE">
 <span id="_CPPv3N6raisin12RaisimObjectE"></span><span id="_CPPv2N6raisin12RaisimObjectE"></span><span id="raisin::RaisimObject"></span><span class="target" id="classraisin_1_1RaisimObject"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RaisimObject</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RaisimObjectE" title="Link to this definition"></a><br /></dt>
-<dd><p>Render wrapper for a <a class="reference internal" href="../Object.html#classraisim_1_1Object"><span class="std std-ref">raisim::Object</span></a>. </p>
-<p><a class="reference internal" href="#classraisin_1_1RaisimObject"><span class="std std-ref">RaisimObject</span></a> caches meshes and per-shape scales for a raisim object and exposes a draw method that respects appearance and collision-visual toggles. </p>
+<dd><p>Render state of one <a class="reference internal" href="../Object.html#classraisim_1_1Object"><span class="std std-ref">raisim::Object</span></a>, built from physics snapshots. </p>
+<p><a class="reference internal" href="#classraisin_1_1RaisimObject"><span class="std std-ref">RaisimObject</span></a> owns the meshes, colors and world transforms of an object as of the last applied PhysicsObjectSnapshot. It never reads the source <a class="reference internal" href="../Object.html#classraisim_1_1Object"><span class="std std-ref">raisim::Object</span></a>, so it stays usable after the object is removed; the snapshot’s object pointer is an identity key only. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-snapshot-state">Snapshot state</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisin12RaisimObject12sourceObjectEv">
+<span id="_CPPv3NK6raisin12RaisimObject12sourceObjectEv"></span><span id="_CPPv2NK6raisin12RaisimObject12sourceObjectEv"></span><span id="raisin::RaisimObject::sourceObjectC"></span><span class="target" id="classraisin_1_1RaisimObject_1a30396076a3417680e088daf652c394ac"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../Object.html#_CPPv4N6raisim6ObjectE" title="raisim::Object"><span class="n"><span class="pre">Object</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">sourceObject</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin12RaisimObject12sourceObjectEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The source object, as an identity key only; it may no longer exist. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisin12RaisimObject10instanceIdEv">
+<span id="_CPPv3NK6raisin12RaisimObject10instanceIdEv"></span><span id="_CPPv2NK6raisin12RaisimObject10instanceIdEv"></span><span id="raisin::RaisimObject::instanceIdC"></span><span class="target" id="classraisin_1_1RaisimObject_1aa3daa39cdd7164ce3fc13d4fec159e8b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">instanceId</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin12RaisimObject10instanceIdEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>An id no other <a class="reference internal" href="#classraisin_1_1RaisimObject"><span class="std std-ref">RaisimObject</span></a> in the process had, so a drawable built for another object at the same address is told apart. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisin12RaisimObject14renderRevisionEv">
+<span id="_CPPv3NK6raisin12RaisimObject14renderRevisionEv"></span><span id="_CPPv2NK6raisin12RaisimObject14renderRevisionEv"></span><span id="raisin::RaisimObject::renderRevisionC"></span><span class="target" id="classraisin_1_1RaisimObject_1ac1fd91d64f4386b0b10cd1ca6156c19a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">renderRevision</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin12RaisimObject14renderRevisionEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Revision that advances whenever the drawn state changes. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisin12RaisimObject13worldPositionEv">
+<span id="_CPPv3NK6raisin12RaisimObject13worldPositionEv"></span><span id="_CPPv2NK6raisin12RaisimObject13worldPositionEv"></span><span id="raisin::RaisimObject::worldPositionC"></span><span class="target" id="classraisin_1_1RaisimObject_1a54a90be19e88b3d9c249d25036fe6bd8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec3</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">worldPosition</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin12RaisimObject13worldPositionEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>World position of the object origin (the plane height for a ground). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisin12RaisimObject13worldRotationEv">
+<span id="_CPPv3NK6raisin12RaisimObject13worldRotationEv"></span><span id="_CPPv2NK6raisin12RaisimObject13worldRotationEv"></span><span id="raisin::RaisimObject::worldRotationC"></span><span class="target" id="classraisin_1_1RaisimObject_1a1a7625916e9078b7276386796e57deef"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">mat3</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">worldRotation</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin12RaisimObject13worldRotationEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>World rotation of the object frame. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-material-queries">Material queries</p>
 <p>Internal: renderer pass-selection queries over all cached meshes. </p>
@@ -24052,15 +24202,15 @@ points and the fast-path boundaries for those APIs.</p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RaisimObject12RaisimObjectEPN6raisim6ObjectEP12RayraiWindowNSt10shared_ptrI17RayraiGlobalAssetEE">
-<span id="_CPPv3N6raisin12RaisimObject12RaisimObjectEPN6raisim6ObjectEP12RayraiWindowNSt10shared_ptrI17RayraiGlobalAssetEE"></span><span id="_CPPv2N6raisin12RaisimObject12RaisimObjectEPN6raisim6ObjectEP12RayraiWindowNSt10shared_ptrI17RayraiGlobalAssetEE"></span><span id="raisin::RaisimObject::RaisimObject__raisim::ObjectP.RayraiWindowP.std::shared_ptr:RayraiGlobalAsset:"></span><span class="target" id="classraisin_1_1RaisimObject_1a00c0e636a8f604ea01d8c838cf018430"></span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RaisimObject</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../Object.html#_CPPv4N6raisim6ObjectE" title="raisim::Object"><span class="n"><span class="pre">Object</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">object</span></span>, <a class="reference internal" href="#_CPPv4N6raisin12RayraiWindowE" title="raisin::RayraiWindow"><span class="n"><span class="pre">RayraiWindow</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">parent</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6raisin17RayraiGlobalAssetE" title="raisin::RayraiGlobalAsset"><span class="n"><span class="pre">RayraiGlobalAsset</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">asset</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RaisimObject12RaisimObjectEPN6raisim6ObjectEP12RayraiWindowNSt10shared_ptrI17RayraiGlobalAssetEE" title="Link to this definition"></a><br /></dt>
-<dd><p>Construct a render wrapper for a raisim object. </p>
-<p>Builds or fetches the geometry for every visual (articulated systems get both visual and collision meshes). Primitive and file meshes come from <code class="docutils literal notranslate"><span class="pre">asset</span></code> and are shared with other objects; meshes of objects whose appearance is hidden at creation may be loaded lazily when shown. Requires a current GL context. </p>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RaisimObject12RaisimObjectERK21PhysicsObjectSnapshotP12RayraiWindowNSt10shared_ptrI17RayraiGlobalAssetEE">
+<span id="_CPPv3N6raisin12RaisimObject12RaisimObjectERK21PhysicsObjectSnapshotP12RayraiWindowNSt10shared_ptrI17RayraiGlobalAssetEE"></span><span id="_CPPv2N6raisin12RaisimObject12RaisimObjectERK21PhysicsObjectSnapshotP12RayraiWindowNSt10shared_ptrI17RayraiGlobalAssetEE"></span><span id="raisin::RaisimObject::RaisimObject__PhysicsObjectSnapshotCR.RayraiWindowP.std::shared_ptr:RayraiGlobalAsset:"></span><span class="target" id="classraisin_1_1RaisimObject_1ada368ddb4225c5eb5594658334a38abc"></span><span class="sig-name descname"><span class="n"><span class="pre">RaisimObject</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">PhysicsObjectSnapshot</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">snapshot</span></span>, <a class="reference internal" href="#_CPPv4N6raisin12RayraiWindowE" title="raisin::RayraiWindow"><span class="n"><span class="pre">RayraiWindow</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">parent</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6raisin17RayraiGlobalAssetE" title="raisin::RayraiGlobalAsset"><span class="n"><span class="pre">RayraiGlobalAsset</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">asset</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RaisimObject12RaisimObjectERK21PhysicsObjectSnapshotP12RayraiWindowNSt10shared_ptrI17RayraiGlobalAssetEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Build the render state of a snapshot object. </p>
+<p>Builds or fetches the geometry of every visual (articulated systems get both visual and collision meshes). Primitive and file meshes come from <code class="docutils literal notranslate"><span class="pre">asset</span></code> and are shared with other objects; meshes of hidden capsules and mesh files load once the object is shown. Requires a current GL context. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>object</strong> – Raisim object to wrap (not owned; must be non-null). </p></li>
-<li><p><strong>parent</strong> – Owning <a class="reference internal" href="#classraisin_1_1RayraiWindow"><span class="std std-ref">RayraiWindow</span></a> (for shared assets/settings). </p></li>
+<li><p><strong>snapshot</strong> – Object state, copied; it must have a description. </p></li>
+<li><p><strong>parent</strong> – Owning <a class="reference internal" href="#classraisin_1_1RayraiWindow"><span class="std std-ref">RayraiWindow</span></a> (for shared textures and settings). </p></li>
 <li><p><strong>asset</strong> – Asset cache to load primitive/mesh geometry. </p></li>
 </ul>
 </dd>
@@ -24068,17 +24218,31 @@ points and the fast-path boundaries for those APIs.</p>
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RaisimObject4drawER6ShaderbN10OpenGLMesh10RenderModeE8uint64_t">
-<span id="_CPPv3N6raisin12RaisimObject4drawER6ShaderbN10OpenGLMesh10RenderModeE8uint64_t"></span><span id="_CPPv2N6raisin12RaisimObject4drawER6ShaderbN10OpenGLMesh10RenderModeE8uint64_t"></span><span id="raisin::RaisimObject::draw__ShaderR.b.OpenGLMesh::RenderMode.uint64_t"></span><span class="target" id="classraisin_1_1RaisimObject_1a693f4ab372d1809bdf0333b86c080bb4"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">draw</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Shader</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">shader</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">showCollisionBodies</span></span>, <a class="reference internal" href="#_CPPv410OpenGLMesh" title="OpenGLMesh"><span class="n"><span class="pre">OpenGLMesh</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N10OpenGLMesh10RenderModeE" title="OpenGLMesh::RenderMode"><span class="n"><span class="pre">RenderMode</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">mode</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410OpenGLMesh" title="OpenGLMesh"><span class="n"><span class="pre">OpenGLMesh</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N10OpenGLMesh10RenderModeE" title="OpenGLMesh::RenderMode"><span class="n"><span class="pre">RenderMode</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N10OpenGLMesh10RenderMode3AllE" title="OpenGLMesh::RenderMode::All"><span class="n"><span class="pre">All</span></span></a>, <span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">renderSerial</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RaisimObject4drawER6ShaderbN10OpenGLMesh10RenderModeE8uint64_t" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RaisimObject5applyERK21PhysicsObjectSnapshot">
+<span id="_CPPv3N6raisin12RaisimObject5applyERK21PhysicsObjectSnapshot"></span><span id="_CPPv2N6raisin12RaisimObject5applyERK21PhysicsObjectSnapshot"></span><span id="raisin::RaisimObject::apply__PhysicsObjectSnapshotCR"></span><span class="target" id="classraisin_1_1RaisimObject_1a74acb960e041ff56c42ac2db66bcdc57"></span><a class="reference internal" href="#_CPPv4N6raisin12RaisimObject7ChangesE" title="raisin::RaisimObject::Changes"><span class="n"><span class="pre">Changes</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">apply</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">PhysicsObjectSnapshot</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">snapshot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RaisimObject5applyERK21PhysicsObjectSnapshot" title="Link to this definition"></a><br /></dt>
+<dd><p>Advance to a newer snapshot of the same object. </p>
+<p>Uploads changed mesh vertices (a vertex delta when the snapshot provides one) and rebuilds meshes whose shapes changed. An unchanged revision costs a comparison. Requires a current GL context. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>snapshot</strong> – Object state with the same object identity, copied when it changed. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>What changed. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RaisimObject4drawER6ShaderbN10OpenGLMesh10RenderModeE">
+<span id="_CPPv3N6raisin12RaisimObject4drawER6ShaderbN10OpenGLMesh10RenderModeE"></span><span id="_CPPv2N6raisin12RaisimObject4drawER6ShaderbN10OpenGLMesh10RenderModeE"></span><span id="raisin::RaisimObject::draw__ShaderR.b.OpenGLMesh::RenderMode"></span><span class="target" id="classraisin_1_1RaisimObject_1a980a8cdd608b8c7a60e90b8bda0aa533"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">draw</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Shader</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">shader</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">showCollisionBodies</span></span>, <a class="reference internal" href="#_CPPv410OpenGLMesh" title="OpenGLMesh"><span class="n"><span class="pre">OpenGLMesh</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N10OpenGLMesh10RenderModeE" title="OpenGLMesh::RenderMode"><span class="n"><span class="pre">RenderMode</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">mode</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410OpenGLMesh" title="OpenGLMesh"><span class="n"><span class="pre">OpenGLMesh</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N10OpenGLMesh10RenderModeE" title="OpenGLMesh::RenderMode"><span class="n"><span class="pre">RenderMode</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N10OpenGLMesh10RenderMode3AllE" title="OpenGLMesh::RenderMode::All"><span class="n"><span class="pre">All</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RaisimObject4drawER6ShaderbN10OpenGLMesh10RenderModeE" title="Link to this definition"></a><br /></dt>
 <dd><p>Draw the object using the provided shader. </p>
-<p>Sets the <code class="docutils literal notranslate"><span class="pre">shadingType</span></code>, <code class="docutils literal notranslate"><span class="pre">model</span></code> and <code class="docutils literal notranslate"><span class="pre">objectColor</span></code> uniforms per mesh; the shader must already be in use. No-op when hidden or invalid. </p>
+<p>Sets the <code class="docutils literal notranslate"><span class="pre">shadingType</span></code>, <code class="docutils literal notranslate"><span class="pre">model</span></code> and <code class="docutils literal notranslate"><span class="pre">objectColor</span></code> uniforms per mesh; the shader must already be in use. No-op when hidden. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>shader</strong> – Shader used for rendering. </p></li>
 <li><p><strong>showCollisionBodies</strong> – True to render collision geometry when available (articulated systems only). </p></li>
 <li><p><strong>mode</strong> – Which material passes of each mesh to draw. </p></li>
-<li><p><strong>renderSerial</strong> – Frame serial used to upload deformable geometry at most once per frame; 0 always re-syncs. </p></li>
 </ul>
 </dd>
 </dl>
@@ -24090,50 +24254,7 @@ points and the fast-path boundaries for those APIs.</p>
 <dd><p>Check if this object can be selected in the picker. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>True if valid, not hidden, and not a heightmap or ground plane. </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6raisin12RaisimObject7isValidEv">
-<span id="_CPPv3NK6raisin12RaisimObject7isValidEv"></span><span id="_CPPv2NK6raisin12RaisimObject7isValidEv"></span><span id="raisin::RaisimObject::isValidC"></span><span class="target" id="classraisin_1_1RaisimObject_1afc6219307acc0bef478f9e6fe7be3dab"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isValid</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin12RaisimObject7isValidEv" title="Link to this definition"></a><br /></dt>
-<dd><p>True when this wrapper still references a live <a class="reference internal" href="../Object.html#classraisim_1_1Object"><span class="std std-ref">raisim::Object</span></a>. </p>
-<p><code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RaisimObject"><span class="std std-ref"><span class="pre">RaisimObject</span></span></a></code> does not own the underlying raisim object; if the world it came from is destroyed or the object removed, the cached pointer becomes dangling. Public mutators (<code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RaisimObject_1abe1078973d57c7ff995f8cbd88117fa8"><span class="std std-ref"><span class="pre">updateAppearance</span></span></a></code>, <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RaisimObject_1ade39b2b856ca028d87d787ccebf5ceae"><span class="std std-ref"><span class="pre">updateHeightMapVisual</span></span></a></code>, <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RaisimObject_1a9bf34fecd2b05fd71c2a371490d3456b"><span class="std std-ref"><span class="pre">configureGroundMaterial</span></span></a></code>) early-return when <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RaisimObject_1afc6219307acc0bef478f9e6fe7be3dab"><span class="std std-ref"><span class="pre">isValid()</span></span></a></code> is false so callers don’t have to track lifetime themselves. Clear the underlying pointer via <code class="docutils literal notranslate"><a class="reference internal" href="#classraisin_1_1RaisimObject_1a8474875f8a9e4ddaa4c80d84411a8f15"><span class="std std-ref"><span class="pre">invalidate()</span></span></a></code> when the source object is removed. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>True while the wrapped object pointer is set. </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RaisimObject10invalidateEv">
-<span id="_CPPv3N6raisin12RaisimObject10invalidateEv"></span><span id="_CPPv2N6raisin12RaisimObject10invalidateEv"></span><span id="raisin::RaisimObject::invalidate"></span><span class="target" id="classraisin_1_1RaisimObject_1a8474875f8a9e4ddaa4c80d84411a8f15"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">invalidate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RaisimObject10invalidateEv" title="Link to this definition"></a><br /></dt>
-<dd><p>Mark this wrapper as no longer referencing a live <a class="reference internal" href="../Object.html#classraisim_1_1Object"><span class="std std-ref">raisim::Object</span></a>. </p>
-<p>Subsequent calls to mutators become no-ops. The owning <a class="reference internal" href="#classraisin_1_1RayraiWindow"><span class="std std-ref">RayraiWindow</span></a> uses this when the world is reset or an object is removed. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RaisimObject16updateAppearanceEv">
-<span id="_CPPv3N6raisin12RaisimObject16updateAppearanceEv"></span><span id="_CPPv2N6raisin12RaisimObject16updateAppearanceEv"></span><span id="raisin::RaisimObject::updateAppearance"></span><span class="target" id="classraisin_1_1RaisimObject_1abe1078973d57c7ff995f8cbd88117fa8"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">updateAppearance</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RaisimObject16updateAppearanceEv" title="Link to this definition"></a><br /></dt>
-<dd><p>Refresh appearance (color and hidden state) from the underlying raisim object. </p>
-<p>Single-body objects only; articulated systems are ignored. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>True when the color or hidden state changed. </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RaisimObject21updateHeightMapVisualEv">
-<span id="_CPPv3N6raisin12RaisimObject21updateHeightMapVisualEv"></span><span id="_CPPv2N6raisin12RaisimObject21updateHeightMapVisualEv"></span><span id="raisin::RaisimObject::updateHeightMapVisual"></span><span class="target" id="classraisin_1_1RaisimObject_1ade39b2b856ca028d87d787ccebf5ceae"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">updateHeightMapVisual</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RaisimObject21updateHeightMapVisualEv" title="Link to this definition"></a><br /></dt>
-<dd><p>Refresh a heightmap object’s existing mesh vertices without rebuilding its mesh. </p>
-<p>Uploads only the heightmap’s visual dirty rows when available, otherwise all vertices. Triangles touching NaN or infinite heights are omitted; their index buffer is refreshed when holes appear or disappear. Requires a current GL context. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>False if this is not a heightmap or its samples are unavailable. </p>
+<dd class="field-odd"><p>True if not hidden, and not a heightmap or ground plane. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -24158,7 +24279,8 @@ points and the fast-path boundaries for those APIs.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin12RaisimObject9setHiddenEb">
 <span id="_CPPv3N6raisin12RaisimObject9setHiddenEb"></span><span id="_CPPv2N6raisin12RaisimObject9setHiddenEb"></span><span id="raisin::RaisimObject::setHidden__b"></span><span class="target" id="classraisin_1_1RaisimObject_1a24230912ab0447ad9aab5b109544defc"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setHidden</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">h</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin12RaisimObject9setHiddenEb" title="Link to this definition"></a><br /></dt>
-<dd><p>Hide or show this object in rendering. </p>
+<dd><p>Hide or show this object in rendering, independent of its appearance. </p>
+<p>The object is drawn only while neither this nor a “hidden” appearance hides it. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>h</strong> – True to hide. </p>
@@ -24172,7 +24294,7 @@ points and the fast-path boundaries for those APIs.</p>
 <dd><p>Check if object is hidden. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>True if hidden. </p>
+<dd class="field-odd"><p>True if hidden by <a class="reference internal" href="#classraisin_1_1RaisimObject_1a24230912ab0447ad9aab5b109544defc"><span class="std std-ref">setHidden()</span></a> or by its appearance. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -24217,7 +24339,7 @@ points and the fast-path boundaries for those APIs.</p>
 <span id="_CPPv3NK6raisin12RaisimObject21shadowDepthMayDiscardEbb"></span><span id="_CPPv2NK6raisin12RaisimObject21shadowDepthMayDiscardEbb"></span><span id="raisin::RaisimObject::shadowDepthMayDiscard__b.bC"></span><span class="target" id="classraisin_1_1RaisimObject_1a8de5800aff615ac8abaaa7305f8b5cfa"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shadowDepthMayDiscard</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">showCollisionBodies</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">transparentShadowDithering</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin12RaisimObject21shadowDepthMayDiscardEbb" title="Link to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>True when a shadow depth draw of this object can discard fragments: a mesh that <a class="reference internal" href="#classraisin_1_1RaisimObject_1a693f4ab372d1809bdf0333b86c080bb4"><span class="std std-ref">draw()</span></a> draws has an alpha-mask material, or an alpha-blend material while <code class="docutils literal notranslate"><span class="pre">transparentShadowDithering</span></code> is set. Deformable surfaces always report true. </p>
+<dd class="field-odd"><p>True when a shadow depth draw of this object can discard fragments: a mesh that <a class="reference internal" href="#classraisin_1_1RaisimObject_1a980a8cdd608b8c7a60e90b8bda0aa533"><span class="std std-ref">draw()</span></a> draws has an alpha-mask material, or an alpha-blend material while <code class="docutils literal notranslate"><span class="pre">transparentShadowDithering</span></code> is set. Deformable surfaces always report true. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -24236,7 +24358,22 @@ points and the fast-path boundaries for those APIs.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>False when the object is invalid or has no geometry. </p>
+<dd class="field-even"><p>False when the object has no geometry. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisin12RaisimObject13cullingBoundsEbRN3glm4vec3ERf">
+<span id="_CPPv3NK6raisin12RaisimObject13cullingBoundsEbRN3glm4vec3ERf"></span><span id="_CPPv2NK6raisin12RaisimObject13cullingBoundsEbRN3glm4vec3ERf"></span><span id="raisin::RaisimObject::cullingBounds__b.glm::vec3R.floatRC"></span><span class="target" id="classraisin_1_1RaisimObject_1aff239f200982b71c70730b6929eb3602"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cullingBounds</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">showCollisionBodies</span></span>, <span class="n"><span class="pre">glm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vec3</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">center</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">radius</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin12RaisimObject13cullingBoundsEbRN3glm4vec3ERf" title="Link to this definition"></a><br /></dt>
+<dd><p>Bounds for coarse culling: <a class="reference internal" href="#classraisin_1_1RaisimObject_1ad5657cbf483c25232d71f90ef50a39a1"><span class="std std-ref">approximateBounds()</span></a>, or a unit sphere at the object origin when the object draws no geometry. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>showCollisionBodies</strong> – Measure collision instead of visual geometry. </p></li>
+<li><p><strong>center</strong> – <strong>[out]</strong> Sphere center in world coordinates. </p></li>
+<li><p><strong>radius</strong> – <strong>[out]</strong> Sphere radius in metres. </p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -24335,7 +24472,7 @@ points and the fast-path boundaries for those APIs.</p>
 <span id="_CPPv3NK6raisin12RaisimObject29debugModelMatrixCacheRebuildsEv"></span><span id="_CPPv2NK6raisin12RaisimObject29debugModelMatrixCacheRebuildsEv"></span><span id="raisin::RaisimObject::debugModelMatrixCacheRebuildsC"></span><span class="target" id="classraisin_1_1RaisimObject_1afbf93311065069cb8f935b679d87c16d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">debugModelMatrixCacheRebuilds</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisin12RaisimObject29debugModelMatrixCacheRebuildsEv" title="Link to this definition"></a><br /></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Number of model-matrix cache rebuilds, for tests and diagnostics. </p>
+<dd class="field-odd"><p>Number of model-matrix rebuilds, for tests and diagnostics. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -24363,6 +24500,33 @@ points and the fast-path boundaries for those APIs.</p>
 </dd></dl>
 
 </div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RaisimObject7ChangesE">
+<span id="_CPPv3N6raisin12RaisimObject7ChangesE"></span><span id="_CPPv2N6raisin12RaisimObject7ChangesE"></span><span id="raisin::RaisimObject::Changes"></span><span class="target" id="structraisin_1_1RaisimObject_1_1Changes"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Changes</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RaisimObject7ChangesE" title="Link to this definition"></a><br /></dt>
+<dd><p>What <a class="reference internal" href="#classraisin_1_1RaisimObject_1a74acb960e041ff56c42ac2db66bcdc57"><span class="std std-ref">apply()</span></a> changed, for the renderer’s caches. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RaisimObject7Changes8revisionE">
+<span id="_CPPv3N6raisin12RaisimObject7Changes8revisionE"></span><span id="_CPPv2N6raisin12RaisimObject7Changes8revisionE"></span><span id="raisin::RaisimObject::Changes::revision__b"></span><span class="target" id="structraisin_1_1RaisimObject_1_1Changes_1aefd370745710eba3687fe38f67e981ed"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">revision</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RaisimObject7Changes8revisionE" title="Link to this definition"></a><br /></dt>
+<dd><p><a class="reference internal" href="#classraisin_1_1RaisimObject_1ac1fd91d64f4386b0b10cd1ca6156c19a"><span class="std std-ref">renderRevision()</span></a> advanced: the pose, geometry or appearance changed. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RaisimObject7Changes9candidateE">
+<span id="_CPPv3N6raisin12RaisimObject7Changes9candidateE"></span><span id="_CPPv2N6raisin12RaisimObject7Changes9candidateE"></span><span id="raisin::RaisimObject::Changes::candidate__b"></span><span class="target" id="structraisin_1_1RaisimObject_1_1Changes_1a00c6664b21f7e57a041f0bbd4f6da5a0"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">candidate</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RaisimObject7Changes9candidateE" title="Link to this definition"></a><br /></dt>
+<dd><p>Draw candidates are stale: appearance, visibility, shapes, body type, or a static pose. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin12RaisimObject7Changes6shadowE">
+<span id="_CPPv3N6raisin12RaisimObject7Changes6shadowE"></span><span id="_CPPv2N6raisin12RaisimObject7Changes6shadowE"></span><span id="raisin::RaisimObject::Changes::shadow__b"></span><span class="target" id="structraisin_1_1RaisimObject_1_1Changes_1a9cebc96a4c23b1ab5e11a69936803679"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shadow</span></span></span><a class="headerlink" href="#_CPPv4N6raisin12RaisimObject7Changes6shadowE" title="Link to this definition"></a><br /></dt>
+<dd><p>Shadow maps are stale beyond what caster-motion tracking sees: visibility, shapes or heightmap vertices. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
 </dd></dl>
 
 </section>

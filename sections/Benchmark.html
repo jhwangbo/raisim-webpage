@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Benchmark &mdash; raisim 2.9.4 documentation</title>
+  <title>Benchmark &mdash; raisim 2.10.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=a5c4661c" />
@@ -16,7 +16,7 @@
     <link rel="shortcut icon" href="../_static/favicon.png"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=e45b7e07"></script>
+      <script src="../_static/documentation_options.js?v=67920a36"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../_static/tabs.js?v=3030b3cb"></script>
@@ -59,6 +59,7 @@
 <li class="toctree-l1"><a class="reference internal" href="ProjectLayout.html">Project Layout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Performance.html">Performance</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Benchmark</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#dense-mesh-contact-workloads">Dense-mesh contact workloads</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#scene-illustrations">Scene illustrations</a></li>
 </ul>
 </li>
@@ -266,7 +267,7 @@ parameters and comparison limits are in <strong>Workloads</strong>.</p>
 <p><a class="reference download internal" download="" href="../_downloads/19332509327256bc26e444ea293191e8/benchmark_results.json"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">the</span> <span class="pre">recorded</span> <span class="pre">results</span> <span class="pre">and</span> <span class="pre">exact</span> <span class="pre">arguments</span></code></a>.
 Absolute timings depend on the machine, compiler, and scene. These ratios describe the
 recorded development build; use your application workload to evaluate the distributed
-2.9.4 package.</p>
+2.10.0 package.</p>
 </div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><p>DOF counts generalized velocity coordinates; a floating base contributes six.
 A step count denotes simulation steps unless the row says queries or sensor updates.</p>
 <div class="benchmark-table-block benchmark-table-scenes docutils container">
@@ -453,6 +454,58 @@ package version, scene, timestep, step count, and machine fixed. See <a class="r
 for other timing examples.</p>
 </div></div>
 </div>
+<section id="dense-mesh-contact-workloads">
+<h2>Dense-mesh contact workloads<a class="headerlink" href="#dense-mesh-contact-workloads" title="Link to this heading"></a></h2>
+<p>Two additional source benchmarks exercise the Unitree G1’s hand collision mesh:
+a closed half-sphere with 3,002 vertices and 6,000 triangles. They are separate
+from the eleven recorded comparisons above and require the engine source
+benchmark runner, which is not shipped in the public binary-package workspace.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Benchmark ID</p></th>
+<th class="head"><p>Workload and measurements</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mesh_primitive_proximity</span></code></p></td>
+<td><p>The hand mesh is posed around a torso cylinder, pelvis box, limb
+cylinder, capsule and sphere at deterministic random orientations.
+Many poses overlap in their world AABBs while remaining separated.
+Defaults: 512 poses per primitive, 20 timed rounds. Reports mean
+narrowphase time, per-call median, 99th percentile and maximum,
+overlapping/contact pose counts, and RaiSim contact signatures.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">g1_hand_self_collision</span></code></p></td>
+<td><p>A fixed-base, 29-DoF G1 follows joint PD targets that swing its hands
+past the torso, pelvis and hips, with intermittent self-contact.
+Defaults: 20,000 steps at 2.5 ms. Reports mean, 99th percentile and
+maximum integration time, steps with self-contacts and hand contacts,
+total contacts, and a RaiSim contact/final-state signature.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Run from an engine source checkout after building the benchmark runner:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">MKL_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>./build-benchmark/benchmark/benchmarks<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--bench<span class="w"> </span>mesh_primitive_proximity<span class="w"> </span>--backend<span class="o">=</span>both<span class="w"> </span>--<span class="w"> </span>--poses<span class="w"> </span><span class="m">512</span><span class="w"> </span>--rounds<span class="w"> </span><span class="m">20</span>
+<span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">MKL_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>./build-benchmark/benchmark/benchmarks<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--bench<span class="w"> </span>g1_hand_self_collision<span class="w"> </span>--backend<span class="o">=</span>both<span class="w"> </span>--<span class="w"> </span>--steps<span class="w"> </span><span class="m">20000</span>
+</pre></div>
+</div>
+<p>For proximity, <code class="docutils literal notranslate"><span class="pre">--shape</span> <span class="pre">torso|pelvis|limb|capsule|sphere</span></code> selects one
+primitive. MuJoCo collides the hand as a convex hull and uses true cylinders;
+RaiSim tests mesh triangles and treats cylinders as capsules for this shape
+pair. Both G1 runs exclude contacts with the nearest ancestor that has
+collision geometry, but use their engines’ own dynamics and contact solvers.
+Compare contact counts and, when RaiSim output is expected to match, signatures
+alongside timings. A timing ratio alone does not establish matching contact
+behavior.</p>
+</section>
 <section id="scene-illustrations">
 <h2>Scene illustrations<a class="headerlink" href="#scene-illustrations" title="Link to this heading"></a></h2>
 <div class="benchmark-table-block benchmark-scene-gallery docutils container">

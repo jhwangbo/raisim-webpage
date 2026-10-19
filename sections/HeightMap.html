@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Height Map &mdash; raisim 2.9.4 documentation</title>
+  <title>Height Map &mdash; raisim 2.10.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=ba8b8cd0" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../_static/favicon.png"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=e45b7e07"></script>
+      <script src="../_static/documentation_options.js?v=67920a36"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -241,9 +241,16 @@ full visual height array and <code class="docutils literal notranslate"><span cl
 inclusive rectangular sample range without rebuilding collision. Both require
 the center and size arguments to match the current ones; the center, like that of <code class="docutils literal notranslate"><span class="pre">update(...)</span></code>,
 is in the height map frame (<code class="docutils literal notranslate"><span class="pre">getCenterX()</span></code>, <code class="docutils literal notranslate"><span class="pre">getCenterY()</span></code>). The patch method
-receives the full row-major height array and copies only the requested range. Per-vertex colors use <code class="docutils literal notranslate"><span class="pre">setColor(...)</span></code>; after a full color map has been
+receives the full row-major height array and copies only the requested range;
+when every sample in the range keeps its value (bit for bit), the map reports no
+update. Per-vertex colors use <code class="docutils literal notranslate"><span class="pre">setColor(...)</span></code>; after a full color map has been
 initialized, <code class="docutils literal notranslate"><span class="pre">setColorPatch(...)</span></code> updates a tightly packed rectangular color
 range.</p>
+<p>Renderers follow height edits through <code class="docutils literal notranslate"><span class="pre">getHeightRowRevisions()</span></code>: one revision
+per sample row, advanced whenever a height in that row changes, by any of the
+update methods or by a deformable terrain sinking. Unlike the update flags and
+the dirty region that <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> reads and clears, the revisions are never
+cleared, so any number of readers can track them and redraw only the edited rows.</p>
 </section>
 <section id="example">
 <h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
@@ -441,7 +448,7 @@ range.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9HeightMap23updateVisualHeightPatchEddddRKNSt6vectorIdEEd6size_t6size_t6size_t6size_t">
 <span id="_CPPv3N6raisim9HeightMap23updateVisualHeightPatchEddddRKNSt6vectorIdEEd6size_t6size_t6size_t6size_t"></span><span id="_CPPv2N6raisim9HeightMap23updateVisualHeightPatchEddddRKNSt6vectorIdEEd6size_t6size_t6size_t6size_t"></span><span id="raisim::HeightMap::updateVisualHeightPatch__double.double.double.double.std::vector:double:CR.double.s.s.s.s"></span><span class="target" id="classraisim_1_1HeightMap_1ad3fac1cd92e00c7ef611e76eaeff9483"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">updateVisualHeightPatch</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">centerX</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">centerY</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sizeX</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sizeY</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">height</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">heightOffset</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">minX</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxX</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">minY</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxY</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim9HeightMap23updateVisualHeightPatchEddddRKNSt6vectorIdEEd6size_t6size_t6size_t6size_t" title="Link to this definition"></a><br /></dt>
-<dd><p>Update a rectangular sample patch for visualization without copying/rebuilding the whole heightmap or its contact data. Sample bounds are inclusive and clamped to the grid. Patch samples and resulting values may be NaN or infinity; they are stored without filtering. </p>
+<dd><p>Update a rectangular sample patch for visualization without copying/rebuilding the whole heightmap or its contact data. Sample bounds are inclusive and clamped to the grid. Patch samples and resulting values may be NaN or infinity; they are stored without filtering. Samples that keep their value (bit for bit) are not reported as updated. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -676,6 +683,17 @@ range.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>false if no region is tracked (nothing changed, or the whole map is dirty) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim9HeightMap21getHeightRowRevisionsEv">
+<span id="_CPPv3NK6raisim9HeightMap21getHeightRowRevisionsEv"></span><span id="_CPPv2NK6raisim9HeightMap21getHeightRowRevisionsEv"></span><span id="raisim::HeightMap::getHeightRowRevisionsC"></span><span class="target" id="classraisim_1_1HeightMap_1a4c77c58544e5245b6d6e8512e25f601a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">uint64_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getHeightRowRevisions</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim9HeightMap21getHeightRowRevisionsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Revisions of the sample rows, for renderers that refresh only the edited part of the surface. Entry y advances whenever a height in sample row y may have changed. Unlike <a class="reference internal" href="#classraisim_1_1HeightMap_1a4634582e0a98dc06e83e651604583c8b"><span class="std std-ref">getVisualDirtyRegion()</span></a>, the revisions are never cleared, so any number of readers can track them. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>one revision per y sample </p>
 </dd>
 </dl>
 </dd></dl>

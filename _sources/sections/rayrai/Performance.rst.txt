@@ -35,15 +35,56 @@ main performance controls explicit:
   than only from the object origin.
 * Scenes with many local lights can give point, spot and area lights a finite
   range with ``additionalLightContributionThreshold`` (see :doc:`RenderQuality`).
-* If the world topology is stable, repeated ``updateObjectLists()`` calls are cheap:
-  rayrai refreshes appearances without rebuilding the object cache unless objects
-  were added or removed.
+* ``updateObjectLists()`` copies only what changed in the bound World: an unchanged
+  object costs a revision check, and the object cache is rebuilt only when objects
+  are added or removed. A heightmap edit copies and uploads only the rows it
+  changes. ``rayrai_world_sync_benchmark`` measures the copy and a small frame for
+  moving boxes, robots, edited heightmaps and a deformable terrain.
 * RGB/depth CPU readback supports an optional PBO-backed asynchronous path. The
   synchronous path remains the deterministic default for simple RL loops.
 * Dynamic point clouds and instanced visuals support partial buffer updates for
   streaming changes.
 * Deformable TCP streaming sends topology/indices only during initialization or topology
   changes; normal frames send vertex positions only.
+
+Physics snapshots for independent cameras
+=========================================
+
+Use :doc:`PhysicsSnapshots` to separate physics capture from camera rendering.
+Capture a shared immutable frame immediately after integration under the World
+mutex, then apply and render it on the owning GL thread after releasing that
+mutex. The capture pool reuses buffers only after consumers release them.
+Persistent shape descriptions are shared, articulated frames contain one pose
+per link, and geometry and appearance have separate revisions. Membership is
+reconciled only when it changes; dynamic mesh updates preserve unchanged
+indices and heightmap patch ranges.
+
+The source target ``rayrai_physics_snapshot_benchmark`` measures capture/apply
+for 1,000 unchanged and moving boxes after warmup, excluding rendering and
+readback. The dedicated guide includes API examples, the latest-frame mailbox
+pattern, copied RGB/depth camera state, and lifetime rules.
+
+Animated articulated visuals retain their loaded meshes when only scale,
+local pose, link attachment or color changes. Candidate bounds and shadows
+follow transform edits. Replacing a mesh file or resizing a capsule retains
+unrelated model assets while acquiring the new geometry; see
+:doc:`PhysicsSnapshots` for the visual fields to edit.
+
+The engine source target ``rayrai_animated_mesh_reuse_test --benchmark``
+measures capture/apply while a robot's authored mesh scale changes over 1,000
+updates. It releases frame-scoped asset owners as rendering does and reports
+``animated_mesh_apply_us`` and ``model_reloads``. With unchanged model files,
+``model_reloads`` should remain zero. Run with one thread and a working
+OpenGL context, for example from a standalone visualizer build:
+
+.. code-block:: bash
+
+    OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 LP_NUM_THREADS=1 \
+      ./build-visualizer/rayrai/rayrai_animated_mesh_reuse_test --benchmark
+
+The test without ``--benchmark`` checks synchronous and asynchronous loading,
+both applied snapshots and a bound World, rendered depth, capsule resizing,
+and mesh-file replacement.
 
 GPU paths and OpenGL requirements
 =================================

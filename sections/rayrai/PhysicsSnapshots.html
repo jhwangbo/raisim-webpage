@@ -1,0 +1,468 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Physics snapshots &mdash; raisim 2.10.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ba8b8cd0" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=67920a36"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Sensors and depth/LiDAR" href="Sensors.html" />
+    <link rel="prev" title="Capture, diagnostics, and headless rendering" href="Capture.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../FeatureMap.html">Feature Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../BuildAndTest.html">Build, Test, and Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DebugTools.html">Regression and Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ProjectLayout.html">Project Layout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Performance.html">Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Benchmark.html">Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Acknowledgement.html">Acknowledgement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RaiSim C++</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ConventionsAndNotations.html">Conventions and Notations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Determinism.html">Determinism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Math.html">Math Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LoggingSystem.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldSystem.html">World</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorldConfigurationFile.html">World Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RsceneFile.html">.rscene File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../OpenUSD.html">OpenUSD Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimServer.html">Raisim Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Object.html">Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ArticulatedSystem.html">Articulated Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../SingleBodyObjects.html">Single-Body Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DeformableObject.html">Deformable Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../GranularMedia.html">Granular Media</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Contact.html">Contact and Collision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CollisionDetection.html">Collision Detection and Colliders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MaterialSystem.html">Material System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../HeightMap.html">Height Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DeformableTerrain.html">Deformable terrain</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Constraints.html">Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Tendons.html">Tendons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RayTest.html">Ray Test</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Related software</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../Rayrai.html">rayrai Visualizer</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../Rayrai.html#overview">Overview</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="RenderQuality.html">Render quality, tone mapping, color grading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Lighting.html">Lighting, shadows, and HDR/IBL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Materials.html">PBR materials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Visuals.html">Custom visuals, instancing, and scene helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Foliage.html">Foliage and forest rendering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="PostProcess.html">Post-process effects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Weather.html">Weather and atmospherics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Capture.html">Capture, diagnostics, and headless rendering</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Physics snapshots</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#capture-and-apply">Capture and apply</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ownership-and-scheduling">Ownership and scheduling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rgb-camera-on-a-separate-thread">RGB camera on a separate thread</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#depth-camera">Depth camera</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#changes-geometry-and-lifetime">Changes, geometry and lifetime</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples-and-measurement">Examples and measurement</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Sensors.html">Sensors and depth/LiDAR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Examples.html">Example targets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Performance.html">Performance notes and the C++ API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#platform-support">Platform support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#source-built-tcp-viewer-recommended">Source-built TCP viewer (recommended)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#build-and-link">Build and link</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#minimal-usage">Minimal usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#threading-contract">Threading contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#lifetime-and-error-model">Lifetime and error model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#example-custom-visuals-background-color">Example: custom visuals + background color</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rayrai.html#where-to-go-next">Where to go next</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../RayraiTcpViewer.html">Rayrai TCP Viewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimEngine2.html">RaiSim Engine 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaisimGymTorch.html">RaisimGymTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimPy.html">RaisimPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RaiSimMatlab.html">RaisimMatlab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LegacyIntegrations.html">Legacy Integrations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">raisim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../Rayrai.html">rayrai Visualizer</a></li>
+      <li class="breadcrumb-item active">Physics snapshots</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="physics-snapshots">
+<span id="rayrai-physics-snapshots"></span><h1>Physics snapshots<a class="headerlink" href="#physics-snapshots" title="Link to this heading"></a></h1>
+<p>Physics snapshots let a camera render a complete physics state while the
+simulation continues on another thread. The physics thread copies poses,
+geometry and appearance after integration. The render thread applies that
+immutable frame to its <code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> and renders with copied camera state.
+The World mutex protects the physics copy; the window mutex protects snapshot
+application, rendering and readback. These phases do not hold both mutexes.</p>
+<p>Snapshots are also how rayrai draws a World bound to the viewer: each render
+copies it with <code class="docutils literal notranslate"><span class="pre">updateObjectLists()</span></code> and draws the copy. Applying a snapshot
+replaces that copy with yours, so both cases share one rendering path.</p>
+<p>The API is always included in the normal rayrai library build. Include
+<code class="docutils literal notranslate"><span class="pre">rayrai/PhysicsSnapshot.hpp</span></code> and link the <code class="docutils literal notranslate"><span class="pre">rayrai</span></code> target, as described in
+<a class="reference internal" href="../Rayrai.html"><span class="doc">rayrai Visualizer</span></a>.</p>
+<section id="capture-and-apply">
+<h2>Capture and apply<a class="headerlink" href="#capture-and-apply" title="Link to this heading"></a></h2>
+<p>Use one <code class="docutils literal notranslate"><span class="pre">raisin::PhysicsSnapshotCapture</span></code> on the physics thread and keep it
+between frames so it can reuse its buffers. <code class="docutils literal notranslate"><span class="pre">capture(world)</span></code> takes no locks
+and performs no OpenGL work. The caller protects the World and captures after
+<code class="docutils literal notranslate"><span class="pre">integrate()</span></code> returns, or immediately after <code class="docutils literal notranslate"><span class="pre">integrate2()</span></code> when using split
+integration. Sensor poses copied for the image must come from that same step.</p>
+<p><code class="docutils literal notranslate"><span class="pre">capture()</span></code> returns <code class="docutils literal notranslate"><span class="pre">std::shared_ptr&lt;const</span> <span class="pre">raisin::PhysicsSnapshot&gt;</span></code>. Pass
+this shared owner directly to <code class="docutils literal notranslate"><span class="pre">RayraiWindow::applyPhysicsSnapshot()</span></code> on the
+render thread, with the window’s OpenGL context current. Subsequent renders,
+including shadows, culling and picking, use the copied physics state. An
+application that builds or edits snapshots itself gets <code class="docutils literal notranslate"><span class="pre">std::invalid_argument</span></code>
+for an object without its description or mesh, malformed vertex blocks, or
+indices past the vertices; the viewer then keeps showing the last complete
+frame. The renderer can be constructed with its own empty World:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;memory&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;mutex&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;raisim/World.hpp&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;rayrai/PhysicsSnapshot.hpp&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;rayrai/RayraiWindow.hpp&gt;</span>
+
+<span class="c1">// Application setup; the renderer&#39;s GL context is current here.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">sourceWorld</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="n">sourceWorld</span><span class="o">-&gt;</span><span class="n">addGround</span><span class="p">();</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">PhysicsSnapshotCapture</span><span class="w"> </span><span class="n">capture</span><span class="p">;</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="w"> </span><span class="nf">viewer</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">&gt;</span><span class="p">(),</span><span class="w"> </span><span class="mi">640</span><span class="p">,</span><span class="w"> </span><span class="mi">480</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">mutex</span><span class="w"> </span><span class="n">windowMutex</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="k">const</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">PhysicsSnapshot</span><span class="o">&gt;</span><span class="w"> </span><span class="n">frame</span><span class="p">;</span>
+
+<span class="c1">// Physics phase.</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">lock_guard</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">&gt;</span><span class="w"> </span><span class="n">physicsLock</span><span class="p">(</span><span class="o">*</span><span class="n">sourceWorld</span><span class="p">);</span>
+<span class="w">  </span><span class="n">sourceWorld</span><span class="o">-&gt;</span><span class="n">integrate</span><span class="p">();</span>
+<span class="w">  </span><span class="n">frame</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">capture</span><span class="p">.</span><span class="n">capture</span><span class="p">(</span><span class="o">*</span><span class="n">sourceWorld</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// Render phase, on the thread owning the GL context.</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">lock_guard</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">mutex</span><span class="o">&gt;</span><span class="w"> </span><span class="n">windowLock</span><span class="p">(</span><span class="n">windowMutex</span><span class="p">);</span>
+<span class="w">  </span><span class="n">viewer</span><span class="p">.</span><span class="n">applyPhysicsSnapshot</span><span class="p">(</span><span class="n">frame</span><span class="p">);</span>
+<span class="w">  </span><span class="n">viewer</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="mi">640</span><span class="p">,</span><span class="w"> </span><span class="mi">480</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This sequence also works in a single-threaded loop. For independent threads,
+publish the frame through a synchronized queue or mailbox after releasing the
+World mutex. With one renderer, <code class="docutils literal notranslate"><span class="pre">ThreadingMode::SingleThread</span></code> remains
+appropriate: all its GL operations stay on one thread. Multiple render workers
+must follow the context and threading-mode rules in <a class="reference internal" href="../Rayrai.html"><span class="doc">rayrai Visualizer</span></a>.</p>
+</section>
+<section id="ownership-and-scheduling">
+<h2>Ownership and scheduling<a class="headerlink" href="#ownership-and-scheduling" title="Link to this heading"></a></h2>
+<p>Keep a shared owner while a camera consumes a frame. The capture writes into a
+frame again only after the last consumer releases it, using an explicit
+release/acquire handoff. Expired weak owners cannot reacquire a frame that is
+being filled. Heightmap and deformable vertices are immutable blocks shared
+between frames, so an edit allocates only the blocks it changes. Several cameras
+can share one frame, and retaining an older frame keeps its poses and geometry
+unchanged even after the source objects move or are removed.</p>
+<p>Animating an articulated visual’s mesh scale, offset, orientation or link
+attachment updates its model transform, culling bounds and shadows while
+retaining its loaded mesh. For file-mesh visuals, edit <code class="docutils literal notranslate"><span class="pre">VisObject::scale</span></code>
+for per-axis scaling, <code class="docutils literal notranslate"><span class="pre">offset</span></code> for local translation, <code class="docutils literal notranslate"><span class="pre">rot</span></code> for local
+rotation, and <code class="docutils literal notranslate"><span class="pre">localIdx</span></code> for the attached link. Capture after the edit and
+apply that frame on the render thread; a viewer drawing its bound World picks
+up the edit on its next render. These transform edits keep loaded meshes in
+both synchronous and asynchronous loading modes, so animation does not
+restart file loading. This also applies to the off-road buggy’s spring and
+drive-shaft animation.</p>
+<p>Sphere, box and cylinder dimensions also update model transforms using shared
+unit meshes. Capsules bake their radius and length into vertices, so changing
+those dimensions rebuilds capsule geometry. Changing a mesh filename loads
+the replacement asset. Both kinds of geometry edit retain unrelated model
+assets while acquiring the new geometry.</p>
+<p>A mailbox containing only the latest pending frame bounds the amount of queued
+work. Replacing its pending owner drops an obsolete image request; a renderer
+that already took the previous owner can finish safely. Every published frame
+contains the complete render state, so consuming the newest one does not require
+applying the skipped frames first.</p>
+<p>Capture at the camera’s scheduled simulation time, after the corresponding
+physics step. A 30 Hz camera does not need a new snapshot at every 1 kHz physics
+step. Multiple cameras due at the same step can share the physics frame and
+publish their individual poses with it. <code class="docutils literal notranslate"><span class="pre">PhysicsSnapshot::simTime</span></code> records
+the source simulation time; use it when timestamping the resulting image.</p>
+<p>Release a mailbox lock before applying or rendering a frame. The physics thread
+must release the World mutex before publishing and must not wait for a window
+lock, a GPU fence or pixel readback while holding it.</p>
+</section>
+<section id="rgb-camera-on-a-separate-thread">
+<h2>RGB camera on a separate thread<a class="headerlink" href="#rgb-camera-on-a-separate-thread" title="Link to this heading"></a></h2>
+<p>Copy <code class="docutils literal notranslate"><span class="pre">RGBCameraProperties</span></code> under the World mutex during setup, then construct
+<code class="docutils literal notranslate"><span class="pre">raisin::Camera</span></code> from that value on the render thread. Publish the camera pose
+alongside each physics frame. RaiSim sensor +X points forward and +Z points up.
+The following mailbox example assumes the sensor is already attached to its
+robot and the World contains that robot:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;utility&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;glm/glm.hpp&gt;</span>
+
+<span class="k">struct</span><span class="w"> </span><span class="nc">CapturedRgbFrame</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="k">const</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">PhysicsSnapshot</span><span class="o">&gt;</span><span class="w"> </span><span class="n">physics</span><span class="p">;</span>
+<span class="w">  </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="w"> </span><span class="n">position</span><span class="p">{</span><span class="mf">0.f</span><span class="p">};</span>
+<span class="w">  </span><span class="n">glm</span><span class="o">::</span><span class="n">mat3</span><span class="w"> </span><span class="n">rotation</span><span class="p">{</span><span class="mf">1.f</span><span class="p">};</span>
+<span class="p">};</span>
+
+<span class="k">struct</span><span class="w"> </span><span class="nc">RgbMailbox</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">mutex</span><span class="w"> </span><span class="n">mutex</span><span class="p">;</span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="k">const</span><span class="w"> </span><span class="n">CapturedRgbFrame</span><span class="o">&gt;</span><span class="w"> </span><span class="n">pending</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="c1">// Called only on the physics thread.</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">stepAndPublish</span><span class="p">(</span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">&amp;</span><span class="w"> </span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">RGBCamera</span><span class="o">&amp;</span><span class="w"> </span><span class="n">sensor</span><span class="p">,</span>
+<span class="w">                    </span><span class="n">raisin</span><span class="o">::</span><span class="n">PhysicsSnapshotCapture</span><span class="o">&amp;</span><span class="w"> </span><span class="n">capture</span><span class="p">,</span><span class="w"> </span><span class="n">RgbMailbox</span><span class="o">&amp;</span><span class="w"> </span><span class="n">mailbox</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">frame</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">CapturedRgbFrame</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">lock_guard</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">World</span><span class="o">&gt;</span><span class="w"> </span><span class="n">physicsLock</span><span class="p">(</span><span class="n">world</span><span class="p">);</span>
+<span class="w">    </span><span class="n">world</span><span class="p">.</span><span class="n">integrate</span><span class="p">();</span>
+<span class="w">    </span><span class="n">frame</span><span class="o">-&gt;</span><span class="n">physics</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">capture</span><span class="p">.</span><span class="n">capture</span><span class="p">(</span><span class="n">world</span><span class="p">);</span>
+<span class="w">    </span><span class="n">sensor</span><span class="p">.</span><span class="n">updatePose</span><span class="p">();</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sensor</span><span class="p">.</span><span class="n">getPosition</span><span class="p">();</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">rotation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sensor</span><span class="p">.</span><span class="n">getOrientation</span><span class="p">();</span>
+<span class="w">    </span><span class="n">frame</span><span class="o">-&gt;</span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">position</span><span class="p">[</span><span class="mi">2</span><span class="p">]};</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">column</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">column</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">column</span><span class="p">)</span>
+<span class="w">      </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">row</span><span class="p">)</span>
+<span class="w">        </span><span class="n">frame</span><span class="o">-&gt;</span><span class="n">rotation</span><span class="p">[</span><span class="n">column</span><span class="p">][</span><span class="n">row</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rotation</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="w"> </span><span class="n">column</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">lock_guard</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">mutex</span><span class="o">&gt;</span><span class="w"> </span><span class="n">publishLock</span><span class="p">(</span><span class="n">mailbox</span><span class="p">.</span><span class="n">mutex</span><span class="p">);</span>
+<span class="w">  </span><span class="n">mailbox</span><span class="p">.</span><span class="n">pending</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">frame</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// Called only on the render thread, with its GL context current.</span>
+<span class="kt">bool</span><span class="w"> </span><span class="nf">renderNewest</span><span class="p">(</span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">&amp;</span><span class="w"> </span><span class="n">viewer</span><span class="p">,</span><span class="w"> </span><span class="n">raisin</span><span class="o">::</span><span class="n">Camera</span><span class="o">&amp;</span><span class="w"> </span><span class="n">camera</span><span class="p">,</span>
+<span class="w">                  </span><span class="n">std</span><span class="o">::</span><span class="n">mutex</span><span class="o">&amp;</span><span class="w"> </span><span class="n">windowMutex</span><span class="p">,</span><span class="w"> </span><span class="n">RgbMailbox</span><span class="o">&amp;</span><span class="w"> </span><span class="n">mailbox</span><span class="p">,</span>
+<span class="w">                  </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">bgra</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="k">const</span><span class="w"> </span><span class="n">CapturedRgbFrame</span><span class="o">&gt;</span><span class="w"> </span><span class="n">frame</span><span class="p">;</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">lock_guard</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">mutex</span><span class="o">&gt;</span><span class="w"> </span><span class="n">mailboxLock</span><span class="p">(</span><span class="n">mailbox</span><span class="p">.</span><span class="n">mutex</span><span class="p">);</span>
+<span class="w">    </span><span class="n">frame</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">exchange</span><span class="p">(</span><span class="n">mailbox</span><span class="p">.</span><span class="n">pending</span><span class="p">,</span><span class="w"> </span><span class="k">nullptr</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">frame</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">lock_guard</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">mutex</span><span class="o">&gt;</span><span class="w"> </span><span class="n">windowLock</span><span class="p">(</span><span class="n">windowMutex</span><span class="p">);</span>
+<span class="w">  </span><span class="n">viewer</span><span class="p">.</span><span class="n">applyPhysicsSnapshot</span><span class="p">(</span><span class="n">frame</span><span class="o">-&gt;</span><span class="n">physics</span><span class="p">);</span>
+<span class="w">  </span><span class="n">camera</span><span class="p">.</span><span class="n">targetObject</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">nullptr</span><span class="p">;</span>
+<span class="w">  </span><span class="n">camera</span><span class="p">.</span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">frame</span><span class="o">-&gt;</span><span class="n">position</span><span class="p">;</span>
+<span class="w">  </span><span class="n">camera</span><span class="p">.</span><span class="n">front</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">frame</span><span class="o">-&gt;</span><span class="n">rotation</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="w">  </span><span class="n">camera</span><span class="p">.</span><span class="n">up</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">frame</span><span class="o">-&gt;</span><span class="n">rotation</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+<span class="w">  </span><span class="n">camera</span><span class="p">.</span><span class="n">right</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">normalize</span><span class="p">(</span><span class="n">glm</span><span class="o">::</span><span class="n">cross</span><span class="p">(</span><span class="n">camera</span><span class="p">.</span><span class="n">front</span><span class="p">,</span><span class="w"> </span><span class="n">camera</span><span class="p">.</span><span class="n">up</span><span class="p">));</span>
+
+<span class="w">  </span><span class="n">raisin</span><span class="o">::</span><span class="n">RayraiWindow</span><span class="o">::</span><span class="n">RenderOverrides</span><span class="w"> </span><span class="n">overrides</span><span class="p">;</span>
+<span class="w">  </span><span class="n">overrides</span><span class="p">.</span><span class="n">drawCoordinateFrames</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">  </span><span class="n">overrides</span><span class="p">.</span><span class="n">drawPointClouds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">  </span><span class="n">overrides</span><span class="p">.</span><span class="n">drawVisualizationObjects</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">  </span><span class="n">overrides</span><span class="p">.</span><span class="n">drawWeatherEffects</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">  </span><span class="n">overrides</span><span class="p">.</span><span class="n">allowViewerMsaa</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">  </span><span class="n">overrides</span><span class="p">.</span><span class="n">allowTemporalAa</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">  </span><span class="n">overrides</span><span class="p">.</span><span class="n">allowViewerUpscale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">  </span><span class="n">viewer</span><span class="p">.</span><span class="n">renderWithExternalCamera</span><span class="p">(</span><span class="n">camera</span><span class="p">,</span><span class="w"> </span><span class="n">overrides</span><span class="p">);</span>
+<span class="w">  </span><span class="n">bgra</span><span class="p">.</span><span class="n">resize</span><span class="p">(</span><span class="kt">size_t</span><span class="p">(</span><span class="n">camera</span><span class="p">.</span><span class="n">rtWidth</span><span class="p">())</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kt">size_t</span><span class="p">(</span><span class="n">camera</span><span class="p">.</span><span class="n">rtHeight</span><span class="p">())</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+<span class="w">  </span><span class="n">camera</span><span class="p">.</span><span class="n">readSceneColorBgra</span><span class="p">(</span><span class="n">bgra</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">bgra</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Call <code class="docutils literal notranslate"><span class="pre">stepAndPublish()</span></code> for steps at which a camera image is due. On other
+steps, integrate under the World mutex without capturing or publishing a frame.
+The example leaves the camera’s simulation-time schedule to the application.</p>
+<p>Create and retain the render camera as follows; <code class="docutils literal notranslate"><span class="pre">rgbProperties</span></code> is the value
+copied from <code class="docutils literal notranslate"><span class="pre">sensor.getProperties()</span></code> during protected setup:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Render thread, GL context current.</span>
+<span class="n">raisin</span><span class="o">::</span><span class="n">Camera</span><span class="w"> </span><span class="nf">camera</span><span class="p">(</span><span class="n">rgbProperties</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The Camera-only overloads and <code class="docutils literal notranslate"><span class="pre">readSceneColorBgra()</span></code> do not access the live
+sensor. Keep <code class="docutils literal notranslate"><span class="pre">targetObject</span></code> null and set the copied axes directly; calling
+<code class="docutils literal notranslate"><span class="pre">Camera::update()</span></code> afterward would recompute the view from its input/orbit
+state. The image buffer contains BGRA8 in top-to-bottom row order by default.</p>
+<p>Camera-only rendering uses the generic external-camera capture policy. The
+example disables custom visuals, instanced visuals and viewer effects to render
+physics objects. Set <code class="docutils literal notranslate"><span class="pre">drawVisualizationObjects</span> <span class="pre">=</span> <span class="pre">true</span></code> when the image should
+also include detectable scene visuals, such as visual-only <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> objects
+or automatic tendon visuals. See <a class="reference internal" href="Sensors.html"><span class="doc">Sensors and depth/LiDAR</span></a> for the other capture policies.</p>
+</section>
+<section id="depth-camera">
+<h2>Depth camera<a class="headerlink" href="#depth-camera" title="Link to this heading"></a></h2>
+<p>Copy <code class="docutils literal notranslate"><span class="pre">DepthCameraProperties</span></code> and the depth sensor pose in the same way. Create
+its <code class="docutils literal notranslate"><span class="pre">Camera</span></code> on the render thread and apply the shared physics frame before
+rendering. Use an independent float buffer for readback:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">raisin</span><span class="o">::</span><span class="n">Camera</span><span class="w"> </span><span class="nf">depthCamera</span><span class="p">(</span><span class="n">depthProperties</span><span class="p">);</span><span class="w">  </span><span class="c1">// copied calibration, GL context current</span>
+<span class="c1">// Set position/front/up/right from the captured depth sensor pose.</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">applyPhysicsSnapshot</span><span class="p">(</span><span class="n">frame</span><span class="p">);</span>
+<span class="n">viewer</span><span class="p">.</span><span class="n">renderDepthPlaneDistance</span><span class="p">(</span><span class="n">depthCamera</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="w"> </span><span class="n">depth</span><span class="p">(</span><span class="kt">size_t</span><span class="p">(</span><span class="n">depthCamera</span><span class="p">.</span><span class="n">rtWidth</span><span class="p">())</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kt">size_t</span><span class="p">(</span><span class="n">depthCamera</span><span class="p">.</span><span class="n">rtHeight</span><span class="p">()));</span>
+<span class="n">depthCamera</span><span class="p">.</span><span class="n">readLinearDepth</span><span class="p">(</span><span class="n">depth</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">depth</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+</pre></div>
+</div>
+<p>Depth values are camera-plane distances in metres; pixels without geometry are
+zero. The default depth call excludes visualization objects. Pass
+<code class="docutils literal notranslate"><span class="pre">nullptr,</span> <span class="pre">true</span></code> after the camera argument to include detectable custom and
+instanced visuals. Reconstruct point clouds using the copied sensor rays and
+captured pose, as demonstrated in
+<a class="reference internal" href="../examples/rayrai/rayrai_depth_camera.html"><span class="doc">Rayrai Example: Depth Camera</span></a>.</p>
+<p>GPU spinning lidar currently casts against the bound live World. Its sensor
+overload raises <code class="docutils literal notranslate"><span class="pre">std::invalid_argument</span></code> in snapshot mode; use a live-world
+renderer protected by the World mutex for that API.</p>
+</section>
+<section id="changes-geometry-and-lifetime">
+<h2>Changes, geometry and lifetime<a class="headerlink" href="#changes-geometry-and-lifetime" title="Link to this heading"></a></h2>
+<p>Frames store contiguous object state and one pose per articulated link. Shapes,
+mesh filenames, scales and local visual transforms are shared across pose and
+appearance updates. The render thread composes cached visual offsets with link
+poses. Geometry and appearance revisions are tracked separately, including
+edits through mutable <code class="docutils literal notranslate"><span class="pre">getVisOb()</span></code> and <code class="docutils literal notranslate"><span class="pre">getVisColOb()</span></code> arrays.</p>
+<p>Object membership is reconciled only when identities or order change. An object
+whose render revision did not advance keeps its state from the previous frame;
+the revision advances for pose and state changes, visual-only heightmap edits
+and deformable integration. An articulated system’s link poses are read again
+only when its revision advances, while its mutable <code class="docutils literal notranslate"><span class="pre">getVisOb()</span></code> and
+<code class="docutils literal notranslate"><span class="pre">getVisColOb()</span></code> arrays are compared on every capture, so edits through
+retained references are detected. Deformable integration updates vertex
+geometry while retaining unchanged triangle indices.</p>
+<p>A heightmap mesh has one vertex block per visual row. Capture reads only the
+sample rows whose revision (<code class="docutils literal notranslate"><span class="pre">HeightMap::getHeightRowRevisions()</span></code>) advanced, so
+it sees visual-only edits and patches even if another consumer cleared the
+source dirty flags, and leaves those flags untouched. It refills the visual rows
+those samples reach, including the margin needed for normals, and shares the
+other rows with the previous frame. The renderer uploads the rows that differ
+from the ones it shows, so applying a frame after skipping others costs no more.
+Indices are uploaded only when their triangle topology changes. Geometry caches
+follow object IDs across membership changes rather than world-list positions.</p>
+<p>A frame shares its World’s immutable <code class="docutils literal notranslate"><span class="pre">.rscene</span></code> scene instead of copying it.
+Applying a frame with a different scene replaces the previous scene-owned
+visuals and preserves unrelated overlays; a frame without a scene restores the
+preceding viewer settings. Snapshots retain CPU render data, rather than owning
+the source World or its objects; <code class="docutils literal notranslate"><span class="pre">world</span></code> and <code class="docutils literal notranslate"><span class="pre">object</span></code> pointers are identity
+keys. A separate <code class="docutils literal notranslate"><span class="pre">worldIdentity</span></code> token distinguishes World lifetimes even when
+an allocator reuses the same address. Applying and rendering never dereference
+those keys: each <code class="docutils literal notranslate"><span class="pre">RaisimObject</span></code> holds a copy of its object’s state. A camera
+whose <code class="docutils literal notranslate"><span class="pre">targetObject</span></code> is set follows that object’s position in the rendered
+frame and is released when the object leaves it. Mesh files, textures and other
+external resources must remain available for asset loading.</p>
+<p><code class="docutils literal notranslate"><span class="pre">viewer.clearPhysicsSnapshot()</span></code> shows the World bound to the viewer again and
+copies it immediately, so protect that World as for a render. If the viewer was
+bound to an empty World, that remains its bound World. Use
+<code class="docutils literal notranslate"><span class="pre">viewer.swapWorld(sourceWorld)</span></code> to switch to the live source World; this also
+clears the snapshot.</p>
+</section>
+<section id="examples-and-measurement">
+<h2>Examples and measurement<a class="headerlink" href="#examples-and-measurement" title="Link to this heading"></a></h2>
+<p>The snapshot workflow is used by 14 of the 28 rayrai demos, including
+<a class="reference internal" href="../examples/rayrai/rayrai_basic_scene.html"><span class="doc">Rayrai Example: Basic Scene</span></a>,
+<a class="reference internal" href="../examples/rayrai/rayrai_rgb_camera.html"><span class="doc">Rayrai Example: RGB Camera</span></a>,
+<a class="reference internal" href="../examples/rayrai/rayrai_depth_camera.html"><span class="doc">Rayrai Example: Depth Camera</span></a>, and
+<a class="reference internal" href="../examples/rayrai/rayrai_runtime_scene_editing.html"><span class="doc">Rayrai Example: Runtime Scene Editing</span></a>.</p>
+<p>The source target <code class="docutils literal notranslate"><span class="pre">rayrai_physics_snapshot_benchmark</span></code> measures capture and
+apply for 1,000 unchanged and moving boxes after warmup, excluding rendering
+and readback; <code class="docutils literal notranslate"><span class="pre">rayrai_world_sync_benchmark</span></code> measures the per-frame copy and
+render of a World bound to the viewer. It also measures capture of 100 idle heightmaps and 100 idle cloths.
+Pose-only updates in these scenes capture into released frames, allocating only
+the shared owner of each frame. First capture, membership changes, geometry edits
+and additional simultaneous frame owners can allocate new storage. Image
+frequency also depends on rendering and readback costs; see <a class="reference internal" href="Performance.html"><span class="doc">Performance notes and the C++ API reference</span></a>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Capture.html" class="btn btn-neutral float-left" title="Capture, diagnostics, and headless rendering" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Sensors.html" class="btn btn-neutral float-right" title="Sensors and depth/LiDAR" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, RaiSim Tech Inc..</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -169,6 +169,26 @@ Mesh pairs use a BVH to find candidate triangles, then test each triangle
 against the convex shape. Contacts are merged by distance/normal and capped
 by the per-pair limit.
 
+Sphere, capsule and cylinder queries also reject BVH nodes whose triangles
+cannot lie within the radius of the center or axis segment. Once the contact
+set is full, nodes that cannot produce a deeper retained contact are skipped.
+Box queries reject nodes separated from a padded oriented box. The padding
+includes the triangle tests' tolerances and the reach of the triangle-plane
+test, including for thin boxes. These checks reduce triangle work for dense
+meshes passing close to a primitive while preserving candidate order and
+contact merging.
+
+The box-triangle path also checks separation before its closest-feature scan
+and GJK/EPA fallback. Triangles proven farther than the 0.2 mm separation
+margin no longer reach the fallback, which could previously report a false
+penetration for such a separated pair. This margin is a rejection tolerance;
+it does not add a collision skin to the box.
+
+These checks apply automatically to non-convex mesh collision bodies, including
+articulated self-collision. Cylinder-mesh contacts still use the axis segment
+and radius as described below. See :doc:`Benchmark` for the dense-mesh proximity
+and G1 hand self-collision workloads.
+
 .. list-table::
    :header-rows: 1
    :widths: 22 45 18 35

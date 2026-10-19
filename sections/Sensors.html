@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sensors &mdash; raisim 2.9.4 documentation</title>
+  <title>Sensors &mdash; raisim 2.10.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=ba8b8cd0" />
@@ -15,9 +15,10 @@
     <link rel="shortcut icon" href="../_static/favicon.png"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=e45b7e07"></script>
+      <script src="../_static/documentation_options.js?v=67920a36"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -89,7 +90,19 @@
 <li class="toctree-l3"><a class="reference internal" href="#depth-camera">Depth camera</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rgb-camera">RGB camera</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#spinning-lidar">Spinning LiDAR</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#imu">IMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sensor-noise">Sensor noise</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#imu">IMU</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#reading-measurements">Reading measurements</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#how-the-ideal-reading-is-computed">How the ideal reading is computed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sampling-and-delivery">Sampling and delivery</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#configuring-the-sensor-model">Configuring the sensor model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bias-and-unfiltered-noise">Bias and unfiltered noise</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#low-pass-filtering-and-filtered-noise">Low-pass filtering and filtered noise</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#quantization-and-saturation">Quantization and saturation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reset-replay-and-xml">Reset, replay and XML</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#accuracy-and-performance-limits">Accuracy and performance limits</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#cpu-depth-camera-fallback">CPU depth camera fallback</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#depth-image">Depth image</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#segmentation-object-id">Segmentation object id</a></li>
@@ -188,11 +201,10 @@ fallback. <code class="docutils literal notranslate"><span class="pre">World::ca
 pose and returns depth, object segmentation, optional hit points, and a
 timestamp without requiring a renderer.</p></li>
 </ul>
-<p>The CPU ray-query paths are single-threaded and deterministic, but they are not
-the recommended RGB/depth image path when rayrai sensors are available. RaiSim
-itself does not support sensor measurement updates from the TCP visualizer.
-Renderer-produced images must be consumed in the rayrai process or copied into a
-sensor buffer by user code with <code class="docutils literal notranslate"><span class="pre">MeasurementSource::MANUAL</span></code>.</p>
+<p>The CPU ray-query paths are single-threaded and deterministic. Use in-process
+rayrai rendering for RGB/depth images when it is available. A connected TCP
+visualizer can also render due <code class="docutils literal notranslate"><span class="pre">MANUAL</span></code> cameras and return their images to
+<code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code>; the server applies the sensor noise when committing those buffers.</p>
 <section id="sensor-frames-and-camera-convention">
 <h2>Sensor frames and camera convention<a class="headerlink" href="#sensor-frames-and-camera-convention" title="Link to this heading"></a></h2>
 <p>Camera and LiDAR sensors use the RaiSim sensor-frame convention:</p>
@@ -241,9 +253,9 @@ images when rayrai is available. <code class="docutils literal notranslate"><spa
 depth cameras. Use it for in-process rayrai RGB/depth rendering or real
 hardware integration.</p></li>
 </ul>
-<p>There is no <code class="docutils literal notranslate"><span class="pre">VISUALIZER</span></code> measurement source in the RaiSim API. RaiSim does not
-request RGB or depth frames from a TCP visualizer and does not update sensor
-buffers from the visualizer.</p>
+<p>There is no <code class="docutils literal notranslate"><span class="pre">VISUALIZER</span></code> measurement source in the RaiSim API. TCP camera
+requests use <code class="docutils literal notranslate"><span class="pre">MANUAL</span></code> sensors: a connected visualizer renders requested frames,
+and <code class="docutils literal notranslate"><span class="pre">RaisimServer</span></code> writes the returned images and acquisition timestamps.</p>
 <p>Recommended RGB/depth usage with rayrai sets camera sensors to <code class="docutils literal notranslate"><span class="pre">MANUAL</span></code> and
 lets the renderer fill or read back the buffers. See <a class="reference internal" href="#using-sensors-with-rayrai">Using sensors with rayrai</a>
 for a complete example. Use <code class="docutils literal notranslate"><span class="pre">RAISIM</span></code> CPU depth updates only when rayrai is not
@@ -271,7 +283,9 @@ available, or from real hardware:</p>
 <section id="depth-camera">
 <h2>Depth camera<a class="headerlink" href="#depth-camera" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">raisim::DepthCamera</span></code> stores a float array with <code class="docutils literal notranslate"><span class="pre">width</span> <span class="pre">*</span> <span class="pre">height</span></code> entries.
-Finite values are plane depth in meters. Missing pixels are <code class="docutils literal notranslate"><span class="pre">NaN</span></code>.</p>
+Finite values are plane depth in meters. CPU ray captures use <code class="docutils literal notranslate"><span class="pre">NaN</span></code> for
+missing pixels; clean raw renderer captures may retain a different missing-return
+encoding. Active noise models normalize invalid depths to <code class="docutils literal notranslate"><span class="pre">NaN</span></code>.</p>
 <p>CPU-only fallback update:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">depth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getSensorSet</span><span class="p">(</span><span class="s">&quot;depth_camera_front_camera_parent&quot;</span><span class="p">)</span>
 <span class="w">                </span><span class="o">-&gt;</span><span class="n">getSensor</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">DepthCamera</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;depth&quot;</span><span class="p">);</span>
@@ -365,28 +379,528 @@ call <code class="docutils literal notranslate"><span class="pre">advanceSweep()
 their world poses) and store the points with <code class="docutils literal notranslate"><span class="pre">setScan()</span></code>. rayrai’s GPU LiDAR
 does exactly this and returns the same points as <code class="docutils literal notranslate"><span class="pre">update()</span></code>.</p>
 </section>
-<section id="imu">
-<h2>IMU<a class="headerlink" href="#imu" title="Link to this heading"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">raisim::InertialMeasurementUnit</span></code> is intended for robot-attached sensor sets
-loaded from URDF sensor XML. With <code class="docutils literal notranslate"><span class="pre">RAISIM</span></code>, the default, the owning articulated
-system writes the measurements during <code class="docutils literal notranslate"><span class="pre">World::integrate()</span></code> at the sensor’s
-update rate; <code class="docutils literal notranslate"><span class="pre">update()</span></code> does nothing. This requires inverse dynamics, which the
-URDF and world-XML loaders enable when they create an IMU. Read the values after
-stepping the world:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">imu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">anymal</span><span class="o">-&gt;</span><span class="n">getSensorSet</span><span class="p">(</span><span class="s">&quot;lidar_link&quot;</span><span class="p">)</span>
-<span class="w">              </span><span class="o">-&gt;</span><span class="n">getSensor</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">InertialMeasurementUnit</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;imu&quot;</span><span class="p">);</span>
-
-<span class="n">world</span><span class="p">.</span><span class="n">integrate</span><span class="p">();</span>
-
-<span class="k">const</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span><span class="o">&amp;</span><span class="w"> </span><span class="n">acc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">imu</span><span class="o">-&gt;</span><span class="n">getLinearAcceleration</span><span class="p">();</span><span class="w">  </span><span class="c1">// specific force, IMU frame [m/s^2]</span>
-<span class="k">const</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span><span class="o">&amp;</span><span class="w"> </span><span class="n">angVel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">imu</span><span class="o">-&gt;</span><span class="n">getAngularVelocity</span><span class="p">();</span><span class="w">  </span><span class="c1">// IMU frame [rad/s]</span>
-<span class="k">const</span><span class="w"> </span><span class="n">raisim</span><span class="o">::</span><span class="n">Vec</span><span class="o">&lt;</span><span class="mi">4</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">quat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">imu</span><span class="o">-&gt;</span><span class="n">getOrientation</span><span class="p">();</span><span class="w">         </span><span class="c1">// IMU frame in world, (w, x, y, z)</span>
+<section id="sensor-noise">
+<span id="sensor-noise-models"></span><h2>Sensor noise<a class="headerlink" href="#sensor-noise" title="Link to this heading"></a></h2>
+<p>Robot-mounted RGB, depth, and spinning LiDAR sensors support optional measurement
+noise. Defaults preserve the clean measurements. Each sensor owns a random stream;
+<code class="docutils literal notranslate"><span class="pre">resetNoise()</span></code> restarts it. Seed zero derives a deterministic stream from the
+sensor’s full name and its owning object’s stable World id, decorrelating sensors
+on one or several robots. An unnamed detached sensor has no identity to mix.
+Nonzero <code class="docutils literal notranslate"><span class="pre">seed</span></code> values select explicit streams, so matching explicit seeds and
+models replay the same draws, independently of sensor names.</p>
+<p><code class="docutils literal notranslate"><span class="pre">World::setSensorNoiseSeed(uint64_t)</span></code> mixes an environment seed into all attached
+sensor streams. Call it before adding robots, or between complete physics steps
+to restart existing random streams. Measurements, IMU bias and filters, the
+acquisition clock and delayed samples are preserved. Use <code class="docutils literal notranslate"><span class="pre">imu-&gt;reset()</span></code> when
+restarting the complete IMU model is intended. The default World seed is zero;
+cloned Worlds with the same seeds and object creation order deliberately replay. In parallel environments,
+set a distinct World seed from the environment index. All 64 seed bits participate;
+this does not alter individual sensor property seeds. World XML and checkpoints
+save the environment seed, and checkpoint restoration resumes the saved streams.
+Resetting properties also resets the stream; for depth, call
+<code class="docutils literal notranslate"><span class="pre">updateRayDirections()</span></code> after editing properties. Repeatability is for the same
+build and sequence of captures; floating-point math can differ between platforms.</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Measurement models</span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+<col style="width: 45.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Sensor</p></th>
+<th class="head"><p>Properties</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>RGB</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">noiseType</span></code>, <code class="docutils literal notranslate"><span class="pre">mean</span></code>, <code class="docutils literal notranslate"><span class="pre">std</span></code></p></td>
+<td><p>Independent Gaussian or uniform read noise per color channel, in normalized
+intensity units: 0 is black, 1 is full scale. Alpha is preserved.</p></td>
+</tr>
+<tr class="row-odd"><td><p>RGB</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">shotNoise</span></code>, <code class="docutils literal notranslate"><span class="pre">rowNoiseStd</span></code></p></td>
+<td><p>Independent signal-dependent Gaussian noise with variance
+<code class="docutils literal notranslate"><span class="pre">shotNoise</span> <span class="pre">*</span> <span class="pre">intensity</span></code>, plus a Gaussian offset shared across each row
+and its three color channels.</p></td>
+</tr>
+<tr class="row-even"><td><p>Depth</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">noiseType</span></code>, <code class="docutils literal notranslate"><span class="pre">mean</span></code>, <code class="docutils literal notranslate"><span class="pre">std</span></code>, <code class="docutils literal notranslate"><span class="pre">stdDepthSquared</span></code></p></td>
+<td><p>Bias in meters and Gaussian/uniform noise with standard deviation
+<code class="docutils literal notranslate"><span class="pre">std</span> <span class="pre">+</span> <span class="pre">stdDepthSquared</span> <span class="pre">*</span> <span class="pre">z</span> <span class="pre">*</span> <span class="pre">z</span></code>, where <code class="docutils literal notranslate"><span class="pre">z</span></code> is clean optical depth in meters.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Depth</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">resolution</span></code>, <code class="docutils literal notranslate"><span class="pre">dropoutProbability</span></code></p></td>
+<td><p>Quantization step in meters and independent per-valid-pixel dropout
+probability. Dropped or out-of-range measurements become NaN.</p></td>
+</tr>
+<tr class="row-even"><td><p>LiDAR</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">rangeBias</span></code>, <code class="docutils literal notranslate"><span class="pre">rangeNoiseStd</span></code>, <code class="docutils literal notranslate"><span class="pre">angularNoiseStd</span></code></p></td>
+<td><p>Range bias and Gaussian range noise in meters; independent Gaussian yaw
+and pitch errors in radians, applied to the returned sensor-frame hits.</p></td>
+</tr>
+<tr class="row-odd"><td><p>LiDAR</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">resolution</span></code>, <code class="docutils literal notranslate"><span class="pre">dropoutProbability</span></code></p></td>
+<td><p>Range quantization in meters and independent per-hit dropout. Dropped and
+out-of-range hits are omitted, preserving the order of surviving hits.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The legacy <code class="docutils literal notranslate"><span class="pre">World::captureDepthCamera</span></code> has a separate, reseeded-per-capture
+noise API and uses a uniform half-range; see <a class="reference internal" href="#optional-deterministic-depth-noise">Optional deterministic depth noise</a>.
+For attached sensors, Gaussian and uniform <code class="docutils literal notranslate"><span class="pre">std</span></code> both mean standard deviation: the uniform interval
+has half-width <code class="docutils literal notranslate"><span class="pre">sqrt(3)</span> <span class="pre">*</span> <span class="pre">std</span></code>. <code class="docutils literal notranslate"><span class="pre">NO_NOISE</span></code> ignores the additive <code class="docutils literal notranslate"><span class="pre">mean</span></code>/<code class="docutils literal notranslate"><span class="pre">std</span></code>
+parameters; RGB shot/row effects and depth quantization/dropout remain independently
+configurable. RGB is rounded and clamped to byte values after all noise is added.
+Depth and LiDAR are quantized after noise, then checked against their configured
+range. Noisy depths outside the finite float32 storage range become NaN before
+conversion. Non-finite and missing returns never turn into valid hits. Noise does
+not change the acquisition timestamp, pose, scan sweep, or alpha channel.</p>
+<p>RGB <code class="docutils literal notranslate"><span class="pre">shotNoise</span></code> is a high photon-count Gaussian approximation in the <strong>rendered
+intensity space</strong>, rather than a calibrated photon/electron simulation. It does
+not model low-light Poisson statistics or an image signal processor. LiDAR angle
+noise perturbs a hit’s reported direction; it does not widen the beam or cast a
+second ray. These models do not add rolling shutter, motion distortion, multipath,
+material-dependent return probabilities, or camera/LiDAR latency.</p>
+<p>Noise is reproducible on the same platform and build when the scene, capture
+order, properties and seed match. Floating-point Gaussian transforms may differ
+between platforms. LiDAR draws are assigned in retained-hit order: a missing or
+extra hit shifts the draws of subsequent hits, so CPU/GPU scans with different
+hit sets need not share per-ray errors.</p>
+<p>Shipped RealSense sensor definitions explicitly disable camera noise to preserve
+clean robot captures. Set <code class="docutils literal notranslate"><span class="pre">type=&quot;gaussian&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">type=&quot;uniform&quot;</span></code> with a nonzero
+<code class="docutils literal notranslate"><span class="pre">stddev</span></code> to enable it. Third-party files with existing nonzero noise settings
+now activate those settings; use <code class="docutils literal notranslate"><span class="pre">type=&quot;none&quot;</span></code> to retain clean captures.
+Unknown camera noise types raise <code class="docutils literal notranslate"><span class="pre">std::invalid_argument</span></code>.</p>
+<p>Disabled depth models preserve raw input bytes, including the renderer’s missing
+return encoding. Active models normalize non-positive and out-of-clip inputs to
+NaN. Depth <code class="docutils literal notranslate"><span class="pre">resolution</span></code> is a quantization step in meters, independent of image
+<code class="docutils literal notranslate"><span class="pre">width</span></code> and <code class="docutils literal notranslate"><span class="pre">height</span></code>.</p>
+<p>Configure a depth camera in C++:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">depth</span><span class="o">-&gt;</span><span class="n">getProperties</span><span class="p">();</span>
+<span class="n">p</span><span class="p">.</span><span class="n">noiseType</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">decltype</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">noiseType</span><span class="p">)</span><span class="o">::</span><span class="n">GAUSSIAN</span><span class="p">;</span>
+<span class="n">p</span><span class="p">.</span><span class="n">std</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.002</span><span class="p">;</span><span class="w">                 </span><span class="c1">// 2 mm at zero distance</span>
+<span class="n">p</span><span class="p">.</span><span class="n">stdDepthSquared</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.001</span><span class="p">;</span><span class="w">     </span><span class="c1">// sigma is 18 mm at 4 m</span>
+<span class="n">p</span><span class="p">.</span><span class="n">resolution</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.001</span><span class="p">;</span><span class="w">          </span><span class="c1">// 1 mm depth steps</span>
+<span class="n">p</span><span class="p">.</span><span class="n">dropoutProbability</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.01</span><span class="p">;</span>
+<span class="n">p</span><span class="p">.</span><span class="n">seed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">101</span><span class="p">;</span>
+<span class="n">depth</span><span class="o">-&gt;</span><span class="n">updateRayDirections</span><span class="p">();</span>
 </pre></div>
 </div>
-<p>Like a real accelerometer, the IMU reports the specific force (acceleration
-minus gravity): an IMU at rest reads the negated gravity vector in the IMU frame.
-With <code class="docutils literal notranslate"><span class="pre">MANUAL</span></code>, set the values from hardware with <code class="docutils literal notranslate"><span class="pre">setLinearAcceleration()</span></code>,
-<code class="docutils literal notranslate"><span class="pre">setAngularVelocity()</span></code> and <code class="docutils literal notranslate"><span class="pre">setOrientation()</span></code>.</p>
+<p>For RGB, copy the immutable properties and pass them to <code class="docutils literal notranslate"><span class="pre">setProperties()</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rgb</span><span class="o">-&gt;</span><span class="n">getProperties</span><span class="p">();</span>
+<span class="n">p</span><span class="p">.</span><span class="n">noiseType</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">decltype</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">noiseType</span><span class="p">)</span><span class="o">::</span><span class="n">GAUSSIAN</span><span class="p">;</span>
+<span class="n">p</span><span class="p">.</span><span class="n">std</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.01</span><span class="p">;</span><span class="w">                 </span><span class="c1">// about 2.55 byte levels</span>
+<span class="n">p</span><span class="p">.</span><span class="n">shotNoise</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0001</span><span class="p">;</span>
+<span class="n">p</span><span class="p">.</span><span class="n">rowNoiseStd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.002</span><span class="p">;</span>
+<span class="n">p</span><span class="p">.</span><span class="n">seed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">43</span><span class="p">;</span>
+<span class="n">rgb</span><span class="o">-&gt;</span><span class="n">setProperties</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>In URDF sensor XML, camera noise settings belong on an optional
+<code class="docutils literal notranslate"><span class="pre">&lt;camera&gt;&lt;noise&gt;</span></code> element; LiDAR takes an optional <code class="docutils literal notranslate"><span class="pre">&lt;noise&gt;</span></code> child of
+<code class="docutils literal notranslate"><span class="pre">&lt;sensor&gt;</span></code>. Omitted attributes retain their clean defaults, so effect-only
+settings such as <code class="docutils literal notranslate"><span class="pre">&lt;noise</span> <span class="pre">shot_noise=&quot;0.001&quot;/&gt;</span></code> or
+<code class="docutils literal notranslate"><span class="pre">&lt;noise</span> <span class="pre">dropout_probability=&quot;0.01&quot;/&gt;</span></code> need no dummy read-noise fields.
+Read noise defaults to <code class="docutils literal notranslate"><span class="pre">NO_NOISE</span></code>; set <code class="docutils literal notranslate"><span class="pre">type=&quot;gaussian&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">type=&quot;uniform&quot;</span></code>
+when configuring additive read noise. Unknown noise types are rejected.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cm">&lt;!-- Inside a depth sensor&#39;s &lt;camera&gt;: --&gt;</span>
+<span class="nt">&lt;noise</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;gaussian&quot;</span><span class="w"> </span><span class="na">mean=</span><span class="s">&quot;0&quot;</span><span class="w"> </span><span class="na">stddev=</span><span class="s">&quot;0.002&quot;</span>
+<span class="w">       </span><span class="na">std_depth_squared=</span><span class="s">&quot;0.001&quot;</span><span class="w"> </span><span class="na">resolution=</span><span class="s">&quot;0.001&quot;</span>
+<span class="w">       </span><span class="na">dropout_probability=</span><span class="s">&quot;0.01&quot;</span><span class="w"> </span><span class="na">seed=</span><span class="s">&quot;101&quot;</span><span class="nt">/&gt;</span>
+<span class="cm">&lt;!-- Inside an RGB sensor&#39;s &lt;camera&gt;: --&gt;</span>
+<span class="nt">&lt;noise</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;gaussian&quot;</span><span class="w"> </span><span class="na">mean=</span><span class="s">&quot;0&quot;</span><span class="w"> </span><span class="na">stddev=</span><span class="s">&quot;0.01&quot;</span>
+<span class="w">       </span><span class="na">shot_noise=</span><span class="s">&quot;0.0001&quot;</span><span class="w"> </span><span class="na">row_noise_std=</span><span class="s">&quot;0.002&quot;</span><span class="w"> </span><span class="na">seed=</span><span class="s">&quot;43&quot;</span><span class="nt">/&gt;</span>
+<span class="cm">&lt;!-- Inside a spinning_lidar sensor: --&gt;</span>
+<span class="nt">&lt;noise</span><span class="w"> </span><span class="na">range_bias=</span><span class="s">&quot;0.002&quot;</span><span class="w"> </span><span class="na">range_noise_std=</span><span class="s">&quot;0.01&quot;</span>
+<span class="w">       </span><span class="na">angular_noise_std=</span><span class="s">&quot;0.001&quot;</span><span class="w"> </span><span class="na">resolution=</span><span class="s">&quot;0.001&quot;</span>
+<span class="w">       </span><span class="na">dropout_probability=</span><span class="s">&quot;0.01&quot;</span><span class="w"> </span><span class="na">seed=</span><span class="s">&quot;987&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<p>Noise is assigned to physical pixels in top-left image order. For a raw
+bottom-left buffer, call <code class="docutils literal notranslate"><span class="pre">applyNoise(data,</span> <span class="pre">size,</span> <span class="pre">false)</span></code>; Rayrai passes its
+<code class="docutils literal notranslate"><span class="pre">flipVertical</span></code> choice automatically. Resetting the stream before captures in
+opposite layouts produces the same seeded measurements with reversed row storage.
+Depth point-cloud conversion expects top-left rows; fisheye rays with a nonpositive
+forward component have no valid positive optical depth and produce NaN points.</p>
+<p>CPU depth/LiDAR <code class="docutils literal notranslate"><span class="pre">update()</span></code> and Rayrai’s sensor-aware <code class="docutils literal notranslate"><span class="pre">getRawImage()</span></code> / GPU
+LiDAR capture apply noise automatically, including custom output buffers. CPU
+<code class="docutils literal notranslate"><span class="pre">DepthCamera::get3DPoints()</span></code> follows the noisy depth image, including its NaNs.
+For Rayrai, use <code class="docutils literal notranslate"><span class="pre">depthToPointCloud()</span></code> to reconstruct measured points; readback
+does not populate <code class="docutils literal notranslate"><span class="pre">get3DPoints()</span></code>. The point conversion handles pinhole and
+fisheye optical depth.</p>
+<p>Manual setters such as <code class="docutils literal notranslate"><span class="pre">setImageBuffer()</span></code>, <code class="docutils literal notranslate"><span class="pre">setDepthArray()</span></code>, and <code class="docutils literal notranslate"><span class="pre">setScan()</span></code>
+keep hardware/playback data unchanged. Call <code class="docutils literal notranslate"><span class="pre">applyNoise()</span></code> explicitly after a
+manual setter to synthesize one measurement. Do not call it again after an
+automatic capture. Raw <code class="docutils literal notranslate"><span class="pre">Camera</span></code> readbacks without a RaiSim sensor remain clean.
+Asynchronous raw readbacks can be processed explicitly with the sensor’s
+<code class="docutils literal notranslate"><span class="pre">applyNoise(pointer,</span> <span class="pre">size)</span></code> overload when the returned frame is consumed.</p>
+<p>For TCP cameras, the visualizer sends clean pixels and RaiSim applies the model
+when it commits the received image. The protocol is unchanged; the visualizer’s
+preview remains clean while the sensor buffer contains the noisy measurement.
+There are no per-pixel allocations; all-disabled models return before processing
+pixels. Rendering resolution, materials, lighting, and shadow quality are unchanged.</p>
+<p>See <a class="reference internal" href="examples/rayrai/rayrai_sensor_noise.html"><span class="doc">the sensor noise example</span></a> for
+reproducible RGB/depth comparison images and the exact capture calls.</p>
+</section>
+<section id="imu">
+<span id="imu-sensor-model"></span><h2>IMU<a class="headerlink" href="#imu" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">raisim::InertialMeasurementUnit</span></code> produces accelerometer and gyroscope
+measurements for a frame attached to an articulated system. The default is an
+ideal sensor; bias, noise, bandwidth, quantization, saturation and delivery
+latency (0 to 60 seconds) are configurable. Sensor measurements do not require enabling inverse
+dynamics on the robot.</p>
+<p>Start with the runnable <a class="reference internal" href="examples/server/imu_sensor_model.html"><span class="doc">Example: IMU Sensor Model</span></a> example. It
+compares an ideal sensor and a modeled sensor at the same mounting point and
+writes CSV without a viewer. <a class="reference internal" href="examples/server/sensor_suite.html"><span class="doc">Server Example: Sensor Suite</span></a> demonstrates
+using an IMU alongside rendered cameras and LiDAR.</p>
+<section id="reading-measurements">
+<h3>Reading measurements<a class="headerlink" href="#reading-measurements" title="Link to this heading"></a></h3>
+<p>With <code class="docutils literal notranslate"><span class="pre">MeasurementSource::RAISIM</span></code> (the default), read the IMU after
+<code class="docutils literal notranslate"><span class="pre">world.integrate()</span></code>. Getters hold the latest delivered sample between updates;
+a changed measurement value is not a reliable way to detect a new sample.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">imu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">robot</span><span class="o">-&gt;</span><span class="n">getSensorSet</span><span class="p">(</span><span class="s">&quot;base&quot;</span><span class="p">)</span>
+<span class="w">                </span><span class="o">-&gt;</span><span class="n">getSensor</span><span class="o">&lt;</span><span class="n">raisim</span><span class="o">::</span><span class="n">InertialMeasurementUnit</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;imu&quot;</span><span class="p">);</span>
+<span class="kt">double</span><span class="w"> </span><span class="n">lastAcquisition</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">-1.0</span><span class="p">;</span>
+
+<span class="c1">// Inside the simulation loop:</span>
+<span class="n">world</span><span class="p">.</span><span class="n">integrate</span><span class="p">();</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">acquired</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">imu</span><span class="o">-&gt;</span><span class="n">getUpdateTimeStamp</span><span class="p">();</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">acquired</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mf">0.0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">acquired</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">lastAcquisition</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">lastAcquisition</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">acquired</span><span class="p">;</span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span><span class="w"> </span><span class="n">acc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">imu</span><span class="o">-&gt;</span><span class="n">getLinearAcceleration</span><span class="p">();</span><span class="w"> </span><span class="c1">// IMU frame, m/s^2</span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span><span class="w"> </span><span class="n">gyro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">imu</span><span class="o">-&gt;</span><span class="n">getAngularVelocity</span><span class="p">();</span><span class="w">   </span><span class="c1">// IMU frame, rad/s</span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">delivered</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">imu</span><span class="o">-&gt;</span><span class="n">getDeliveryTimeStamp</span><span class="p">();</span><span class="w">   </span><span class="c1">// simulation seconds</span>
+<span class="w">  </span><span class="c1">// Consume acc/gyro with their acquisition timestamp, not the current world time.</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>With <code class="docutils literal notranslate"><span class="pre">MANUAL</span></code>, RaiSim leaves the measurements unchanged. User code can write
+hardware data with <code class="docutils literal notranslate"><span class="pre">setLinearAcceleration()</span></code>, <code class="docutils literal notranslate"><span class="pre">setAngularVelocity()</span></code> and
+<code class="docutils literal notranslate"><span class="pre">setOrientation()</span></code>, and manage its timestamps through <code class="docutils literal notranslate"><span class="pre">setUpdateTimeStamp()</span></code>.</p>
+</section>
+<section id="how-the-ideal-reading-is-computed">
+<h3>How the ideal reading is computed<a class="headerlink" href="#how-the-ideal-reading-is-computed" title="Link to this heading"></a></h3>
+<p>The IMU uses the completed physics step’s pose and angular velocity. Generalized
+acceleration is obtained from the solver’s velocity change over a physics step
+of duration <span class="math notranslate nohighlight">\(h\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\dot v \simeq \frac{v_{\mathrm{after}}-v_{\mathrm{before}}}{h}.\]</div>
+<p>A forward acceleration pass through the joint tree adds joint motion, rotational
+and Coriolis terms. For an IMU at world-frame offset <span class="math notranslate nohighlight">\(r\)</span> from its body’s
+reference point, the resulting acceleration is</p>
+<div class="math notranslate nohighlight">
+\[a_{\mathrm{IMU}} = a_{\mathrm{body}}
+  + \alpha\times r + \omega\times(\omega\times r).\]</div>
+<p>The last two terms account for tangential and centripetal acceleration. A sensor
+away from a rotation axis therefore measures acceleration even when the body’s
+reference point is stationary.</p>
+<p>Let <span class="math notranslate nohighlight">\(R_{WS}\)</span> map sensor coordinates into world coordinates. The ideal
+accelerometer reports <strong>specific force</strong>, and the gyro reports angular velocity,
+both expressed in the IMU’s own axes:</p>
+<div class="math notranslate nohighlight">
+\[f = R_{WS}^{T}(a_{\mathrm{IMU}}-g), \qquad
+\omega_S = R_{WS}^{T}\omega_W.\]</div>
+<p>For an aligned, upright sensor with gravity <span class="math notranslate nohighlight">\(g=(0,0,-9.81)\)</span>:</p>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text">Ideal accelerometer checks</span><a class="headerlink" href="#id2" title="Link to this table"></a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Motion</p></th>
+<th class="head"><p>Expected reading</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Stationary and supported</p></td>
+<td><p><span class="math notranslate nohighlight">\((0,0,9.81)\)</span> m/s²</p></td>
+</tr>
+<tr class="row-odd"><td><p>Free fall without rotation</p></td>
+<td><p><span class="math notranslate nohighlight">\((0,0,0)\)</span> m/s²</p></td>
+</tr>
+<tr class="row-even"><td><p>Constant rotation about +Z, zero gravity, sensor 0.1 m along the body’s +X axis, <span class="math notranslate nohighlight">\(\omega_Z=2\)</span> rad/s</p></td>
+<td><p><span class="math notranslate nohighlight">\((-0.4,0,0)\)</span> m/s²; the gyro reads <span class="math notranslate nohighlight">\((0,0,2)\)</span> rad/s</p></td>
+</tr>
+</tbody>
+</table>
+<p>Rotating the sensor mount rotates these vectors into the sensor frame. The
+accelerometer is not a gravity-removed linear-acceleration output.</p>
+<p><code class="docutils literal notranslate"><span class="pre">getOrientation()</span></code> and <code class="docutils literal notranslate"><span class="pre">getGroundTruthOrientation()</span></code> return the same
+<strong>ground-truth</strong> sensor-to-world quaternion in <code class="docutils literal notranslate"><span class="pre">(w,</span> <span class="pre">x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code> order. It belongs
+to the delivered sample’s acquisition time, including when delivery is delayed.
+It is not an attitude estimate derived from noisy accelerometer and gyro data;
+adding channel noise does not make this quaternion noisy. Validate an attitude
+estimator using the raw accelerometer and gyro channels instead.</p>
+</section>
+<section id="sampling-and-delivery">
+<h3>Sampling and delivery<a class="headerlink" href="#sampling-and-delivery" title="Link to this heading"></a></h3>
+<p>The acquisition clock retains its phase when a deadline falls between physics
+steps. Acquisition takes place at the first completed step at or after the
+deadline; the next deadline advances from the original clock rather than the
+rounded acquisition time. There is at most one acquisition per physics step,
+so a requested rate above the physics rate cannot create additional motion data.</p>
+<p>For a simulation starting at time zero with 1 ms physics, a 400 Hz IMU and 3 ms
+latency, the first samples are:</p>
+<table class="docutils align-default" id="id3">
+<caption><span class="caption-text">Simulation times in milliseconds</span><a class="headerlink" href="#id3" title="Link to this table"></a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Acquisition</p></th>
+<th class="head"><p>Delivery</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>7</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>9</p></td>
+</tr>
+<tr class="row-odd"><td><p>9</p></td>
+<td><p>12</p></td>
+</tr>
+<tr class="row-even"><td><p>11</p></td>
+<td><p>14</p></td>
+</tr>
+</tbody>
+</table>
+<p>The acquisition intervals alternate between 2 ms and 3 ms. The mean rate remains
+400 Hz. <code class="docutils literal notranslate"><span class="pre">getUpdateTimeStamp()</span></code> is the <strong>acquisition</strong> time of the most recently
+delivered sample. <code class="docutils literal notranslate"><span class="pre">getDeliveryTimeStamp()</span></code> is when that sample became available.
+Both are simulation times, not wall-clock times.</p>
+<p>For latency <span class="math notranslate nohighlight">\(L\)</span>, a sample acquired at <span class="math notranslate nohighlight">\(t_s\)</span> becomes available at the
+first physics step with <span class="math notranslate nohighlight">\(t\ge t_s+L\)</span>. Delivery is checked every physics
+step, including steps without a new acquisition. Latency is therefore rounded
+up to the available physics times. Acceleration, gyro and ground-truth orientation
+are queued together. Before the first delivery, timestamps are negative and the
+quaternion is the identity; do not treat those initial buffers as measurements.</p>
+<p>Queue storage grows with acquired samples, up to 65,536 pending measurements
+(about 6 MiB per IMU). If this capacity is exhausted, or growth cannot allocate
+memory, new samples are dropped until room becomes available. Existing queued
+samples keep their acquisition times and delivery latency. A warning is emitted
+on the first loss after <code class="docutils literal notranslate"><span class="pre">reset()</span></code>; <code class="docutils literal notranslate"><span class="pre">getDroppedMeasurementCount()</span></code> reports the
+cumulative loss and is preserved by checkpoints. Reduce latency or update rate if
+this count is nonzero. The physics timestep continues normally.</p>
+<p>Sleeping and fixed bodies continue to produce samples, including specific force
+from gravity and the configured stochastic errors. With filtering enabled, the
+filter advances every physics step, even when no new output sample is due.</p>
+<p>Python RGB, LiDAR and IMU <code class="docutils literal notranslate"><span class="pre">getProperties()</span></code> return independent copies. Edit the
+copy and call <code class="docutils literal notranslate"><span class="pre">setProperties()</span></code> to validate and apply it; a rejected edit leaves
+the sensor unchanged. Depth retains mutable properties and requires
+<code class="docutils literal notranslate"><span class="pre">updateRayDirections()</span></code> after edits.</p>
+</section>
+<section id="configuring-the-sensor-model">
+<h3>Configuring the sensor model<a class="headerlink" href="#configuring-the-sensor-model" title="Link to this heading"></a></h3>
+<p>Accelerometer and gyro settings are independent. Prefer const access when copying
+properties, then apply the complete configuration with <code class="docutils literal notranslate"><span class="pre">setProperties()</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;utility&gt;</span><span class="c1"> // std::as_const</span>
+
+<span class="k">auto</span><span class="w"> </span><span class="n">properties</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">as_const</span><span class="p">(</span><span class="o">*</span><span class="n">imu</span><span class="p">).</span><span class="n">getProperties</span><span class="p">();</span>
+<span class="n">properties</span><span class="p">.</span><span class="n">seed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">43</span><span class="p">;</span>
+<span class="n">properties</span><span class="p">.</span><span class="n">accelerometer</span><span class="p">.</span><span class="n">bias</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.02</span><span class="p">,</span><span class="w"> </span><span class="mf">0.03</span><span class="p">);</span>
+<span class="n">properties</span><span class="p">.</span><span class="n">accelerometer</span><span class="p">.</span><span class="n">noiseDensity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.002</span><span class="p">;</span>
+<span class="n">properties</span><span class="p">.</span><span class="n">accelerometer</span><span class="p">.</span><span class="n">biasRandomWalk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0001</span><span class="p">;</span>
+<span class="n">properties</span><span class="p">.</span><span class="n">accelerometer</span><span class="p">.</span><span class="n">cutoffFrequency</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">30.0</span><span class="p">;</span>
+<span class="n">properties</span><span class="p">.</span><span class="n">accelerometer</span><span class="p">.</span><span class="n">resolution</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.001</span><span class="p">;</span>
+<span class="n">properties</span><span class="p">.</span><span class="n">gyroscope</span><span class="p">.</span><span class="n">bias</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span><span class="p">(</span><span class="mf">0.001</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.002</span><span class="p">,</span><span class="w"> </span><span class="mf">0.003</span><span class="p">);</span>
+<span class="n">properties</span><span class="p">.</span><span class="n">gyroscope</span><span class="p">.</span><span class="n">noiseDensity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0002</span><span class="p">;</span>
+<span class="n">properties</span><span class="p">.</span><span class="n">gyroscope</span><span class="p">.</span><span class="n">biasRandomWalk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.00001</span><span class="p">;</span>
+<span class="n">properties</span><span class="p">.</span><span class="n">gyroscope</span><span class="p">.</span><span class="n">cutoffFrequency</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">50.0</span><span class="p">;</span>
+<span class="n">properties</span><span class="p">.</span><span class="n">gyroscope</span><span class="p">.</span><span class="n">resolution</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0001</span><span class="p">;</span>
+<span class="n">properties</span><span class="p">.</span><span class="n">maxAcc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">16.0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">9.81</span><span class="p">;</span><span class="w"> </span><span class="c1">// 16 g, independently on each axis</span>
+<span class="n">properties</span><span class="p">.</span><span class="n">maxAngVel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">34.906585</span><span class="p">;</span><span class="w"> </span><span class="c1">// approximately 2000 degrees/s, in rad/s</span>
+<span class="n">properties</span><span class="p">.</span><span class="n">latency</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.003</span><span class="p">;</span>
+<span class="n">imu</span><span class="o">-&gt;</span><span class="n">setProperties</span><span class="p">(</span><span class="n">properties</span><span class="p">);</span>
+<span class="n">imu</span><span class="o">-&gt;</span><span class="n">setUpdateRate</span><span class="p">(</span><span class="mf">400.0</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>These are illustrative settings, not a calibrated preset for a specific device.
+In the table below, a “channel unit” is m/s² for the accelerometer and rad/s for
+the gyro. All channel error settings default to zero (disabled).</p>
+<table class="docutils align-default" id="id4">
+<caption><span class="caption-text">Model parameters</span><a class="headerlink" href="#id4" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Property</p></th>
+<th class="head"><p>Unit</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">bias</span></code></p></td>
+<td><p>Channel units, three axes</p></td>
+<td><p>Initial offset in sensor coordinates.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">noiseDensity</span></code></p></td>
+<td><p>Channel units / sqrt(Hz)</p></td>
+<td><p>Continuous white-noise strength; not the per-sample standard deviation.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">biasRandomWalk</span></code></p></td>
+<td><p>Channel units / sqrt(s)</p></td>
+<td><p>Strength of the Brownian bias increments.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cutoffFrequency</span></code></p></td>
+<td><p>Hz</p></td>
+<td><p>First-order low-pass cutoff; zero bypasses filtering.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">resolution</span></code></p></td>
+<td><p>Channel units</p></td>
+<td><p>Quantization step; zero disables quantization.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maxAcc</span></code>, <code class="docutils literal notranslate"><span class="pre">maxAngVel</span></code></p></td>
+<td><p>m/s², rad/s</p></td>
+<td><p>Positive symmetric per-axis clipping ranges. Defaults are effectively unlimited.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">latency</span></code></p></td>
+<td><p>Seconds</p></td>
+<td><p>Delay between acquisition and availability, from 0 to 60 seconds, shared by all reported channels.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">seed</span></code></p></td>
+<td><p>Unsigned 32-bit integer</p></td>
+<td><p>Zero derives a stream from sensor identity; nonzero selects an explicit stream. The World environment seed is mixed into both.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="bias-and-unfiltered-noise">
+<h3>Bias and unfiltered noise<a class="headerlink" href="#bias-and-unfiltered-noise" title="Link to this heading"></a></h3>
+<p>For each axis, the initial bias is the configured <code class="docutils literal notranslate"><span class="pre">bias</span></code>. With bias random-walk
+strength <span class="math notranslate nohighlight">\(\sigma_b\)</span>, a bias update over elapsed time <span class="math notranslate nohighlight">\(\Delta t\)</span> is</p>
+<div class="math notranslate nohighlight">
+\[b_{k+1}=b_k+\sigma_b\sqrt{\Delta t}\,\xi_k,
+\qquad \xi_k\sim\mathcal N(0,1).\]</div>
+<p>Bias is stepped at physics rate for filtered channels and at acquisition times
+for unfiltered channels, using the corresponding elapsed time. Its uncertainty
+grows with elapsed time; it is not independent additive noise at each sample.
+<code class="docutils literal notranslate"><span class="pre">getAccelerometerBias()</span></code> and <code class="docutils literal notranslate"><span class="pre">getGyroscopeBias()</span></code> expose the current simulated
+bias state for diagnostics. Those diagnostic states are not delayed to match a
+previously acquired measurement.</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">cutoffFrequency</span></code> is zero, the ideal signal is sampled at acquisition and
+the output before quantization/clipping is</p>
+<div class="math notranslate nohighlight">
+\[u_k=x_k+b_k+\frac{\sigma_n}{\sqrt{\Delta t_s}}\,\eta_k,
+\qquad \eta_k\sim\mathcal N(0,1),\]</div>
+<p>where <span class="math notranslate nohighlight">\(\sigma_n\)</span> is <code class="docutils literal notranslate"><span class="pre">noiseDensity</span></code> and <span class="math notranslate nohighlight">\(\Delta t_s\)</span> is the actual
+acquisition interval. This noise-variance convention assumes ideal noise
+averaging/decimation, as in
+<a class="reference external" href="https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model">Kalibr’s IMU noise model</a>.
+It does not average the ideal motion signal over that interval. Enable a
+suitable cutoff when signal bandwidth and filtering before downsampling matter.</p>
+<p>For example, noise density 0.002 m/s²/sqrt(Hz) at a uniform 400 Hz acquisition
+rate gives a sample standard deviation of 0.04 m/s² without the explicit filter.
+With rounded acquisition intervals, the variance follows each actual interval.
+Accelerometer and gyro axes use independent random draws, with separate channel
+parameters.</p>
+</section>
+<section id="low-pass-filtering-and-filtered-noise">
+<h3>Low-pass filtering and filtered noise<a class="headerlink" href="#low-pass-filtering-and-filtered-noise" title="Link to this heading"></a></h3>
+<p>For a positive cutoff <span class="math notranslate nohighlight">\(f_c\)</span>, define <span class="math notranslate nohighlight">\(\lambda=2\pi f_c\)</span> and
+<span class="math notranslate nohighlight">\(a=\exp(-\lambda h)\)</span>, where <span class="math notranslate nohighlight">\(h\)</span> is the physics step. The signal and
+bias are filtered together:</p>
+<div class="math notranslate nohighlight">
+\[s_{k+1}=a\,s_k+(1-a)(x_{k+1}+b_{k+1}).\]</div>
+<p>This is the exact first-order response for a held input over the step. The signal
+filter initializes from the first input to avoid an artificial startup transient.
+White noise passing through the same bandwidth is advanced separately:</p>
+<div class="math notranslate nohighlight">
+\[z_{k+1}=a\,z_k+
+  \sigma_n\sqrt{\frac{\lambda}{2}(1-a^2)}\,\eta_k.\]</div>
+<p>The filtered reading is <span class="math notranslate nohighlight">\(u=s+z\)</span>. This is the exact discrete
+Ornstein–Uhlenbeck transition for that continuous white-noise model. Its
+steady-state variance is <span class="math notranslate nohighlight">\(\sigma_n^2\pi f_c\)</span>, and its one-physics-step
+correlation is <span class="math notranslate nohighlight">\(\exp(-2\pi f_c h)\)</span>. Unlike drawing independent output noise,
+it preserves the temporal correlation created by the sensor bandwidth. The noise
+state starts at zero and approaches this stationary distribution after reset.</p>
+<p>Filtering advances before output downsampling. Coefficients are cached for a
+constant physics timestep and recomputed when the step changes. “Exact” here
+refers to these filter transitions; the simulated motion and stepped bias remain
+limited by the physics resolution and the held-input assumption.</p>
+</section>
+<section id="quantization-and-saturation">
+<h3>Quantization and saturation<a class="headerlink" href="#quantization-and-saturation" title="Link to this heading"></a></h3>
+<p>At acquisition, each output axis is quantized to step <span class="math notranslate nohighlight">\(q\)</span>, when configured,
+then independently clipped to range <span class="math notranslate nohighlight">\([-M,M]\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[y_i=\operatorname{clip}\left(q\operatorname{round}(u_i/q),-M,M\right).\]</div>
+<p>With <code class="docutils literal notranslate"><span class="pre">resolution=0</span></code>, the rounding stage is skipped. <code class="docutils literal notranslate"><span class="pre">maxAcc</span></code> and <code class="docutils literal notranslate"><span class="pre">maxAngVel</span></code>
+are axis limits, so saturation on one axis does not reduce another axis. This
+replaces the previous vector-norm scaling behavior.</p>
+<p>The legacy <code class="docutils literal notranslate"><span class="pre">noiseType</span></code>, <code class="docutils literal notranslate"><span class="pre">mean</span></code> and <code class="docutils literal notranslate"><span class="pre">std</span></code> settings now add output sample noise
+to both channels after the explicit filter and before quantization. Uniform noise
+has half-width <code class="docutils literal notranslate"><span class="pre">sqrt(3)</span> <span class="pre">*</span> <span class="pre">std</span></code>. Prefer the independent channel noise densities
+for new models; configuring both mechanisms adds both noise contributions.</p>
+</section>
+<section id="reset-replay-and-xml">
+<h3>Reset, replay and XML<a class="headerlink" href="#reset-replay-and-xml" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">setProperties()</span></code> rejects invalid model parameters before applying them and
+resets measurements, bias, filters, sampling clock, pending delivery queue and
+random stream. Sensor <code class="docutils literal notranslate"><span class="pre">name</span></code> and <code class="docutils literal notranslate"><span class="pre">full_name</span></code> are immutable after construction;
+changing them through <code class="docutils literal notranslate"><span class="pre">setProperties()</span></code> is rejected.
+<code class="docutils literal notranslate"><span class="pre">resetNoise()</span></code> restarts only the random stream, preserving measurements and model
+history. <code class="docutils literal notranslate"><span class="pre">reset()</span></code> restarts the current model from its configured biases
+and seed; it does not rewind the robot or an application controller. Legacy
+mutable <code class="docutils literal notranslate"><span class="pre">getProperties()</span></code> access is supported: valid edits reset the model on
+the next update. Invalid edits, including identity changes, restore the last valid
+configuration and emit a warning, so they cannot interrupt a world step. Use
+<code class="docutils literal notranslate"><span class="pre">setProperties()</span></code> for immediate validation and exceptions before stepping.
+Obtaining a mutable reference permanently enables property comparisons on each
+update, even when it was obtained only to copy the settings. References remain
+tracked after checkpoint restore. Prefer <code class="docutils literal notranslate"><span class="pre">std::as_const(*imu).getProperties()</span></code>
+for reading, or call through a const reference.</p>
+<p>Repeated motion with the same seed on the same platform/build reproduces the
+stochastic output. Cross-platform floating-point results need not be bit-identical.
+The IMU uses the same full-width seeded stream and Gaussian sampler as the
+camera/LiDAR models, so high seed bits also select different streams. World
+checkpoints preserve the complete random state,
+bias, filter state, acquisition clock, pending delayed samples and delivery timestamps.
+For replay of a running simulation, restore a world checkpoint rather than merely
+reapplying the same seed. Application controller and random state still belong to
+the application.</p>
+<p>URDF declarations support the same configuration:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;sensor</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;imu&quot;</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;imu&quot;</span><span class="w"> </span><span class="na">update_rate=</span><span class="s">&quot;400&quot;</span><span class="w"> </span><span class="na">seed=</span><span class="s">&quot;43&quot;</span><span class="w"> </span><span class="na">latency=</span><span class="s">&quot;0.003&quot;</span><span class="nt">&gt;</span>
+<span class="w">  </span><span class="nt">&lt;origin</span><span class="w"> </span><span class="na">xyz=</span><span class="s">&quot;0.1 0 0&quot;</span><span class="w"> </span><span class="na">rpy=</span><span class="s">&quot;0 0 0&quot;</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;limit</span><span class="w"> </span><span class="na">acc_limit=</span><span class="s">&quot;156.96&quot;</span><span class="w"> </span><span class="na">ang_vel_limit=</span><span class="s">&quot;34.906585&quot;</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;accelerometer</span><span class="w"> </span><span class="na">bias=</span><span class="s">&quot;0.01 -0.02 0.03&quot;</span><span class="w"> </span><span class="na">noise_density=</span><span class="s">&quot;0.002&quot;</span>
+<span class="w">                 </span><span class="na">bias_random_walk=</span><span class="s">&quot;0.0001&quot;</span><span class="w"> </span><span class="na">cutoff_frequency=</span><span class="s">&quot;30&quot;</span><span class="w"> </span><span class="na">resolution=</span><span class="s">&quot;0.001&quot;</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;gyroscope</span><span class="w"> </span><span class="na">bias=</span><span class="s">&quot;0.001 -0.002 0.003&quot;</span><span class="w"> </span><span class="na">noise_density=</span><span class="s">&quot;0.0002&quot;</span>
+<span class="w">             </span><span class="na">bias_random_walk=</span><span class="s">&quot;0.00001&quot;</span><span class="w"> </span><span class="na">cutoff_frequency=</span><span class="s">&quot;50&quot;</span><span class="w"> </span><span class="na">resolution=</span><span class="s">&quot;0.0001&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/sensor&gt;</span>
+</pre></div>
+</div>
+<p>Use the channel child elements above as the canonical URDF form. Prefixed
+<code class="docutils literal notranslate"><span class="pre">acc_*</span></code>/<code class="docutils literal notranslate"><span class="pre">gyro_*</span></code> attributes remain accepted for serialized world XML; avoid
+mixing those attributes with child elements in authored URDF. Legacy additive
+sample noise can be configured with a <code class="docutils literal notranslate"><span class="pre">&lt;noise</span> <span class="pre">type=&quot;gaussian&quot;</span> <span class="pre">mean=&quot;0&quot;</span>
+<span class="pre">stddev=&quot;0.01&quot;/&gt;</span></code> child.</p>
+<p>World XML export preserves this configuration, not the evolving stochastic state.
+The model fields require matching RaiSim headers and binaries that provide
+<code class="docutils literal notranslate"><span class="pre">InertialMeasurementUnit::ChannelProperties</span></code>; older binary packages do not
+implement this API.</p>
+</section>
+<section id="accuracy-and-performance-limits">
+<h3>Accuracy and performance limits<a class="headerlink" href="#accuracy-and-performance-limits" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Contact impulses contribute acceleration averaged over one physics step.
+Smaller timesteps may be required to resolve short impacts or vibration.</p></li>
+<li><p>A first-order filter is a configurable sensor approximation. There is no
+device-specific transfer function, temperature dependence, scale-factor error,
+cross-axis calibration error or attitude-estimation algorithm in this model.</p></li>
+<li><p>Delivery occurs only on physics steps. There is no wall-clock scheduling jitter
+or packet-loss model.</p></li>
+<li><p>The ideal path bypasses random draws and filtering. The zero-latency path needs
+no delay buffer; positive latency uses reusable queue storage. Acceleration is
+propagated once per articulated system when needed by its IMUs, without the
+inverse-dynamics force sweep.</p></li>
+</ul>
+<p>For engine-side timing, the <code class="docutils literal notranslate"><span class="pre">imu_sensor_benchmark</span></code> target compares baseline
+integration, ideal IMUs and the full model on one thread:
+<code class="docutils literal notranslate"><span class="pre">build-benchmark/benchmark/imu_sensor_benchmark</span> <span class="pre">--steps=500000</span> <span class="pre">--robots=16</span></code>.</p>
+</section>
 </section>
 <section id="cpu-depth-camera-fallback">
 <h2>CPU depth camera fallback<a class="headerlink" href="#cpu-depth-camera-fallback" title="Link to this heading"></a></h2>
@@ -502,8 +1016,17 @@ generation.</p>
 </section>
 <section id="optional-deterministic-depth-noise">
 <h3>Optional deterministic depth noise<a class="headerlink" href="#optional-deterministic-depth-noise" title="Link to this heading"></a></h3>
-<p>Depth noise is disabled by default. To add reproducible noise, set
-<code class="docutils literal notranslate"><span class="pre">depthNoiseType</span></code>, <code class="docutils literal notranslate"><span class="pre">depthNoiseMean</span></code>, <code class="docutils literal notranslate"><span class="pre">depthNoiseStd</span></code>, and
+<p>Depth noise is disabled by default.</p>
+<p>This legacy world-level capture API is separate from the attached
+<a class="reference internal" href="#sensor-noise-models"><span class="std std-ref">Sensor noise</span></a> above. In this API, uniform <code class="docutils literal notranslate"><span class="pre">depthNoiseStd</span></code> is the
+<strong>half-range</strong>, while attached <code class="docutils literal notranslate"><span class="pre">DepthCamera::DepthCameraProperties::std</span></code> is a
+<strong>standard deviation</strong> (uniform half-range <code class="docutils literal notranslate"><span class="pre">sqrt(3)</span> <span class="pre">*</span> <span class="pre">std</span></code>). Its generator is
+reseeded on each capture: repeat captures with the same input repeat the noise,
+rather than advancing an attached sensor’s stream. The legacy standard-library
+distributions reproduce within a platform/build; their Gaussian samples can differ
+between C++ standard libraries. Use attached depth sensors for the shared model,
+quantization, dropout, environment seeds and an advancing stream.</p>
+<p>To enable it, set <code class="docutils literal notranslate"><span class="pre">depthNoiseType</span></code>, <code class="docutils literal notranslate"><span class="pre">depthNoiseMean</span></code>, <code class="docutils literal notranslate"><span class="pre">depthNoiseStd</span></code>, and
 <code class="docutils literal notranslate"><span class="pre">depthNoiseSeed</span></code>. The same world state, camera pose, properties, and seed
 produce the same noisy depth image.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">prop</span><span class="p">.</span><span class="n">depthNoiseType</span><span class="w"> </span><span class="o">=</span>
@@ -649,7 +1172,7 @@ points, and timestamps without a visualizer, but it is the CPU fallback path.</p
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim6SensorE">
 <span id="_CPPv3N6raisim6SensorE"></span><span id="_CPPv2N6raisim6SensorE"></span><span id="raisim::Sensor"></span><span class="target" id="classraisim_1_1Sensor"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Sensor</span></span></span><a class="headerlink" href="#_CPPv4N6raisim6SensorE" title="Link to this definition"></a><br /></dt>
 <dd><p>Base class of all sensors attached to an <a class="reference internal" href="articulated_system/API.html#classraisim_1_1ArticulatedSystem"><span class="std std-ref">ArticulatedSystem</span></a> frame (<a class="reference internal" href="#classraisim_1_1RGBCamera"><span class="std std-ref">RGBCamera</span></a>, <a class="reference internal" href="#classraisim_1_1DepthCamera"><span class="std std-ref">DepthCamera</span></a>, <a class="reference internal" href="#classraisim_1_1InertialMeasurementUnit"><span class="std std-ref">InertialMeasurementUnit</span></a>, SpinningLidar).</p>
-<p>Sensors are owned by a SensorSet, which belongs to a body of an <a class="reference internal" href="articulated_system/API.html#classraisim_1_1ArticulatedSystem"><span class="std std-ref">ArticulatedSystem</span></a>. Every sensor is attached to a fixed frame of that system (see <a class="reference internal" href="#classraisim_1_1Sensor_1abc244823b2c41b8d99e699736349023c"><span class="std std-ref">getFrameId()</span></a>); its world pose is read from that frame. When the measurement source is <a class="reference internal" href="#classraisim_1_1Sensor_1a74aba488a930506ce30f4280f3d1c809a3ea38b53983a21d38e8287cef5878ef8"><span class="std std-ref">MeasurementSource::RAISIM</span></a>, the owning <a class="reference internal" href="articulated_system/API.html#classraisim_1_1ArticulatedSystem"><span class="std std-ref">ArticulatedSystem</span></a> refreshes the measurement during <a class="reference internal" href="WorldSystem.html#classraisim_1_1World_1a469054d6525c640a978abfaf3da71a33"><span class="std std-ref">World::integrate()</span></a> whenever at least 1/getUpdateRate() seconds of simulated time have passed since <a class="reference internal" href="#classraisim_1_1Sensor_1a32ff5755a3683076fe48e255bb14b8b0"><span class="std std-ref">getUpdateTimeStamp()</span></a>. With <a class="reference internal" href="#classraisim_1_1Sensor_1a74aba488a930506ce30f4280f3d1c809aa60a6a471c0681e5a49c4f5d00f6bc5a"><span class="std std-ref">MeasurementSource::MANUAL</span></a>, user code (or a renderer) writes the measurement buffers. </p>
+<p>Sensors are owned by a SensorSet, which belongs to a body of an <a class="reference internal" href="articulated_system/API.html#classraisim_1_1ArticulatedSystem"><span class="std std-ref">ArticulatedSystem</span></a>. Every sensor is attached to a fixed frame of that system (see <a class="reference internal" href="#classraisim_1_1Sensor_1abc244823b2c41b8d99e699736349023c"><span class="std std-ref">getFrameId()</span></a>); its world pose is read from that frame. When the measurement source is <a class="reference internal" href="#classraisim_1_1Sensor_1a74aba488a930506ce30f4280f3d1c809a3ea38b53983a21d38e8287cef5878ef8"><span class="std std-ref">MeasurementSource::RAISIM</span></a>, the owning <a class="reference internal" href="articulated_system/API.html#classraisim_1_1ArticulatedSystem"><span class="std std-ref">ArticulatedSystem</span></a> refreshes the measurement during <a class="reference internal" href="WorldSystem.html#classraisim_1_1World_1a469054d6525c640a978abfaf3da71a33"><span class="std std-ref">World::integrate()</span></a> whenever at least 1/getUpdateRate() seconds of simulated time have passed since <a class="reference internal" href="#classraisim_1_1Sensor_1a32ff5755a3683076fe48e255bb14b8b0"><span class="std std-ref">getUpdateTimeStamp()</span></a>. IMUs use a phase-preserving clock and expose the acquisition time even when delivery is delayed. With <a class="reference internal" href="#classraisim_1_1Sensor_1a74aba488a930506ce30f4280f3d1c809aa60a6a471c0681e5a49c4f5d00f6bc5a"><span class="std std-ref">MeasurementSource::MANUAL</span></a>, user code (or a renderer) writes the measurement buffers. </p>
 <p>Subclassed by <a class="reference internal" href="#classraisim_1_1DepthCamera"><span class="std std-ref">raisim::DepthCamera</span></a>, <a class="reference internal" href="#classraisim_1_1InertialMeasurementUnit"><span class="std std-ref">raisim::InertialMeasurementUnit</span></a>, <a class="reference internal" href="#classraisim_1_1RGBCamera"><span class="std std-ref">raisim::RGBCamera</span></a>, raisim::SpinningLidar</p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
@@ -1145,6 +1668,38 @@ points, and timestamps without a visualizer, but it is the CPU fallback path.</p
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim11DepthCamera10applyNoiseEv">
+<span id="_CPPv3N6raisim11DepthCamera10applyNoiseEv"></span><span id="_CPPv2N6raisim11DepthCamera10applyNoiseEv"></span><span id="raisim::DepthCamera::applyNoise"></span><span class="target" id="classraisim_1_1DepthCamera_1a6f632b0f9a6fc9c142c15ce0c4d40813"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">applyNoise</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim11DepthCamera10applyNoiseEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Apply one exposure’s noise to the depth image. Manual setters do not add noise. This does not refresh <a class="reference internal" href="#classraisim_1_1DepthCamera_1a83da2b9af4c0fa25a0ccc894e3440644"><span class="std std-ref">get3DPoints()</span></a>; <a class="reference internal" href="#classraisim_1_1DepthCamera_1aa17746c17006198c72a1d5949ae56cf3"><span class="std std-ref">update()</span></a> fills both buffers for CPU captures. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim11DepthCamera10applyNoiseEPf6size_t">
+<span id="_CPPv3N6raisim11DepthCamera10applyNoiseEPf6size_t"></span><span id="_CPPv2N6raisim11DepthCamera10applyNoiseEPf6size_t"></span><span id="raisim::DepthCamera::applyNoise__floatP.s"></span><span class="target" id="classraisim_1_1DepthCamera_1abc642af8e24ed5fac27c176e091fa081"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">applyNoise</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">depth</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim11DepthCamera10applyNoiseEPf6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Apply noise to a custom image of exactly width * height optical depths in meters. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>depth</strong> – <strong>[inout]</strong> Depth image in top-left row order; invalid depths stay invalid. </p></li>
+<li><p><strong>size</strong> – <strong>[in]</strong> Number of floats. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim11DepthCamera10applyNoiseEPf6size_tb">
+<span id="_CPPv3N6raisim11DepthCamera10applyNoiseEPf6size_tb"></span><span id="_CPPv2N6raisim11DepthCamera10applyNoiseEPf6size_tb"></span><span id="raisim::DepthCamera::applyNoise__floatP.s.b"></span><span class="target" id="classraisim_1_1DepthCamera_1a1b67d73437147f0cbe91b743f8ddfdd2"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">applyNoise</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">depth</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">topLeftOrigin</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim11DepthCamera10applyNoiseEPf6size_tb" title="Link to this definition"></a><br /></dt>
+<dd><p>Apply noise to top-left (true) or bottom-left (false) row storage, preserving the same seeded measurement at every physical pixel in either layout. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim11DepthCamera10resetNoiseEv">
+<span id="_CPPv3N6raisim11DepthCamera10resetNoiseEv"></span><span id="_CPPv2N6raisim11DepthCamera10resetNoiseEv"></span><span id="raisim::DepthCamera::resetNoise"></span><span class="target" id="classraisim_1_1DepthCamera_1a6bf7878ac1ed0d4b28261c068add8637"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">resetNoise</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6raisim11DepthCamera10resetNoiseEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Restart the stream from the sensor seed, identity, owner id and <a class="reference internal" href="WorldSystem.html#classraisim_1_1World"><span class="std std-ref">World</span></a> environment seed. </p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim11DepthCamera11get3DPointsEv">
 <span id="_CPPv3NK6raisim11DepthCamera11get3DPointsEv"></span><span id="_CPPv2NK6raisim11DepthCamera11get3DPointsEv"></span><span id="raisim::DepthCamera::get3DPointsC"></span><span class="target" id="classraisim_1_1DepthCamera_1a83da2b9af4c0fa25a0ccc894e3440644"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">AlignedAllocator</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">32</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">get3DPoints</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim11DepthCamera11get3DPointsEv" title="Link to this definition"></a><br /></dt>
 <dd><p>Hit points of the last RaiSim update (or the values given to <a class="reference internal" href="#classraisim_1_1DepthCamera_1a90ae8f3f059ee09ea8201d008167c864"><span class="std std-ref">set3DPoints()</span></a>), one per pixel in the image layout. Pixels without a valid hit are NaN. Only RaiSim-sourced updates fill this buffer. </p>
@@ -1162,6 +1717,16 @@ points, and timestamps without a visualizer, but it is the CPU fallback path.</p
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the depth camera properties </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim11DepthCamera13getPropertiesEv">
+<span id="_CPPv3NK6raisim11DepthCamera13getPropertiesEv"></span><span id="_CPPv2NK6raisim11DepthCamera13getPropertiesEv"></span><span id="raisim::DepthCamera::getPropertiesC"></span><span class="target" id="classraisim_1_1DepthCamera_1a278b157834541d7a530b2b7fbd88e335"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim11DepthCamera21DepthCameraPropertiesE" title="raisim::DepthCamera::DepthCameraProperties"><span class="n"><span class="pre">DepthCameraProperties</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getProperties</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim11DepthCamera13getPropertiesEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Immutable camera properties. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -1185,7 +1750,7 @@ points, and timestamps without a visualizer, but it is the CPU fallback path.</p
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>depthArray</strong> – <strong>[in]</strong> input depth array to convert (width * height entries in the image layout; a size mismatch is a fatal error) </p></li>
-<li><p><strong>pointCloud</strong> – <strong>[out]</strong> output point cloud, resized to width * height. Non-finite depths give NaN points. </p></li>
+<li><p><strong>pointCloud</strong> – <strong>[out]</strong> output point cloud, resized to width * height. Non-finite depths and rays with a nonpositive forward component give NaN points. </p></li>
 <li><p><strong>isInSensorFrame</strong> – <strong>[in]</strong> True to output points in the sensor frame, false for the world frame (uses the current pose of the attachment frame) </p></li>
 </ul>
 </dd>
@@ -1225,7 +1790,7 @@ points, and timestamps without a visualizer, but it is the CPU fallback path.</p
 <dl class="cpp enum-class">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim11DepthCamera21DepthCameraProperties9NoiseTypeE">
 <span id="_CPPv3N6raisim11DepthCamera21DepthCameraProperties9NoiseTypeE"></span><span id="_CPPv2N6raisim11DepthCamera21DepthCameraProperties9NoiseTypeE"></span><span class="target" id="structraisim_1_1DepthCamera_1_1DepthCameraProperties_1ad76751d263ec7d0e86571b64e1b55cb4"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NoiseType</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><a class="headerlink" href="#_CPPv4N6raisim11DepthCamera21DepthCameraProperties9NoiseTypeE" title="Link to this definition"></a><br /></dt>
-<dd><p>Noise model (stored and serialized; RaiSim does not add noise to the depth image). </p>
+<dd><p>Additive depth-noise distribution, applied to CPU and Rayrai simulated captures. </p>
 <p><em>Values:</em></p>
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim11DepthCamera21DepthCameraProperties9NoiseType8GAUSSIANE">
@@ -1319,13 +1884,37 @@ points, and timestamps without a visualizer, but it is the CPU fallback path.</p
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim11DepthCamera21DepthCameraProperties4meanE">
 <span id="_CPPv3N6raisim11DepthCamera21DepthCameraProperties4meanE"></span><span id="_CPPv2N6raisim11DepthCamera21DepthCameraProperties4meanE"></span><span id="raisim::DepthCamera::DepthCameraProperties::mean__double"></span><span class="target" id="structraisim_1_1DepthCamera_1_1DepthCameraProperties_1a01423a44b9b3e525937f024a29575b5a"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">mean</span></span></span><a class="headerlink" href="#_CPPv4N6raisim11DepthCamera21DepthCameraProperties4meanE" title="Link to this definition"></a><br /></dt>
-<dd><p>Noise mean. </p>
+<dd><p>Additive depth bias in meters (used when noiseType is not NO_NOISE). </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim11DepthCamera21DepthCameraPropertiesStE">
 <span id="_CPPv3N6raisim11DepthCamera21DepthCameraPropertiesStE"></span><span id="_CPPv2N6raisim11DepthCamera21DepthCameraPropertiesStE"></span><span id="raisim::DepthCamera::DepthCameraProperties::std__double"></span><span class="target" id="structraisim_1_1DepthCamera_1_1DepthCameraProperties_1ab0e83edda49f283553398dbcec3029cc"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">std</span></span></span><a class="headerlink" href="#_CPPv4N6raisim11DepthCamera21DepthCameraPropertiesStE" title="Link to this definition"></a><br /></dt>
-<dd><p>Noise standard deviation. </p>
+<dd><p>Depth-noise standard deviation at zero distance, in meters. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim11DepthCamera21DepthCameraProperties15stdDepthSquaredE">
+<span id="_CPPv3N6raisim11DepthCamera21DepthCameraProperties15stdDepthSquaredE"></span><span id="_CPPv2N6raisim11DepthCamera21DepthCameraProperties15stdDepthSquaredE"></span><span id="raisim::DepthCamera::DepthCameraProperties::stdDepthSquared__double"></span><span class="target" id="structraisim_1_1DepthCamera_1_1DepthCameraProperties_1a15377d1528f23c34868eb4130e22a882"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stdDepthSquared</span></span></span><a class="headerlink" href="#_CPPv4N6raisim11DepthCamera21DepthCameraProperties15stdDepthSquaredE" title="Link to this definition"></a><br /></dt>
+<dd><p>Additional standard deviation per squared meter of optical depth: sigma(z) = std + stdDepthSquared * z * z, in meters. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim11DepthCamera21DepthCameraProperties10resolutionE">
+<span id="_CPPv3N6raisim11DepthCamera21DepthCameraProperties10resolutionE"></span><span id="_CPPv2N6raisim11DepthCamera21DepthCameraProperties10resolutionE"></span><span id="raisim::DepthCamera::DepthCameraProperties::resolution__double"></span><span class="target" id="structraisim_1_1DepthCamera_1_1DepthCameraProperties_1a70493c231a498992945ee63dbf90f075"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">resolution</span></span></span><a class="headerlink" href="#_CPPv4N6raisim11DepthCamera21DepthCameraProperties10resolutionE" title="Link to this definition"></a><br /></dt>
+<dd><p>Depth quantization step in meters; zero disables quantization. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim11DepthCamera21DepthCameraProperties18dropoutProbabilityE">
+<span id="_CPPv3N6raisim11DepthCamera21DepthCameraProperties18dropoutProbabilityE"></span><span id="_CPPv2N6raisim11DepthCamera21DepthCameraProperties18dropoutProbabilityE"></span><span id="raisim::DepthCamera::DepthCameraProperties::dropoutProbability__double"></span><span class="target" id="structraisim_1_1DepthCamera_1_1DepthCameraProperties_1a89096f11c97a6463fd85e423d169c0b5"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dropoutProbability</span></span></span><a class="headerlink" href="#_CPPv4N6raisim11DepthCamera21DepthCameraProperties18dropoutProbabilityE" title="Link to this definition"></a><br /></dt>
+<dd><p>Probability of discarding a valid pixel. Discarded/out-of-range depths become NaN. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim11DepthCamera21DepthCameraProperties4seedE">
+<span id="_CPPv3N6raisim11DepthCamera21DepthCameraProperties4seedE"></span><span id="_CPPv2N6raisim11DepthCamera21DepthCameraProperties4seedE"></span><span id="raisim::DepthCamera::DepthCameraProperties::seed__uint32_t"></span><span class="target" id="structraisim_1_1DepthCamera_1_1DepthCameraProperties_1a5e931715c123cee0b6a8091f743cd306"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">seed</span></span></span><a class="headerlink" href="#_CPPv4N6raisim11DepthCamera21DepthCameraProperties4seedE" title="Link to this definition"></a><br /></dt>
+<dd><p>Zero derives a stream from sensor identity and owner id; nonzero selects an explicit stream. The <a class="reference internal" href="WorldSystem.html#classraisim_1_1World"><span class="std std-ref">World</span></a> environment seed is mixed into both. </p>
 </dd></dl>
 
 <dl class="cpp var">
@@ -1450,6 +2039,38 @@ points, and timestamps without a visualizer, but it is the CPU fallback path.</p
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim9RGBCamera10applyNoiseEv">
+<span id="_CPPv3N6raisim9RGBCamera10applyNoiseEv"></span><span id="_CPPv2N6raisim9RGBCamera10applyNoiseEv"></span><span id="raisim::RGBCamera::applyNoise"></span><span class="target" id="classraisim_1_1RGBCamera_1a5ab26fb76109f44e8feb94b4a803ae9f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">applyNoise</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim9RGBCamera10applyNoiseEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Apply one simulated exposure’s noise in place. Alpha is preserved. Manual setters do not add noise; Rayrai capture and the RaiSim server call this after writing a clean image. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim9RGBCamera10applyNoiseEPc6size_t">
+<span id="_CPPv3N6raisim9RGBCamera10applyNoiseEPc6size_t"></span><span id="_CPPv2N6raisim9RGBCamera10applyNoiseEPc6size_t"></span><span id="raisim::RGBCamera::applyNoise__cP.s"></span><span class="target" id="classraisim_1_1RGBCamera_1a8b8484851a113027041c30e6a34197c2"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">applyNoise</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">image</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim9RGBCamera10applyNoiseEPc6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Apply noise to a custom four-channel image with exactly width * height * 4 bytes. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> – <strong>[inout]</strong> RGBA or BGRA image in top-left row order. </p></li>
+<li><p><strong>size</strong> – <strong>[in]</strong> Image size in bytes. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim9RGBCamera10applyNoiseEPc6size_tb">
+<span id="_CPPv3N6raisim9RGBCamera10applyNoiseEPc6size_tb"></span><span id="_CPPv2N6raisim9RGBCamera10applyNoiseEPc6size_tb"></span><span id="raisim::RGBCamera::applyNoise__cP.s.b"></span><span class="target" id="classraisim_1_1RGBCamera_1ad92ddd994b78a84386c898e887733e10"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">applyNoise</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">image</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">topLeftOrigin</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim9RGBCamera10applyNoiseEPc6size_tb" title="Link to this definition"></a><br /></dt>
+<dd><p>Apply the same exposure to top-left (true) or bottom-left (false) row storage. The seed always assigns noise to physical pixels in top-left image order. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim9RGBCamera10resetNoiseEv">
+<span id="_CPPv3N6raisim9RGBCamera10resetNoiseEv"></span><span id="_CPPv2N6raisim9RGBCamera10resetNoiseEv"></span><span id="raisim::RGBCamera::resetNoise"></span><span class="target" id="classraisim_1_1RGBCamera_1ab4a481bdc0bd3f84db7e307794b58a1c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">resetNoise</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6raisim9RGBCamera10resetNoiseEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Restart the stream from the sensor seed, identity, owner id and <a class="reference internal" href="WorldSystem.html#classraisim_1_1World"><span class="std std-ref">World</span></a> environment seed. </p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9RGBCamera6updateER5World">
 <span id="_CPPv3N6raisim9RGBCamera6updateER5World"></span><span id="_CPPv2N6raisim9RGBCamera6updateER5World"></span><span id="raisim::RGBCamera::update__WorldR"></span><span class="target" id="classraisim_1_1RGBCamera_1a6318a2dc3961020b4132b2885aae47a6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">update</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">class</span></span><span class="w"> </span><a class="reference internal" href="WorldSystem.html#_CPPv4N6raisim5WorldE" title="raisim::World"><span class="n"><span class="pre">World</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">world</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim9RGBCamera6updateER5World" title="Link to this definition"></a><br /></dt>
 <dd><p>Always a fatal error: RaiSim cannot produce RGB measurements (use <a class="reference internal" href="#classraisim_1_1Sensor_1a74aba488a930506ce30f4280f3d1c809aa60a6a471c0681e5a49c4f5d00f6bc5a"><span class="std std-ref">MeasurementSource::MANUAL</span></a>). </p>
@@ -1483,7 +2104,7 @@ points, and timestamps without a visualizer, but it is the CPU fallback path.</p
 <dl class="cpp enum-class">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9RGBCamera19RGBCameraProperties9NoiseTypeE">
 <span id="_CPPv3N6raisim9RGBCamera19RGBCameraProperties9NoiseTypeE"></span><span id="_CPPv2N6raisim9RGBCamera19RGBCameraProperties9NoiseTypeE"></span><span class="target" id="structraisim_1_1RGBCamera_1_1RGBCameraProperties_1a77c9e131bfc2cb615327a288262bd9ef"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NoiseType</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><a class="headerlink" href="#_CPPv4N6raisim9RGBCamera19RGBCameraProperties9NoiseTypeE" title="Link to this definition"></a><br /></dt>
-<dd><p>Noise model (stored and serialized; RaiSim does not apply it). </p>
+<dd><p>Additive read-noise distribution, applied to simulated captures. </p>
 <p><em>Values:</em></p>
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9RGBCamera19RGBCameraProperties9NoiseType8GAUSSIANE">
@@ -1577,13 +2198,31 @@ points, and timestamps without a visualizer, but it is the CPU fallback path.</p
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9RGBCamera19RGBCameraProperties4meanE">
 <span id="_CPPv3N6raisim9RGBCamera19RGBCameraProperties4meanE"></span><span id="_CPPv2N6raisim9RGBCamera19RGBCameraProperties4meanE"></span><span id="raisim::RGBCamera::RGBCameraProperties::mean__double"></span><span class="target" id="structraisim_1_1RGBCamera_1_1RGBCameraProperties_1a7d93a77f3f4af96c3695eb144efe4640"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">mean</span></span></span><a class="headerlink" href="#_CPPv4N6raisim9RGBCamera19RGBCameraProperties4meanE" title="Link to this definition"></a><br /></dt>
-<dd><p>Noise mean. </p>
+<dd><p>Additive read-noise mean in normalized intensity units (1 is full scale). </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim9RGBCamera19RGBCameraPropertiesStE">
 <span id="_CPPv3N6raisim9RGBCamera19RGBCameraPropertiesStE"></span><span id="_CPPv2N6raisim9RGBCamera19RGBCameraPropertiesStE"></span><span id="raisim::RGBCamera::RGBCameraProperties::std__double"></span><span class="target" id="structraisim_1_1RGBCamera_1_1RGBCameraProperties_1a968b527766b07fe831a7bc717c9b7167"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">std</span></span></span><a class="headerlink" href="#_CPPv4N6raisim9RGBCamera19RGBCameraPropertiesStE" title="Link to this definition"></a><br /></dt>
-<dd><p>Noise standard deviation. </p>
+<dd><p>Read-noise standard deviation in normalized intensity units. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim9RGBCamera19RGBCameraProperties9shotNoiseE">
+<span id="_CPPv3N6raisim9RGBCamera19RGBCameraProperties9shotNoiseE"></span><span id="_CPPv2N6raisim9RGBCamera19RGBCameraProperties9shotNoiseE"></span><span id="raisim::RGBCamera::RGBCameraProperties::shotNoise__double"></span><span class="target" id="structraisim_1_1RGBCamera_1_1RGBCameraProperties_1a007d387caee10635f89be54fedefe75b"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shotNoise</span></span></span><a class="headerlink" href="#_CPPv4N6raisim9RGBCamera19RGBCameraProperties9shotNoiseE" title="Link to this definition"></a><br /></dt>
+<dd><p>Signal-dependent Gaussian variance coefficient: variance = shotNoise * intensity. This is the high photon-count approximation to shot noise, in the rendered color space. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim9RGBCamera19RGBCameraProperties11rowNoiseStdE">
+<span id="_CPPv3N6raisim9RGBCamera19RGBCameraProperties11rowNoiseStdE"></span><span id="_CPPv2N6raisim9RGBCamera19RGBCameraProperties11rowNoiseStdE"></span><span id="raisim::RGBCamera::RGBCameraProperties::rowNoiseStd__double"></span><span class="target" id="structraisim_1_1RGBCamera_1_1RGBCameraProperties_1ae2ca86df74e0707136dfed278f8978e7"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rowNoiseStd</span></span></span><a class="headerlink" href="#_CPPv4N6raisim9RGBCamera19RGBCameraProperties11rowNoiseStdE" title="Link to this definition"></a><br /></dt>
+<dd><p>Standard deviation of a Gaussian row offset shared by the three color channels. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim9RGBCamera19RGBCameraProperties4seedE">
+<span id="_CPPv3N6raisim9RGBCamera19RGBCameraProperties4seedE"></span><span id="_CPPv2N6raisim9RGBCamera19RGBCameraProperties4seedE"></span><span id="raisim::RGBCamera::RGBCameraProperties::seed__uint32_t"></span><span class="target" id="structraisim_1_1RGBCamera_1_1RGBCameraProperties_1a067b9209ad42dd0c277214ad0567cf01"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">seed</span></span></span><a class="headerlink" href="#_CPPv4N6raisim9RGBCamera19RGBCameraProperties4seedE" title="Link to this definition"></a><br /></dt>
+<dd><p>Zero derives a stream from sensor identity and owner id; nonzero selects an explicit stream. The <a class="reference internal" href="WorldSystem.html#classraisim_1_1World"><span class="std std-ref">World</span></a> environment seed is mixed into both. </p>
 </dd></dl>
 
 <dl class="cpp var">
@@ -1619,138 +2258,143 @@ points, and timestamps without a visualizer, but it is the CPU fallback path.</p
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnitE">
 <span id="_CPPv3N6raisim23InertialMeasurementUnitE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnitE"></span><span id="raisim::InertialMeasurementUnit"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InertialMeasurementUnit</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6raisim6SensorE" title="raisim::Sensor"><span class="n"><span class="pre">Sensor</span></span></a><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnitE" title="Link to this definition"></a><br /></dt>
-<dd><p>Inertial measurement unit. With <a class="reference internal" href="#classraisim_1_1Sensor_1a74aba488a930506ce30f4280f3d1c809a3ea38b53983a21d38e8287cef5878ef8"><span class="std std-ref">MeasurementSource::RAISIM</span></a> (the default), the owning <a class="reference internal" href="articulated_system/API.html#classraisim_1_1ArticulatedSystem"><span class="std std-ref">ArticulatedSystem</span></a> writes the measurements at the sensor’s update rate. This requires inverse dynamics on the articulated system (ArticulatedSystem::setComputeInverseDynamics(true)), which the URDF and world-XML loaders enable when they create an IMU. </p>
+<dd><p>An ideal or stochastic six-axis IMU. Measurements use the completed physics state. Orientation is ground truth, not an attitude estimate. No inverse-dynamics setting is required. Sampling is limited to one acquisition per physics step, with a phase-preserving clock. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit23InertialMeasurementUnitERK13ImuPropertiesP17ArticulatedSystemRK3VecIXL3EEERK3MatIXL3EEXL3EEE">
-<span id="_CPPv3N6raisim23InertialMeasurementUnit23InertialMeasurementUnitERK13ImuPropertiesP17ArticulatedSystemRK3VecIXL3EEERK3MatIXL3EEXL3EEE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit23InertialMeasurementUnitERK13ImuPropertiesP17ArticulatedSystemRK3VecIX3EERK3MatIX3EX3EE"></span><span id="raisim::InertialMeasurementUnit::InertialMeasurementUnit__ImuPropertiesCR.ArticulatedSystemP.Vec:3:CR.Mat:3.3:CR"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1a2832a3a2795dd18af9b82e51214777b4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InertialMeasurementUnit</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuPropertiesE" title="raisim::InertialMeasurementUnit::ImuProperties"><span class="n"><span class="pre">ImuProperties</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">prop</span></span>, <span class="k"><span class="pre">class</span></span><span class="w"> </span><a class="reference internal" href="articulated_system/API.html#_CPPv4N6raisim17ArticulatedSystemE" title="raisim::ArticulatedSystem"><span class="n"><span class="pre">ArticulatedSystem</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">as</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pos</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Mat</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit23InertialMeasurementUnitERK13ImuPropertiesP17ArticulatedSystemRK3VecIXL3EEERK3MatIXL3EEXL3EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>Create an IMU with zero-initialized measurements. The measurement source is RAISIM. </p>
+<span id="_CPPv3N6raisim23InertialMeasurementUnit23InertialMeasurementUnitERK13ImuPropertiesP17ArticulatedSystemRK3VecIXL3EEERK3MatIXL3EEXL3EEE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit23InertialMeasurementUnitERK13ImuPropertiesP17ArticulatedSystemRK3VecIX3EERK3MatIX3EX3EE"></span><span id="raisim::InertialMeasurementUnit::InertialMeasurementUnit__ImuPropertiesCR.ArticulatedSystemP.Vec:3:CR.Mat:3.3:CR"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1a855ee5cf4ed81aeccce716db177c5da3"></span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InertialMeasurementUnit</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuPropertiesE" title="raisim::InertialMeasurementUnit::ImuProperties"><span class="n"><span class="pre">ImuProperties</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">prop</span></span>, <a class="reference internal" href="articulated_system/API.html#_CPPv4N6raisim17ArticulatedSystemE" title="raisim::ArticulatedSystem"><span class="n"><span class="pre">ArticulatedSystem</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">as</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pos</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Mat</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit23InertialMeasurementUnitERK13ImuPropertiesP17ArticulatedSystemRK3VecIXL3EEERK3MatIXL3EEXL3EEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Create a physics-backed IMU mounted at pos/rot on the owning articulated system. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>prop</strong> – <strong>[in]</strong> IMU properties. </p></li>
-<li><p><strong>as</strong> – <strong>[in]</strong> Owning articulated system. </p></li>
-<li><p><strong>pos</strong> – <strong>[in]</strong> <a class="reference internal" href="#classraisim_1_1Sensor"><span class="std std-ref">Sensor</span></a> position relative to the body (link) it is defined on. </p></li>
-<li><p><strong>rot</strong> – <strong>[in]</strong> <a class="reference internal" href="#classraisim_1_1Sensor"><span class="std std-ref">Sensor</span></a> orientation relative to the body (link) it is defined on. </p></li>
+<li><p><strong>prop</strong> – Measurement settings and immutable sensor identity. </p></li>
+<li><p><strong>as</strong> – Owning system; may be null until attachment. </p></li>
+<li><p><strong>pos</strong> – Mount position relative to its body. </p></li>
+<li><p><strong>rot</strong> – Sensor-to-body rotation. </p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnitD0Ev">
+<span id="_CPPv3N6raisim23InertialMeasurementUnitD0Ev"></span><span id="_CPPv2N6raisim23InertialMeasurementUnitD0Ev"></span><span id="raisim::InertialMeasurementUnit::~InertialMeasurementUnit"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1ab751e33b4e7431a5e34af827d81f1d00"></span><span class="sig-name descname"><span class="n"><span class="pre">~InertialMeasurementUnit</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnitD0Ev" title="Link to this definition"></a><br /></dt>
+<dd><p>Release model state and pending delayed samples. </p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim23InertialMeasurementUnit13serializePropEN6server13BoundedWriterE">
 <span id="_CPPv3NK6raisim23InertialMeasurementUnit13serializePropEN6server13BoundedWriterE"></span><span id="_CPPv2NK6raisim23InertialMeasurementUnit13serializePropEN6server13BoundedWriterE"></span><span id="raisim::InertialMeasurementUnit::serializeProp__server::BoundedWriterC"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1ac0d6a8af98cf0521cdafa22b28a0c8cb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">server</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">BoundedWriter</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">serializeProp</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">server</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">BoundedWriter</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4NK6raisim23InertialMeasurementUnit13serializePropEN6server13BoundedWriterE" title="Link to this definition"></a><br /></dt>
-<dd><p>Used by the server. Do not use it if you don’t know what it does. It serializes the sensor properties </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>data</strong> – <strong>[in]</strong> where the property is written; throws server::SerializationError if it does not fit </p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>where the next data should be written </p>
-</dd>
-</dl>
+<dd><p>Write sensor metadata using the existing server wire format. </p>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim23InertialMeasurementUnit21serializeMeasurementsEN6server13BoundedWriterE">
-<span id="_CPPv3NK6raisim23InertialMeasurementUnit21serializeMeasurementsEN6server13BoundedWriterE"></span><span id="_CPPv2NK6raisim23InertialMeasurementUnit21serializeMeasurementsEN6server13BoundedWriterE"></span><span id="raisim::InertialMeasurementUnit::serializeMeasurements__server::BoundedWriterC"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1a311684927c1a3f72f2c0c823b9ea8efa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">server</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">BoundedWriter</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">serializeMeasurements</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">server</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">BoundedWriter</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim23InertialMeasurementUnit21serializeMeasurementsEN6server13BoundedWriterE" title="Link to this definition"></a><br /></dt>
-<dd><p>Used by the server. Do not use it if you don’t know what it does. It serializes sensor measurements. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>data</strong> – <strong>[in]</strong> where the measurements are written; throws server::SerializationError if they do not fit </p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>where the next data should be written </p>
-</dd>
-</dl>
+<span id="_CPPv3NK6raisim23InertialMeasurementUnit21serializeMeasurementsEN6server13BoundedWriterE"></span><span id="_CPPv2NK6raisim23InertialMeasurementUnit21serializeMeasurementsEN6server13BoundedWriterE"></span><span id="raisim::InertialMeasurementUnit::serializeMeasurements__server::BoundedWriterC"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1a8ae10c33905b1257ae52160d7e5c5ea4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">server</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">BoundedWriter</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">serializeMeasurements</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">server</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">BoundedWriter</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4NK6raisim23InertialMeasurementUnit21serializeMeasurementsEN6server13BoundedWriterE" title="Link to this definition"></a><br /></dt>
+<dd><p>Write delivered accelerometer and gyro samples as floats. </p>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim23InertialMeasurementUnit21getLinearAccelerationEv">
 <span id="_CPPv3NK6raisim23InertialMeasurementUnit21getLinearAccelerationEv"></span><span id="_CPPv2NK6raisim23InertialMeasurementUnit21getLinearAccelerationEv"></span><span id="raisim::InertialMeasurementUnit::getLinearAccelerationC"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1a44e0285910b508e192d8869af5bb9a78"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector3d</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getLinearAcceleration</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim23InertialMeasurementUnit21getLinearAccelerationEv" title="Link to this definition"></a><br /></dt>
-<dd><p>Get the linear acceleration measured by the sensor. In simulation, this is updated every update loop (set by the updateRate). On the real robot, this value should be set externally by <a class="reference internal" href="#classraisim_1_1InertialMeasurementUnit_1a0f955068cde58f7acae79712e22aaf28"><span class="std std-ref">setLinearAcceleration()</span></a> </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>linear acceleration in m/s^2, expressed in the IMU frame. Like a real accelerometer it reports specific force (acceleration minus gravity), so an IMU at rest reads the negated gravity vector (e.g. 9.81 m/s^2 pointing up) rotated into the IMU frame. Clamped in norm to <a class="reference internal" href="#structraisim_1_1InertialMeasurementUnit_1_1ImuProperties_1acb5929eb56adda2089dbea403d6e679b"><span class="std std-ref">ImuProperties::maxAcc</span></a>. </p>
-</dd>
-</dl>
+<dd><p>Specific force (acceleration minus gravity) in the IMU frame [m/s^2]. </p>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim23InertialMeasurementUnit18getAngularVelocityEv">
 <span id="_CPPv3NK6raisim23InertialMeasurementUnit18getAngularVelocityEv"></span><span id="_CPPv2NK6raisim23InertialMeasurementUnit18getAngularVelocityEv"></span><span id="raisim::InertialMeasurementUnit::getAngularVelocityC"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1a18bfc9b8774ba502ae7b02617aaa1a8b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector3d</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getAngularVelocity</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim23InertialMeasurementUnit18getAngularVelocityEv" title="Link to this definition"></a><br /></dt>
-<dd><p>Get the angular velocity measured by the sensor. In simulation, this is updated every update loop (set by the updateRate). On the real robot, this value should be set externally by <a class="reference internal" href="#classraisim_1_1InertialMeasurementUnit_1a7251e9f30ae66501c92ea208152c3c17"><span class="std std-ref">setAngularVelocity()</span></a> </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>angular velocity in rad/s, expressed in the IMU frame. Clamped in norm to <a class="reference internal" href="#structraisim_1_1InertialMeasurementUnit_1_1ImuProperties_1a399f56b57372daa36903dd9564454e4d"><span class="std std-ref">ImuProperties::maxAngVel</span></a>. </p>
-</dd>
-</dl>
+<dd><p>Angular velocity in the IMU frame [rad/s]. </p>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6raisim23InertialMeasurementUnit14getOrientationEv">
 <span id="_CPPv3NK6raisim23InertialMeasurementUnit14getOrientationEv"></span><span id="_CPPv2NK6raisim23InertialMeasurementUnit14getOrientationEv"></span><span id="raisim::InertialMeasurementUnit::getOrientationC"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1a71dd31869efb5ebd13b951234af6929f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">4</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getOrientation</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim23InertialMeasurementUnit14getOrientationEv" title="Link to this definition"></a><br /></dt>
-<dd><p>Get the orientation measured by the sensor as a quaternion (w, x, y, z). In simulation, this is updated every update loop (set by the updateRate). On the real robot, this value should be set externally by <a class="reference internal" href="#classraisim_1_1InertialMeasurementUnit_1aff144aaa982637346993126f9743e912"><span class="std std-ref">setOrientation()</span></a> </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>orientation of the IMU frame relative to the world frame, quaternion (w, x, y, z) </p>
-</dd>
-</dl>
+<dd><p>Ground-truth sensor-to-world quaternion (w, x, y, z) at the delivered acquisition time. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim23InertialMeasurementUnit25getGroundTruthOrientationEv">
+<span id="_CPPv3NK6raisim23InertialMeasurementUnit25getGroundTruthOrientationEv"></span><span id="_CPPv2NK6raisim23InertialMeasurementUnit25getGroundTruthOrientationEv"></span><span id="raisim::InertialMeasurementUnit::getGroundTruthOrientationC"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1ae35f59e6b0b3b3f28eecbd477d53b336"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">4</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getGroundTruthOrientation</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim23InertialMeasurementUnit25getGroundTruthOrientationEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Ground-truth orientation at acquisition; identical to <a class="reference internal" href="#classraisim_1_1Sensor_1a282ccc14f283670796174292b20e48c4"><span class="std std-ref">getOrientation()</span></a>. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim23InertialMeasurementUnit20getDeliveryTimeStampEv">
+<span id="_CPPv3NK6raisim23InertialMeasurementUnit20getDeliveryTimeStampEv"></span><span id="_CPPv2NK6raisim23InertialMeasurementUnit20getDeliveryTimeStampEv"></span><span id="raisim::InertialMeasurementUnit::getDeliveryTimeStampC"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1a7b0e88901ac66dd380f85efdf718e94d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getDeliveryTimeStamp</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim23InertialMeasurementUnit20getDeliveryTimeStampEv" title="Link to this definition"></a><br /></dt>
+<dd><p><a class="reference internal" href="WorldSystem.html#classraisim_1_1World"><span class="std std-ref">World</span></a> time when the most recent sample became available; negative before first delivery. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim23InertialMeasurementUnit20getAccelerometerBiasEv">
+<span id="_CPPv3NK6raisim23InertialMeasurementUnit20getAccelerometerBiasEv"></span><span id="_CPPv2NK6raisim23InertialMeasurementUnit20getAccelerometerBiasEv"></span><span id="raisim::InertialMeasurementUnit::getAccelerometerBiasC"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1a5d1650e843faf84f9e841e49a77e9d8c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector3d</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getAccelerometerBias</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim23InertialMeasurementUnit20getAccelerometerBiasEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Current accelerometer bias, including its random walk, in m/s^2. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim23InertialMeasurementUnit16getGyroscopeBiasEv">
+<span id="_CPPv3NK6raisim23InertialMeasurementUnit16getGyroscopeBiasEv"></span><span id="_CPPv2NK6raisim23InertialMeasurementUnit16getGyroscopeBiasEv"></span><span id="raisim::InertialMeasurementUnit::getGyroscopeBiasC"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1ac1c387cc59ecd47fd788759e49594fae"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector3d</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getGyroscopeBias</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim23InertialMeasurementUnit16getGyroscopeBiasEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Current gyro bias, including its random walk, in rad/s. </p>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit21setLinearAccelerationERKN5Eigen8Vector3dE">
 <span id="_CPPv3N6raisim23InertialMeasurementUnit21setLinearAccelerationERKN5Eigen8Vector3dE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit21setLinearAccelerationERKN5Eigen8Vector3dE"></span><span id="raisim::InertialMeasurementUnit::setLinearAcceleration__Eigen::Vector3dCR"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1a0f955068cde58f7acae79712e22aaf28"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setLinearAcceleration</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector3d</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">acc</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit21setLinearAccelerationERKN5Eigen8Vector3dE" title="Link to this definition"></a><br /></dt>
-<dd><p>This set method make sense only on the real robot (MANUAL measurement source). </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>acc</strong> – <strong>[in]</strong> acceleration measured from sensor (m/s^2, IMU frame) </p>
-</dd>
-</dl>
+<dd><p>Write hardware measurements when using <a class="reference internal" href="#classraisim_1_1Sensor_1a74aba488a930506ce30f4280f3d1c809aa60a6a471c0681e5a49c4f5d00f6bc5a"><span class="std std-ref">MeasurementSource::MANUAL</span></a>. </p>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit18setAngularVelocityERKN5Eigen8Vector3dE">
 <span id="_CPPv3N6raisim23InertialMeasurementUnit18setAngularVelocityERKN5Eigen8Vector3dE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit18setAngularVelocityERKN5Eigen8Vector3dE"></span><span id="raisim::InertialMeasurementUnit::setAngularVelocity__Eigen::Vector3dCR"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1a7251e9f30ae66501c92ea208152c3c17"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setAngularVelocity</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector3d</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">vel</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit18setAngularVelocityERKN5Eigen8Vector3dE" title="Link to this definition"></a><br /></dt>
-<dd><p>This set method make sense only on the real robot (MANUAL measurement source). </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>vel</strong> – <strong>[in]</strong> angular velocity measured from sensor (rad/s, IMU frame) </p>
-</dd>
-</dl>
+<dd><p>Write a hardware gyro measurement in the sensor frame [rad/s]. </p>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit14setOrientationERK3VecIXL4EEE">
 <span id="_CPPv3N6raisim23InertialMeasurementUnit14setOrientationERK3VecIXL4EEE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit14setOrientationERK3VecIX4EE"></span><span id="raisim::InertialMeasurementUnit::setOrientation__Vec:4:CR"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1aff144aaa982637346993126f9743e912"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setOrientation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Vec</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">4</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">orientation</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit14setOrientationERK3VecIXL4EEE" title="Link to this definition"></a><br /></dt>
-<dd><p>This set method make sense only on the real robot (MANUAL measurement source). </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>orientation</strong> – <strong>[in]</strong> orientation of the imu sensor in quaternion (w,x,y,z convention) </p>
-</dd>
-</dl>
+<dd><p>Write a hardware sensor-to-world orientation (w, x, y, z). </p>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit13getPropertiesEv">
 <span id="_CPPv3N6raisim23InertialMeasurementUnit13getPropertiesEv"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit13getPropertiesEv"></span><span id="raisim::InertialMeasurementUnit::getProperties"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1a124f57d79f7f9ad661597ee9c06292c3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuPropertiesE" title="raisim::InertialMeasurementUnit::ImuProperties"><span class="n"><span class="pre">ImuProperties</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getProperties</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit13getPropertiesEv" title="Link to this definition"></a><br /></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The IMU configuration properties. </p>
-</dd>
-</dl>
+<dd><p>Legacy mutable access; permanently enables model comparisons on each update. Valid edits reset the model on the next update; invalid edits are restored with a warning. Prefer const access and <a class="reference internal" href="#classraisim_1_1InertialMeasurementUnit_1afe3d7ef5fbb6aa057e16b8e1656e747f"><span class="std std-ref">setProperties()</span></a>, which rejects invalid edits immediately. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim23InertialMeasurementUnit13getPropertiesEv">
+<span id="_CPPv3NK6raisim23InertialMeasurementUnit13getPropertiesEv"></span><span id="_CPPv2NK6raisim23InertialMeasurementUnit13getPropertiesEv"></span><span id="raisim::InertialMeasurementUnit::getPropertiesC"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1a1b7075dfa23e94f69f4c2b0b54eea3c0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuPropertiesE" title="raisim::InertialMeasurementUnit::ImuProperties"><span class="n"><span class="pre">ImuProperties</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getProperties</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim23InertialMeasurementUnit13getPropertiesEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Read settings without enabling legacy mutation tracking. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit13setPropertiesERK13ImuProperties">
+<span id="_CPPv3N6raisim23InertialMeasurementUnit13setPropertiesERK13ImuProperties"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit13setPropertiesERK13ImuProperties"></span><span id="raisim::InertialMeasurementUnit::setProperties__ImuPropertiesCR"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1afe3d7ef5fbb6aa057e16b8e1656e747f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setProperties</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuPropertiesE" title="raisim::InertialMeasurementUnit::ImuProperties"><span class="n"><span class="pre">ImuProperties</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">prop</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit13setPropertiesERK13ImuProperties" title="Link to this definition"></a><br /></dt>
+<dd><p>Validate transactionally, then reset filters, bias, clock, pending samples and random stream. <a class="reference internal" href="#classraisim_1_1Sensor"><span class="std std-ref">Sensor</span></a> name and full_name must match the identity chosen at construction. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit5resetEv">
+<span id="_CPPv3N6raisim23InertialMeasurementUnit5resetEv"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit5resetEv"></span><span id="raisim::InertialMeasurementUnit::reset"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1a9736ff115ccfed12460880f970aee353"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">reset</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit5resetEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Reset measurements and stochastic history using the configured seed and initial biases. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit10resetNoiseEv">
+<span id="_CPPv3N6raisim23InertialMeasurementUnit10resetNoiseEv"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit10resetNoiseEv"></span><span id="raisim::InertialMeasurementUnit::resetNoise"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1ae41162b62931927099e1aab41453d19f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">resetNoise</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit10resetNoiseEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Restart only the random stream from the active seed, sensor identity, owner id and <a class="reference internal" href="WorldSystem.html#classraisim_1_1World"><span class="std std-ref">World</span></a> seed. Preserve bias, filters, acquisition clock, queued samples and measurements. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6raisim23InertialMeasurementUnit26getDroppedMeasurementCountEv">
+<span id="_CPPv3NK6raisim23InertialMeasurementUnit26getDroppedMeasurementCountEv"></span><span id="_CPPv2NK6raisim23InertialMeasurementUnit26getDroppedMeasurementCountEv"></span><span id="raisim::InertialMeasurementUnit::getDroppedMeasurementCountC"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1ab26eeda7c996e79136466e03a9f344ee"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getDroppedMeasurementCount</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6raisim23InertialMeasurementUnit26getDroppedMeasurementCountEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Samples dropped because the latency queue was full or allocation failed, since <a class="reference internal" href="#classraisim_1_1InertialMeasurementUnit_1a9736ff115ccfed12460880f970aee353"><span class="std std-ref">reset()</span></a>. </p>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit6updateER5World">
-<span id="_CPPv3N6raisim23InertialMeasurementUnit6updateER5World"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit6updateER5World"></span><span id="raisim::InertialMeasurementUnit::update__WorldR"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1a354fc5464431accc5280b71f082801ab"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">update</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">class</span></span><span class="w"> </span><a class="reference internal" href="WorldSystem.html#_CPPv4N6raisim5WorldE" title="raisim::World"><span class="n"><span class="pre">World</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">world</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit6updateER5World" title="Link to this definition"></a><br /></dt>
-<dd><p>Does nothing. The measurements are computed by the owning <a class="reference internal" href="articulated_system/API.html#classraisim_1_1ArticulatedSystem"><span class="std std-ref">ArticulatedSystem</span></a>. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>world</strong> – <strong>[in]</strong> unused </p>
-</dd>
-</dl>
+<span id="_CPPv3N6raisim23InertialMeasurementUnit6updateER5World"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit6updateER5World"></span><span id="raisim::InertialMeasurementUnit::update__WorldR"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1afd107b2f5828fd4ff12759b714fc6283"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">update</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="WorldSystem.html#_CPPv4N6raisim5WorldE" title="raisim::World"><span class="n"><span class="pre">World</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">world</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">final</span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit6updateER5World" title="Link to this definition"></a><br /></dt>
+<dd><p>Acquire/filter/deliver once for the current physics step; manual sources are untouched. </p>
 </dd></dl>
 
 </div>
@@ -1759,41 +2403,85 @@ points, and timestamps without a visualizer, but it is the CPU fallback path.</p
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit7getTypeEv">
 <span id="_CPPv3N6raisim23InertialMeasurementUnit7getTypeEv"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit7getTypeEv"></span><span id="raisim::InertialMeasurementUnit::getType"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1a7be1a581e2943393155c0253b20d3b3f"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getType</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit7getTypeEv" title="Link to this definition"></a><br /></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#classraisim_1_1Sensor_1a45404b5200755a3a6a398dccc6f70a91aadce094d314507ad8b234a286aeff254"><span class="std std-ref">Sensor::Type::IMU</span></a>. </p>
-</dd>
-</dl>
+<dd><p>Concrete sensor type: IMU. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-attributes">Public Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit23kMaxPendingMeasurementsE">
+<span id="_CPPv3N6raisim23InertialMeasurementUnit23kMaxPendingMeasurementsE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit23kMaxPendingMeasurementsE"></span><span id="raisim::InertialMeasurementUnit::kMaxPendingMeasurements__s"></span><span class="target" id="classraisim_1_1InertialMeasurementUnit_1a6918f83606cf001142be40aebff4e743"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kMaxPendingMeasurements</span></span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit23kMaxPendingMeasurementsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Maximum delayed samples retained per IMU (about 6 MiB). Excess new samples are dropped. </p>
 </dd></dl>
 
 </div>
 <dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit17ChannelPropertiesE">
+<span id="_CPPv3N6raisim23InertialMeasurementUnit17ChannelPropertiesE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit17ChannelPropertiesE"></span><span id="raisim::InertialMeasurementUnit::ChannelProperties"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ChannelProperties"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ChannelProperties</span></span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit17ChannelPropertiesE" title="Link to this definition"></a><br /></dt>
+<dd><p>Sensor-frame bias, bandwidth, stochastic errors and quantization for one channel. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit17ChannelProperties4biasE">
+<span id="_CPPv3N6raisim23InertialMeasurementUnit17ChannelProperties4biasE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit17ChannelProperties4biasE"></span><span id="raisim::InertialMeasurementUnit::ChannelProperties::bias__Eigen::Vector3d"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ChannelProperties_1a3de40a06be54ba43a28e524fcf40f9e0"></span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector3d</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bias</span></span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit17ChannelProperties4biasE" title="Link to this definition"></a><br /></dt>
+<dd><p>Constant sensor-frame offset, in m/s^2 (accelerometer) or rad/s (gyro). </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit17ChannelProperties12noiseDensityE">
+<span id="_CPPv3N6raisim23InertialMeasurementUnit17ChannelProperties12noiseDensityE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit17ChannelProperties12noiseDensityE"></span><span id="raisim::InertialMeasurementUnit::ChannelProperties::noiseDensity__double"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ChannelProperties_1af300ce0ec8bb6b694037b6b990e606b0"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">noiseDensity</span></span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit17ChannelProperties12noiseDensityE" title="Link to this definition"></a><br /></dt>
+<dd><p>Continuous white-noise strength, in channel units / sqrt(Hz). </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit17ChannelProperties14biasRandomWalkE">
+<span id="_CPPv3N6raisim23InertialMeasurementUnit17ChannelProperties14biasRandomWalkE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit17ChannelProperties14biasRandomWalkE"></span><span id="raisim::InertialMeasurementUnit::ChannelProperties::biasRandomWalk__double"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ChannelProperties_1a9e18df1d307439ef1b97c19944279947"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">biasRandomWalk</span></span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit17ChannelProperties14biasRandomWalkE" title="Link to this definition"></a><br /></dt>
+<dd><p>Brownian bias strength, in channel units / sqrt(s). </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit17ChannelProperties15cutoffFrequencyE">
+<span id="_CPPv3N6raisim23InertialMeasurementUnit17ChannelProperties15cutoffFrequencyE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit17ChannelProperties15cutoffFrequencyE"></span><span id="raisim::InertialMeasurementUnit::ChannelProperties::cutoffFrequency__double"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ChannelProperties_1a2261f742bb4b8698ba6fda25fb60e8ed"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cutoffFrequency</span></span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit17ChannelProperties15cutoffFrequencyE" title="Link to this definition"></a><br /></dt>
+<dd><p>First-order low-pass cutoff [Hz]. Zero bypasses filtering. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit17ChannelProperties10resolutionE">
+<span id="_CPPv3N6raisim23InertialMeasurementUnit17ChannelProperties10resolutionE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit17ChannelProperties10resolutionE"></span><span id="raisim::InertialMeasurementUnit::ChannelProperties::resolution__double"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ChannelProperties_1a29dbe5761dd1c1911fca02579adaf067"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">resolution</span></span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit17ChannelProperties10resolutionE" title="Link to this definition"></a><br /></dt>
+<dd><p>Quantization step in channel units. Zero disables quantization. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit13ImuPropertiesE">
 <span id="_CPPv3N6raisim23InertialMeasurementUnit13ImuPropertiesE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit13ImuPropertiesE"></span><span id="raisim::InertialMeasurementUnit::ImuProperties"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ImuProperties"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ImuProperties</span></span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuPropertiesE" title="Link to this definition"></a><br /></dt>
-<dd><p>Configuration of an <a class="reference internal" href="#classraisim_1_1InertialMeasurementUnit"><span class="std std-ref">InertialMeasurementUnit</span></a>. </p>
+<dd><p>Complete IMU measurement model. All model effects are disabled by default. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
 <dl class="cpp enum-class">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties9NoiseTypeE">
 <span id="_CPPv3N6raisim23InertialMeasurementUnit13ImuProperties9NoiseTypeE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit13ImuProperties9NoiseTypeE"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ImuProperties_1a66a00d92840289405902fb960d5c216c"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NoiseType</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties9NoiseTypeE" title="Link to this definition"></a><br /></dt>
-<dd><p>Noise model (stored; RaiSim does not add noise to the IMU measurements). </p>
+<dd><p>Legacy additive sample noise, shared by both channels. Prefer noiseDensity. </p>
 <p><em>Values:</em></p>
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties9NoiseType8GAUSSIANE">
 <span id="_CPPv3N6raisim23InertialMeasurementUnit13ImuProperties9NoiseType8GAUSSIANE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit13ImuProperties9NoiseType8GAUSSIANE"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ImuProperties_1a66a00d92840289405902fb960d5c216ca0fceff26ae86a047835cafbb6cadb1b9"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GAUSSIAN</span></span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties9NoiseType8GAUSSIANE" title="Link to this definition"></a><br /></dt>
-<dd><p>Gaussian noise. </p>
+<dd><p>Gaussian sample noise. </p>
 </dd></dl>
 
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties9NoiseType7UNIFORME">
 <span id="_CPPv3N6raisim23InertialMeasurementUnit13ImuProperties9NoiseType7UNIFORME"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit13ImuProperties9NoiseType7UNIFORME"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ImuProperties_1a66a00d92840289405902fb960d5c216ca891f35a29c3d51d02ffd42dd6dcc69b2"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">UNIFORM</span></span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties9NoiseType7UNIFORME" title="Link to this definition"></a><br /></dt>
-<dd><p>Uniform noise. </p>
+<dd><p>Uniform sample noise with half-width sqrt(3) times std. </p>
 </dd></dl>
 
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties9NoiseType8NO_NOISEE">
 <span id="_CPPv3N6raisim23InertialMeasurementUnit13ImuProperties9NoiseType8NO_NOISEE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit13ImuProperties9NoiseType8NO_NOISEE"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ImuProperties_1a66a00d92840289405902fb960d5c216ca957ecf343f680d3cc208ad40ac609441"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NO_NOISE</span></span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties9NoiseType8NO_NOISEE" title="Link to this definition"></a><br /></dt>
-<dd><p>No noise. </p>
+<dd><p>Disable legacy additive sample noise. </p>
 </dd></dl>
 
 </dd></dl>
@@ -1804,43 +2492,67 @@ points, and timestamps without a visualizer, but it is the CPU fallback path.</p
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties4nameE">
 <span id="_CPPv3N6raisim23InertialMeasurementUnit13ImuProperties4nameE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit13ImuProperties4nameE"></span><span id="raisim::InertialMeasurementUnit::ImuProperties::name__ss"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ImuProperties_1a1da79d15ba598c142d0e753caf095e8e"></span><a class="reference internal" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuPropertiesStE" title="raisim::InertialMeasurementUnit::ImuProperties::std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties4nameE" title="Link to this definition"></a><br /></dt>
-<dd><p><a class="reference internal" href="#classraisim_1_1Sensor"><span class="std std-ref">Sensor</span></a> name (without the sensor set prefix). </p>
+<dd><p><a class="reference internal" href="#classraisim_1_1Sensor"><span class="std std-ref">Sensor</span></a> name without the set prefix. </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties9full_nameE">
 <span id="_CPPv3N6raisim23InertialMeasurementUnit13ImuProperties9full_nameE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit13ImuProperties9full_nameE"></span><span id="raisim::InertialMeasurementUnit::ImuProperties::full_name__ss"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ImuProperties_1a0d64c3c299d0d82f8d6b0042e944fd36"></span><a class="reference internal" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuPropertiesStE" title="raisim::InertialMeasurementUnit::ImuProperties::std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">full_name</span></span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties9full_nameE" title="Link to this definition"></a><br /></dt>
-<dd><p><a class="reference internal" href="#classraisim_1_1Sensor"><span class="std std-ref">Sensor</span></a> name including the sensor set prefix. </p>
+<dd><p><a class="reference internal" href="#classraisim_1_1Sensor"><span class="std std-ref">Sensor</span></a> name including its set prefix. </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties6maxAccE">
 <span id="_CPPv3N6raisim23InertialMeasurementUnit13ImuProperties6maxAccE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit13ImuProperties6maxAccE"></span><span id="raisim::InertialMeasurementUnit::ImuProperties::maxAcc__double"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ImuProperties_1acb5929eb56adda2089dbea403d6e679b"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">maxAcc</span></span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties6maxAccE" title="Link to this definition"></a><br /></dt>
-<dd><p>Maximum measurable linear acceleration (m/s^2). Larger readings are scaled down to this norm. </p>
+<dd><p>Symmetric per-axis accelerometer range [m/s^2]. </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties9maxAngVelE">
 <span id="_CPPv3N6raisim23InertialMeasurementUnit13ImuProperties9maxAngVelE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit13ImuProperties9maxAngVelE"></span><span id="raisim::InertialMeasurementUnit::ImuProperties::maxAngVel__double"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ImuProperties_1a399f56b57372daa36903dd9564454e4d"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">maxAngVel</span></span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties9maxAngVelE" title="Link to this definition"></a><br /></dt>
-<dd><p>Maximum measurable angular velocity (rad/s). Larger readings are scaled down to this norm. </p>
+<dd><p>Symmetric per-axis gyroscope range [rad/s]. </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties9noiseTypeE">
-<span id="_CPPv3N6raisim23InertialMeasurementUnit13ImuProperties9noiseTypeE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit13ImuProperties9noiseTypeE"></span><span id="raisim::InertialMeasurementUnit::ImuProperties::noiseType__raisim::InertialMeasurementUnit::ImuProperties::NoiseType"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ImuProperties_1aee317521f731bd41a8ebf142bf53a123"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="n"><span class="pre">raisim</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6raisim23InertialMeasurementUnitE" title="raisim::InertialMeasurementUnit"><span class="n"><span class="pre">InertialMeasurementUnit</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuPropertiesE" title="raisim::InertialMeasurementUnit::ImuProperties"><span class="n"><span class="pre">ImuProperties</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties9NoiseTypeE" title="raisim::InertialMeasurementUnit::ImuProperties::NoiseType"><span class="n"><span class="pre">NoiseType</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">noiseType</span></span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties9noiseTypeE" title="Link to this definition"></a><br /></dt>
-<dd><p>Selected noise model (default NO_NOISE). </p>
+<span id="_CPPv3N6raisim23InertialMeasurementUnit13ImuProperties9noiseTypeE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit13ImuProperties9noiseTypeE"></span><span id="raisim::InertialMeasurementUnit::ImuProperties::noiseType__NoiseType"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ImuProperties_1a255f72ed718f808e9fc397715f6a731f"></span><a class="reference internal" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties9NoiseTypeE" title="raisim::InertialMeasurementUnit::ImuProperties::NoiseType"><span class="n"><span class="pre">NoiseType</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">noiseType</span></span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties9noiseTypeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Selected legacy distribution; defaults to NO_NOISE. </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties4meanE">
 <span id="_CPPv3N6raisim23InertialMeasurementUnit13ImuProperties4meanE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit13ImuProperties4meanE"></span><span id="raisim::InertialMeasurementUnit::ImuProperties::mean__double"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ImuProperties_1a737a648f67e05d198eec216e8333e4f8"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">mean</span></span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties4meanE" title="Link to this definition"></a><br /></dt>
-<dd><p>Noise mean. </p>
+<dd><p>Legacy additive sample-noise mean, in each channel’s units. </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit13ImuPropertiesStE">
 <span id="_CPPv3N6raisim23InertialMeasurementUnit13ImuPropertiesStE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit13ImuPropertiesStE"></span><span id="raisim::InertialMeasurementUnit::ImuProperties::std__double"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ImuProperties_1af6bb417db890a0e6d66d151118401d54"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">std</span></span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuPropertiesStE" title="Link to this definition"></a><br /></dt>
-<dd><p>Noise standard deviation. </p>
+<dd><p>Standard deviation; uniform noise has half-width sqrt(3) * std. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties13accelerometerE">
+<span id="_CPPv3N6raisim23InertialMeasurementUnit13ImuProperties13accelerometerE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit13ImuProperties13accelerometerE"></span><span id="raisim::InertialMeasurementUnit::ImuProperties::accelerometer__ChannelProperties"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ImuProperties_1ac008b7a7331315cd9f9a611686bc031d"></span><a class="reference internal" href="#_CPPv4N6raisim23InertialMeasurementUnit17ChannelPropertiesE" title="raisim::InertialMeasurementUnit::ChannelProperties"><span class="n"><span class="pre">ChannelProperties</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">accelerometer</span></span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties13accelerometerE" title="Link to this definition"></a><br /></dt>
+<dd><p>Accelerometer parameters, using m/s^2 for channel units. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties9gyroscopeE">
+<span id="_CPPv3N6raisim23InertialMeasurementUnit13ImuProperties9gyroscopeE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit13ImuProperties9gyroscopeE"></span><span id="raisim::InertialMeasurementUnit::ImuProperties::gyroscope__ChannelProperties"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ImuProperties_1af0e6805a650c8ad9752c438985b3cf1d"></span><a class="reference internal" href="#_CPPv4N6raisim23InertialMeasurementUnit17ChannelPropertiesE" title="raisim::InertialMeasurementUnit::ChannelProperties"><span class="n"><span class="pre">ChannelProperties</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">gyroscope</span></span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties9gyroscopeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Gyroscope parameters, using rad/s for channel units. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties7latencyE">
+<span id="_CPPv3N6raisim23InertialMeasurementUnit13ImuProperties7latencyE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit13ImuProperties7latencyE"></span><span id="raisim::InertialMeasurementUnit::ImuProperties::latency__double"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ImuProperties_1afde38b81da1e4a2552580712be384b72"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">latency</span></span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties7latencyE" title="Link to this definition"></a><br /></dt>
+<dd><p>Delivery latency [s], from 0 to 60. Acquisition timestamps remain unchanged. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties4seedE">
+<span id="_CPPv3N6raisim23InertialMeasurementUnit13ImuProperties4seedE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit13ImuProperties4seedE"></span><span id="raisim::InertialMeasurementUnit::ImuProperties::seed__std::uint32_t"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ImuProperties_1aacb1889e46ba0b1ac2fee067499ab586"></span><a class="reference internal" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuPropertiesStE" title="raisim::InertialMeasurementUnit::ImuProperties::std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">seed</span></span></span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties4seedE" title="Link to this definition"></a><br /></dt>
+<dd><p>Zero derives a stream from sensor identity and owner id; nonzero selects an explicit stream. The <a class="reference internal" href="WorldSystem.html#classraisim_1_1World"><span class="std std-ref">World</span></a> environment seed is mixed into both. </p>
 </dd></dl>
 
 </div>
@@ -1849,14 +2561,7 @@ points, and timestamps without a visualizer, but it is the CPU fallback path.</p
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties17stringToNoiseTypeERKNSt6stringE">
 <span id="_CPPv3N6raisim23InertialMeasurementUnit13ImuProperties17stringToNoiseTypeERKNSt6stringE"></span><span id="_CPPv2N6raisim23InertialMeasurementUnit13ImuProperties17stringToNoiseTypeERKNSt6stringE"></span><span id="raisim::InertialMeasurementUnit::ImuProperties::stringToNoiseType__ssCR"></span><span class="target" id="structraisim_1_1InertialMeasurementUnit_1_1ImuProperties_1a3d72c7c18847df907b7a99fd0d38a629"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties9NoiseTypeE" title="raisim::InertialMeasurementUnit::ImuProperties::NoiseType"><span class="n"><span class="pre">NoiseType</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stringToNoiseType</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuPropertiesStE" title="raisim::InertialMeasurementUnit::ImuProperties::std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">type</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisim23InertialMeasurementUnit13ImuProperties17stringToNoiseTypeERKNSt6stringE" title="Link to this definition"></a><br /></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>type</strong> – <strong>[in]</strong> Noise name. </p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>GAUSSIAN for “gaussian”/”Gaussian”, UNIFORM for “uniform”/”Uniform”, otherwise NO_NOISE. </p>
-</dd>
-</dl>
+<dd><p>Parse gaussian/Gaussian or uniform/Uniform; other strings select NO_NOISE. </p>
 </dd></dl>
 
 </div>

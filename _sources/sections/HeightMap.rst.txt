@@ -105,9 +105,17 @@ full visual height array and ``updateVisualHeightPatch(...)`` updates an
 inclusive rectangular sample range without rebuilding collision. Both require
 the center and size arguments to match the current ones; the center, like that of ``update(...)``,
 is in the height map frame (``getCenterX()``, ``getCenterY()``). The patch method
-receives the full row-major height array and copies only the requested range. Per-vertex colors use ``setColor(...)``; after a full color map has been
+receives the full row-major height array and copies only the requested range;
+when every sample in the range keeps its value (bit for bit), the map reports no
+update. Per-vertex colors use ``setColor(...)``; after a full color map has been
 initialized, ``setColorPatch(...)`` updates a tightly packed rectangular color
 range.
+
+Renderers follow height edits through ``getHeightRowRevisions()``: one revision
+per sample row, advanced whenever a height in that row changes, by any of the
+update methods or by a deformable terrain sinking. Unlike the update flags and
+the dirty region that ``RaisimServer`` reads and clears, the revisions are never
+cleared, so any number of readers can track them and redraw only the edited rows.
 
 Example
 =============================
