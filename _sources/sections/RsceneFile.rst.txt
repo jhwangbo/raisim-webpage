@@ -196,7 +196,7 @@ swapped without editing the other:
    <raisim>
        <include value="[THIS_DIR]/../../city/rayrai_city.rscene"/>
        <objects>
-           <articulated_system name="anymal" urdf_path="[THIS_DIR]/../../anymal_c/urdf/anymal.urdf">
+           <articulated_system name="anymal" urdf_path="[THIS_DIR]/../../anymal_c/urdf/anymal.urdf" convexify_meshes="1">
                <state qpos="-36, -1.6, 0.56, 0.2675, 0, 0, 0.9636, 0.03, 0.4, -0.8, -0.03, 0.4, -0.8, 0.03, -0.4, 0.8, -0.03, -0.4, 0.8"
                       qvel="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
            </articulated_system>

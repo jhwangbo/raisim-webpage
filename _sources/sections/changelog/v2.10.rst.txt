@@ -1,7 +1,27 @@
 Changelog: v2.10
 ================
 
-v2.10.0 (unreleased)
+v2.10.1 (unreleased)
+--------------------
+
+Rebuild applications after updating (``RayraiGlobalAsset`` ABI change).
+
+**rayrai**
+
+* Fix: a model that asynchronous loading had copied into the staging buffers crashed the renderer when asynchronous loading was turned off before the model finished, as ``RayraiWindow::setAsyncMeshLoadingEnabled(false)`` and the TCP viewer's scene loading do. Its remaining meshes now upload from the staging buffers.
+* Fix: a staged mesh could be destroyed by a decode worker, which has no OpenGL context, when the render thread let go of it while copy helpers were still queued: after finishing the copy itself, or when a load ended without uploading it. Every staged copy now lets go of its mesh on the render thread, and one that is never uploaded (a failed or abandoned load) skips its unstarted copies and gives its staging regions and staged textures back, in the next frame of its own context when another context is current.
+* A ``RayraiGlobalAsset`` advances its model loads only in the OpenGL context current at its construction, which it now requires (``std::logic_error`` without one); ``RayraiWindow``'s store is made in the window's context. Polled with another context current (``pollAsyncLoads()``, ``pollAsyncLoadsUntil()``, the new ``requireUploadContext()``, or ``RayraiWindow::pollAsyncMeshLoads()`` and each frame's poll), it advances none of its loads, gives their staging space back and throws ``std::logic_error``; once polled in its own context, the loads finish as usual. An instanced visual's automatic mesh LOD upload, tied to the context it began in, behaves the same when polled directly (``pollAsyncMeshPreparation()``; ``releaseStagedAsyncMeshUploads()`` is new), and a draw in another context leaves it pending instead of throwing out of the pass. Loads used to crash, or mix their meshes across contexts, and a poll could tie a load that had not started uploading to the wrong context, after which the whole store stayed stuck.
+* rayrai tells OpenGL contexts apart by the context the OpenGL binding itself reports as current (GLX or EGL, WGL, CGL), not by SDL's record. A context that an embedding host such as Qt or GLFW, or plain EGL, makes current without SDL now counts as its own context. Its texture and mesh caches, upload staging and load ownership work as they do for rayrai's SDL contexts. All such contexts used to count as one, and got no upload staging.
+* Upload staging buffers belong to their OpenGL context wherever it is current, so a context handed to another thread keeps its staging there, also after the thread that made it exited. They were kept per thread: a staged mesh then could not be uploaded, and its staging space was never freed. A store destroyed before its context forgets the context's staging, so contexts made and destroyed leave none behind.
+
+**TCP viewer**
+
+* Fix: a URDF or MJCF file that RaiSim cannot load, such as one naming a missing mesh file, ended the viewer when dropped on it or passed with ``--inspect``. The inspector now reports that the load failed, and removes whatever the file had added, such as an MJCF file's floor.
+* The inspector tells MJCF from URDF by the file's root element, as dropping a file already did; a ``<mujoco>`` element after a long comment (over 64 KB) used to be taken for a URDF.
+* The inspector (a URDF or MJCF file dropped on a disconnected viewer) loads URDF collision meshes as convex hulls. It never simulates and draws collision bodies from their mesh files, so only loading changes: a 26 MB collision mesh loads in 0.36 s instead of 0.68 s.
+* Build: the inspector's loader moved to ``TcpViewerInspectorLoad.cpp``, which the raisim2Lib ``rayrai_tcp_viewer`` example now compiles too.
+
+v2.10.0 (2026-10-19)
 --------------------
 
 Rebuild applications after updating (``Camera``, ``RaisimObject``, ``RayraiWindow``, ``raisim::World``, ``ArticulatedSystem``,

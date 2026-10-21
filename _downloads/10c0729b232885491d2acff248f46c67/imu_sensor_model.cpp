@@ -42,7 +42,9 @@ int main(int, char** argv) {
         <sensor name="ideal" type="imu" update_rate="400"><origin xyz="0.1 0 0"/></sensor>
         <sensor name="modeled" type="imu" update_rate="400"><origin xyz="0.1 0 0"/></sensor>
       </link></robot>)xml";
-    auto* body = world.addArticulatedSystem(urdf);
+    raisim::ArticulatedSystemOption options;
+    options.convexifyCollisionMeshes = true;
+    auto* body = world.addArticulatedSystem(urdf, "", {}, raisim::CollisionGroup(1), raisim::CollisionGroup(-1), options);
     auto* sensors = body->getSensorSet("base");
     auto* ideal = sensors->getSensor<raisim::InertialMeasurementUnit>("ideal");
     auto* modeled = sensors->getSensor<raisim::InertialMeasurementUnit>("modeled");

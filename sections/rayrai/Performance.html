@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Performance notes and the C++ API reference &mdash; raisim 2.10.0 documentation</title>
+  <title>Performance notes and the C++ API reference &mdash; raisim 2.10.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ba8b8cd0" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../../_static/favicon.png"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=67920a36"></script>
+      <script src="../../_static/documentation_options.js?v=c3ea8e2f"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -1745,7 +1745,7 @@ renderer’s object lists must be current before the next render.</p></li>
 <dd><p>Finalize ready async mesh imports on the render thread. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>maxAssets</strong> – Maximum import/upload stages to advance (zero does no work). Instanced LOD preparation is also polled, with one submesh upload per batch. </p>
+<dd class="field-odd"><p><strong>maxAssets</strong> – Maximum import/upload stages to advance (zero does no work). Instanced LOD preparation is also polled, with one submesh upload per batch. Requires the window’s GL context: with another current, the pending uploads give their staging space back and this throws std::logic_error before any advances (as does a frame’s poll in <a class="reference internal" href="#classraisin_1_1RayraiWindow_1a08a0eaf7026ed37d7efd9a9010743c22"><span class="std std-ref">update()</span></a>). </p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Number of assets finalized. </p>
@@ -10165,7 +10165,7 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin17RayraiGlobalAsset14pollAsyncLoadsE6size_t">
 <span id="_CPPv3N6raisin17RayraiGlobalAsset14pollAsyncLoadsE6size_t"></span><span id="_CPPv2N6raisin17RayraiGlobalAsset14pollAsyncLoadsE6size_t"></span><span id="raisin::RayraiGlobalAsset::pollAsyncLoads__s"></span><span class="target" id="classraisin_1_1RayraiGlobalAsset_1a06be5276b1b683b001de328c6544d76f"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pollAsyncLoads</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxAssets</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin17RayraiGlobalAsset14pollAsyncLoadsE6size_t" title="Link to this definition"></a><br /></dt>
 <dd><p>Advance ready import, worker geometry, and incremental GPU upload stages. </p>
-<p>This must be called on the OpenGL/render thread because it creates textures, vertex buffers, and vertex array objects. Each processed asset advances one stage (import, geometry preparation, or one submesh upload) per call. </p>
+<p>This must be called on the OpenGL/render thread because it creates textures, vertex buffers, and vertex array objects. Each processed asset advances one stage (import, geometry preparation, or one submesh upload) per call. Throws std::logic_error as <a class="reference internal" href="#classraisin_1_1RayraiGlobalAsset_1a33deec9105bbdd101ea0aad60a03a3c5"><span class="std std-ref">requireUploadContext()</span></a> does, before advancing any. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>maxAssets</strong> – Maximum number of pending assets advanced in this call. </p>
@@ -10180,7 +10180,7 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin17RayraiGlobalAsset19pollAsyncLoadsUntilENSt6chrono12steady_clock10time_pointE">
 <span id="_CPPv3N6raisin17RayraiGlobalAsset19pollAsyncLoadsUntilENSt6chrono12steady_clock10time_pointE"></span><span id="_CPPv2N6raisin17RayraiGlobalAsset19pollAsyncLoadsUntilENSt6chrono12steady_clock10time_pointE"></span><span id="raisin::RayraiGlobalAsset::pollAsyncLoadsUntil__std::chrono::steady_clock::time_point"></span><span class="target" id="classraisin_1_1RayraiGlobalAsset_1aafde1c3b9c30fc81e5a7084fdd301d62"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pollAsyncLoadsUntil</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">chrono</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">steady_clock</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">time_point</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">deadline</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin17RayraiGlobalAsset19pollAsyncLoadsUntilENSt6chrono12steady_clock10time_pointE" title="Link to this definition"></a><br /></dt>
 <dd><p>Advance every pending import as far as it can go before <code class="docutils literal notranslate"><span class="pre">deadline</span></code>. </p>
-<p>Like <a class="reference internal" href="#classraisin_1_1RayraiGlobalAsset_1a06be5276b1b683b001de328c6544d76f"><span class="std std-ref">pollAsyncLoads()</span></a>, on the OpenGL/render thread, but an asset keeps advancing (one submesh upload after another) until it waits for a worker or the deadline passes. Imports whose worker finished go first, so the next worker stages start early. With async loading enabled, an import is finished only once the background decodes of its textures are done, so the render thread decodes no image. At least one ready stage runs per call. </p>
+<p>Like <a class="reference internal" href="#classraisin_1_1RayraiGlobalAsset_1a06be5276b1b683b001de328c6544d76f"><span class="std std-ref">pollAsyncLoads()</span></a>, on the OpenGL/render thread, but an asset keeps advancing (one submesh upload after another) until it waits for a worker or the deadline passes. Imports whose worker finished go first, so the next worker stages start early. With async loading enabled, an import is finished only once the background decodes of its textures are done, so the render thread decodes no image. At least one ready stage runs per call. Throws std::logic_error as <a class="reference internal" href="#classraisin_1_1RayraiGlobalAsset_1a33deec9105bbdd101ea0aad60a03a3c5"><span class="std std-ref">requireUploadContext()</span></a> does, before advancing any. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>deadline</strong> – Time after which no further stage starts. </p>
@@ -10199,6 +10199,13 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dd class="field-odd"><p>Number of mesh file imports that have not been finalized yet. </p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin17RayraiGlobalAsset20requireUploadContextEv">
+<span id="_CPPv3N6raisin17RayraiGlobalAsset20requireUploadContextEv"></span><span id="_CPPv2N6raisin17RayraiGlobalAsset20requireUploadContextEv"></span><span id="raisin::RayraiGlobalAsset::requireUploadContext"></span><span class="target" id="classraisin_1_1RayraiGlobalAsset_1a33deec9105bbdd101ea0aad60a03a3c5"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">requireUploadContext</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin17RayraiGlobalAsset20requireUploadContextEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Fails unless the OpenGL context current at construction is current. </p>
+<p>The store’s textures, vertex arrays and staging regions belong to that context, so its loads advance only there. Elsewhere every pending load first gives its staged copies back to the staging buffer (it stages again, or uploads directly, once polled in its context), and then this throws std::logic_error. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -13088,7 +13095,7 @@ Tangents are recomputed and generated LODs are dropped. The mesh is edited in pl
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals24pollAsyncMeshPreparationEv">
 <span id="_CPPv3N6raisin16InstancedVisuals24pollAsyncMeshPreparationEv"></span><span id="_CPPv2N6raisin16InstancedVisuals24pollAsyncMeshPreparationEv"></span><span id="raisin::InstancedVisuals::pollAsyncMeshPreparation"></span><span class="target" id="classraisin_1_1InstancedVisuals_1a30b24d17078f174bf6afd08965578dc0"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pollAsyncMeshPreparation</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals24pollAsyncMeshPreparationEv" title="Link to this definition"></a><br /></dt>
-<dd><p>Finish worker-prepared LODs incrementally on the render thread. Starts the worker on the first call and uploads one prepared submesh per later call; draws also call it. Requires the batch’s GL context. </p>
+<dd><p>Finish worker-prepared LODs incrementally on the render thread. Starts the worker on the first call and uploads one prepared submesh per later call; draws also call it. Requires the batch’s GL context: once its uploads began in one context, a call with another current gives the staged uploads back (see <a class="reference internal" href="#classraisin_1_1InstancedVisuals_1acad236d71b865c6daa3fd15804868e2d"><span class="std std-ref">releaseStagedAsyncMeshUploads()</span></a>) and throws std::logic_error; a draw there leaves the batch pending instead. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>True on the call that installs the finished LODs. </p>
@@ -13118,6 +13125,12 @@ Tangents are recomputed and generated LODs are dropped. The mesh is edited in pl
 <dd class="field-odd"><p>True while automatic LODs are still being prepared (the batch is not drawn). </p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin16InstancedVisuals29releaseStagedAsyncMeshUploadsEv">
+<span id="_CPPv3N6raisin16InstancedVisuals29releaseStagedAsyncMeshUploadsEv"></span><span id="_CPPv2N6raisin16InstancedVisuals29releaseStagedAsyncMeshUploadsEv"></span><span id="raisin::InstancedVisuals::releaseStagedAsyncMeshUploads"></span><span class="target" id="classraisin_1_1InstancedVisuals_1acad236d71b865c6daa3fd15804868e2d"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">releaseStagedAsyncMeshUploads</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin16InstancedVisuals29releaseStagedAsyncMeshUploadsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Gives the staging space of the prepared submeshes waiting for upload back, from any context; they stage again, or upload directly, once polled in the batch’s context. <a class="reference internal" href="#classraisin_1_1RayraiWindow"><span class="std std-ref">RayraiWindow</span></a> calls it when polled in another context. </p>
 </dd></dl>
 
 <dl class="cpp function">

@@ -63,6 +63,17 @@ OpenGL 4.3 core context, falling back to 3.3; it aborts when no context can be
 created. The caller owns both handles and releases them with
 ``SDL_GL_DeleteContext`` and ``SDL_DestroyWindow``.
 
+rayrai also works in a context that the application makes current itself,
+through Qt, GLFW or EGL. The context must come from GLX or EGL on Linux, WGL on
+Windows, or CGL on macOS, which is what those toolkits use. First point glbinding at the context's OpenGL functions
+(``glbinding::initialize`` with the toolkit's ``getProcAddress``), then construct
+the ``RayraiWindow`` and call it with that context current. rayrai tells these
+contexts apart the same way it tells its own apart: a renderer loads its meshes
+only in the context it was constructed in, and polling them with another context
+current throws ``std::logic_error``. To switch between several renderers' contexts
+on one thread, use ``makeOffscreenContextCurrent`` (see below). It takes SDL
+contexts.
+
 The offscreen path does not require an ImGui context. If an application embeds rayrai
 without ImGui, pass ``false`` for the hover and click arguments of ``RayraiWindow::update``
 or drive the camera state explicitly. The renderer guards ImGui input access, so headless

@@ -21,7 +21,7 @@ editing the other.
    <raisim version="2.0.0">
        <include value="[THIS_DIR]/../../city/rayrai_city.rscene"/>
        <objects>
-           <articulated_system name="anymal" urdf_path="[THIS_DIR]/../../anymal_c/urdf/anymal.urdf">
+           <articulated_system name="anymal" urdf_path="[THIS_DIR]/../../anymal_c/urdf/anymal.urdf" convexify_meshes="1">
                <state qpos="-36, -1.6, 0.56, ..." qvel="0 0 0 ..."/>
                <tuning control="1" kp="..." kd="..." qref="..." uref="..." feedforward="..."/>
            </articulated_system>

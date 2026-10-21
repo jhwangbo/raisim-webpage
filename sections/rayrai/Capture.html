@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Capture, diagnostics, and headless rendering &mdash; raisim 2.10.0 documentation</title>
+  <title>Capture, diagnostics, and headless rendering &mdash; raisim 2.10.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ba8b8cd0" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../../_static/favicon.png"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=67920a36"></script>
+      <script src="../../_static/documentation_options.js?v=c3ea8e2f"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -220,6 +220,16 @@ helpers to create and bind a hidden SDL window context:</p>
 OpenGL 4.3 core context, falling back to 3.3; it aborts when no context can be
 created. The caller owns both handles and releases them with
 <code class="docutils literal notranslate"><span class="pre">SDL_GL_DeleteContext</span></code> and <code class="docutils literal notranslate"><span class="pre">SDL_DestroyWindow</span></code>.</p>
+<p>rayrai also works in a context that the application makes current itself,
+through Qt, GLFW or EGL. The context must come from GLX or EGL on Linux, WGL on
+Windows, or CGL on macOS, which is what those toolkits use. First point glbinding at the context’s OpenGL functions
+(<code class="docutils literal notranslate"><span class="pre">glbinding::initialize</span></code> with the toolkit’s <code class="docutils literal notranslate"><span class="pre">getProcAddress</span></code>), then construct
+the <code class="docutils literal notranslate"><span class="pre">RayraiWindow</span></code> and call it with that context current. rayrai tells these
+contexts apart the same way it tells its own apart: a renderer loads its meshes
+only in the context it was constructed in, and polling them with another context
+current throws <code class="docutils literal notranslate"><span class="pre">std::logic_error</span></code>. To switch between several renderers’ contexts
+on one thread, use <code class="docutils literal notranslate"><span class="pre">makeOffscreenContextCurrent</span></code> (see below). It takes SDL
+contexts.</p>
 <p>The offscreen path does not require an ImGui context. If an application embeds rayrai
 without ImGui, pass <code class="docutils literal notranslate"><span class="pre">false</span></code> for the hover and click arguments of <code class="docutils literal notranslate"><span class="pre">RayraiWindow::update</span></code>
 or drive the camera state explicitly. The renderer guards ImGui input access, so headless
