@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Performance notes and the C++ API reference &mdash; raisim 2.10.1 documentation</title>
+  <title>Performance notes and the C++ API reference &mdash; raisim 2.10.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ba8b8cd0" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../../_static/favicon.png"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=c3ea8e2f"></script>
+      <script src="../../_static/documentation_options.js?v=f4120445"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -10212,11 +10212,19 @@ Prefer <a class="reference internal" href="#classraisin_1_1Camera_1a64a81eb1cb2c
 <dt class="sig sig-object cpp" id="_CPPv4N6raisin17RayraiGlobalAsset26setAsyncMeshLoadingEnabledEb">
 <span id="_CPPv3N6raisin17RayraiGlobalAsset26setAsyncMeshLoadingEnabledEb"></span><span id="_CPPv2N6raisin17RayraiGlobalAsset26setAsyncMeshLoadingEnabledEb"></span><span id="raisin::RayraiGlobalAsset::setAsyncMeshLoadingEnabled__b"></span><span class="target" id="classraisin_1_1RayraiGlobalAsset_1adcd9cefbecf7eff934886f3bca307551"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setAsyncMeshLoadingEnabled</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">enabled</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin17RayraiGlobalAsset26setAsyncMeshLoadingEnabledEb" title="Link to this definition"></a><br /></dt>
 <dd><p>Enable or disable async mesh file import for future <a class="reference internal" href="#classraisin_1_1RayraiGlobalAsset_1a176ac7a711928ef229c762853e44e38a"><span class="std std-ref">getMeshes()</span></a> calls. </p>
+<p>Loads already pending keep loading asynchronously (they wait for the background decodes of their textures and copy through the staging buffer), unless a synchronous <a class="reference internal" href="#classraisin_1_1RayraiGlobalAsset_1a176ac7a711928ef229c762853e44e38a"><span class="std std-ref">getMeshes()</span></a> waits for one of them or <a class="reference internal" href="#classraisin_1_1RayraiGlobalAsset_1a4ead5db60fc7665a645e901e2a17cbc5"><span class="std std-ref">loadPendingSynchronously()</span></a> is called. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>enabled</strong> – True (default) to import on a worker thread; finalize with <a class="reference internal" href="#classraisin_1_1RayraiGlobalAsset_1a06be5276b1b683b001de328c6544d76f"><span class="std std-ref">pollAsyncLoads()</span></a>. </p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6raisin17RayraiGlobalAsset24loadPendingSynchronouslyEv">
+<span id="_CPPv3N6raisin17RayraiGlobalAsset24loadPendingSynchronouslyEv"></span><span id="_CPPv2N6raisin17RayraiGlobalAsset24loadPendingSynchronouslyEv"></span><span id="raisin::RayraiGlobalAsset::loadPendingSynchronously"></span><span class="target" id="classraisin_1_1RayraiGlobalAsset_1a4ead5db60fc7665a645e901e2a17cbc5"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">loadPendingSynchronously</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6raisin17RayraiGlobalAsset24loadPendingSynchronouslyEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Makes every pending load finish synchronously as it is polled: it no longer waits for the background decodes of its textures or for room in the staging buffer. </p>
+<p>RayraiWindow::setAsyncMeshLoadingEnabled(false) calls this before finishing them. </p>
 </dd></dl>
 
 <dl class="cpp function">
