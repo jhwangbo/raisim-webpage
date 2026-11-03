@@ -3,6 +3,7 @@ import {RenderPanel, moduleBridge} from './render-panel.mjs';
 import {RobotFiles, droppedRobot, loadRobotCatalog} from './robot-library.mjs';
 import {degreesFromQuaternion, emptyScene, MAX_OBJECTS, MAX_ROBOTS, newObject, newRobot, nextObjectId, parseDraft, parseSceneNumber, quaternionFromDegrees, SceneHistory, serializeRscene, starterScene, validateScene} from './scene-model.mjs';
 import {LoadProgress, resolveSiteLinks} from './tool-ui.mjs';
+import {TouchTracker} from './touch-input.mjs';
 import {ensureBrowserIsolation, loadWasmBundle, openProgramStore, requireBrowserGraphics} from './wasm-cache.mjs';
 
 const tasks = new SerialTasks();
@@ -36,6 +37,8 @@ let selected = null, sim, loading, ready = false, running = false,
 let suspended = false;
 let dirty = true, resizeDirty = true, lastRatio = 0, lastTime = 0, time = 0;
 let tool = 'move', pointer, dragScene, pendingMove, rotationInputs;
+// Two fingers pinch to zoom and drag together to orbit, and cancel whatever one finger started.
+const touches = new TouchTracker();
 let moduleRetry = 0, bundleStorage;
 for (const input of document.querySelectorAll('input[type="number"]'))
   input.step = 'any';
@@ -520,8 +523,24 @@ function pick(event, height, hitObjects = true) {
   return JSON.parse(sim.UTF8ToString(pointer));
 }
 canvas.addEventListener('contextmenu', event => event.preventDefault());
+// Fingers are tracked as their events arrive, ahead of the serialized handlers below, so a finger
+// lifted while those are busy is never left behind. A finger lifted over a panel leaves the canvas
+// without its pointerup, so lifts are taken from the window.
+canvas.addEventListener('pointerdown', event => touches.down(event), {capture: true});
+canvas.addEventListener('pointermove', event => touches.move(event), {capture: true});
+for (const type of ['pointerup', 'pointercancel'])
+  window.addEventListener(type, event => touches.lift(event), {capture: true});
+window.addEventListener('blur', () => touches.clear());
 canvas.addEventListener(
     'pointerdown', protect(async event => {
+      if (event.pinchGesture) {
+        if (pointer && ready) {
+          // The first finger keeps its pointer capture through the cancelled drag, for the pinch.
+          pointer.id = undefined;
+          await finishPointer(true);
+        }
+        return;
+      }
       if (!ready || pointer) return;
       event.preventDefault();
       canvas.focus();
@@ -548,6 +567,14 @@ canvas.addEventListener(
       canvas.setPointerCapture(event.pointerId);
     }));
 function updatePointer(event) {
+  if (touches.pinch && touches.has(event.pointerId)) {
+    const step = ready && touches.advance();
+    if (step) {
+      check(sim._editor_orbit(-step.dx * .007, step.dy * .007, Math.max(-1, Math.min(1, step.zoom))));
+      dirty = true;
+    }
+    return;
+  }
   if (!pointer || event.pointerId !== pointer.id || !ready) return;
   if (pointer.move) {
     const point = pick(event, pointer.position[2], false).point;

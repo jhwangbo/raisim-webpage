@@ -1,5 +1,6 @@
 import {LoadProgress, confirmDownload, resolveSiteLinks, savedFilesButton} from './tool-ui.mjs';
 import {exampleResources, fetchOk, parseManifest, savedFiles, writeModuleFile} from './viewer-examples.mjs';
+import {limitPixelRatio, mouseFromTouch} from './touch-input.mjs';
 import {ensureBrowserIsolation, loadWasmBundle, openProgramStore, requireBrowserGraphics} from './wasm-cache.mjs';
 
 // Runs one of raisim2Lib's rayrai examples, named by ?example=, from its unchanged source. The
@@ -9,6 +10,8 @@ const byId = id => document.getElementById(id);
 const canvas = byId('canvas');
 const status = byId('status');
 const progress = new LoadProgress(byId('loading'));
+limitPixelRatio();
+mouseFromTouch(canvas);
 
 function fail(error) {
   console.error(error);
