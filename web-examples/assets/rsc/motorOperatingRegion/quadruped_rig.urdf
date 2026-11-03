@@ -1,0 +1,310 @@
+<?xml version="1.0"?>
+
+<robot name="mor_quadruped_rig">
+  <material name="body_gray"><color rgba="0.22 0.24 0.28 1"/></material>
+  <material name="hip_orange"><color rgba="0.93 0.55 0.17 1"/></material>
+  <material name="thigh_blue"><color rgba="0.20 0.48 0.86 1"/></material>
+  <material name="shank_teal"><color rgba="0.16 0.68 0.62 1"/></material>
+  <material name="foot_dark"><color rgba="0.10 0.10 0.12 1"/></material>
+
+  <link name="world"/>
+  <joint name="world_to_body" type="fixed">
+    <parent link="world"/>
+    <child link="body"/>
+    <origin xyz="0 0 0.95"/>
+  </joint>
+  <link name="body">
+    <inertial>
+      <mass value="8"/>
+      <inertia ixx="0.08" ixy="0" ixz="0" iyy="0.6" iyz="0" izz="0.6"/>
+    </inertial>
+    <visual>
+      <geometry><box size="1.0 0.3 0.12"/></geometry>
+      <material name="body_gray"/>
+    </visual>
+  </link>
+
+  
+  <joint name="LF_HAA" type="revolute">
+    <parent link="body"/>
+    <child link="LF_hip"/>
+    <origin xyz="0.45 0.15 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-0.6" upper="0.6" effort="18" velocity="60"/>
+    <dynamics damping="0.02" rotor_inertia="0.0036"/>
+  </joint>
+  <link name="LF_hip">
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.0008" ixy="0" ixz="0" iyy="0.0008" iyz="0" izz="0.0008"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0.04 0" rpy="1.5708 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.08"/></geometry>
+      <material name="hip_orange"/>
+    </visual>
+  </link>
+  <joint name="LF_HFE" type="revolute">
+    <parent link="LF_hip"/>
+    <child link="LF_thigh"/>
+    <origin xyz="0 0.08 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="30" velocity="36"/>
+    <dynamics damping="0.02" rotor_inertia="0.01"/>
+  </joint>
+  <link name="LF_thigh">
+    <inertial>
+      <origin xyz="0 0 -0.125"/>
+      <mass value="1.0"/>
+      <inertia ixx="0.0055" ixy="0" ixz="0" iyy="0.0055" iyz="0" izz="0.0008"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 -0.125"/>
+      <geometry><capsule radius="0.03" length="0.25"/></geometry>
+      <material name="thigh_blue"/>
+    </visual>
+  </link>
+  <joint name="LF_KFE" type="revolute">
+    <parent link="LF_thigh"/>
+    <child link="LF_shank"/>
+    <origin xyz="0 0 -0.25"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="30" velocity="36"/>
+    <dynamics damping="0.02" rotor_inertia="0.01"/>
+  </joint>
+  <link name="LF_shank">
+    <inertial>
+      <origin xyz="0 0 -0.14"/>
+      <mass value="0.35"/>
+      <inertia ixx="0.002" ixy="0" ixz="0" iyy="0.002" iyz="0" izz="0.0002"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 -0.125"/>
+      <geometry><capsule radius="0.022" length="0.25"/></geometry>
+      <material name="shank_teal"/>
+    </visual>
+    <visual>
+      <origin xyz="0 0 -0.25"/>
+      <geometry><sphere radius="0.035"/></geometry>
+      <material name="foot_dark"/>
+    </visual>
+  </link>
+  <actuator joint="LF_HAA" file="abduction_actuator.xml"/>
+  <actuator joint="LF_HFE" file="hound_leg_actuator.xml"/>
+  <actuator joint="LF_KFE" file="hound_leg_actuator.xml">
+    <coupling joint="LF_HFE" ratio="1"/>
+  </actuator>
+
+  
+  <joint name="RF_HAA" type="revolute">
+    <parent link="body"/>
+    <child link="RF_hip"/>
+    <origin xyz="0.45 -0.15 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-0.6" upper="0.6" effort="18" velocity="60"/>
+    <dynamics damping="0.02" rotor_inertia="0.0036"/>
+  </joint>
+  <link name="RF_hip">
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.0008" ixy="0" ixz="0" iyy="0.0008" iyz="0" izz="0.0008"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 -0.04 0" rpy="1.5708 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.08"/></geometry>
+      <material name="hip_orange"/>
+    </visual>
+  </link>
+  <joint name="RF_HFE" type="revolute">
+    <parent link="RF_hip"/>
+    <child link="RF_thigh"/>
+    <origin xyz="0 -0.08 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="30" velocity="36"/>
+    <dynamics damping="0.02" rotor_inertia="0.01"/>
+  </joint>
+  <link name="RF_thigh">
+    <inertial>
+      <origin xyz="0 0 -0.125"/>
+      <mass value="1.0"/>
+      <inertia ixx="0.0055" ixy="0" ixz="0" iyy="0.0055" iyz="0" izz="0.0008"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 -0.125"/>
+      <geometry><capsule radius="0.03" length="0.25"/></geometry>
+      <material name="thigh_blue"/>
+    </visual>
+  </link>
+  <joint name="RF_KFE" type="revolute">
+    <parent link="RF_thigh"/>
+    <child link="RF_shank"/>
+    <origin xyz="0 0 -0.25"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="30" velocity="36"/>
+    <dynamics damping="0.02" rotor_inertia="0.01"/>
+  </joint>
+  <link name="RF_shank">
+    <inertial>
+      <origin xyz="0 0 -0.14"/>
+      <mass value="0.35"/>
+      <inertia ixx="0.002" ixy="0" ixz="0" iyy="0.002" iyz="0" izz="0.0002"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 -0.125"/>
+      <geometry><capsule radius="0.022" length="0.25"/></geometry>
+      <material name="shank_teal"/>
+    </visual>
+    <visual>
+      <origin xyz="0 0 -0.25"/>
+      <geometry><sphere radius="0.035"/></geometry>
+      <material name="foot_dark"/>
+    </visual>
+  </link>
+  <actuator joint="RF_HAA" file="abduction_actuator.xml"/>
+  <actuator joint="RF_HFE" file="hound_leg_actuator.xml"/>
+  <actuator joint="RF_KFE" file="hound_leg_actuator.xml">
+    <coupling joint="RF_HFE" ratio="1"/>
+  </actuator>
+
+  
+  <joint name="LH_HAA" type="revolute">
+    <parent link="body"/>
+    <child link="LH_hip"/>
+    <origin xyz="-0.45 0.15 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-0.6" upper="0.6" effort="18" velocity="60"/>
+    <dynamics damping="0.02" rotor_inertia="0.0036"/>
+  </joint>
+  <link name="LH_hip">
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.0008" ixy="0" ixz="0" iyy="0.0008" iyz="0" izz="0.0008"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0.04 0" rpy="1.5708 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.08"/></geometry>
+      <material name="hip_orange"/>
+    </visual>
+  </link>
+  <joint name="LH_HFE" type="revolute">
+    <parent link="LH_hip"/>
+    <child link="LH_thigh"/>
+    <origin xyz="0 0.08 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="30" velocity="36"/>
+    <dynamics damping="0.02" rotor_inertia="0.01"/>
+  </joint>
+  <link name="LH_thigh">
+    <inertial>
+      <origin xyz="0 0 -0.125"/>
+      <mass value="1.0"/>
+      <inertia ixx="0.0055" ixy="0" ixz="0" iyy="0.0055" iyz="0" izz="0.0008"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 -0.125"/>
+      <geometry><capsule radius="0.03" length="0.25"/></geometry>
+      <material name="thigh_blue"/>
+    </visual>
+  </link>
+  <joint name="LH_KFE" type="revolute">
+    <parent link="LH_thigh"/>
+    <child link="LH_shank"/>
+    <origin xyz="0 0 -0.25"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="30" velocity="36"/>
+    <dynamics damping="0.02" rotor_inertia="0.01"/>
+  </joint>
+  <link name="LH_shank">
+    <inertial>
+      <origin xyz="0 0 -0.14"/>
+      <mass value="0.35"/>
+      <inertia ixx="0.002" ixy="0" ixz="0" iyy="0.002" iyz="0" izz="0.0002"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 -0.125"/>
+      <geometry><capsule radius="0.022" length="0.25"/></geometry>
+      <material name="shank_teal"/>
+    </visual>
+    <visual>
+      <origin xyz="0 0 -0.25"/>
+      <geometry><sphere radius="0.035"/></geometry>
+      <material name="foot_dark"/>
+    </visual>
+  </link>
+  <actuator joint="LH_HAA" file="abduction_actuator.xml"/>
+  <actuator joint="LH_HFE" file="hound_leg_actuator.xml"/>
+  <actuator joint="LH_KFE" file="hound_leg_actuator.xml">
+    <coupling joint="LH_HFE" ratio="1"/>
+  </actuator>
+
+  
+  <joint name="RH_HAA" type="revolute">
+    <parent link="body"/>
+    <child link="RH_hip"/>
+    <origin xyz="-0.45 -0.15 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-0.6" upper="0.6" effort="18" velocity="60"/>
+    <dynamics damping="0.02" rotor_inertia="0.0036"/>
+  </joint>
+  <link name="RH_hip">
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.0008" ixy="0" ixz="0" iyy="0.0008" iyz="0" izz="0.0008"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 -0.04 0" rpy="1.5708 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.08"/></geometry>
+      <material name="hip_orange"/>
+    </visual>
+  </link>
+  <joint name="RH_HFE" type="revolute">
+    <parent link="RH_hip"/>
+    <child link="RH_thigh"/>
+    <origin xyz="0 -0.08 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="30" velocity="36"/>
+    <dynamics damping="0.02" rotor_inertia="0.01"/>
+  </joint>
+  <link name="RH_thigh">
+    <inertial>
+      <origin xyz="0 0 -0.125"/>
+      <mass value="1.0"/>
+      <inertia ixx="0.0055" ixy="0" ixz="0" iyy="0.0055" iyz="0" izz="0.0008"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 -0.125"/>
+      <geometry><capsule radius="0.03" length="0.25"/></geometry>
+      <material name="thigh_blue"/>
+    </visual>
+  </link>
+  <joint name="RH_KFE" type="revolute">
+    <parent link="RH_thigh"/>
+    <child link="RH_shank"/>
+    <origin xyz="0 0 -0.25"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="30" velocity="36"/>
+    <dynamics damping="0.02" rotor_inertia="0.01"/>
+  </joint>
+  <link name="RH_shank">
+    <inertial>
+      <origin xyz="0 0 -0.14"/>
+      <mass value="0.35"/>
+      <inertia ixx="0.002" ixy="0" ixz="0" iyy="0.002" iyz="0" izz="0.0002"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 -0.125"/>
+      <geometry><capsule radius="0.022" length="0.25"/></geometry>
+      <material name="shank_teal"/>
+    </visual>
+    <visual>
+      <origin xyz="0 0 -0.25"/>
+      <geometry><sphere radius="0.035"/></geometry>
+      <material name="foot_dark"/>
+    </visual>
+  </link>
+  <actuator joint="RH_HAA" file="abduction_actuator.xml"/>
+  <actuator joint="RH_HFE" file="hound_leg_actuator.xml"/>
+  <actuator joint="RH_KFE" file="hound_leg_actuator.xml">
+    <coupling joint="RH_HFE" ratio="1"/>
+  </actuator>
+</robot>

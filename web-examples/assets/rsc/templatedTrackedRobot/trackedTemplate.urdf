@@ -1,0 +1,215 @@
+<?xml version="1.0" ?>
+
+<robot name="tracked_robot">
+  <material name="Body">
+    <color rgba="0.85 0.55 0.12 1.0"/>
+  </material>
+  <material name="Hub">
+    <color rgba="0.65 0.65 0.68 1.0"/>
+  </material>
+  <material name="Spoke">
+    <color rgba="0.95 0.85 0.2 1.0"/>
+  </material>
+
+  <link name="base_link">
+    <inertial>
+      <mass value="{@@rho*@@base_length*@@base_width*0.2}"/>
+      <origin xyz="0 0 0.12"/>
+      <inertia ixx="{@@rho*@@base_length*@@base_width*0.2*(@@base_width*@@base_width+0.04)/12}"
+               iyy="{@@rho*@@base_length*@@base_width*0.2*(@@base_length*@@base_length+0.04)/12}"
+               izz="{@@rho*@@base_length*@@base_width*0.2*(@@base_length*@@base_length+@@base_width*@@base_width)/12}"
+               ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0.12"/>
+      <geometry>
+        <box size="@@base_length @@base_width 0.2"/>
+      </geometry>
+      <material name="Body"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.12"/>
+      <geometry>
+        <box size="@@base_length @@base_width 0.2"/>
+      </geometry>
+    </collision>
+  </link>
+
+  
+  <link name="left_sprocket_link">
+    <inertial>
+      <mass value="{@@rho*@@wheel_width*@@wheel_radius*@@wheel_radius*0.94}"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="0.01" iyy="{@@rho*@@wheel_width*@@wheel_radius*@@wheel_radius*0.47*@@wheel_radius*@@wheel_radius}"
+               izz="0.01" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+    <visual>
+      <origin rpy="1.5708 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder length="{@@wheel_width+0.02}" radius="{@@wheel_radius*0.55}"/>
+      </geometry>
+      <material name="Hub"/>
+    </visual>
+    <visual>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <box size="{@@wheel_radius*1.05} {@@wheel_width+0.024} 0.03"/>
+      </geometry>
+      <material name="Spoke"/>
+    </visual>
+  </link>
+  <joint name="left_sprocket" type="continuous">
+    <parent link="base_link"/>
+    <child link="left_sprocket_link"/>
+    <origin xyz="{@@base_length*0.5} @@wheel_y_offset 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+  <link name="right_sprocket_link">
+    <inertial>
+      <mass value="{@@rho*@@wheel_width*@@wheel_radius*@@wheel_radius*0.94}"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="0.01" iyy="{@@rho*@@wheel_width*@@wheel_radius*@@wheel_radius*0.47*@@wheel_radius*@@wheel_radius}"
+               izz="0.01" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+    <visual>
+      <origin rpy="1.5708 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder length="{@@wheel_width+0.02}" radius="{@@wheel_radius*0.55}"/>
+      </geometry>
+      <material name="Hub"/>
+    </visual>
+    <visual>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <box size="{@@wheel_radius*1.05} {@@wheel_width+0.024} 0.03"/>
+      </geometry>
+      <material name="Spoke"/>
+    </visual>
+  </link>
+  <joint name="right_sprocket" type="continuous">
+    <parent link="base_link"/>
+    <child link="right_sprocket_link"/>
+    <origin xyz="{@@base_length*0.5} -@@wheel_y_offset 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+
+  
+  <link name="left_idler_link">
+    <visual>
+      <origin rpy="1.5708 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder length="{@@wheel_width+0.02}" radius="{@@wheel_radius*0.55}"/>
+      </geometry>
+      <material name="Hub"/>
+    </visual>
+  </link>
+  <joint name="left_idler" type="fixed">
+    <parent link="base_link"/>
+    <child link="left_idler_link"/>
+    <origin xyz="-{@@base_length*0.5} @@wheel_y_offset 0"/>
+  </joint>
+
+  <link name="right_idler_link">
+    <visual>
+      <origin rpy="1.5708 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder length="{@@wheel_width+0.02}" radius="{@@wheel_radius*0.55}"/>
+      </geometry>
+      <material name="Hub"/>
+    </visual>
+  </link>
+  <joint name="right_idler" type="fixed">
+    <parent link="base_link"/>
+    <child link="right_idler_link"/>
+    <origin xyz="-{@@base_length*0.5} -@@wheel_y_offset 0"/>
+  </joint>
+
+  
+  <link name="left_flipper">
+    <inertial>
+      <mass value="{@@rho*@@wheel_width*@@flipper_radius*@@flipper_radius*1.57}"/>
+      <origin xyz="0.15 0 0"/>
+      <inertia ixx="0.01" iyy="0.03" izz="0.03" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+    <visual>
+      <origin rpy="1.5708 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder length="{@@wheel_width+0.02}" radius="{@@flipper_radius*0.55}"/>
+      </geometry>
+      <material name="Hub"/>
+    </visual>
+    <visual>
+      <origin rpy="1.5708 0 0" xyz="0.35 0 0"/>
+      <geometry>
+        <cylinder length="{@@wheel_width+0.02}" radius="{@@flipper_radius*0.3}"/>
+      </geometry>
+      <material name="Hub"/>
+    </visual>
+  </link>
+  <joint name="left_flipper_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="left_flipper"/>
+    <origin xyz="{@@base_length*0.5} @@track_y_offset 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+  <link name="right_flipper">
+    <inertial>
+      <mass value="{@@rho*@@wheel_width*@@flipper_radius*@@flipper_radius*1.57}"/>
+      <origin xyz="0.15 0 0"/>
+      <inertia ixx="0.01" iyy="0.03" izz="0.03" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+    <visual>
+      <origin rpy="1.5708 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder length="{@@wheel_width+0.02}" radius="{@@flipper_radius*0.55}"/>
+      </geometry>
+      <material name="Hub"/>
+    </visual>
+    <visual>
+      <origin rpy="1.5708 0 0" xyz="0.35 0 0"/>
+      <geometry>
+        <cylinder length="{@@wheel_width+0.02}" radius="{@@flipper_radius*0.3}"/>
+      </geometry>
+      <material name="Hub"/>
+    </visual>
+  </link>
+  <joint name="right_flipper_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="right_flipper"/>
+    <origin xyz="{@@base_length*0.5} -@@track_y_offset 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+  
+  <track name="left" link="base_link" width="@@wheel_width" thickness="@@track_thickness" color="0.2 0.2 0.22 1">
+    <axis xyz="0 1 0"/>
+    <wheel joint="left_sprocket" radius="@@wheel_radius"/>
+    <wheel joint="left_idler" radius="@@wheel_radius"/>
+    <drive joint="left_sprocket" gain="@@wheel_radius"/>
+  </track>
+  <track name="right" link="base_link" width="@@wheel_width" thickness="@@track_thickness" color="0.2 0.2 0.22 1">
+    <axis xyz="0 1 0"/>
+    <wheel joint="right_sprocket" radius="@@wheel_radius"/>
+    <wheel joint="right_idler" radius="@@wheel_radius"/>
+    <drive joint="right_sprocket" gain="@@wheel_radius"/>
+  </track>
+
+  
+  <track name="left_flipper" link="left_flipper" width="@@wheel_width" thickness="@@track_thickness" color="0.2 0.2 0.22 1">
+    <axis xyz="0 1 0"/>
+    <wheel xyz="0 0 0" radius="@@flipper_radius"/>
+    <wheel xyz="0.35 0 0" radius="{@@flipper_radius*0.55}"/>
+    <drive joint="left_sprocket" gain="@@wheel_radius"/>
+    <drive joint="left_flipper_joint" gain="-@@wheel_radius"/>
+  </track>
+  <track name="right_flipper" link="right_flipper" width="@@wheel_width" thickness="@@track_thickness" color="0.2 0.2 0.22 1">
+    <axis xyz="0 1 0"/>
+    <wheel xyz="0 0 0" radius="@@flipper_radius"/>
+    <wheel xyz="0.35 0 0" radius="{@@flipper_radius*0.55}"/>
+    <drive joint="right_sprocket" gain="@@wheel_radius"/>
+    <drive joint="right_flipper_joint" gain="-@@wheel_radius"/>
+  </track>
+</robot>
