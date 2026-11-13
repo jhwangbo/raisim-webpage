@@ -2,6 +2,7 @@ import {LoadProgress, confirmDownload, resolveSiteLinks, savedFilesButton} from 
 import {exampleResources, fetchOk, parseManifest, savedFiles, writeModuleFile} from './viewer-examples.mjs';
 import {limitPixelRatio, mouseFromTouch} from './touch-input.mjs';
 import {ensureBrowserIsolation, loadWasmBundle, openProgramStore, requireBrowserGraphics} from './wasm-cache.mjs';
+import {installFemWorkbench} from './fem-workbench.mjs';
 
 // Runs one of raisim2Lib's rayrai examples, named by ?example=, from its unchanged source. The
 // example draws on this page's canvas through WebGPU and runs on the page's main thread, yielding
@@ -65,6 +66,7 @@ async function boot() {
     locateFile: file => new URL(file, import.meta.url).href,
   });
   for (const {path, bytes} of files) writeModuleFile(module, module._rayrai_example_write_file, path, bytes);
+  if (name === 'rayrai_fem_workbench') installFemWorkbench(module, canvas);
   progress.done();
   byId('cache-status').textContent = bundle.storage === 'reused' ? 'Using the simulator saved in this browser.' :
       bundle.storage === 'saved' ? 'Simulator saved in this browser for your next visit.' :

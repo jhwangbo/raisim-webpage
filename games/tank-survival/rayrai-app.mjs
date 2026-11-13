@@ -68,16 +68,51 @@ async function download(url, onBytes) {
 // arrive and keep(path, bytes) for each.
 async function fetchAssets(manifestUrl, onBytes, keep) {
   manifestUrl = new URL(manifestUrl, location.href);
-  const response = await fetch(manifestUrl);
+  const response = await fetch(manifestUrl, {cache: 'no-cache'});
   if (!response.ok) throw Error(`Cannot load ${manifestUrl.pathname}: HTTP ${response.status}`);
   const {folder, bytes, program, files} = await response.json();
   const base = new URL(folder.replace(/\/*$/, '/'), manifestUrl);
+  let cache;
+  try { if (globalThis.crypto?.subtle) cache = await globalThis.caches?.open('rayrai-assets-v1'); } catch {}
+  const digest = async data => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', data)),
+      byte => byte.toString(16).padStart(2, '0')).join('');
   let next = 0;
   const fetchNext = async () => {
     while (next < files.length) {
-      const path = files[next++][0];
+      const [path, size, hash] = files[next++];
       const url = new URL(path.replace(/^\/+/, '').split('/').map(encodeURIComponent).join('/'), base);
-      keep(path, await download(url.href, onBytes));
+      const versioned = /^[a-f0-9]{64}$/.test(hash);
+      if (versioned) url.searchParams.set('sha256', hash);
+      let data;
+      if (cache && versioned) {
+        try {
+          const saved = await cache.match(url.href);
+          if (saved) {
+            const bytes = new Uint8Array(await saved.arrayBuffer());
+            if (bytes.byteLength === size && await digest(bytes) === hash) data = bytes;
+            else await cache.delete(url.href);
+          }
+        } catch {}
+      }
+      if (data) onBytes(data.byteLength);
+      else {
+        data = await download(url.href, onBytes);
+        if (versioned && (data.byteLength !== size ||
+            (globalThis.crypto?.subtle && await digest(data) !== hash)))
+          throw Error(`Asset integrity check failed: ${path}`);
+        if (cache && versioned) {
+          try {
+            await cache.put(url.href, new Response(data));
+            for (const request of await cache.keys()) {
+              const old = new URL(request.url);
+              if (old.origin === url.origin && old.pathname === url.pathname && old.href !== url.href)
+                await cache.delete(request);
+            }
+          }
+          catch (error) { console.warn(`Could not save ${path}: ${error.message}`); }
+        }
+      }
+      keep(path, data);
     }
   };
   const done = Promise.all(Array.from({length: Math.min(6, files.length)}, fetchNext));
