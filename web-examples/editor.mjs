@@ -506,7 +506,7 @@ $('export').addEventListener(
       const robots = history.current.objects.some(object => object.type === 'robot');
       message(robots ?
           'Exported scene.rscene. Its robots name rsc/… (raisim2Lib\'s rsc folder) and robots/… paths next to the scene.' :
-          'Exported the authored scene to scene.rscene. Open it in RaiSim or RaiSim Engine 2.');
+          'Exported the authored scene to scene.rscene. Open it in RaiSim.');
     }));
 for (const mode of ['move', 'orbit'])
   $(mode + '-tool').addEventListener('click', () => {
