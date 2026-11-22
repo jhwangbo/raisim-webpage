@@ -92,6 +92,11 @@ class Channel {
   }
 }
 
+export async function waitForExamplePort(buffer, address) {
+  const channel = new Channel(buffer, address);
+  while (!channel.port) await new Promise(resolve => setTimeout(resolve, 16));
+}
+
 export async function fetchOk(url, what) {
   const response = await fetch(url, {cache: 'no-cache', credentials: 'same-origin'});
   if (!response.ok) throw Error(`Could not download ${what}. Try again.`);
@@ -312,10 +317,16 @@ export class ExampleRuntime {
     const worker = new Worker(this.workerUrl, {type: 'module', name: `raisim example ${process.example.name}`});
     process.worker = worker;
     worker.onmessage = ({data}) => {
+      if (process.state === 'exited') return;
       if (data.type === 'output') this.print(process, data.text);
       else if (data.type === 'channel') {
-        process.channel = new Channel(data.buffer, data.address);
-        process.state = 'running';
+        try {
+          for (const {path, bytes} of data.visualFiles ?? []) this.viewerFiles(path, bytes);
+          process.channel = new Channel(data.buffer, data.address);
+          process.state = 'running';
+        } catch (error) {
+          this.exit(process, -1, error);
+        }
       } else if (data.type === 'exit') this.exit(process, data.code, data.reason && Error(data.reason));
     };
     worker.onerror = event => this.exit(process, -1, Error(event.message || 'The example stopped.'));
